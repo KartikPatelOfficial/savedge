@@ -45,7 +45,7 @@ abstract class RegisterModule {
     );
 
     // Configure SSL certificate handling for development
-    if (kDebugMode && Platform.isAndroid) {
+    if (kDebugMode && !kIsWeb && Platform.isAndroid) {
       // For Android, you might need to add a custom certificate handler
       dio.httpClientAdapter = DefaultHttpClientAdapter()
         ..onHttpClientCreate = (client) {
