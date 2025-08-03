@@ -1,0 +1,29 @@
+/// Application-wide constants
+class AppConstants {
+  AppConstants._();
+
+  // API Constants
+  static const String baseUrl = 'https://10.0.2.2:44447';
+  static const String apiVersion = 'v1';
+  static const Duration connectionTimeout = Duration(seconds: 30);
+  static const Duration receiveTimeout = Duration(seconds: 30);
+
+  // Storage Keys
+  static const String authTokenKey = 'auth_token';
+  static const String userDataKey = 'user_data';
+  static const String themeKey = 'theme_mode';
+
+  // App Info
+  static const String appName = 'Savedge';
+  static const String appVersion = '1.0.0';
+
+  // Validation
+  static const int minPasswordLength = 8;
+  static const int maxPasswordLength = 50;
+  static const int maxNameLength = 100;
+
+  // UI
+  static const double defaultPadding = 16.0;
+  static const double defaultRadius = 8.0;
+  static const Duration defaultAnimationDuration = Duration(milliseconds: 300);
+}
