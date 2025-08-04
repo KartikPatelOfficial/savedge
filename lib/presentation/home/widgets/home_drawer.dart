@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:savedge/presentation/stores/stores_page.dart';
 
 /// Model class for drawer menu items
 class DrawerMenuItem {
@@ -35,7 +36,7 @@ class HomeDrawer extends StatelessWidget {
             // Menu Items
             Expanded(
               child: _MenuItemsList(
-                items: _getMenuItems(),
+                items: _getMenuItems(context),
                 onItemTap: onMenuItemTap,
               ),
             ),
@@ -45,13 +46,17 @@ class HomeDrawer extends StatelessWidget {
     );
   }
 
-  List<DrawerMenuItem> _getMenuItems() {
+  List<DrawerMenuItem> _getMenuItems(BuildContext context) {
     return [
       const DrawerMenuItem(
         icon: Icons.local_offer_outlined,
         title: 'Current Offers',
       ),
-      const DrawerMenuItem(icon: Icons.store_outlined, title: 'Stores'),
+      DrawerMenuItem(
+        icon: Icons.store_outlined,
+        title: 'Stores',
+        onTap: () => _navigateToStores(context),
+      ),
       const DrawerMenuItem(icon: Icons.info_outline, title: 'About Us'),
       const DrawerMenuItem(icon: Icons.feedback_outlined, title: 'Feedback'),
       const DrawerMenuItem(icon: Icons.phone_outlined, title: 'Contact Us'),
@@ -61,6 +66,14 @@ class HomeDrawer extends StatelessWidget {
         title: 'Brand Vouchers',
       ),
     ];
+  }
+
+  void _navigateToStores(BuildContext context) {
+    Navigator.pop(context); // Close drawer first
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const StoresPage()),
+    );
   }
 }
 

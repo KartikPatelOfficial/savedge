@@ -19,15 +19,22 @@ part 'auth_state.dart';
 /// BLoC for handling authentication flow
 @injectable
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
-  AuthBloc(
-    this._sendOtpUseCase,
-    this._verifyOtpUseCase,
-    this._checkUserExistsUseCase,
-    this._registerUserUseCase,
-    this._syncUserProfileUseCase,
-    this._getCurrentUserUseCase,
-    this._signOutUseCase,
-  ) : super(AuthInitial()) {
+  AuthBloc({
+    required SendOtpUseCase sendOtpUseCase,
+    required VerifyOtpUseCase verifyOtpUseCase,
+    required CheckUserExistsUseCase checkUserExistsUseCase,
+    required RegisterUserUseCase registerUserUseCase,
+    required SyncUserProfileUseCase syncUserProfileUseCase,
+    required GetCurrentUserUseCase getCurrentUserUseCase,
+    required SignOutUseCase signOutUseCase,
+  }) : _sendOtpUseCase = sendOtpUseCase,
+       _verifyOtpUseCase = verifyOtpUseCase,
+       _checkUserExistsUseCase = checkUserExistsUseCase,
+       _registerUserUseCase = registerUserUseCase,
+       _syncUserProfileUseCase = syncUserProfileUseCase,
+       _getCurrentUserUseCase = getCurrentUserUseCase,
+       _signOutUseCase = signOutUseCase,
+       super(AuthInitial()) {
     on<CheckAuthStatusEvent>(_onCheckAuthStatus);
     on<SendOtpEvent>(_onSendOtp);
     on<VerifyOtpEvent>(_onVerifyOtp);
@@ -58,7 +65,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
 
     result.fold(
-      (failure) => emit(AuthError(failure.message)),
+      (failure) => emit(AuthError(failure.message ?? 'Failed to send OTP')),
       (phoneAuth) => emit(AuthOtpSent(phoneAuth)),
     );
   }
@@ -73,10 +80,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       VerifyOtpParams(verificationId: event.verificationId, otp: event.otp),
     );
 
-    result.fold((failure) => emit(AuthError(failure.message)), (firebaseUser) {
-      _currentFirebaseUser = firebaseUser;
-      emit(AuthFirebaseSuccess(firebaseUser));
-    });
+    result.fold(
+      (failure) => emit(AuthError(failure.message ?? "Failed to verify OTP")),
+      (firebaseUser) {
+        _currentFirebaseUser = firebaseUser;
+        emit(AuthFirebaseSuccess(firebaseUser));
+      },
+    );
   }
 
   Future<void> _onCheckUserExists(
@@ -87,21 +97,23 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
     final result = await _checkUserExistsUseCase();
 
-    result.fold((failure) => emit(AuthError(failure.message)), (
-      userExistsResult,
-    ) {
-      if (userExistsResult.exists && _currentFirebaseUser != null) {
-        emit(
-          AuthUserExists(
-            _currentFirebaseUser!,
-            isEmployee: userExistsResult.isEmployee,
-            user: userExistsResult.user,
-          ),
-        );
-      } else {
-        emit(AuthUserNotExists());
-      }
-    });
+    result.fold(
+      (failure) =>
+          emit(AuthError(failure.message ?? "Failed to check user existence")),
+      (userExistsResult) {
+        if (userExistsResult.exists && _currentFirebaseUser != null) {
+          emit(
+            AuthUserExists(
+              _currentFirebaseUser!,
+              isEmployee: userExistsResult.isEmployee,
+              user: userExistsResult.user,
+            ),
+          );
+        } else {
+          emit(AuthUserNotExists());
+        }
+      },
+    );
   }
 
   Future<void> _onRegisterUser(
@@ -119,7 +131,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
 
     result.fold(
-      (failure) => emit(AuthError(failure.message)),
+      (failure) =>
+          emit(AuthError(failure.message ?? "Failed to register user")),
       (user) => emit(AuthRegisterSuccess(user)),
     );
   }
@@ -135,7 +148,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
 
     result.fold(
-      (failure) => emit(AuthError(failure.message)),
+      (failure) =>
+          emit(AuthError(failure.message ?? "Failed to sync user profile")),
       (user) => emit(AuthSyncSuccess(user)),
     );
   }
@@ -223,7 +237,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     final result = await _signOutUseCase();
 
     result.fold(
-      (failure) => emit(AuthError(failure.message)),
+      (failure) => emit(AuthError(failure.message ?? 'Failed to sign out')),
       (_) => emit(AuthSignedOut()),
     );
   }

@@ -1,7 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:injectable/injectable.dart';
-
 import 'package:savedge/core/error/exceptions.dart';
 import 'package:savedge/core/error/failures.dart';
 import 'package:savedge/features/auth/data/datasources/auth_local_data_source.dart';
@@ -32,11 +31,11 @@ class AuthRepositoryImpl implements AuthRepository {
       final response = await _remoteDataSource.checkUserExists();
       return Right(response.exists);
     } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message, statusCode: e.statusCode));
+      return Left(ServerFailure(e.message));
     } on NetworkException catch (e) {
-      return Left(NetworkFailure(message: e.message, statusCode: e.statusCode));
+      return Left(NetworkFailure(e.message));
     } catch (e) {
-      return Left(UnexpectedFailure(message: e.toString()));
+      return Left(UnexpectedFailure(e.toString()));
     }
   }
 
@@ -44,25 +43,23 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<Failure, UserExistsResult>> checkUserExistsWithProfile() async {
     try {
       final response = await _remoteDataSource.checkUserExists();
-      
+
       if (response.exists && response.userProfile != null) {
         final user = response.userProfile!.toUserModel().toEntity();
         final isEmployee = response.userProfile!.isEmployee;
-        
-        return Right(UserExistsResult(
-          exists: true,
-          user: user,
-          isEmployee: isEmployee,
-        ));
+
+        return Right(
+          UserExistsResult(exists: true, user: user, isEmployee: isEmployee),
+        );
       } else {
         return const Right(UserExistsResult(exists: false));
       }
     } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message, statusCode: e.statusCode));
+      return Left(ServerFailure(e.message));
     } on NetworkException catch (e) {
-      return Left(NetworkFailure(message: e.message, statusCode: e.statusCode));
+      return Left(NetworkFailure(e.message));
     } catch (e) {
-      return Left(UnexpectedFailure(message: e.toString()));
+      return Left(UnexpectedFailure(e.toString()));
     }
   }
 
@@ -78,7 +75,7 @@ class AuthRepositoryImpl implements AuthRepository {
         firstName: firstName,
         lastName: lastName,
       );
-      
+
       final response = await _remoteDataSource.registerUser(request);
       final user = User(
         id: response.id,
@@ -88,22 +85,22 @@ class AuthRepositoryImpl implements AuthRepository {
         lastName: response.lastName,
         organizationId: response.organizationId,
         organizationName: response.organizationName,
-        pointsBalance: response.pointsBalance ?? 0,
+        pointsBalance: response.pointsBalance,
         pointsExpiry: response.pointsExpiry,
-        isActive: response.isActive ?? true,
+        isActive: response.isActive,
         createdAt: response.createdAt,
       );
-      
+
       // Cache user locally
       await _localDataSource.cacheUser(user.toModel());
-      
+
       return Right(user);
     } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message, statusCode: e.statusCode));
+      return Left(ServerFailure(e.message));
     } on NetworkException catch (e) {
-      return Left(NetworkFailure(message: e.message, statusCode: e.statusCode));
+      return Left(NetworkFailure(e.message));
     } catch (e) {
-      return Left(UnexpectedFailure(message: e.toString()));
+      return Left(UnexpectedFailure(e.toString()));
     }
   }
 
@@ -113,11 +110,8 @@ class AuthRepositoryImpl implements AuthRepository {
     String? displayName,
   }) async {
     try {
-      final request = SyncUserRequest(
-        email: email,
-        displayName: displayName,
-      );
-      
+      final request = SyncUserRequest(email: email, displayName: displayName);
+
       final response = await _remoteDataSource.syncUserProfile(request);
       final user = User(
         id: response.id,
@@ -126,23 +120,23 @@ class AuthRepositoryImpl implements AuthRepository {
         firstName: response.firstName,
         lastName: response.lastName,
         organizationId: response.organizationId,
-        organizationName: response.organizationId.toString(),
-        pointsBalance: response.pointsBalance ?? 0,
+        organizationName: response.organizationId?.toString() ?? '',
+        pointsBalance: response.pointsBalance,
         pointsExpiry: response.pointsExpiry,
-        isActive: response.isActive ?? true,
+        isActive: response.isActive,
         createdAt: response.createdAt,
       );
-      
+
       // Cache user locally
       await _localDataSource.cacheUser(user.toModel());
-      
+
       return Right(user);
     } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message, statusCode: e.statusCode));
+      return Left(ServerFailure(e.message));
     } on NetworkException catch (e) {
-      return Left(NetworkFailure(message: e.message, statusCode: e.statusCode));
+      return Left(NetworkFailure(e.message));
     } catch (e) {
-      return Left(UnexpectedFailure(message: e.toString()));
+      return Left(UnexpectedFailure(e.toString()));
     }
   }
 
@@ -157,20 +151,23 @@ class AuthRepositoryImpl implements AuthRepository {
         firstName: response.firstName,
         lastName: response.lastName,
         organizationId: response.organizationId,
-        organizationName: response.organizationId.toString(),
-        pointsBalance: response.pointsBalance ?? 0,
+        organizationName: response.organizationId?.toString() ?? '',
+        pointsBalance: response.pointsBalance,
         pointsExpiry: response.pointsExpiry,
-        isActive: response.isActive ?? true,
+        isActive: response.isActive,
         createdAt: response.createdAt,
       );
-      
+
+      // Update local cache
+      await _localDataSource.cacheUser(user.toModel());
+
       return Right(user);
     } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message, statusCode: e.statusCode));
+      return Left(ServerFailure(e.message));
     } on NetworkException catch (e) {
-      return Left(NetworkFailure(message: e.message, statusCode: e.statusCode));
+      return Left(NetworkFailure(e.message));
     } catch (e) {
-      return Left(UnexpectedFailure(message: e.toString()));
+      return Left(UnexpectedFailure(e.toString()));
     }
   }
 
@@ -180,17 +177,11 @@ class AuthRepositoryImpl implements AuthRepository {
     String? lastName,
   }) async {
     try {
-      final currentUser = await getCurrentUser();
-      final email = currentUser.fold(
-        (failure) => throw Exception('No current user'),
-        (user) => user?.email ?? '',
-      );
-      
       final request = UpdateUserProfileRequest(
         firstName: firstName,
         lastName: lastName,
       );
-      
+
       final response = await _remoteDataSource.updateUserProfile(request);
       final user = User(
         id: response.id,
@@ -199,20 +190,23 @@ class AuthRepositoryImpl implements AuthRepository {
         firstName: response.firstName,
         lastName: response.lastName,
         organizationId: response.organizationId,
-        organizationName: response.organizationName,
-        pointsBalance: response.pointsBalance ?? 0,
+        organizationName: response.organizationId?.toString() ?? '',
+        pointsBalance: response.pointsBalance,
         pointsExpiry: response.pointsExpiry,
-        isActive: response.isActive ?? true,
+        isActive: response.isActive,
         createdAt: response.createdAt,
       );
-      
+
+      // Update local cache
+      await _localDataSource.cacheUser(user.toModel());
+
       return Right(user);
     } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message, statusCode: e.statusCode));
+      return Left(ServerFailure(e.message));
     } on NetworkException catch (e) {
-      return Left(NetworkFailure(message: e.message, statusCode: e.statusCode));
+      return Left(NetworkFailure(e.message));
     } catch (e) {
-      return Left(UnexpectedFailure(message: e.toString()));
+      return Left(UnexpectedFailure(e.toString()));
     }
   }
 
@@ -222,11 +216,12 @@ class AuthRepositoryImpl implements AuthRepository {
     required int organizationId,
   }) async {
     try {
-      final request = ChangeOrganizationRequest(
-        organizationId: organizationId, // This should be provided by the UI
+      final request = ChangeOrganizationRequest(organizationId: organizationId);
+
+      final response = await _remoteDataSource.changeUserOrganization(
+        userId,
+        request,
       );
-      
-      final response = await _remoteDataSource.changeUserOrganization(userId, request);
       final user = User(
         id: response.id,
         email: response.email,
@@ -234,27 +229,32 @@ class AuthRepositoryImpl implements AuthRepository {
         firstName: response.firstName,
         lastName: response.lastName,
         organizationId: response.organizationId,
-        organizationName: response.organizationName,
-        pointsBalance: response.pointsBalance ?? 0,
+        organizationName: response.organizationId?.toString() ?? '',
+        pointsBalance: response.pointsBalance,
         pointsExpiry: response.pointsExpiry,
-        isActive: response.isActive ?? true,
+        isActive: response.isActive,
         createdAt: response.createdAt,
       );
-      
+
+      // Update local cache
+      await _localDataSource.cacheUser(user.toModel());
+
       return Right(user);
     } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message, statusCode: e.statusCode));
+      return Left(ServerFailure(e.message));
     } on NetworkException catch (e) {
-      return Left(NetworkFailure(message: e.message, statusCode: e.statusCode));
+      return Left(NetworkFailure(e.message));
     } catch (e) {
-      return Left(UnexpectedFailure(message: e.toString()));
+      return Left(UnexpectedFailure(e.toString()));
     }
   }
 
   @override
   Future<Either<Failure, User>> removeFromOrganization(String userId) async {
     try {
-      final response = await _remoteDataSource.removeUserFromOrganization(userId);
+      final response = await _remoteDataSource.removeUserFromOrganization(
+        userId,
+      );
       final user = User(
         id: response.id,
         email: response.email,
@@ -262,20 +262,23 @@ class AuthRepositoryImpl implements AuthRepository {
         firstName: response.firstName,
         lastName: response.lastName,
         organizationId: response.organizationId,
-        organizationName: response.organizationName,
-        pointsBalance: response.pointsBalance ?? 0,
+        organizationName: response.organizationId?.toString() ?? '',
+        pointsBalance: response.pointsBalance,
         pointsExpiry: response.pointsExpiry,
-        isActive: response.isActive ?? true,
+        isActive: response.isActive,
         createdAt: response.createdAt,
       );
-      
+
+      // Update local cache
+      await _localDataSource.cacheUser(user.toModel());
+
       return Right(user);
     } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message, statusCode: e.statusCode));
+      return Left(ServerFailure(e.message));
     } on NetworkException catch (e) {
-      return Left(NetworkFailure(message: e.message, statusCode: e.statusCode));
+      return Left(NetworkFailure(e.message));
     } catch (e) {
-      return Left(UnexpectedFailure(message: e.toString()));
+      return Left(UnexpectedFailure(e.toString()));
     }
   }
 
@@ -286,30 +289,29 @@ class AuthRepositoryImpl implements AuthRepository {
       await _remoteDataSource.validateToken(request);
       return const Right(true);
     } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message, statusCode: e.statusCode));
+      return Left(ServerFailure(e.message));
     } on NetworkException catch (e) {
-      return Left(NetworkFailure(message: e.message, statusCode: e.statusCode));
+      return Left(NetworkFailure(e.message));
     } catch (e) {
-      return Left(UnexpectedFailure(message: e.toString()));
+      return Left(UnexpectedFailure(e.toString()));
     }
   }
 
-  // Firebase Authentication methods
   @override
   Future<Either<Failure, PhoneAuth>> sendOtp({
     required String phoneNumber,
     required String countryCode,
   }) async {
     try {
-      final phoneAuth = await _firebaseDataSource.sendOtp(
+      final result = await _firebaseDataSource.sendOtp(
         phoneNumber: phoneNumber,
         countryCode: countryCode,
       );
-      return Right(phoneAuth);
+      return Right(result);
     } on AuthException catch (e) {
-      return Left(AuthFailure(message: e.message, statusCode: e.statusCode));
+      return Left(AuthFailure(e.message));
     } catch (e) {
-      return Left(UnexpectedFailure(message: e.toString()));
+      return Left(UnexpectedFailure(e.toString()));
     }
   }
 
@@ -325,9 +327,9 @@ class AuthRepositoryImpl implements AuthRepository {
       );
       return Right(user);
     } on AuthException catch (e) {
-      return Left(AuthFailure(message: e.message, statusCode: e.statusCode));
+      return Left(AuthFailure(e.message));
     } catch (e) {
-      return Left(UnexpectedFailure(message: e.toString()));
+      return Left(UnexpectedFailure(e.toString()));
     }
   }
 
@@ -338,16 +340,16 @@ class AuthRepositoryImpl implements AuthRepository {
     int? forceResendingToken,
   }) async {
     try {
-      final phoneAuth = await _firebaseDataSource.resendOtp(
+      final result = await _firebaseDataSource.resendOtp(
         phoneNumber: phoneNumber,
         countryCode: countryCode,
         forceResendingToken: forceResendingToken,
       );
-      return Right(phoneAuth);
+      return Right(result);
     } on AuthException catch (e) {
-      return Left(AuthFailure(message: e.message, statusCode: e.statusCode));
+      return Left(AuthFailure(e.message));
     } catch (e) {
-      return Left(UnexpectedFailure(message: e.toString()));
+      return Left(UnexpectedFailure(e.toString()));
     }
   }
 
@@ -356,131 +358,33 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       await _firebaseDataSource.signOut();
       await _localDataSource.clearUser();
-      await _localDataSource.clearAuthToken();
       return const Right(null);
     } on AuthException catch (e) {
-      return Left(AuthFailure(message: e.message, statusCode: e.statusCode));
+      return Left(AuthFailure(e.message));
     } on CacheException catch (e) {
-      return Left(CacheFailure(message: e.message, statusCode: e.statusCode));
+      return Left(CacheFailure(e.message));
     } catch (e) {
-      return Left(UnexpectedFailure(message: e.toString()));
+      return Left(UnexpectedFailure(e.toString()));
     }
   }
 
   @override
-  firebase_auth.User? get currentFirebaseUser => _firebaseDataSource.currentUser;
+  firebase_auth.User? get currentFirebaseUser =>
+      _firebaseDataSource.currentUser;
 
   @override
-  Stream<firebase_auth.User?> get authStateChanges => _firebaseDataSource.authStateChanges;
+  Stream<firebase_auth.User?> get authStateChanges =>
+      _firebaseDataSource.authStateChanges;
 
   @override
   Future<Either<Failure, User?>> getCurrentUser() async {
     try {
-      // Check if user is authenticated with Firebase
-      final firebaseUser = _firebaseDataSource.currentUser;
-      if (firebaseUser == null) {
-        // No Firebase user, clear local cache and return null
-        await _localDataSource.clearUser();
-        return const Right(null);
-      }
-
-      // Check local cache first
-      final cachedUser = await _localDataSource.getCachedUser();
-      if (cachedUser != null) {
-        // Validate cached user with backend
-        try {
-          final idToken = await firebaseUser.getIdToken();
-          if (idToken?.isEmpty ?? true) {
-            // No valid token, sign out Firebase user and clear cache
-            await signOut();
-            return const Right(null);
-          }
-          final validateResult = await validateToken(idToken!);
-          
-          return validateResult.fold(
-            (failure) async {
-              // Token validation failed, sign out Firebase user and clear cache
-              await signOut();
-              return const Right(null);
-            },
-            (isValid) {
-              if (isValid) {
-                return Right(cachedUser.toEntity());
-              } else {
-                // Invalid token, sign out and clear cache
-                signOut();
-                return const Right(null);
-              }
-            },
-          );
-        } catch (e) {
-          // Error validating token, try to check user exists in backend
-          try {
-            final userExistsResult = await checkUserExists();
-            return userExistsResult.fold(
-              (failure) async {
-                // User doesn't exist in backend, sign out Firebase user
-                await signOut();
-                return const Right(null);
-              },
-              (userExists) {
-                if (userExists) {
-                  return Right(cachedUser.toEntity());
-                } else {
-                  // User doesn't exist in backend, sign out Firebase user
-                  signOut();
-                  return const Right(null);
-                }
-              },
-            );
-          } catch (e) {
-            // If all checks fail, sign out
-            await signOut();
-            return const Right(null);
-          }
-        }
-      } else {
-        // No cached user, check if user exists in backend
-        try {
-          final userExistsResult = await checkUserExists();
-          return userExistsResult.fold(
-            (failure) async {
-              // User doesn't exist in backend, sign out Firebase user
-              await signOut();
-              return const Right(null);
-            },
-            (userExists) async {
-              if (userExists) {
-                // User exists in backend, sync and cache
-                final email = firebaseUser.email ?? '';
-                final syncResult = await syncUserProfile(email: email);
-                return syncResult.fold(
-                  (failure) async {
-                    await signOut();
-                    return const Right(null);
-                  },
-                  (user) async {
-                    await _localDataSource.cacheUser(user.toModel());
-                    return Right(user);
-                  },
-                );
-              } else {
-                // User doesn't exist in backend, sign out Firebase user
-                await signOut();
-                return const Right(null);
-              }
-            },
-          );
-        } catch (e) {
-          // If check fails, sign out
-          await signOut();
-          return const Right(null);
-        }
-      }
+      final user = await _localDataSource.getCachedUser();
+      return Right(user?.toEntity());
     } on CacheException catch (e) {
-      return Left(CacheFailure(message: e.message, statusCode: e.statusCode));
+      return Left(CacheFailure(e.message));
     } catch (e) {
-      return Left(UnexpectedFailure(message: e.toString()));
+      return Left(UnexpectedFailure(e.toString()));
     }
   }
 
@@ -490,9 +394,9 @@ class AuthRepositoryImpl implements AuthRepository {
       await _localDataSource.cacheUser(user.toModel());
       return const Right(null);
     } on CacheException catch (e) {
-      return Left(CacheFailure(message: e.message, statusCode: e.statusCode));
+      return Left(CacheFailure(e.message));
     } catch (e) {
-      return Left(UnexpectedFailure(message: e.toString()));
+      return Left(UnexpectedFailure(e.toString()));
     }
   }
 
@@ -502,9 +406,9 @@ class AuthRepositoryImpl implements AuthRepository {
       await _localDataSource.clearUser();
       return const Right(null);
     } on CacheException catch (e) {
-      return Left(CacheFailure(message: e.message, statusCode: e.statusCode));
+      return Left(CacheFailure(e.message));
     } catch (e) {
-      return Left(UnexpectedFailure(message: e.toString()));
+      return Left(UnexpectedFailure(e.toString()));
     }
   }
 }

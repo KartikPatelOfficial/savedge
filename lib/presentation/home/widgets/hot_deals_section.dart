@@ -1,23 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-/// Model class for hot deal items
-class HotDeal {
-  const HotDeal({
-    required this.name,
-    required this.rating,
-    required this.offer,
-    this.imageUrl,
-    this.onTap,
-  });
+import '../../../core/injection/injection.dart';
+import '../../../features/vendors/domain/entities/vendor.dart';
+import '../../../features/vendors/presentation/bloc/vendors_bloc.dart';
+import '../../../features/vendors/presentation/bloc/vendors_event.dart';
+import '../../../features/vendors/presentation/bloc/vendors_state.dart';
+import '../../stores/vendor_detail_page.dart';
 
-  final String name;
-  final String rating;
-  final String offer;
-  final String? imageUrl;
-  final VoidCallback? onTap;
-}
-
-/// Hot deals section widget with horizontal scrollable cards
+/// Hot deals section widget with real vendor data
 class HotDealsSection extends StatelessWidget {
   const HotDealsSection({
     super.key,
@@ -30,8 +21,22 @@ class HotDealsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final defaultDeals = deals.isEmpty ? _getDefaultDeals() : deals;
+    return BlocProvider(
+      create: (context) =>
+          getIt<VendorsBloc>()
+            ..add(const LoadVendors(pageSize: 5)), // Load only 5 for hot deals
+      child: HotDealsView(title: title),
+    );
+  }
+}
 
+class HotDealsView extends StatelessWidget {
+  const HotDealsView({super.key, required this.title});
+
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Column(
@@ -51,17 +56,16 @@ class HotDealsSection extends StatelessWidget {
           const SizedBox(height: 16),
           SizedBox(
             height: 220,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: defaultDeals.length,
-              itemBuilder: (context, index) {
-                return Padding(
-                  padding: EdgeInsets.only(
-                    right: index == defaultDeals.length - 1 ? 0 : 12,
-                  ),
-                  child: HotDealCard(deal: defaultDeals[index]),
-                );
+            child: BlocBuilder<VendorsBloc, VendorsState>(
+              builder: (context, state) {
+                if (state is VendorsLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (state is VendorsError) {
+                  return _buildErrorWidget(state.message);
+                } else if (state is VendorsLoaded) {
+                  return _buildVendorsList(state.vendors);
+                }
+                return const SizedBox.shrink();
               },
             ),
           ),
@@ -70,29 +74,91 @@ class HotDealsSection extends StatelessWidget {
     );
   }
 
-  List<HotDeal> _getDefaultDeals() {
-    return [
-      const HotDeal(
-        name: 'Amrutam Restaurant',
-        rating: '4.9',
-        offer: 'Up to 50% OFF',
+  Widget _buildVendorsList(List<Vendor> vendors) {
+    if (vendors.isEmpty) {
+      return const Center(
+        child: Text(
+          'No deals available',
+          style: TextStyle(fontSize: 16, color: Colors.grey),
+        ),
+      );
+    }
+
+    return ListView.builder(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      itemCount: vendors.length,
+      itemBuilder: (context, index) {
+        final vendor = vendors[index];
+        return Padding(
+          padding: EdgeInsets.only(right: index == vendors.length - 1 ? 0 : 12),
+          child: HotDealCard(
+            vendor: vendor,
+            onTap: () => _navigateToVendorDetail(context, vendor),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildErrorWidget(String message) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.error_outline, size: 48, color: Colors.grey[400]),
+          const SizedBox(height: 8),
+          Text(
+            'Failed to load deals',
+            style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+          ),
+        ],
       ),
-      const HotDeal(name: 'Amruta', rating: '4.8', offer: 'Up to 30% OFF'),
-    ];
+    );
+  }
+
+  void _navigateToVendorDetail(BuildContext context, Vendor vendor) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => VendorDetailPage(vendor: vendor)),
+    );
   }
 }
 
-/// Individual hot deal card widget
-class HotDealCard extends StatelessWidget {
-  const HotDealCard({super.key, required this.deal, this.width = 280});
+/// Model class for hot deal items (now using vendor data)
+class HotDeal {
+  const HotDeal({
+    required this.name,
+    required this.rating,
+    required this.offer,
+    this.imageUrl,
+    this.onTap,
+  });
 
-  final HotDeal deal;
+  final String name;
+  final String rating;
+  final String offer;
+  final String? imageUrl;
+  final VoidCallback? onTap;
+}
+
+/// Individual hot deal card widget using vendor data
+class HotDealCard extends StatelessWidget {
+  const HotDealCard({
+    super.key,
+    required this.vendor,
+    this.width = 280,
+    this.onTap,
+  });
+
+  final Vendor vendor;
   final double width;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: deal.onTap,
+      onTap: onTap,
       child: Container(
         width: width,
         decoration: BoxDecoration(
@@ -110,7 +176,7 @@ class HotDealCard extends StatelessWidget {
           child: Stack(
             children: [
               // Background image
-              _DealBackground(),
+              _DealBackground(vendor: vendor),
               // Gradient overlay
               Container(
                 decoration: BoxDecoration(
@@ -131,9 +197,9 @@ class HotDealCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _OfferBadge(offer: deal.offer),
+                    _OfferBadge(vendor: vendor),
                     const Spacer(),
-                    _DealInfo(deal: deal),
+                    _DealInfo(vendor: vendor),
                   ],
                 ),
               ),
@@ -146,39 +212,55 @@ class HotDealCard extends StatelessWidget {
 }
 
 class _DealBackground extends StatelessWidget {
+  const _DealBackground({required this.vendor});
+
+  final Vendor vendor;
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage('assets/images/restaurant_bg.jpg'),
-          fit: BoxFit.cover,
-          onError: null,
-        ),
+      decoration: BoxDecoration(
+        image: vendor.primaryImageUrl != null
+            ? DecorationImage(
+                image: NetworkImage(vendor.primaryImageUrl!),
+                fit: BoxFit.cover,
+                onError: (error, stackTrace) {},
+              )
+            : null,
+        gradient: vendor.primaryImageUrl == null
+            ? LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Colors.brown[300]!.withOpacity(0.8),
+                  Colors.brown[600]!.withOpacity(0.8),
+                ],
+              )
+            : null,
       ),
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Colors.brown[300]!.withOpacity(0.8),
-              Colors.brown[600]!.withOpacity(0.8),
-            ],
-          ),
-        ),
-      ),
+      child: vendor.primaryImageUrl == null
+          ? Center(
+              child: Icon(
+                Icons.restaurant,
+                size: 60,
+                color: Colors.white.withOpacity(0.3),
+              ),
+            )
+          : null,
     );
   }
 }
 
 class _OfferBadge extends StatelessWidget {
-  const _OfferBadge({required this.offer});
+  const _OfferBadge({required this.vendor});
 
-  final String offer;
+  final Vendor vendor;
 
   @override
   Widget build(BuildContext context) {
+    // Generate dynamic offer based on vendor ID
+    final offerPercentage = 20 + (vendor.id % 4) * 10; // 20%, 30%, 40%, or 50%
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
@@ -191,7 +273,7 @@ class _OfferBadge extends StatelessWidget {
           const Icon(Icons.local_offer, color: Colors.white, size: 14),
           const SizedBox(width: 4),
           Text(
-            offer,
+            'Up to $offerPercentage% OFF',
             style: const TextStyle(
               color: Colors.white,
               fontSize: 12,
@@ -205,9 +287,9 @@ class _OfferBadge extends StatelessWidget {
 }
 
 class _DealInfo extends StatelessWidget {
-  const _DealInfo({required this.deal});
+  const _DealInfo({required this.vendor});
 
-  final HotDeal deal;
+  final Vendor vendor;
 
   @override
   Widget build(BuildContext context) {
@@ -215,12 +297,14 @@ class _DealInfo extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          deal.name,
+          vendor.businessName,
           style: const TextStyle(
             color: Colors.white,
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
         const SizedBox(height: 8),
         Row(
@@ -237,7 +321,7 @@ class _DealInfo extends StatelessWidget {
                   const Icon(Icons.star, color: Colors.amber, size: 16),
                   const SizedBox(width: 4),
                   Text(
-                    deal.rating,
+                    vendor.ratingDisplay,
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 14,
