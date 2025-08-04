@@ -120,7 +120,7 @@ class HotDealsView extends StatelessWidget {
   void _navigateToVendorDetail(BuildContext context, Vendor vendor) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => VendorDetailPage(vendor: vendor)),
+      MaterialPageRoute(builder: (context) => VendorDetailPage(vendorId: vendor.id)),
     );
   }
 }

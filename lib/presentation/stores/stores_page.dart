@@ -277,7 +277,7 @@ class _StoresViewState extends State<StoresView> {
   void _navigateToVendorDetail(Vendor vendor) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => VendorDetailPage(vendor: vendor)),
+      MaterialPageRoute(builder: (context) => VendorDetailPage(vendorId: vendor.id)),
     );
   }
 }

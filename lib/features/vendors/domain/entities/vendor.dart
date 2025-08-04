@@ -1,5 +1,9 @@
 import 'package:equatable/equatable.dart';
 
+/// Import the coupon entity
+// TODO: Uncomment when coupon entity is properly set up
+// import 'coupon.dart';
+
 /// Vendor domain entity
 class Vendor extends Equatable {
   const Vendor({
@@ -25,6 +29,7 @@ class Vendor extends Equatable {
     required this.vendorFullName,
     this.images = const [],
     this.socialMediaLinks = const [],
+    // this.coupons = const [], // TODO: Uncomment when coupon entity is ready
     this.rating,
     this.averagePrice,
     this.isOpen,
@@ -54,6 +59,7 @@ class Vendor extends Equatable {
   final String vendorFullName;
   final List<VendorImage> images;
   final List<VendorSocialMedia> socialMediaLinks;
+  // final List<Coupon> coupons; // TODO: Uncomment when coupon entity is ready
 
   // Additional computed properties for UI
   final double? rating;

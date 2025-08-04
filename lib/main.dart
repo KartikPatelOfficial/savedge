@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -8,6 +10,11 @@ import 'package:savedge/presentation/app/app.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Configure HTTP client for network images in debug mode
+  if (kDebugMode) {
+    HttpOverrides.global = DevHttpOverrides();
+  }
 
   // Initialize Firebase
   await Firebase.initializeApp(
@@ -21,6 +28,15 @@ void main() async {
   Bloc.observer = AppBlocObserver();
 
   runApp(const SavedgeApp());
+}
+
+/// Custom HTTP overrides for development to bypass SSL certificate validation
+class DevHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+  }
 }
 
 /// Global BLoC observer for debugging and logging

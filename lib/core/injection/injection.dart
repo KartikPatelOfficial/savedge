@@ -22,7 +22,9 @@ import 'package:savedge/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:savedge/features/vendors/data/datasources/vendors_remote_data_source.dart';
 import 'package:savedge/features/vendors/data/repositories/vendors_repository_impl.dart';
 import 'package:savedge/features/vendors/domain/repositories/vendors_repository.dart';
+import 'package:savedge/features/vendors/domain/usecases/get_vendor_usecase.dart';
 import 'package:savedge/features/vendors/domain/usecases/get_vendors_usecase.dart';
+import 'package:savedge/features/vendors/presentation/bloc/vendor_detail_bloc.dart';
 import 'package:savedge/features/vendors/presentation/bloc/vendors_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -102,6 +104,10 @@ Future<void> configureDependencies() async {
     GetVendorsUseCase(getIt<VendorsRepository>()),
   );
 
+  getIt.registerSingleton<GetVendorUseCase>(
+    GetVendorUseCase(getIt<VendorsRepository>()),
+  );
+
   // BLoCs (as factories since they should be created fresh each time)
   getIt.registerFactory<AuthBloc>(
     () => AuthBloc(
@@ -117,6 +123,10 @@ Future<void> configureDependencies() async {
 
   getIt.registerFactory<VendorsBloc>(
     () => VendorsBloc(getVendorsUseCase: getIt<GetVendorsUseCase>()),
+  );
+
+  getIt.registerFactory<VendorDetailBloc>(
+    () => VendorDetailBloc(getVendorUseCase: getIt<GetVendorUseCase>()),
   );
 }
 
