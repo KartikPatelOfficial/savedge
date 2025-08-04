@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
 
-import '../../../../core/error/failures.dart';
-import '../entities/vendor.dart';
+import 'package:savedge/core/error/failures.dart';
+import 'package:savedge/features/vendors/domain/entities/vendor.dart';
 
 abstract class VendorsRepository {
   Future<Either<Failure, List<Vendor>>> getVendors({

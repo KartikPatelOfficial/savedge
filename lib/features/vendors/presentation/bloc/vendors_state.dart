@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-import '../../domain/entities/vendor.dart';
+import 'package:savedge/features/vendors/domain/entities/vendor.dart';
 
 abstract class VendorsState extends Equatable {
   const VendorsState();

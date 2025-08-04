@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 
-import 'package:savedge/core/constants/app_constants.dart';
 import 'package:savedge/core/error/exceptions.dart';
 
 /// Network info interface for checking connectivity

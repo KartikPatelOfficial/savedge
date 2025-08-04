@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:savedge/core/injection/injection.dart';
-import 'package:savedge/core/themes/app_theme.dart';
 import 'package:savedge/firebase_options.dart';
 import 'package:savedge/presentation/app/app.dart';
 

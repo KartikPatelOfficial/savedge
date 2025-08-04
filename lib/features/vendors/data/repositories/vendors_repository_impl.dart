@@ -1,11 +1,11 @@
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 
-import '../../../../core/error/failures.dart';
-import '../../domain/entities/vendor.dart';
-import '../../domain/repositories/vendors_repository.dart';
-import '../datasources/vendors_remote_data_source.dart';
-import '../models/vendor_models.dart';
+import 'package:savedge/core/error/failures.dart';
+import 'package:savedge/features/vendors/domain/entities/vendor.dart';
+import 'package:savedge/features/vendors/domain/repositories/vendors_repository.dart';
+import 'package:savedge/features/vendors/data/datasources/vendors_remote_data_source.dart';
+import 'package:savedge/features/vendors/data/models/vendor_models.dart';
 
 class VendorsRepositoryImpl implements VendorsRepository {
   const VendorsRepositoryImpl({required this.remoteDataSource});

@@ -8,6 +8,28 @@ part 'user_model.g.dart';
 /// User data model for API communication
 @freezed
 abstract class UserModel with _$UserModel {
+
+  /// Creates model from domain entity
+  factory UserModel.fromEntity(User user) {
+    return UserModel(
+      id: user.id,
+      email: user.email,
+      firebaseUid: user.firebaseUid,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      organizationId: user.organizationId,
+      organizationName: user.organizationName,
+      pointsBalance: user.pointsBalance,
+      pointsExpiry: user.pointsExpiry,
+      isActive: user.isActive,
+      createdAt: user.createdAt,
+      isEmployee: user.isEmployee,
+      employeeCode: user.employeeCode,
+      department: user.department,
+      position: user.position,
+      joinDate: user.joinDate,
+    );
+  }
   const factory UserModel({
     required String id,
     required String email,
@@ -51,28 +73,6 @@ abstract class UserModel with _$UserModel {
       department: department,
       position: position,
       joinDate: joinDate,
-    );
-  }
-
-  /// Creates model from domain entity
-  factory UserModel.fromEntity(User user) {
-    return UserModel(
-      id: user.id,
-      email: user.email,
-      firebaseUid: user.firebaseUid,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      organizationId: user.organizationId,
-      organizationName: user.organizationName,
-      pointsBalance: user.pointsBalance,
-      pointsExpiry: user.pointsExpiry,
-      isActive: user.isActive,
-      createdAt: user.createdAt,
-      isEmployee: user.isEmployee,
-      employeeCode: user.employeeCode,
-      department: user.department,
-      position: user.position,
-      joinDate: user.joinDate,
     );
   }
 }

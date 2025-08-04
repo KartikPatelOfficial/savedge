@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-import '../../data/models/user_model.dart';
+import 'package:savedge/features/auth/data/models/user_model.dart';
 
 /// User entity representing authenticated user
 class User extends Equatable {

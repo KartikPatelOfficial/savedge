@@ -5,8 +5,8 @@ import 'package:savedge/features/vendors/presentation/bloc/vendors_bloc.dart';
 import 'package:savedge/features/vendors/presentation/bloc/vendors_event.dart';
 import 'package:savedge/features/vendors/presentation/bloc/vendors_state.dart';
 
-import '../../../core/injection/injection.dart';
-import 'vendor_detail_page.dart';
+import 'package:savedge/core/injection/injection.dart';
+import 'package:savedge/presentation/stores/vendor_detail_page.dart';
 
 class StoresPage extends StatelessWidget {
   const StoresPage({super.key});

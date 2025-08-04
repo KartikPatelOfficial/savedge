@@ -82,7 +82,7 @@ class _OrganizationChangePageState extends State<OrganizationChangePage> {
                     width: double.infinity,
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: context.colorScheme.surfaceVariant,
+                      color: context.colorScheme.surfaceContainerHighest,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Column(

@@ -1,9 +1,9 @@
 import 'package:dartz/dartz.dart';
 
-import '../../../../core/error/failures.dart';
-import '../../../../core/usecases/usecase.dart';
-import '../entities/vendor.dart';
-import '../repositories/vendors_repository.dart';
+import 'package:savedge/core/error/failures.dart';
+import 'package:savedge/core/usecases/usecase.dart';
+import 'package:savedge/features/vendors/domain/entities/vendor.dart';
+import 'package:savedge/features/vendors/domain/repositories/vendors_repository.dart';
 
 class GetVendorsUseCase implements UseCase<List<Vendor>, GetVendorsParams> {
   const GetVendorsUseCase(this.repository);

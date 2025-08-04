@@ -81,7 +81,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
 
     result.fold(
-      (failure) => emit(AuthError(failure.message ?? "Failed to verify OTP")),
+      (failure) => emit(AuthError(failure.message ?? 'Failed to verify OTP')),
       (firebaseUser) {
         _currentFirebaseUser = firebaseUser;
         emit(AuthFirebaseSuccess(firebaseUser));
@@ -99,7 +99,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
     result.fold(
       (failure) =>
-          emit(AuthError(failure.message ?? "Failed to check user existence")),
+          emit(AuthError(failure.message ?? 'Failed to check user existence')),
       (userExistsResult) {
         if (userExistsResult.exists && _currentFirebaseUser != null) {
           emit(
@@ -132,7 +132,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
     result.fold(
       (failure) =>
-          emit(AuthError(failure.message ?? "Failed to register user")),
+          emit(AuthError(failure.message ?? 'Failed to register user')),
       (user) => emit(AuthRegisterSuccess(user)),
     );
   }
@@ -149,7 +149,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
     result.fold(
       (failure) =>
-          emit(AuthError(failure.message ?? "Failed to sync user profile")),
+          emit(AuthError(failure.message ?? 'Failed to sync user profile')),
       (user) => emit(AuthSyncSuccess(user)),
     );
   }

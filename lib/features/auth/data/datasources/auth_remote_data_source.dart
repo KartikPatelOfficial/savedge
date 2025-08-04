@@ -1,6 +1,5 @@
 import 'package:retrofit/retrofit.dart';
 import 'package:dio/dio.dart';
-import 'package:injectable/injectable.dart';
 
 import 'package:savedge/features/auth/data/models/auth_requests.dart';
 import 'package:savedge/features/auth/data/models/auth_responses.dart';

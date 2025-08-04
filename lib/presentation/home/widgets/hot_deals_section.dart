@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../core/injection/injection.dart';
-import '../../../features/vendors/domain/entities/vendor.dart';
-import '../../../features/vendors/presentation/bloc/vendors_bloc.dart';
-import '../../../features/vendors/presentation/bloc/vendors_event.dart';
-import '../../../features/vendors/presentation/bloc/vendors_state.dart';
-import '../../stores/vendor_detail_page.dart';
+import 'package:savedge/core/injection/injection.dart';
+import 'package:savedge/features/vendors/domain/entities/vendor.dart';
+import 'package:savedge/features/vendors/presentation/bloc/vendors_bloc.dart';
+import 'package:savedge/features/vendors/presentation/bloc/vendors_event.dart';
+import 'package:savedge/features/vendors/presentation/bloc/vendors_state.dart';
+import 'package:savedge/presentation/stores/vendor_detail_page.dart';
 
 /// Hot deals section widget with real vendor data
 class HotDealsSection extends StatelessWidget {

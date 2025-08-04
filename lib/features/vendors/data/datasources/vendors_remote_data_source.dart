@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
 
-import '../models/vendor_models.dart';
+import 'package:savedge/features/vendors/data/models/vendor_models.dart';
 
 part 'vendors_remote_data_source.g.dart';
 

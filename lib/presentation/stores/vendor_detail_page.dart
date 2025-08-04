@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../features/vendors/domain/entities/vendor.dart';
-import '../home/widgets/membership_section.dart';
+import 'package:savedge/features/vendors/domain/entities/vendor.dart';
+import 'package:savedge/presentation/home/widgets/membership_section.dart';
 
 class VendorDetailPage extends StatelessWidget {
   const VendorDetailPage({super.key, required this.vendor});

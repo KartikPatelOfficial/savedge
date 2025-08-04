@@ -1,8 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../domain/usecases/get_vendors_usecase.dart';
-import 'vendors_event.dart';
-import 'vendors_state.dart';
+import 'package:savedge/features/vendors/domain/usecases/get_vendors_usecase.dart';
+import 'package:savedge/features/vendors/presentation/bloc/vendors_event.dart';
+import 'package:savedge/features/vendors/presentation/bloc/vendors_state.dart';
 
 class VendorsBloc extends Bloc<VendorsEvent, VendorsState> {
   VendorsBloc({required this.getVendorsUseCase}) : super(VendorsInitial()) {

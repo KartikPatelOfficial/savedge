@@ -135,7 +135,7 @@ Dio _createDio() {
 
   // Configure SSL certificate handling for development
   if (kDebugMode && !kIsWeb && Platform.isAndroid) {
-    dio.httpClientAdapter = DefaultHttpClientAdapter()
+    dio.httpClientAdapter = IOHttpClientAdapter()
       ..onHttpClientCreate = (client) {
         client.badCertificateCallback =
             (X509Certificate cert, String host, int port) => true;
