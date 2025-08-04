@@ -1,10 +1,105 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
+import 'package:savedge/core/injection/injection.dart';
+import 'package:savedge/core/network/image_cache_manager.dart';
 import 'package:savedge/features/vendors/domain/entities/vendor.dart';
+import 'package:savedge/features/vendors/presentation/bloc/vendor_detail_bloc.dart';
+import 'package:savedge/features/vendors/presentation/bloc/vendor_detail_event.dart';
+import 'package:savedge/features/vendors/presentation/bloc/vendor_detail_state.dart';
 import 'package:savedge/presentation/home/widgets/membership_section.dart';
 
 class VendorDetailPage extends StatelessWidget {
-  const VendorDetailPage({super.key, required this.vendor});
+  const VendorDetailPage({
+    super.key,
+    this.vendor,
+    this.vendorId,
+  }) : assert(vendor != null || vendorId != null, 'Either vendor or vendorId must be provided');
+
+  final Vendor? vendor;
+  final int? vendorId;
+
+  @override
+  Widget build(BuildContext context) {
+    // Always load vendor details from API to get complete data (images, coupons, etc.)
+    final int id = vendorId ?? vendor!.id;
+    
+    return BlocProvider(
+      create: (context) => getIt<VendorDetailBloc>()
+        ..add(LoadVendorDetail(id)),
+      child: BlocBuilder<VendorDetailBloc, VendorDetailState>(
+        builder: (context, state) {
+          if (state is VendorDetailLoading) {
+            return Scaffold(
+              backgroundColor: Colors.white,
+              appBar: AppBar(
+                backgroundColor: Colors.white,
+                foregroundColor: Colors.black87,
+                elevation: 0,
+                title: const Text('Loading...'),
+              ),
+              body: const Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
+          } else if (state is VendorDetailLoaded) {
+            return _VendorDetailView(vendor: state.vendor);
+          } else if (state is VendorDetailError) {
+            return Scaffold(
+              backgroundColor: Colors.white,
+              appBar: AppBar(
+                backgroundColor: Colors.white,
+                foregroundColor: Colors.black87,
+                elevation: 0,
+                title: const Text('Error'),
+              ),
+              body: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.error_outline,
+                      size: 64,
+                      color: Colors.grey[400],
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      state.message,
+                      style: Theme.of(context).textTheme.bodyLarge,
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () {
+                        context.read<VendorDetailBloc>().add(
+                          RefreshVendorDetail(id),
+                        );
+                      },
+                      child: const Text('Retry'),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+
+          // Initial state - should not reach here due to bloc initialization
+          return const Scaffold(
+            backgroundColor: Colors.white,
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _VendorDetailView extends StatelessWidget {
+  const _VendorDetailView({required this.vendor});
 
   final Vendor vendor;
 
@@ -21,7 +116,7 @@ class VendorDetailPage extends StatelessWidget {
           // Offers Section
           SliverToBoxAdapter(child: _buildOffersSection()),
           // Yearly Subscription
-          SliverToBoxAdapter(child: _buildYearlySubscription()),
+          SliverToBoxAdapter(child: MembershipSection()),
           // Other Restaurants
           SliverToBoxAdapter(child: _buildOtherRestaurants()),
           // Bottom spacing
@@ -32,6 +127,28 @@ class VendorDetailPage extends StatelessWidget {
   }
 
   Widget _buildSliverAppBar(BuildContext context) {
+    // Get all gallery images or use primary image as fallback
+    final galleryImages = vendor.images
+        .where((img) => img.imageType == 'gallery' || img.imageType == 'Gallery')
+        .toList();
+    
+    final imagesToShow = galleryImages.isNotEmpty 
+        ? galleryImages 
+        : vendor.images.take(3).toList(); // Show up to 3 images
+    
+    // Debug: Print image information
+    if (kDebugMode) {
+      print('=== Vendor Images Debug ===');
+      print('Total images: ${vendor.images.length}');
+      print('Gallery images: ${galleryImages.length}');
+      print('Images to show: ${imagesToShow.length}');
+      for (int i = 0; i < imagesToShow.length; i++) {
+        final img = imagesToShow[i];
+        print('Image $i: ${img.imageUrl} (Type: ${img.imageType}, Primary: ${img.isPrimary})');
+      }
+      print('===========================');
+    }
+    
     return SliverAppBar(
       expandedHeight: 300,
       pinned: true,
@@ -41,65 +158,133 @@ class VendorDetailPage extends StatelessWidget {
         background: Stack(
           children: [
             // Image Carousel
-            PageView.builder(
-              itemCount: 3, // Mock multiple images
-              itemBuilder: (context, index) {
-                return Container(
-                  decoration: BoxDecoration(
-                    image: vendor.primaryImageUrl != null
-                        ? DecorationImage(
-                            image: NetworkImage(vendor.primaryImageUrl!),
-                            fit: BoxFit.cover,
-                            onError: (error, stackTrace) {},
-                          )
-                        : null,
-                    color: Colors.grey[300],
-                  ),
-                  child: vendor.primaryImageUrl == null
-                      ? Center(
-                          child: Icon(
-                            Icons.restaurant,
-                            size: 80,
-                            color: Colors.grey[500],
+            imagesToShow.isNotEmpty
+                ? PageView.builder(
+                    itemCount: imagesToShow.length,
+                    itemBuilder: (context, index) {
+                      final image = imagesToShow[index];
+                      return CachedNetworkImage(
+                        imageUrl: image.imageUrl,
+                        fit: BoxFit.cover,
+                        cacheManager: CustomImageCacheManager(),
+                        placeholder: (context, url) => Container(
+                          color: Colors.grey[300],
+                          child: Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                CircularProgressIndicator(
+                                  color: const Color(0xFF6F3FCC),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'Loading image...',
+                                  style: TextStyle(
+                                    color: Colors.grey[600],
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        )
-                      : null,
-                );
-              },
-            ),
-            // Navigation arrows
-            Positioned(
-              left: 16,
-              top: 0,
-              bottom: 0,
-              child: Center(
-                child: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.5),
-                    shape: BoxShape.circle,
+                        ),
+                        errorWidget: (context, url, error) => Container(
+                          color: Colors.grey[300],
+                          child: Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.error_outline,
+                                    size: 48,
+                                    color: Colors.grey[500],
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'Failed to load image',
+                                    style: TextStyle(
+                                      color: Colors.grey[600],
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'Error: $error',
+                                    style: TextStyle(
+                                      color: Colors.grey[500],
+                                      fontSize: 10,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'URL: ${image.imageUrl}',
+                                    style: TextStyle(
+                                      color: Colors.grey[500],
+                                      fontSize: 10,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                    maxLines: 3,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  )
+                : Container(
+                    color: Colors.grey[300],
+                    child: Center(
+                      child: Icon(
+                        Icons.restaurant,
+                        size: 80,
+                        color: Colors.grey[500],
+                      ),
+                    ),
                   ),
-                  child: const Icon(Icons.chevron_left, color: Colors.white),
+            // Navigation arrows (only show if multiple images)
+            if (imagesToShow.length > 1) ...[
+              Positioned(
+                left: 16,
+                top: 0,
+                bottom: 0,
+                child: Center(
+                  child: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.5),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.chevron_left, color: Colors.white),
+                  ),
                 ),
               ),
-            ),
-            Positioned(
-              right: 16,
-              top: 0,
-              bottom: 0,
-              child: Center(
-                child: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.5),
-                    shape: BoxShape.circle,
+              Positioned(
+                right: 16,
+                top: 0,
+                bottom: 0,
+                child: Center(
+                  child: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.5),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.chevron_right, color: Colors.white),
                   ),
-                  child: const Icon(Icons.chevron_right, color: Colors.white),
                 ),
               ),
-            ),
+            ],
             // Gradient overlay at bottom
             Positioned(
               bottom: 0,
@@ -230,33 +415,28 @@ class VendorDetailPage extends StatelessWidget {
           // Action buttons
           Row(
             children: [
-              Expanded(
-                child: Container(
-                  width: 50,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF6F3FCC),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.favorite_border,
-                    color: Colors.white,
-                    size: 24,
-                  ),
+              Container(
+                width: 50,
+                height: 50,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF6F3FCC),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.favorite_border,
+                  color: Colors.white,
+                  size: 24,
                 ),
               ),
               const SizedBox(width: 16),
-              Expanded(
-                flex: 8,
-                child: Container(
-                  width: 50,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF4CAF50),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Icons.call, color: Colors.white, size: 24),
+              Container(
+                width: 50,
+                height: 50,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF4CAF50),
+                  shape: BoxShape.circle,
                 ),
+                child: const Icon(Icons.call, color: Colors.white, size: 24),
               ),
             ],
           ),
@@ -360,27 +540,6 @@ class VendorDetailPage extends StatelessWidget {
               ),
             ),
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildYearlySubscription() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Yearly Subscription',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
-            ),
-          ),
-          const SizedBox(height: 16),
-          const MembershipSection(),
         ],
       ),
     );
