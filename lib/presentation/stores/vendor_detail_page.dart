@@ -10,6 +10,7 @@ import 'package:savedge/features/vendors/presentation/bloc/vendor_detail_bloc.da
 import 'package:savedge/features/vendors/presentation/bloc/vendor_detail_event.dart';
 import 'package:savedge/features/vendors/presentation/bloc/vendor_detail_state.dart';
 import 'package:savedge/presentation/home/widgets/membership_section.dart';
+import 'package:savedge/presentation/stores/widgets/vendor_offers_section.dart';
 
 class VendorDetailPage extends StatelessWidget {
   const VendorDetailPage({
@@ -114,7 +115,7 @@ class _VendorDetailView extends StatelessWidget {
           // Vendor Info
           SliverToBoxAdapter(child: _buildVendorInfo()),
           // Offers Section
-          SliverToBoxAdapter(child: _buildOffersSection()),
+          SliverToBoxAdapter(child: VendorOffersSection(vendorId: vendor.id)),
           // Yearly Subscription
           SliverToBoxAdapter(child: MembershipSection()),
           // Other Restaurants
@@ -439,106 +440,6 @@ class _VendorDetailView extends StatelessWidget {
                 child: const Icon(Icons.call, color: Colors.white, size: 24),
               ),
             ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildOffersSection() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Offer for you',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
-            ),
-          ),
-          const SizedBox(height: 16),
-          // Offer cards
-          _buildOfferCard(
-            '20% Off',
-            'when you spend ₹1500 or more!',
-            'This offer requires only 1 coupon out of 5',
-            const Color(0xFF6F3FCC),
-          ),
-          const SizedBox(height: 12),
-          _buildOfferCard(
-            '10% Off',
-            'on your ₹1000 bill',
-            'This offer requires only 1 coupon out of 5',
-            const Color(0xFFFF9800),
-          ),
-          const SizedBox(height: 12),
-          _buildOfferCard(
-            '15% Off',
-            'when you spend ₹1200 or more!',
-            'This offer requires only 1 coupon out of 5',
-            const Color(0xFFE91E63),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildOfferCard(
-    String title,
-    String subtitle,
-    String terms,
-    Color color,
-  ) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Get $title',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  subtitle,
-                  style: const TextStyle(color: Colors.white, fontSize: 14),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  terms,
-                  style: const TextStyle(color: Colors.white70, fontSize: 11),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Text(
-              'Check Now',
-              style: TextStyle(
-                color: color,
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
           ),
         ],
       ),

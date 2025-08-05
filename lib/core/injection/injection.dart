@@ -20,12 +20,18 @@ import 'package:savedge/features/auth/domain/usecases/sync_user_profile_usecase.
 import 'package:savedge/features/auth/domain/usecases/verify_otp_usecase.dart';
 import 'package:savedge/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:savedge/features/vendors/data/datasources/vendors_remote_data_source.dart';
+import 'package:savedge/features/vendors/data/datasources/coupons_remote_data_source.dart';
 import 'package:savedge/features/vendors/data/repositories/vendors_repository_impl.dart';
+import 'package:savedge/features/vendors/data/repositories/coupons_repository_impl.dart';
 import 'package:savedge/features/vendors/domain/repositories/vendors_repository.dart';
+import 'package:savedge/features/vendors/domain/repositories/coupons_repository.dart';
 import 'package:savedge/features/vendors/domain/usecases/get_vendor_usecase.dart';
 import 'package:savedge/features/vendors/domain/usecases/get_vendors_usecase.dart';
+import 'package:savedge/features/vendors/domain/usecases/get_featured_coupons_usecase.dart';
+import 'package:savedge/features/vendors/domain/usecases/get_vendor_coupons_usecase.dart';
 import 'package:savedge/features/vendors/presentation/bloc/vendor_detail_bloc.dart';
 import 'package:savedge/features/vendors/presentation/bloc/vendors_bloc.dart';
+import 'package:savedge/features/vendors/presentation/bloc/coupons_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final GetIt getIt = GetIt.instance;
@@ -58,6 +64,10 @@ Future<void> configureDependencies() async {
     VendorsRemoteDataSource(getIt<Dio>()),
   );
 
+  getIt.registerSingleton<CouponsRemoteDataSource>(
+    CouponsRemoteDataSource(getIt<Dio>()),
+  );
+
   // Repositories
   getIt.registerSingleton<AuthRepository>(
     AuthRepositoryImpl(
@@ -69,6 +79,10 @@ Future<void> configureDependencies() async {
 
   getIt.registerSingleton<VendorsRepository>(
     VendorsRepositoryImpl(remoteDataSource: getIt<VendorsRemoteDataSource>()),
+  );
+
+  getIt.registerSingleton<CouponsRepository>(
+    CouponsRepositoryImpl(getIt<CouponsRemoteDataSource>()),
   );
 
   // Use cases
@@ -108,6 +122,14 @@ Future<void> configureDependencies() async {
     GetVendorUseCase(getIt<VendorsRepository>()),
   );
 
+  getIt.registerSingleton<GetFeaturedCouponsUseCase>(
+    GetFeaturedCouponsUseCase(getIt<CouponsRepository>()),
+  );
+
+  getIt.registerSingleton<GetVendorCouponsUseCase>(
+    GetVendorCouponsUseCase(getIt<CouponsRepository>()),
+  );
+
   // BLoCs (as factories since they should be created fresh each time)
   getIt.registerFactory<AuthBloc>(
     () => AuthBloc(
@@ -127,6 +149,13 @@ Future<void> configureDependencies() async {
 
   getIt.registerFactory<VendorDetailBloc>(
     () => VendorDetailBloc(getVendorUseCase: getIt<GetVendorUseCase>()),
+  );
+
+  getIt.registerFactory<CouponsBloc>(
+    () => CouponsBloc(
+      getFeaturedCouponsUseCase: getIt<GetFeaturedCouponsUseCase>(),
+      getVendorCouponsUseCase: getIt<GetVendorCouponsUseCase>(),
+    ),
   );
 }
 

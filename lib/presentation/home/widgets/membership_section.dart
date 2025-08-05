@@ -41,13 +41,14 @@ class _MembershipCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(20),
-      child: IntrinsicHeight(
+    return SizedBox(
+      height: 600, // Fixed height to prevent layout issues
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Expanded(flex: 1, child: _MembershipContent()),
+            Expanded(flex: 1, child: const _MembershipContent()),
             Expanded(flex: 1, child: _MembershipDetails(onJoinTap: onJoinTap)),
           ],
         ),
