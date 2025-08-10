@@ -26,4 +26,11 @@ class AppConstants {
   static const double defaultPadding = 16.0;
   static const double defaultRadius = 8.0;
   static const Duration defaultAnimationDuration = Duration(milliseconds: 300);
+
+  /// Cache keys
+  static const String userCacheKey = 'CACHED_USER';
+
+  /// Firebase collections
+  static const String usersCollection = 'users';
+  static const String organizationsCollection = 'organizations';
 }

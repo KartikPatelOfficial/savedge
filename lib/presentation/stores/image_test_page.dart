@@ -36,7 +36,7 @@ class ImageTestPage extends StatelessWidget {
             // Test 1: CachedNetworkImage with custom cache manager
             const Text('1. CachedNetworkImage with Custom Cache Manager:'),
             const SizedBox(height: 8),
-            Container(
+            SizedBox(
               height: 200,
               width: double.infinity,
               child: CachedNetworkImage(
@@ -83,7 +83,7 @@ class ImageTestPage extends StatelessWidget {
             // Test 2: Regular CachedNetworkImage
             const Text('2. Regular CachedNetworkImage:'),
             const SizedBox(height: 8),
-            Container(
+            SizedBox(
               height: 200,
               width: double.infinity,
               child: CachedNetworkImage(
@@ -129,7 +129,7 @@ class ImageTestPage extends StatelessWidget {
             // Test 3: Regular NetworkImage
             const Text('3. Regular NetworkImage:'),
             const SizedBox(height: 8),
-            Container(
+            SizedBox(
               height: 200,
               width: double.infinity,
               child: Image.network(

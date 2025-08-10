@@ -1,5 +1,40 @@
 /// Coupon response model
 class CouponResponse {
+
+  factory CouponResponse.fromJson(Map<String, dynamic> json) {
+    return CouponResponse(
+      id: json['id'] as int,
+      title: json['title'] as String,
+      description: json['description'] as String,
+      discountValue: (json['discountValue'] as num).toDouble(),
+      discountType: _mapDiscountTypeFromInt(json['discountType'] as int),
+      minimumOrderAmount: (json['minCartValue'] as num?)?.toDouble() ?? 0.0,
+      maximumDiscountAmount: (json['maxDiscountAmount'] as num?)?.toDouble() ?? 0.0,
+      validFrom: DateTime.parse(json['validFrom'] as String),
+      validTo: DateTime.parse(json['validUntil'] as String),
+      isActive: json['isActive'] as bool,
+      vendorId: json['vendorId'] as int,
+      status: _mapStatusFromInt(json['status'] as int),
+      termsAndConditions: json['termsAndConditions'] as String?,
+      usageCount: json['currentRedemptions'] as int? ?? 0,
+      maxUsageCount: json['maxRedemptions'] as int?,
+      createdAt: json['createdAt'] != null 
+          ? DateTime.parse(json['createdAt'] as String) 
+          : null,
+      updatedAt: json['updatedAt'] != null 
+          ? DateTime.parse(json['updatedAt'] as String) 
+          : null,
+      vendorName: json['vendorName'] as String?,
+      discountTypeDisplay: json['discountTypeDisplay'] as String?,
+      discountDisplay: json['discountDisplay'] as String?,
+      statusDisplay: json['statusDisplay'] as String?,
+      imageUrl: json['imageUrl'] as String?,
+      pointsCost: json['pointsCost'] as int?,
+      isOnePerUser: json['isOnePerUser'] as bool? ?? false,
+      isValid: json['isValid'] as bool? ?? true,
+      isExpired: json['isExpired'] as bool? ?? false,
+    );
+  }
   const CouponResponse({
     required this.id,
     required this.title,
@@ -55,41 +90,6 @@ class CouponResponse {
   final bool isOnePerUser;
   final bool isValid;
   final bool isExpired;
-
-  factory CouponResponse.fromJson(Map<String, dynamic> json) {
-    return CouponResponse(
-      id: json['id'] as int,
-      title: json['title'] as String,
-      description: json['description'] as String,
-      discountValue: (json['discountValue'] as num).toDouble(),
-      discountType: _mapDiscountTypeFromInt(json['discountType'] as int),
-      minimumOrderAmount: (json['minCartValue'] as num?)?.toDouble() ?? 0.0,
-      maximumDiscountAmount: (json['maxDiscountAmount'] as num?)?.toDouble() ?? 0.0,
-      validFrom: DateTime.parse(json['validFrom'] as String),
-      validTo: DateTime.parse(json['validUntil'] as String),
-      isActive: json['isActive'] as bool,
-      vendorId: json['vendorId'] as int,
-      status: _mapStatusFromInt(json['status'] as int),
-      termsAndConditions: json['termsAndConditions'] as String?,
-      usageCount: json['currentRedemptions'] as int? ?? 0,
-      maxUsageCount: json['maxRedemptions'] as int?,
-      createdAt: json['createdAt'] != null 
-          ? DateTime.parse(json['createdAt'] as String) 
-          : null,
-      updatedAt: json['updatedAt'] != null 
-          ? DateTime.parse(json['updatedAt'] as String) 
-          : null,
-      vendorName: json['vendorName'] as String?,
-      discountTypeDisplay: json['discountTypeDisplay'] as String?,
-      discountDisplay: json['discountDisplay'] as String?,
-      statusDisplay: json['statusDisplay'] as String?,
-      imageUrl: json['imageUrl'] as String?,
-      pointsCost: json['pointsCost'] as int?,
-      isOnePerUser: json['isOnePerUser'] as bool? ?? false,
-      isValid: json['isValid'] as bool? ?? true,
-      isExpired: json['isExpired'] as bool? ?? false,
-    );
-  }
 
   Map<String, dynamic> toJson() {
     return {
@@ -153,6 +153,20 @@ class CouponResponse {
 
 /// Get coupons response wrapper
 class GetCouponsResponse {
+
+  factory GetCouponsResponse.fromJson(Map<String, dynamic> json) {
+    return GetCouponsResponse(
+      items: (json['items'] as List<dynamic>)
+          .map((item) => CouponResponse.fromJson(item as Map<String, dynamic>))
+          .toList(),
+      totalCount: json['totalCount'] as int,
+      pageNumber: json['pageNumber'] as int,
+      pageSize: json['pageSize'] as int? ?? 10,
+      hasNextPage: json['hasNextPage'] as bool? ?? false,
+      hasPreviousPage: json['hasPreviousPage'] as bool? ?? false,
+      totalPages: json['totalPages'] as int?,
+    );
+  }
   const GetCouponsResponse({
     required this.items,
     required this.totalCount,
@@ -170,20 +184,6 @@ class GetCouponsResponse {
   final bool hasNextPage;
   final bool hasPreviousPage;
   final int? totalPages;
-
-  factory GetCouponsResponse.fromJson(Map<String, dynamic> json) {
-    return GetCouponsResponse(
-      items: (json['items'] as List<dynamic>)
-          .map((item) => CouponResponse.fromJson(item as Map<String, dynamic>))
-          .toList(),
-      totalCount: json['totalCount'] as int,
-      pageNumber: json['pageNumber'] as int,
-      pageSize: json['pageSize'] as int? ?? 10,
-      hasNextPage: json['hasNextPage'] as bool? ?? false,
-      hasPreviousPage: json['hasPreviousPage'] as bool? ?? false,
-      totalPages: json['totalPages'] as int?,
-    );
-  }
 
   Map<String, dynamic> toJson() {
     return {

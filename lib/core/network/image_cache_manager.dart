@@ -5,9 +5,6 @@ import 'package:http/io_client.dart';
 
 /// Custom cache manager for handling images with SSL bypass in debug mode
 class CustomImageCacheManager extends CacheManager with ImageCacheManager {
-  static const key = 'customImageCache';
-
-  static final CustomImageCacheManager _instance = CustomImageCacheManager._();
   factory CustomImageCacheManager() => _instance;
 
   CustomImageCacheManager._()
@@ -20,6 +17,9 @@ class CustomImageCacheManager extends CacheManager with ImageCacheManager {
             fileService: _createHttpFileService(),
           ),
         );
+  static const key = 'customImageCache';
+
+  static final CustomImageCacheManager _instance = CustomImageCacheManager._();
 
   static HttpFileService _createHttpFileService() {
     final httpClient = HttpClient();

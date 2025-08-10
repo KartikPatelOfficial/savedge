@@ -1,90 +1,72 @@
 import 'package:flutter/material.dart';
 
-/// Extension methods for BuildContext
-extension ContextExtensions on BuildContext {
-  /// Gets the current theme data
+/// Extensions for BuildContext
+extension BuildContextExtensions on BuildContext {
+  /// Theme extensions
   ThemeData get theme => Theme.of(this);
-
-  /// Gets the current color scheme
+  TextTheme get textTheme => theme.textTheme;
   ColorScheme get colorScheme => theme.colorScheme;
 
-  /// Gets the current text theme
-  TextTheme get textTheme => theme.textTheme;
-
-  /// Gets the media query data
+  /// MediaQuery extensions
   MediaQueryData get mediaQuery => MediaQuery.of(this);
-
-  /// Gets the screen size
   Size get screenSize => mediaQuery.size;
-
-  /// Gets the screen width
   double get screenWidth => screenSize.width;
-
-  /// Gets the screen height
   double get screenHeight => screenSize.height;
 
-  /// Checks if the device is in portrait mode
-  bool get isPortrait => mediaQuery.orientation == Orientation.portrait;
+  /// Navigation extensions
+  void pushNamed(String routeName, {Object? arguments}) {
+    Navigator.of(this).pushNamed(routeName, arguments: arguments);
+  }
 
-  /// Checks if the device is in landscape mode
-  bool get isLandscape => mediaQuery.orientation == Orientation.landscape;
+  void pushNamedAndClearStack(String routeName, {Object? arguments}) {
+    Navigator.of(this).pushNamedAndRemoveUntil(
+      routeName,
+      (route) => false,
+      arguments: arguments,
+    );
+  }
 
-  /// Gets the safe area padding
-  EdgeInsets get padding => mediaQuery.padding;
+  void pop<T>([T? result]) {
+    Navigator.of(this).pop(result);
+  }
 
-  /// Gets the keyboard height
-  double get keyboardHeight => mediaQuery.viewInsets.bottom;
-
-  /// Checks if the keyboard is visible
-  bool get isKeyboardVisible => keyboardHeight > 0;
-
-  /// Shows a snackbar with the given message
-  void showSnackBar(String message, {Duration? duration}) {
+  /// SnackBar extensions
+  void showSnackBar(String message, {Color? backgroundColor}) {
     ScaffoldMessenger.of(this).showSnackBar(
       SnackBar(
         content: Text(message),
-        duration: duration ?? const Duration(seconds: 3),
+        backgroundColor: backgroundColor,
+        behavior: SnackBarBehavior.floating,
       ),
     );
   }
 
-  /// Shows an error snackbar
-  void showErrorSnackBar(String message, {Duration? duration}) {
-    ScaffoldMessenger.of(this).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: colorScheme.error,
-        duration: duration ?? const Duration(seconds: 4),
-      ),
-    );
+  void showErrorSnackBar(String message) {
+    showSnackBar(message, backgroundColor: Colors.red);
   }
 
-  /// Shows a success snackbar
-  void showSuccessSnackBar(String message, {Duration? duration}) {
-    ScaffoldMessenger.of(this).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.green,
-        duration: duration ?? const Duration(seconds: 3),
-      ),
-    );
+  void showSuccessSnackBar(String message) {
+    showSnackBar(message, backgroundColor: Colors.green);
+  }
+}
+
+/// Extensions for String
+extension StringExtensions on String {
+  /// Check if string is email
+  bool get isEmail {
+    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+$');
+    return emailRegex.hasMatch(this);
   }
 
-  /// Pops the current route
-  void pop<T>([T? result]) => Navigator.of(this).pop(result);
+  /// Check if string is phone number
+  bool get isPhoneNumber {
+    final phoneRegex = RegExp(r'^\+?[\d\s-()]+$');
+    return phoneRegex.hasMatch(this);
+  }
 
-  /// Pushes a new route
-  Future<T?> push<T>(Route<T> route) => Navigator.of(this).push(route);
-
-  /// Pushes a new named route
-  Future<T?> pushNamed<T>(String routeName, {Object? arguments}) =>
-      Navigator.of(this).pushNamed(routeName, arguments: arguments);
-
-  /// Pushes a new route and removes all previous routes
-  Future<T?> pushNamedAndClearStack<T>(String routeName, {Object? arguments}) =>
-      Navigator.of(this).pushNamedAndRemoveUntil(
-        routeName,
-        (route) => false,
-        arguments: arguments,
-      );
+  /// Capitalize first letter
+  String get capitalize {
+    if (isEmpty) return this;
+    return '${this[0].toUpperCase()}${substring(1)}';
+  }
 }

@@ -27,6 +27,7 @@ void main() async {
   // Set up global BLoC observer for debugging
   Bloc.observer = AppBlocObserver();
 
+  // Run the main app with new auth system
   runApp(const SavedgeApp());
 }
 

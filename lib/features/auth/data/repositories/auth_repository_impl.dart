@@ -1,414 +1,165 @@
-import 'package:dartz/dartz.dart';
-import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
-import 'package:injectable/injectable.dart';
-import 'package:savedge/core/error/exceptions.dart';
-import 'package:savedge/core/error/failures.dart';
-import 'package:savedge/features/auth/data/datasources/auth_local_data_source.dart';
 import 'package:savedge/features/auth/data/datasources/auth_remote_data_source.dart';
-import 'package:savedge/features/auth/data/datasources/firebase_auth_data_source.dart';
-import 'package:savedge/features/auth/data/models/auth_requests.dart';
-import 'package:savedge/features/auth/domain/entities/phone_auth.dart';
-import 'package:savedge/features/auth/domain/entities/user.dart';
+import 'package:savedge/features/auth/data/models/auth_models.dart';
+import 'package:savedge/features/auth/domain/entities/user_profile.dart';
+import 'package:savedge/features/auth/domain/entities/extended_user_profile.dart';
 import 'package:savedge/features/auth/domain/repositories/auth_repository.dart';
-import 'package:savedge/features/auth/domain/usecases/check_user_exists_usecase.dart';
 
-/// Implementation of AuthRepository
-@LazySingleton(as: AuthRepository)
 class AuthRepositoryImpl implements AuthRepository {
-  const AuthRepositoryImpl(
-    this._remoteDataSource,
-    this._localDataSource,
-    this._firebaseDataSource,
-  );
+  const AuthRepositoryImpl(this._remote);
+  final AuthRemoteDataSource _remote;
 
-  final AuthRemoteDataSource _remoteDataSource;
-  final AuthLocalDataSource _localDataSource;
-  final FirebaseAuthDataSource _firebaseDataSource;
-
-  @override
-  Future<Either<Failure, bool>> checkUserExists() async {
-    try {
-      final response = await _remoteDataSource.checkUserExists();
-      return Right(response.exists);
-    } on ServerException catch (e) {
-      return Left(ServerFailure(e.message));
-    } on NetworkException catch (e) {
-      return Left(NetworkFailure(e.message));
-    } catch (e) {
-      return Left(UnexpectedFailure(e.toString()));
-    }
-  }
-
-  @override
-  Future<Either<Failure, UserExistsResult>> checkUserExistsWithProfile() async {
-    try {
-      final response = await _remoteDataSource.checkUserExists();
-
-      if (response.exists && response.userProfile != null) {
-        final user = response.userProfile!.toUserModel().toEntity();
-        final isEmployee = response.userProfile!.isEmployee;
-
-        return Right(
-          UserExistsResult(exists: true, user: user, isEmployee: isEmployee),
-        );
-      } else {
-        return const Right(UserExistsResult(exists: false));
-      }
-    } on ServerException catch (e) {
-      return Left(ServerFailure(e.message));
-    } on NetworkException catch (e) {
-      return Left(NetworkFailure(e.message));
-    } catch (e) {
-      return Left(UnexpectedFailure(e.toString()));
-    }
-  }
-
-  @override
-  Future<Either<Failure, User>> registerUser({
+  UserProfile _mapBase({
+    required String id,
     required String email,
     String? firstName,
     String? lastName,
-  }) async {
-    try {
-      final request = UserRegistrationRequest(
+    String? firebaseUid,
+    int? organizationId,
+    int? pointsBalance,
+    DateTime? pointsExpiry,
+    bool? isActive,
+    DateTime? createdAt,
+  }) =>
+      UserProfile(
+        id: id,
         email: email,
         firstName: firstName,
         lastName: lastName,
+        firebaseUid: firebaseUid,
+        organizationId: organizationId,
+        pointsBalance: pointsBalance ?? 0,
+        pointsExpiry: pointsExpiry,
+        isActive: isActive,
+        createdAt: createdAt,
       );
 
-      final response = await _remoteDataSource.registerUser(request);
-      final user = User(
-        id: response.id,
-        email: response.email,
-        firebaseUid: response.firebaseUid ?? '',
-        firstName: response.firstName,
-        lastName: response.lastName,
-        organizationId: response.organizationId,
-        organizationName: response.organizationName,
-        pointsBalance: response.pointsBalance,
-        pointsExpiry: response.pointsExpiry,
-        isActive: response.isActive,
-        createdAt: response.createdAt,
+  UserProfile _map(UserProfileResponse r) => _mapBase(
+        id: r.id,
+        email: r.email,
+        firstName: r.firstName,
+        lastName: r.lastName,
+        firebaseUid: r.firebaseUid,
+        organizationId: r.organizationId,
+        pointsBalance: r.pointsBalance,
+        pointsExpiry: r.pointsExpiry,
+        isActive: r.isActive,
+        createdAt: r.createdAt,
       );
 
-      // Cache user locally
-      await _localDataSource.cacheUser(user.toModel());
+  UserProfile _map2(UserProfileResponse2 r) => _mapBase(
+        id: r.id,
+        email: r.email,
+        firstName: r.firstName,
+        lastName: r.lastName,
+        firebaseUid: r.firebaseUid,
+        organizationId: r.organizationId,
+        pointsBalance: r.pointsBalance,
+        pointsExpiry: r.pointsExpiry,
+        isActive: r.isActive,
+        createdAt: r.createdAt,
+      );
 
-      return Right(user);
-    } on ServerException catch (e) {
-      return Left(ServerFailure(e.message));
-    } on NetworkException catch (e) {
-      return Left(NetworkFailure(e.message));
+  ExtendedUserProfile _mapExtended(UserProfileResponse2 r) => ExtendedUserProfile(
+        id: r.id,
+        email: r.email,
+        firstName: r.firstName,
+        lastName: r.lastName,
+        firebaseUid: r.firebaseUid,
+        organizationId: r.organizationId,
+        organizationName: r.organizationName,
+        pointsBalance: r.pointsBalance,
+        pointsExpiry: r.pointsExpiry,
+        isActive: r.isActive,
+        createdAt: r.createdAt,
+        roles: r.roles,
+        isEmployee: r.isEmployee,
+        employeeCode: r.employeeCode,
+        department: r.department,
+        position: r.position,
+        joinDate: r.joinDate,
+      );
+
+  @override
+  Future<UserProfile> getProfile() async => _map(await _remote.getProfile());
+
+  @override
+  Future<UserProfile> syncUser({required String email, String? displayName}) async => _map(
+        await _remote.syncUser(SyncUserRequest(email: email, displayName: displayName)),
+      );
+
+  @override
+  Future<void> validateToken(String idToken) async {
+    await _remote.validateToken(ValidateTokenRequest(idToken: idToken));
+  }
+
+  @override
+  Future<UserProfile> updateProfile({required String email, String? firstName, String? lastName}) async {
+    final res = await _remote.updateUserProfile(
+      UpdateUserProfileRequest(email: email, firstName: firstName, lastName: lastName),
+    );
+    return _map2(res);
+  }
+
+  @override
+  Future<ExtendedUserProfile> getUserProfileExtended() async {
+    final res = await _remote.getUserProfile();
+    return _mapExtended(res);
+  }
+
+  @override
+  Future<CheckUserExistsResponse> checkUserExists(String firebaseUid) async {
+    final res = await _remote.checkUserExists(
+      CheckUserExistsRequest(firebaseUid: firebaseUid),
+    );
+    return res;
+  }
+
+  @override
+  Future<EmployeeInfoResponse?> checkEmployeeByPhone(String phoneNumber) async {
+    try {
+      final res = await _remote.checkEmployeeByPhone(
+        CheckEmployeeByPhoneRequest(phoneNumber: phoneNumber),
+      );
+      return res;
     } catch (e) {
-      return Left(UnexpectedFailure(e.toString()));
+      // If employee not found, return null
+      return null;
     }
   }
 
   @override
-  Future<Either<Failure, User>> syncUserProfile({
+  Future<PhoneRegistrationResponse> registerEmployeeByPhone({
+    required String phoneNumber,
     required String email,
-    String? displayName,
+    required String firstName,
+    required String lastName,
   }) async {
-    try {
-      final request = SyncUserRequest(email: email, displayName: displayName);
-
-      final response = await _remoteDataSource.syncUserProfile(request);
-      final user = User(
-        id: response.id,
-        email: response.email,
-        firebaseUid: response.firebaseUid ?? '',
-        firstName: response.firstName,
-        lastName: response.lastName,
-        organizationId: response.organizationId,
-        organizationName: response.organizationId?.toString() ?? '',
-        pointsBalance: response.pointsBalance,
-        pointsExpiry: response.pointsExpiry,
-        isActive: response.isActive,
-        createdAt: response.createdAt,
-      );
-
-      // Cache user locally
-      await _localDataSource.cacheUser(user.toModel());
-
-      return Right(user);
-    } on ServerException catch (e) {
-      return Left(ServerFailure(e.message));
-    } on NetworkException catch (e) {
-      return Left(NetworkFailure(e.message));
-    } catch (e) {
-      return Left(UnexpectedFailure(e.toString()));
-    }
-  }
-
-  @override
-  Future<Either<Failure, User>> getUserProfile() async {
-    try {
-      final response = await _remoteDataSource.getUserProfile();
-      final user = User(
-        id: response.id,
-        email: response.email,
-        firebaseUid: response.firebaseUid ?? '',
-        firstName: response.firstName,
-        lastName: response.lastName,
-        organizationId: response.organizationId,
-        organizationName: response.organizationId?.toString() ?? '',
-        pointsBalance: response.pointsBalance,
-        pointsExpiry: response.pointsExpiry,
-        isActive: response.isActive,
-        createdAt: response.createdAt,
-      );
-
-      // Update local cache
-      await _localDataSource.cacheUser(user.toModel());
-
-      return Right(user);
-    } on ServerException catch (e) {
-      return Left(ServerFailure(e.message));
-    } on NetworkException catch (e) {
-      return Left(NetworkFailure(e.message));
-    } catch (e) {
-      return Left(UnexpectedFailure(e.toString()));
-    }
-  }
-
-  @override
-  Future<Either<Failure, User>> updateUserProfile({
-    String? firstName,
-    String? lastName,
-  }) async {
-    try {
-      final request = UpdateUserProfileRequest(
+    final res = await _remote.registerEmployeeByPhone(
+      RegisterEmployeeByPhoneRequest(
+        phoneNumber: phoneNumber,
+        email: email,
         firstName: firstName,
         lastName: lastName,
-      );
-
-      final response = await _remoteDataSource.updateUserProfile(request);
-      final user = User(
-        id: response.id,
-        email: response.email,
-        firebaseUid: response.firebaseUid ?? '',
-        firstName: response.firstName,
-        lastName: response.lastName,
-        organizationId: response.organizationId,
-        organizationName: response.organizationId?.toString() ?? '',
-        pointsBalance: response.pointsBalance,
-        pointsExpiry: response.pointsExpiry,
-        isActive: response.isActive,
-        createdAt: response.createdAt,
-      );
-
-      // Update local cache
-      await _localDataSource.cacheUser(user.toModel());
-
-      return Right(user);
-    } on ServerException catch (e) {
-      return Left(ServerFailure(e.message));
-    } on NetworkException catch (e) {
-      return Left(NetworkFailure(e.message));
-    } catch (e) {
-      return Left(UnexpectedFailure(e.toString()));
-    }
+      ),
+    );
+    return res;
   }
 
   @override
-  Future<Either<Failure, User>> changeOrganization({
-    required String userId,
-    required int organizationId,
-  }) async {
-    try {
-      final request = ChangeOrganizationRequest(organizationId: organizationId);
-
-      final response = await _remoteDataSource.changeUserOrganization(
-        userId,
-        request,
-      );
-      final user = User(
-        id: response.id,
-        email: response.email,
-        firebaseUid: response.firebaseUid ?? '',
-        firstName: response.firstName,
-        lastName: response.lastName,
-        organizationId: response.organizationId,
-        organizationName: response.organizationId?.toString() ?? '',
-        pointsBalance: response.pointsBalance,
-        pointsExpiry: response.pointsExpiry,
-        isActive: response.isActive,
-        createdAt: response.createdAt,
-      );
-
-      // Update local cache
-      await _localDataSource.cacheUser(user.toModel());
-
-      return Right(user);
-    } on ServerException catch (e) {
-      return Left(ServerFailure(e.message));
-    } on NetworkException catch (e) {
-      return Left(NetworkFailure(e.message));
-    } catch (e) {
-      return Left(UnexpectedFailure(e.toString()));
-    }
-  }
-
-  @override
-  Future<Either<Failure, User>> removeFromOrganization(String userId) async {
-    try {
-      final response = await _remoteDataSource.removeUserFromOrganization(
-        userId,
-      );
-      final user = User(
-        id: response.id,
-        email: response.email,
-        firebaseUid: response.firebaseUid ?? '',
-        firstName: response.firstName,
-        lastName: response.lastName,
-        organizationId: response.organizationId,
-        organizationName: response.organizationId?.toString() ?? '',
-        pointsBalance: response.pointsBalance,
-        pointsExpiry: response.pointsExpiry,
-        isActive: response.isActive,
-        createdAt: response.createdAt,
-      );
-
-      // Update local cache
-      await _localDataSource.cacheUser(user.toModel());
-
-      return Right(user);
-    } on ServerException catch (e) {
-      return Left(ServerFailure(e.message));
-    } on NetworkException catch (e) {
-      return Left(NetworkFailure(e.message));
-    } catch (e) {
-      return Left(UnexpectedFailure(e.toString()));
-    }
-  }
-
-  @override
-  Future<Either<Failure, bool>> validateToken(String idToken) async {
-    try {
-      final request = ValidateTokenRequest(idToken: idToken);
-      await _remoteDataSource.validateToken(request);
-      return const Right(true);
-    } on ServerException catch (e) {
-      return Left(ServerFailure(e.message));
-    } on NetworkException catch (e) {
-      return Left(NetworkFailure(e.message));
-    } catch (e) {
-      return Left(UnexpectedFailure(e.toString()));
-    }
-  }
-
-  @override
-  Future<Either<Failure, PhoneAuth>> sendOtp({
+  Future<PhoneRegistrationResponse> registerUserByPhone({
     required String phoneNumber,
-    required String countryCode,
+    required String email,
+    required String firstName,
+    required String lastName,
   }) async {
-    try {
-      final result = await _firebaseDataSource.sendOtp(
+    final res = await _remote.registerUserByPhone(
+      RegisterUserByPhoneRequest(
         phoneNumber: phoneNumber,
-        countryCode: countryCode,
-      );
-      return Right(result);
-    } on AuthException catch (e) {
-      return Left(AuthFailure(e.message));
-    } catch (e) {
-      return Left(UnexpectedFailure(e.toString()));
-    }
-  }
-
-  @override
-  Future<Either<Failure, firebase_auth.User>> verifyOtp({
-    required String verificationId,
-    required String otp,
-  }) async {
-    try {
-      final user = await _firebaseDataSource.verifyOtp(
-        verificationId: verificationId,
-        otp: otp,
-      );
-      return Right(user);
-    } on AuthException catch (e) {
-      return Left(AuthFailure(e.message));
-    } catch (e) {
-      return Left(UnexpectedFailure(e.toString()));
-    }
-  }
-
-  @override
-  Future<Either<Failure, PhoneAuth>> resendOtp({
-    required String phoneNumber,
-    required String countryCode,
-    int? forceResendingToken,
-  }) async {
-    try {
-      final result = await _firebaseDataSource.resendOtp(
-        phoneNumber: phoneNumber,
-        countryCode: countryCode,
-        forceResendingToken: forceResendingToken,
-      );
-      return Right(result);
-    } on AuthException catch (e) {
-      return Left(AuthFailure(e.message));
-    } catch (e) {
-      return Left(UnexpectedFailure(e.toString()));
-    }
-  }
-
-  @override
-  Future<Either<Failure, void>> signOut() async {
-    try {
-      await _firebaseDataSource.signOut();
-      await _localDataSource.clearUser();
-      return const Right(null);
-    } on AuthException catch (e) {
-      return Left(AuthFailure(e.message));
-    } on CacheException catch (e) {
-      return Left(CacheFailure(e.message));
-    } catch (e) {
-      return Left(UnexpectedFailure(e.toString()));
-    }
-  }
-
-  @override
-  firebase_auth.User? get currentFirebaseUser =>
-      _firebaseDataSource.currentUser;
-
-  @override
-  Stream<firebase_auth.User?> get authStateChanges =>
-      _firebaseDataSource.authStateChanges;
-
-  @override
-  Future<Either<Failure, User?>> getCurrentUser() async {
-    try {
-      final user = await _localDataSource.getCachedUser();
-      return Right(user?.toEntity());
-    } on CacheException catch (e) {
-      return Left(CacheFailure(e.message));
-    } catch (e) {
-      return Left(UnexpectedFailure(e.toString()));
-    }
-  }
-
-  @override
-  Future<Either<Failure, void>> saveUserToLocal(User user) async {
-    try {
-      await _localDataSource.cacheUser(user.toModel());
-      return const Right(null);
-    } on CacheException catch (e) {
-      return Left(CacheFailure(e.message));
-    } catch (e) {
-      return Left(UnexpectedFailure(e.toString()));
-    }
-  }
-
-  @override
-  Future<Either<Failure, void>> clearLocalUser() async {
-    try {
-      await _localDataSource.clearUser();
-      return const Right(null);
-    } on CacheException catch (e) {
-      return Left(CacheFailure(e.message));
-    } catch (e) {
-      return Left(UnexpectedFailure(e.toString()));
-    }
+        email: email,
+        firstName: firstName,
+        lastName: lastName,
+      ),
+    );
+    return res;
   }
 }
