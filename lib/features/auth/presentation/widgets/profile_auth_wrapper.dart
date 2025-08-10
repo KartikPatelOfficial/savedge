@@ -16,13 +16,23 @@ class ProfileAuthWrapper extends StatefulWidget {
 
   @override
   State<ProfileAuthWrapper> createState() => _ProfileAuthWrapperState();
+  
+  /// Global key to access the ProfileAuthWrapper state from anywhere
+  static final GlobalKey globalKey = GlobalKey<State<ProfileAuthWrapper>>();
+  
+  /// Static method to trigger a recheck of auth status
+  static void recheckAuthStatus() {
+    final state = globalKey.currentState;
+    if (state is _ProfileAuthWrapperState) {
+      state._checkAuthStatus();
+    }
+  }
 }
 
 class _ProfileAuthWrapperState extends State<ProfileAuthWrapper> {
   bool _isLoading = true;
   String? _error;
   ProfileAuthStatus? _authStatus;
-  ExtendedUserProfile? _extendedProfile;
   StreamSubscription<User?>? _authSubscription;
 
   AuthRepository get _authRepository => GetIt.I<AuthRepository>();
@@ -54,20 +64,24 @@ class _ProfileAuthWrapperState extends State<ProfileAuthWrapper> {
   Future<void> _checkAuthStatus() async {
     print('ProfileAuthWrapper: Starting auth status check');
     try {
-      setState(() {
-        _isLoading = true;
-        _error = null;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = true;
+          _error = null;
+        });
+      }
 
       final firebaseUser = FirebaseAuth.instance.currentUser;
       print('ProfileAuthWrapper: Firebase user: ${firebaseUser?.email ?? "null"}');
       
       if (firebaseUser == null) {
         print('ProfileAuthWrapper: No Firebase user, showing phone auth');
-        setState(() {
-          _authStatus = ProfileAuthStatus.unauthenticated;
-          _isLoading = false;
-        });
+        if (mounted) {
+          setState(() {
+            _authStatus = ProfileAuthStatus.unauthenticated;
+            _isLoading = false;
+          });
+        }
         return;
       }
 
@@ -84,11 +98,12 @@ class _ProfileAuthWrapperState extends State<ProfileAuthWrapper> {
           final status = _determineAuthStatus(extendedProfile);
           print('ProfileAuthWrapper: Determined status: $status');
           
-          setState(() {
-            _extendedProfile = extendedProfile;
-            _authStatus = status;
-            _isLoading = false;
-          });
+          if (mounted) {
+            setState(() {
+              _authStatus = status;
+              _isLoading = false;
+            });
+          }
         } else {
           // User doesn't exist in backend, check if they're an employee
           print('ProfileAuthWrapper: User not found, checking employee status...');
@@ -99,40 +114,50 @@ class _ProfileAuthWrapperState extends State<ProfileAuthWrapper> {
             
             if (employeeInfo != null) {
               print('ProfileAuthWrapper: Found employee, showing employee registration');
-              setState(() {
-                _authStatus = ProfileAuthStatus.employeeFound;
-                _isLoading = false;
-              });
+              if (mounted) {
+                setState(() {
+                  _authStatus = ProfileAuthStatus.employeeFound;
+                  _isLoading = false;
+                });
+              }
             } else {
               print('ProfileAuthWrapper: No employee found, showing individual registration');
+              if (mounted) {
+                setState(() {
+                  _authStatus = ProfileAuthStatus.needsRegistration;
+                  _isLoading = false;
+                });
+              }
+            }
+          } else {
+            print('ProfileAuthWrapper: No phone number, showing individual registration');
+            if (mounted) {
               setState(() {
                 _authStatus = ProfileAuthStatus.needsRegistration;
                 _isLoading = false;
               });
             }
-          } else {
-            print('ProfileAuthWrapper: No phone number, showing individual registration');
-            setState(() {
-              _authStatus = ProfileAuthStatus.needsRegistration;
-              _isLoading = false;
-            });
           }
         }
       } catch (e) {
         print('ProfileAuthWrapper: Error checking user status: $e');
-        setState(() {
-          _authStatus = ProfileAuthStatus.error;
-          _isLoading = false;
-          _error = 'Failed to check user status: $e';
-        });
+        if (mounted) {
+          setState(() {
+            _authStatus = ProfileAuthStatus.error;
+            _isLoading = false;
+            _error = 'Failed to check user status: $e';
+          });
+        }
       }
     } catch (e) {
       print('ProfileAuthWrapper: General error: $e');
-      setState(() {
-        _error = e.toString();
-        _authStatus = ProfileAuthStatus.error;
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _error = e.toString();
+          _authStatus = ProfileAuthStatus.error;
+          _isLoading = false;
+        });
+      }
     }
   }
 
