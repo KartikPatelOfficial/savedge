@@ -29,6 +29,13 @@ import 'package:savedge/features/auth/domain/usecases/sync_user_usecase.dart';
 import 'package:savedge/features/auth/presentation/bloc/phone_auth_cubit.dart';
 import 'package:savedge/features/auth/presentation/bloc/auth_status_cubit.dart';
 import 'package:savedge/core/network/auth_token_interceptor.dart';
+// Subscription imports
+import 'package:savedge/features/subscription/data/datasources/subscription_plan_remote_data_source.dart';
+import 'package:savedge/features/subscription/data/repositories/subscription_plan_repository_impl.dart';
+import 'package:savedge/features/subscription/domain/repositories/subscription_plan_repository.dart';
+import 'package:savedge/features/subscription/domain/services/razorpay_payment_service.dart';
+import 'package:savedge/features/subscription/presentation/bloc/subscription_plan_bloc.dart';
+import 'package:savedge/core/network/network_client.dart';
 
 final GetIt getIt = GetIt.instance;
 
@@ -42,6 +49,9 @@ Future<void> configureDependencies() async {
 
   // Dio HTTP client
   getIt.registerSingleton<Dio>(_createDio());
+  
+  // HTTP client wrapper
+  getIt.registerSingleton<HttpClient>(DioHttpClient(getIt<Dio>()));
 
   // Auth layer
   getIt.registerSingleton<AuthRemoteDataSource>(AuthRemoteDataSource(getIt<Dio>()));
@@ -57,6 +67,11 @@ Future<void> configureDependencies() async {
     CouponsRemoteDataSource(getIt<Dio>()),
   );
 
+  // Subscription layer
+  getIt.registerSingleton<SubscriptionPlanRemoteDataSource>(
+    SubscriptionPlanRemoteDataSourceImpl(getIt<Dio>()),
+  );
+
   // Repositories
   getIt.registerSingleton<VendorsRepository>(
     VendorsRepositoryImpl(remoteDataSource: getIt<VendorsRemoteDataSource>()),
@@ -64,6 +79,10 @@ Future<void> configureDependencies() async {
 
   getIt.registerSingleton<CouponsRepository>(
     CouponsRepositoryImpl(getIt<CouponsRemoteDataSource>()),
+  );
+
+  getIt.registerSingleton<SubscriptionPlanRepository>(
+    SubscriptionPlanRepositoryImpl(getIt<SubscriptionPlanRemoteDataSource>()),
   );
 
   getIt.registerSingleton<GetVendorsUseCase>(
@@ -94,6 +113,13 @@ Future<void> configureDependencies() async {
         getFeaturedCouponsUseCase: getIt<GetFeaturedCouponsUseCase>(),
         getVendorCouponsUseCase: getIt<GetVendorCouponsUseCase>(),
       ));
+
+  getIt.registerFactory<SubscriptionPlanBloc>(() => SubscriptionPlanBloc(
+        subscriptionPlanRepository: getIt<SubscriptionPlanRepository>(),
+      ));
+
+  // Payment service
+  getIt.registerLazySingleton<RazorpayPaymentService>(() => RazorpayPaymentService());
 
   // Auth cubits
   getIt.registerFactory<PhoneAuthCubit>(() => PhoneAuthCubit(getIt<FirebaseAuth>()));

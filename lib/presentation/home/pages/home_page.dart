@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:savedge/presentation/home/widgets/widgets.dart';
+import 'package:savedge/core/services/subscription_plan_service.dart';
+import 'package:savedge/presentation/subscription/subscription_purchase_page.dart';
 
 /// Home page of the application
 class HomePage extends StatefulWidget {
@@ -49,9 +51,15 @@ class _HomePageState extends State<HomePage> {
             ),
             // Hot Deals
             SliverToBoxAdapter(child: HotDealsSection(deals: _getHotDeals())),
-            // Membership Section
+            // Subscription Plans
             SliverToBoxAdapter(
-              child: MembershipSection(onJoinTap: _onMembershipJoinTap),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: SubscriptionPlansWidget(
+                  plans: SubscriptionPlanService.getSamplePlans(),
+                  onPlanTap: _onSubscriptionPlanTap,
+                ),
+              ),
             ),
             // Marketplace
             SliverToBoxAdapter(
@@ -93,8 +101,10 @@ class _HomePageState extends State<HomePage> {
     debugPrint('Categories see all tap');
   }
 
-  void _onMembershipJoinTap() {
-    debugPrint('Membership join tap');
+  void _onSubscriptionPlanTap(plan) {
+    Navigator.of(context).push(
+      SubscriptionPurchasePage.route(plan),
+    );
   }
 
   void _onMarketplaceSeeAllTap() {

@@ -6,7 +6,7 @@
     "version": "1.0.0"
   },
   "paths": {
-    "/api/AdminClaims/set-admin": {
+    "/api/admin/claims/set-admin": {
       "post": {
         "tags": [
           "AdminClaims"
@@ -39,7 +39,7 @@
         }
       }
     },
-    "/api/AdminClaims/remove-admin": {
+    "/api/admin/claims/remove-admin": {
       "post": {
         "tags": [
           "AdminClaims"
@@ -72,7 +72,7 @@
         }
       }
     },
-    "/api/AdminClaims/get-claims/{firebaseUid}": {
+    "/api/admin/claims/get-claims/{firebaseUid}": {
       "get": {
         "tags": [
           "AdminClaims"
@@ -112,18 +112,122 @@
         }
       }
     },
-    "/api/auth/sync": {
+    "/api/admin/ledger/points": {
+      "get": {
+        "tags": [
+          "AdminLedger"
+        ],
+        "operationId": "AdminLedger_GetSystemPointsLedger",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SystemPointLedgerEntryResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/ledger/coupons": {
+      "get": {
+        "tags": [
+          "AdminLedger"
+        ],
+        "operationId": "AdminLedger_GetCouponRedemptions",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SystemCouponRedemptionResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/subscriptions": {
+      "get": {
+        "tags": [
+          "AdminSubscriptions"
+        ],
+        "operationId": "AdminSubscriptions_GetPlans",
+        "parameters": [
+          {
+            "name": "pageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            },
+            "x-position": 1
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            },
+            "x-position": 2
+          },
+          {
+            "name": "isActive",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "nullable": true
+            },
+            "x-position": 3
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 4
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminSubscriptionPlansResponse"
+                }
+              }
+            }
+          }
+        }
+      },
       "post": {
         "tags": [
-          "Auth"
+          "AdminSubscriptions"
         ],
-        "operationId": "Auth_SyncUserProfile",
+        "operationId": "AdminSubscriptions_CreatePlan",
         "requestBody": {
           "x-name": "request",
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/SyncUserRequest"
+                "$ref": "#/components/schemas/CreateSubscriptionPlanRequest"
               }
             }
           },
@@ -136,7 +240,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UserProfileResponse"
+                  "$ref": "#/components/schemas/AdminSubscriptionPlanDto"
                 }
               }
             }
@@ -144,19 +248,104 @@
         }
       }
     },
-    "/api/auth/profile": {
+    "/api/admin/subscriptions/{id}": {
       "get": {
         "tags": [
-          "Auth"
+          "AdminSubscriptions"
         ],
-        "operationId": "Auth_GetProfile",
+        "operationId": "AdminSubscriptions_GetPlan",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UserProfileResponse"
+                  "$ref": "#/components/schemas/AdminSubscriptionPlanDetailDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "AdminSubscriptions"
+        ],
+        "operationId": "AdminSubscriptions_UpdatePlan",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSubscriptionPlanRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminSubscriptionPlanDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "AdminSubscriptions"
+        ],
+        "operationId": "AdminSubscriptions_DeletePlan",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
                 }
               }
             }
@@ -164,7 +353,62 @@
         }
       }
     },
-    "/api/auth/validate-token": {
+    "/api/admin/subscriptions/{id}/subscribers": {
+      "get": {
+        "tags": [
+          "AdminSubscriptions"
+        ],
+        "operationId": "AdminSubscriptions_GetPlanSubscribers",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "pageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            },
+            "x-position": 2
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            },
+            "x-position": 3
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SubscriberDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Auth/validate-token": {
       "post": {
         "tags": [
           "Auth"
@@ -466,6 +710,147 @@
         }
       }
     },
+    "/api/employees/check-by-phone": {
+      "post": {
+        "tags": [
+          "Employees"
+        ],
+        "operationId": "Employees_CheckEmployeeByPhone",
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckEmployeeByPhoneRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmployeeValidationResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/employees/register-by-phone": {
+      "post": {
+        "tags": [
+          "Employees"
+        ],
+        "operationId": "Employees_RegisterEmployeeByPhone",
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmployeeRegistrationByPhoneRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserRegistrationResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/organizations/{organizationId}/employees": {
+      "get": {
+        "tags": [
+          "Employees"
+        ],
+        "operationId": "Employees_GetEmployeesByOrganization",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EmployeeDetailResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Employees"
+        ],
+        "operationId": "Employees_AddEmployee",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminAddEmployeeRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmployeeDetailResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/organizations/{organizationId}/employees/bulk": {
       "post": {
         "tags": [
@@ -510,15 +895,15 @@
         }
       }
     },
-    "/api/admin/organizations/{organizationId}/employees": {
-      "get": {
+    "/api/admin/employees/{employeeId}": {
+      "delete": {
         "tags": [
           "Employees"
         ],
-        "operationId": "Employees_GetOrganizationEmployees",
+        "operationId": "Employees_RemoveEmployee",
         "parameters": [
           {
-            "name": "organizationId",
+            "name": "employeeId",
             "in": "path",
             "required": true,
             "schema": {
@@ -526,26 +911,40 @@
               "format": "int32"
             },
             "x-position": 1
+          },
+          {
+            "name": "deactivateUserAccount",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": true
+            },
+            "x-position": 2
+          },
+          {
+            "name": "reason",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 3
           }
         ],
         "responses": {
           "200": {
             "description": "",
             "content": {
-              "application/json": {
+              "application/octet-stream": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/EmployeeDetailResponse"
-                  }
+                  "type": "string",
+                  "format": "binary"
                 }
               }
             }
           }
         }
-      }
-    },
-    "/api/admin/employees/{employeeId}": {
+      },
       "put": {
         "tags": [
           "Employees"
@@ -579,20 +978,21 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": {
+              "application/octet-stream": {
                 "schema": {
-                  "$ref": "#/components/schemas/EmployeeDetailResponse"
+                  "type": "string",
+                  "format": "binary"
                 }
               }
             }
           }
         }
       },
-      "delete": {
+      "get": {
         "tags": [
           "Employees"
         ],
-        "operationId": "Employees_RemoveEmployee",
+        "operationId": "Employees_GetEmployee",
         "parameters": [
           {
             "name": "employeeId",
@@ -609,10 +1009,9 @@
           "200": {
             "description": "",
             "content": {
-              "application/octet-stream": {
+              "application/json": {
                 "schema": {
-                  "type": "string",
-                  "format": "binary"
+                  "$ref": "#/components/schemas/EmployeeDetailResponse"
                 }
               }
             }
@@ -620,19 +1019,31 @@
         }
       }
     },
-    "/api/employees/my-info": {
+    "/api/ImageProxy/{fileName}": {
       "get": {
         "tags": [
-          "Employees"
+          "ImageProxy"
         ],
-        "operationId": "Employees_GetMyEmployeeInfo",
+        "operationId": "ImageProxy_GetImage",
+        "parameters": [
+          {
+            "name": "fileName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
             "content": {
-              "application/json": {
+              "application/octet-stream": {
                 "schema": {
-                  "$ref": "#/components/schemas/EmployeeDetailResponse"
+                  "type": "string",
+                  "format": "binary"
                 }
               }
             }
@@ -813,12 +1224,43 @@
         }
       }
     },
-    "/api/admin/organizations": {
+    "/api/admin/reports": {
       "get": {
         "tags": [
-          "Organizations"
+          "LedgerReports"
         ],
-        "operationId": "Organizations_GetOrganizations",
+        "operationId": "LedgerReports_GetReports",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LedgerReportResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/offers": {
+      "get": {
+        "tags": [
+          "Offers"
+        ],
+        "operationId": "Offers_GetOffers",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 1
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -827,8 +1269,144 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/OrganizationResponse"
+                    "$ref": "#/components/schemas/AdminOfferDto"
                   }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Offers"
+        ],
+        "operationId": "Offers_CreateAdminOffer",
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAdminOfferRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminOfferDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/offers/{offerId}/status": {
+      "put": {
+        "tags": [
+          "Offers"
+        ],
+        "operationId": "Offers_UpdateOfferStatus",
+        "parameters": [
+          {
+            "name": "offerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateOfferStatusRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/organizations": {
+      "get": {
+        "tags": [
+          "Organizations"
+        ],
+        "operationId": "Organizations_GetOrganizations",
+        "parameters": [
+          {
+            "name": "pageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            },
+            "x-position": 1
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            },
+            "x-position": 2
+          },
+          {
+            "name": "searchTerm",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 3
+          },
+          {
+            "name": "isActive",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "nullable": true
+            },
+            "x-position": 4
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
                 }
               }
             }
@@ -856,9 +1434,10 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": {
+              "application/octet-stream": {
                 "schema": {
-                  "$ref": "#/components/schemas/OrganizationResponse"
+                  "type": "string",
+                  "format": "binary"
                 }
               }
             }
@@ -888,20 +1467,90 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": {
+              "application/octet-stream": {
                 "schema": {
-                  "$ref": "#/components/schemas/OrganizationDetailResponse"
+                  "type": "string",
+                  "format": "binary"
                 }
               }
             }
           }
         }
-      },
-      "put": {
+      }
+    },
+    "/api/vendors/{vendorId}/reviews": {
+      "get": {
         "tags": [
-          "Organizations"
+          "Reviews"
         ],
-        "operationId": "Organizations_UpdateOrganization",
+        "operationId": "Reviews_GetVendorReviews",
+        "parameters": [
+          {
+            "name": "vendorId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ReviewDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/reviews": {
+      "post": {
+        "tags": [
+          "Reviews"
+        ],
+        "operationId": "Reviews_CreateReview",
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateReviewRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReviewDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/reviews/{id}": {
+      "delete": {
+        "tags": [
+          "Reviews"
+        ],
+        "operationId": "Reviews_DeleteOwnReview",
         "parameters": [
           {
             "name": "id",
@@ -914,36 +1563,27 @@
             "x-position": 1
           }
         ],
-        "requestBody": {
-          "x-name": "request",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateOrganizationRequest"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 2
-        },
         "responses": {
           "200": {
             "description": "",
             "content": {
-              "application/json": {
+              "application/octet-stream": {
                 "schema": {
-                  "$ref": "#/components/schemas/OrganizationResponse"
+                  "type": "string",
+                  "format": "binary"
                 }
               }
             }
           }
         }
-      },
+      }
+    },
+    "/api/admin/reviews/{id}": {
       "delete": {
         "tags": [
-          "Organizations"
+          "Reviews"
         ],
-        "operationId": "Organizations_DeleteOrganization",
+        "operationId": "Reviews_AdminDeleteReview",
         "parameters": [
           {
             "name": "id",
@@ -1144,31 +1784,67 @@
         }
       }
     },
-    "/api/Test": {
+    "/api/subscriptions": {
       "get": {
         "tags": [
-          "Test"
+          "Subscriptions"
         ],
-        "operationId": "Test_Get",
+        "operationId": "Subscriptions_GetPlans",
         "responses": {
           "200": {
             "description": "",
             "content": {
-              "application/octet-stream": {
+              "application/json": {
                 "schema": {
-                  "type": "string",
-                  "format": "binary"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SubscriptionPlanDto"
+                  }
                 }
               }
             }
           }
         }
-      },
-      "options": {
+      }
+    },
+    "/api/user/subscription": {
+      "get": {
         "tags": [
-          "Test"
+          "Subscriptions"
         ],
-        "operationId": "Test_Options",
+        "operationId": "Subscriptions_GetMySubscription",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserSubscriptionDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/subscription/purchase": {
+      "post": {
+        "tags": [
+          "Subscriptions"
+        ],
+        "operationId": "Subscriptions_PurchaseSubscription",
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PurchaseSubscriptionRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
         "responses": {
           "200": {
             "description": "",
@@ -1184,20 +1860,118 @@
         }
       }
     },
-    "/api/Test/auth": {
+    "/api/user/coupons": {
       "get": {
         "tags": [
-          "Test"
+          "UserCoupons"
         ],
-        "operationId": "Test_GetAuth",
+        "operationId": "UserCoupons_GetMyCoupons",
         "responses": {
           "200": {
             "description": "",
             "content": {
-              "application/octet-stream": {
+              "application/json": {
                 "schema": {
-                  "type": "string",
-                  "format": "binary"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserCouponDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/coupons/claim": {
+      "post": {
+        "tags": [
+          "UserCoupons"
+        ],
+        "operationId": "UserCoupons_ClaimCoupon",
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClaimCouponRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClaimCouponResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/coupons/purchase": {
+      "post": {
+        "tags": [
+          "UserCoupons"
+        ],
+        "operationId": "UserCoupons_PurchaseCoupon",
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PurchaseCouponRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClaimCouponResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/check-exists": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "Users_CheckUserExists",
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckUserExistsRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckUserExistsResponse"
                 }
               }
             }
@@ -1242,31 +2016,33 @@
         "tags": [
           "Users"
         ],
-        "operationId": "Users_GetProfile",
+        "operationId": "Users_GetUserProfile",
         "responses": {
           "200": {
             "description": "",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UserProfileResponse2"
+                  "$ref": "#/components/schemas/UserProfileResponse"
                 }
               }
             }
           }
         }
-      },
-      "put": {
+      }
+    },
+    "/api/users/register-with-phone": {
+      "post": {
         "tags": [
           "Users"
         ],
-        "operationId": "Users_UpdateProfile",
+        "operationId": "Users_RegisterUserWithPhone",
         "requestBody": {
           "x-name": "request",
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateUserProfileRequest"
+                "$ref": "#/components/schemas/PhoneRegistrationRequest"
               }
             }
           },
@@ -1279,7 +2055,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UserProfileResponse2"
+                  "$ref": "#/components/schemas/UserRegistrationResponse"
                 }
               }
             }
@@ -1287,19 +2063,19 @@
         }
       }
     },
-    "/api/users/check-exists": {
-      "post": {
+    "/api/user/points": {
+      "get": {
         "tags": [
-          "Users"
+          "UserWallet"
         ],
-        "operationId": "Users_CheckUserExists",
+        "operationId": "UserWallet_GetPoints",
         "responses": {
           "200": {
             "description": "",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UserExistsResponse"
+                  "$ref": "#/components/schemas/UserPointsResponse"
                 }
               }
             }
@@ -1307,112 +2083,12 @@
         }
       }
     },
-    "/api/users/{userId}/change-organization": {
-      "post": {
-        "tags": [
-          "Users"
-        ],
-        "operationId": "Users_ChangeUserOrganization",
-        "parameters": [
-          {
-            "name": "userId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 1
-          }
-        ],
-        "requestBody": {
-          "x-name": "request",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ChangeOrganizationRequest"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 2
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/octet-stream": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/users/{userId}/remove-from-organization": {
-      "post": {
-        "tags": [
-          "Users"
-        ],
-        "operationId": "Users_RemoveFromOrganization",
-        "parameters": [
-          {
-            "name": "userId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 1
-          }
-        ],
-        "requestBody": {
-          "x-name": "request",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RemoveFromOrganizationRequest"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 2
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/octet-stream": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/organizations/{organizationId}/pending-employees": {
+    "/api/user/ledger": {
       "get": {
         "tags": [
-          "Users"
+          "UserWallet"
         ],
-        "operationId": "Users_GetPendingEmployees",
-        "parameters": [
-          {
-            "name": "organizationId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "x-position": 1
-          }
-        ],
+        "operationId": "UserWallet_GetLedger",
         "responses": {
           "200": {
             "description": "",
@@ -1421,7 +2097,136 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/PendingEmployeeResponse"
+                    "$ref": "#/components/schemas/UserPointLedgerEntryResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/vendor/profile": {
+      "get": {
+        "tags": [
+          "VendorPortal"
+        ],
+        "operationId": "VendorPortal_GetProfile",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VendorProfileDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "VendorPortal"
+        ],
+        "operationId": "VendorPortal_UpdateProfile",
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateVendorProfileRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/vendor/offers": {
+      "get": {
+        "tags": [
+          "VendorPortal"
+        ],
+        "operationId": "VendorPortal_GetMyOffers",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/VendorOfferDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/vendor/redeem": {
+      "post": {
+        "tags": [
+          "VendorPortal"
+        ],
+        "operationId": "VendorPortal_RedeemCoupon",
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RedeemCouponRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VendorRedemptionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/vendor/redemptions": {
+      "get": {
+        "tags": [
+          "VendorPortal"
+        ],
+        "operationId": "VendorPortal_GetRedemptions",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/VendorRedemptionDto"
                   }
                 }
               }
@@ -1619,6 +2424,159 @@
         }
       }
     },
+    "/api/Vendors/with-images": {
+      "post": {
+        "tags": [
+          "Vendors"
+        ],
+        "operationId": "Vendors_CreateVendorWithImages",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "properties": {
+                  "businessName": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "contactEmail": {
+                    "type": "string"
+                  },
+                  "contactPhone": {
+                    "type": "string"
+                  },
+                  "address": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "city": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "state": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "pinCode": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "category": {
+                    "type": "string"
+                  },
+                  "website": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "vendorFirstName": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "vendorLastName": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "imageFiles": {
+                    "type": "array",
+                    "nullable": true,
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateVendorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Vendors/register/with-images": {
+      "post": {
+        "tags": [
+          "Vendors"
+        ],
+        "operationId": "Vendors_RegisterVendorWithImages",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "properties": {
+                  "businessName": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "businessType": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "contactPersonName": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "email": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "phoneNumber": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "address": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "website": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "description": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "imageFiles": {
+                    "type": "array",
+                    "nullable": true,
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/Vendors/{id}": {
       "get": {
         "tags": [
@@ -1710,6 +2668,101 @@
             "x-position": 1
           }
         ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Vendors/{id}/with-images": {
+      "put": {
+        "tags": [
+          "Vendors"
+        ],
+        "operationId": "Vendors_UpdateVendorWithImages",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "properties": {
+                  "businessName": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "contactEmail": {
+                    "type": "string"
+                  },
+                  "contactPhone": {
+                    "type": "string"
+                  },
+                  "address": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "city": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "state": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "pinCode": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "category": {
+                    "type": "string"
+                  },
+                  "website": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "vendorFirstName": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "vendorLastName": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "imageFiles": {
+                    "type": "array",
+                    "nullable": true,
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "",
@@ -1833,40 +2886,141 @@
           }
         }
       },
-      "UserProfileResponse": {
+      "SystemPointLedgerEntryResponse": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
           "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "userId": {
             "type": "string"
           },
-          "email": {
+          "pointsDelta": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "type": {
             "type": "string"
           },
-          "firstName": {
-            "type": "string",
-            "nullable": true
+          "description": {
+            "type": "string"
           },
-          "lastName": {
+          "transactionDate": {
             "type": "string",
-            "nullable": true
+            "format": "date-time"
           },
-          "firebaseUid": {
-            "type": "string",
-            "nullable": true
-          },
-          "organizationId": {
+          "relatedCouponId": {
             "type": "integer",
             "format": "int32",
             "nullable": true
           },
-          "pointsBalance": {
+          "relatedSubscriptionId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        }
+      },
+      "SystemCouponRedemptionResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "userCouponId": {
             "type": "integer",
             "format": "int32"
           },
-          "pointsExpiry": {
+          "couponId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "vendorId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "uniqueCode": {
+            "type": "string"
+          },
+          "redeemedDate": {
             "type": "string",
-            "format": "date-time",
+            "format": "date-time"
+          },
+          "title": {
+            "type": "string"
+          }
+        }
+      },
+      "AdminSubscriptionPlansResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminSubscriptionPlanDto"
+            }
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "AdminSubscriptionPlanDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "price": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "durationMonths": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "bonusPoints": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "maxCoupons": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "maxUsers": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "features": {
+            "type": "string",
+            "nullable": true
+          },
+          "imageUrl": {
+            "type": "string",
             "nullable": true
           },
           "isActive": {
@@ -1875,24 +3029,207 @@
           "createdAt": {
             "type": "string",
             "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "subscribersCount": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },
-      "SyncUserRequest": {
+      "AdminSubscriptionPlanDetailDto": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/AdminSubscriptionPlanDto"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "recentSubscriptions": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/SubscriptionDetailDto"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "SubscriptionDetailDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "autoRenew": {
+            "type": "boolean"
+          }
+        }
+      },
+      "CreateSubscriptionPlanRequest": {
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "email"
+          "name",
+          "price",
+          "durationMonths"
         ],
         "properties": {
-          "email": {
+          "name": {
             "type": "string",
-            "format": "email",
+            "maxLength": 200,
             "minLength": 1
           },
-          "displayName": {
+          "description": {
             "type": "string",
+            "maxLength": 1000,
             "nullable": true
+          },
+          "price": {
+            "type": "number",
+            "format": "decimal",
+            "minimum": 0.01
+          },
+          "durationMonths": {
+            "type": "integer",
+            "format": "int32",
+            "maximum": 60.0,
+            "minimum": 1.0
+          },
+          "bonusPoints": {
+            "type": "integer",
+            "format": "int32",
+            "maximum": 2147483647.0,
+            "minimum": 0.0
+          },
+          "maxCoupons": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "maxUsers": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "features": {
+            "type": "string",
+            "maxLength": 2000,
+            "nullable": true
+          },
+          "imageUrl": {
+            "type": "string",
+            "maxLength": 500,
+            "nullable": true
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        }
+      },
+      "UpdateSubscriptionPlanRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "price",
+          "durationMonths"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 1000,
+            "nullable": true
+          },
+          "price": {
+            "type": "number",
+            "format": "decimal",
+            "minimum": 0.01
+          },
+          "durationMonths": {
+            "type": "integer",
+            "format": "int32",
+            "maximum": 60.0,
+            "minimum": 1.0
+          },
+          "bonusPoints": {
+            "type": "integer",
+            "format": "int32",
+            "maximum": 2147483647.0,
+            "minimum": 0.0
+          },
+          "maxCoupons": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "maxUsers": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "features": {
+            "type": "string",
+            "maxLength": 2000,
+            "nullable": true
+          },
+          "imageUrl": {
+            "type": "string",
+            "maxLength": 500,
+            "nullable": true
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        }
+      },
+      "SubscriberDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "autoRenew": {
+            "type": "boolean"
           }
         }
       },
@@ -2281,28 +3618,14 @@
           }
         }
       },
-      "BulkEmployeeResponse": {
+      "EmployeeValidationResponse": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "successful": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/EmployeeCreationResult"
-            }
+          "id": {
+            "type": "integer",
+            "format": "int32"
           },
-          "failed": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/EmployeeCreationError"
-            }
-          }
-        }
-      },
-      "EmployeeCreationResult": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
           "email": {
             "type": "string"
           },
@@ -2315,9 +3638,244 @@
           "position": {
             "type": "string"
           },
+          "phoneNumber": {
+            "type": "string",
+            "nullable": true
+          },
           "joinDate": {
             "type": "string",
             "format": "date-time"
+          },
+          "isRegistered": {
+            "type": "boolean"
+          },
+          "organizationId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "organizationName": {
+            "type": "string"
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        }
+      },
+      "CheckEmployeeByPhoneRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "phoneNumber"
+        ],
+        "properties": {
+          "phoneNumber": {
+            "type": "string",
+            "format": "phone",
+            "minLength": 1
+          }
+        }
+      },
+      "UserRegistrationResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "firebaseUid": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string",
+            "nullable": true
+          },
+          "lastName": {
+            "type": "string",
+            "nullable": true
+          },
+          "role": {
+            "type": "string"
+          },
+          "organizationId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "organizationName": {
+            "type": "string",
+            "nullable": true
+          },
+          "pointsBalance": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pointsExpiry": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "isNewUser": {
+            "type": "boolean"
+          },
+          "isEmployee": {
+            "type": "boolean"
+          },
+          "employeeCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "department": {
+            "type": "string",
+            "nullable": true
+          },
+          "position": {
+            "type": "string",
+            "nullable": true
+          },
+          "employeeDetails": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/EmployeeDetailResponse"
+              }
+            ]
+          }
+        }
+      },
+      "EmployeeDetailResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "employeeId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "email": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string",
+            "nullable": true
+          },
+          "employeeCode": {
+            "type": "string"
+          },
+          "department": {
+            "type": "string",
+            "nullable": true
+          },
+          "position": {
+            "type": "string",
+            "nullable": true
+          },
+          "phoneNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "joinDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "isRegistered": {
+            "type": "boolean"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "organizationId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "organizationName": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "lastModifiedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "EmployeeRegistrationByPhoneRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "phoneNumber",
+          "email"
+        ],
+        "properties": {
+          "phoneNumber": {
+            "type": "string",
+            "format": "phone",
+            "minLength": 1
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "minLength": 1
+          },
+          "firstName": {
+            "type": "string",
+            "maxLength": 50,
+            "minLength": 0,
+            "nullable": true
+          },
+          "lastName": {
+            "type": "string",
+            "maxLength": 50,
+            "minLength": 0,
+            "nullable": true
+          }
+        }
+      },
+      "BulkEmployeeResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "successful": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmployeeDetailResponse"
+            }
+          },
+          "failed": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmployeeCreationError"
+            }
+          },
+          "successfullyAdded": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "addedEmployees": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmployeeDetailResponse"
+            }
           }
         }
       },
@@ -2343,25 +3901,25 @@
           "employees": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/AddEmployeeRequest"
+              "$ref": "#/components/schemas/BulkEmployeeRequest"
             }
           }
         }
       },
-      "AddEmployeeRequest": {
+      "BulkEmployeeRequest": {
         "type": "object",
         "additionalProperties": false,
         "required": [
           "email",
           "employeeCode",
-          "department",
-          "position"
+          "phoneNumber"
         ],
         "properties": {
           "email": {
             "type": "string",
             "format": "email",
-            "minLength": 1
+            "maxLength": 100,
+            "minLength": 0
           },
           "employeeCode": {
             "type": "string",
@@ -2371,11 +3929,63 @@
           "department": {
             "type": "string",
             "maxLength": 100,
-            "minLength": 0
+            "minLength": 0,
+            "nullable": true
           },
           "position": {
             "type": "string",
             "maxLength": 100,
+            "minLength": 0,
+            "nullable": true
+          },
+          "phoneNumber": {
+            "type": "string",
+            "format": "phone",
+            "maxLength": 20,
+            "minLength": 0
+          },
+          "joinDate": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "AdminAddEmployeeRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "email",
+          "employeeCode",
+          "phoneNumber"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "maxLength": 100,
+            "minLength": 0
+          },
+          "employeeCode": {
+            "type": "string",
+            "maxLength": 50,
+            "minLength": 0
+          },
+          "department": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 0,
+            "nullable": true
+          },
+          "position": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 0,
+            "nullable": true
+          },
+          "phoneNumber": {
+            "type": "string",
+            "format": "phone",
+            "maxLength": 20,
             "minLength": 0
           },
           "joinDate": {
@@ -2385,72 +3995,50 @@
           }
         }
       },
-      "EmployeeDetailResponse": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "email": {
-            "type": "string"
-          },
-          "userId": {
-            "type": "string",
-            "nullable": true
-          },
-          "employeeCode": {
-            "type": "string"
-          },
-          "department": {
-            "type": "string"
-          },
-          "position": {
-            "type": "string"
-          },
-          "joinDate": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "isRegistered": {
-            "type": "boolean"
-          },
-          "isActive": {
-            "type": "boolean"
-          },
-          "organizationName": {
-            "type": "string"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          }
-        }
-      },
       "UpdateEmployeeRequest": {
         "type": "object",
         "additionalProperties": false,
-        "required": [
-          "employeeCode",
-          "department",
-          "position"
-        ],
         "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "maxLength": 256,
+            "minLength": 0,
+            "nullable": true
+          },
           "employeeCode": {
             "type": "string",
             "maxLength": 50,
-            "minLength": 0
+            "minLength": 0,
+            "nullable": true
           },
           "department": {
             "type": "string",
             "maxLength": 100,
-            "minLength": 0
+            "minLength": 0,
+            "nullable": true
           },
           "position": {
             "type": "string",
             "maxLength": 100,
-            "minLength": 0
+            "minLength": 0,
+            "nullable": true
+          },
+          "phoneNumber": {
+            "type": "string",
+            "format": "phone",
+            "maxLength": 20,
+            "minLength": 0,
+            "nullable": true
+          },
+          "joinDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "isActive": {
+            "type": "boolean",
+            "nullable": true
           }
         }
       },
@@ -2568,7 +4156,37 @@
           }
         }
       },
-      "OrganizationResponse": {
+      "LedgerReportResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "totalEmployees": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalVendors": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalCoupons": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "redemptionsLast30Days": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pointsCreditedLast30Days": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pointsDebitedLast30Days": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "AdminOfferDto": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
@@ -2576,86 +4194,114 @@
             "type": "integer",
             "format": "int32"
           },
-          "name": {
+          "vendorId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "title": {
             "type": "string"
           },
-          "description": {
-            "type": "string",
-            "nullable": true
-          },
-          "contactEmail": {
+          "status": {
             "type": "string"
-          },
-          "contactPhone": {
-            "type": "string",
-            "nullable": true
-          },
-          "address": {
-            "type": "string",
-            "nullable": true
           },
           "isActive": {
             "type": "boolean"
           },
-          "employeeCount": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "created": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "lastModified": {
+          "validUntil": {
             "type": "string",
             "format": "date-time"
           }
         }
       },
-      "OrganizationDetailResponse": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/OrganizationResponse"
-          },
-          {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-              "employees": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/EmployeeResponse"
-                }
-              }
-            }
-          }
-        ]
-      },
-      "EmployeeResponse": {
+      "UpdateOfferStatusRequest": {
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "status"
+        ],
         "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "userId": {
-            "type": "string"
-          },
-          "employeeCode": {
-            "type": "string"
-          },
-          "department": {
-            "type": "string"
-          },
-          "position": {
-            "type": "string"
-          },
-          "joinDate": {
+          "status": {
             "type": "string",
-            "format": "date-time"
+            "minLength": 1
           },
           "isActive": {
             "type": "boolean"
+          }
+        }
+      },
+      "CreateAdminOfferRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "vendorId",
+          "title",
+          "discountType",
+          "discountValue",
+          "validFrom",
+          "validUntil",
+          "expiryDate"
+        ],
+        "properties": {
+          "vendorId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 0
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "discountType": {
+            "$ref": "#/components/schemas/DiscountType"
+          },
+          "discountValue": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "pointsCost": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "validFrom": {
+            "type": "string",
+            "format": "date-time",
+            "minLength": 1
+          },
+          "validUntil": {
+            "type": "string",
+            "format": "date-time",
+            "minLength": 1
+          },
+          "expiryDate": {
+            "type": "string",
+            "format": "date-time",
+            "minLength": 1
+          },
+          "maxRedemptions": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "isOnePerUser": {
+            "type": "boolean"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "status": {
+            "$ref": "#/components/schemas/CouponStatus"
+          },
+          "terms": {
+            "type": "string",
+            "nullable": true
+          },
+          "imageUrl": {
+            "type": "string",
+            "nullable": true
           }
         }
       },
@@ -2681,13 +4327,11 @@
           "contactEmail": {
             "type": "string",
             "format": "email",
-            "maxLength": 100,
-            "minLength": 0
+            "minLength": 1
           },
           "contactPhone": {
             "type": "string",
-            "maxLength": 20,
-            "minLength": 0,
+            "format": "phone",
             "nullable": true
           },
           "address": {
@@ -2698,40 +4342,55 @@
           }
         }
       },
-      "UpdateOrganizationRequest": {
+      "ReviewDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "vendorId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "rating": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "reviewText": {
+            "type": "string",
+            "nullable": true
+          },
+          "reviewDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "isVerified": {
+            "type": "boolean"
+          }
+        }
+      },
+      "CreateReviewRequest": {
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "name",
-          "contactEmail"
+          "vendorId"
         ],
         "properties": {
-          "name": {
-            "type": "string",
-            "maxLength": 200,
-            "minLength": 0
+          "vendorId": {
+            "type": "integer",
+            "format": "int32"
           },
-          "description": {
+          "rating": {
+            "type": "integer",
+            "format": "int32",
+            "maximum": 5.0,
+            "minimum": 1.0
+          },
+          "reviewText": {
             "type": "string",
             "maxLength": 1000,
-            "minLength": 0,
-            "nullable": true
-          },
-          "contactEmail": {
-            "type": "string",
-            "format": "email",
-            "maxLength": 100,
-            "minLength": 0
-          },
-          "contactPhone": {
-            "type": "string",
-            "maxLength": 20,
-            "minLength": 0,
-            "nullable": true
-          },
-          "address": {
-            "type": "string",
-            "maxLength": 500,
             "minLength": 0,
             "nullable": true
           }
@@ -2825,99 +4484,213 @@
           }
         }
       },
-      "UserRegistrationResponse": {
+      "SubscriptionPlanDto": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
           "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
             "type": "string"
           },
-          "email": {
-            "type": "string"
-          },
-          "firstName": {
+          "description": {
             "type": "string",
             "nullable": true
           },
-          "lastName": {
+          "price": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "durationMonths": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "bonusPoints": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "maxCoupons": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "features": {
             "type": "string",
             "nullable": true
+          },
+          "imageUrl": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "UserSubscriptionDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "planId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "planName": {
+            "type": "string"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "autoRenew": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PurchaseSubscriptionRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "planId"
+        ],
+        "properties": {
+          "planId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "autoRenew": {
+            "type": "boolean"
+          }
+        }
+      },
+      "UserCouponDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "couponId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "title": {
+            "type": "string"
+          },
+          "vendorId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "status": {
+            "type": "string"
+          },
+          "acquiredDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "redeemedDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "expiryDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "uniqueCode": {
+            "type": "string"
+          },
+          "qrCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "discountType": {
+            "type": "string"
+          },
+          "discountValue": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "imageUrl": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ClaimCouponResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "userCouponId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "uniqueCode": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "ClaimCouponRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "couponId"
+        ],
+        "properties": {
+          "couponId": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "PurchaseCouponRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "couponId"
+        ],
+        "properties": {
+          "couponId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "paymentMethod": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "CheckUserExistsResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "exists": {
+            "type": "boolean"
           },
           "firebaseUid": {
             "type": "string",
             "nullable": true
           },
-          "role": {
-            "type": "string"
-          },
-          "organizationId": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
-          "organizationName": {
-            "type": "string",
-            "nullable": true
-          },
-          "pointsBalance": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "pointsExpiry": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "isActive": {
-            "type": "boolean"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "isNewUser": {
-            "type": "boolean"
-          },
-          "isEmployee": {
-            "type": "boolean"
-          },
-          "employeeCode": {
-            "type": "string",
-            "nullable": true
-          },
-          "department": {
-            "type": "string",
-            "nullable": true
-          },
-          "position": {
-            "type": "string",
-            "nullable": true
+          "userProfile": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/UserProfileResponse"
+              }
+            ]
           }
         }
       },
-      "UserRegistrationRequest": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "email"
-        ],
-        "properties": {
-          "email": {
-            "type": "string",
-            "format": "email",
-            "minLength": 1
-          },
-          "firstName": {
-            "type": "string",
-            "nullable": true
-          },
-          "lastName": {
-            "type": "string",
-            "nullable": true
-          }
-        }
-      },
-      "UserProfileResponse2": {
+      "UserProfileResponse": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
@@ -2992,119 +4765,304 @@
           }
         }
       },
-      "UpdateUserProfileRequest": {
+      "CheckUserExistsRequest": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "UserRegistrationRequest": {
         "type": "object",
         "additionalProperties": false,
-        "required": [
-          "email"
-        ],
         "properties": {
           "email": {
             "type": "string",
-            "format": "email",
-            "minLength": 1
+            "nullable": true
           },
           "firstName": {
             "type": "string",
+            "maxLength": 50,
+            "minLength": 0,
             "nullable": true
           },
           "lastName": {
             "type": "string",
+            "maxLength": 50,
+            "minLength": 0,
             "nullable": true
           }
         }
       },
-      "UserExistsResponse": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "exists": {
-            "type": "boolean"
-          },
-          "firebaseUid": {
-            "type": "string"
-          },
-          "userProfile": {
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/UserProfileResponse2"
-              }
-            ]
-          }
-        }
-      },
-      "ChangeOrganizationRequest": {
+      "PhoneRegistrationRequest": {
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "newOrganizationId",
-          "employeeCode",
-          "department",
-          "position"
+          "phoneNumber"
         ],
         "properties": {
-          "newOrganizationId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "employeeCode": {
+          "phoneNumber": {
             "type": "string",
+            "format": "phone",
             "minLength": 1
           },
-          "department": {
-            "type": "string",
-            "minLength": 1
-          },
-          "position": {
-            "type": "string",
-            "minLength": 1
-          }
-        }
-      },
-      "RemoveFromOrganizationRequest": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "organizationId"
-        ],
-        "properties": {
-          "organizationId": {
-            "type": "integer",
-            "format": "int32"
-          }
-        }
-      },
-      "PendingEmployeeResponse": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
           "email": {
+            "type": "string",
+            "format": "email",
+            "nullable": true
+          },
+          "firstName": {
+            "type": "string",
+            "maxLength": 50,
+            "minLength": 0,
+            "nullable": true
+          },
+          "lastName": {
+            "type": "string",
+            "maxLength": 50,
+            "minLength": 0,
+            "nullable": true
+          }
+        }
+      },
+      "UserPointsResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "pointsBalance": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pointsExpiry": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "UserPointLedgerEntryResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pointsDelta": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "type": {
             "type": "string"
           },
-          "employeeCode": {
+          "description": {
             "type": "string"
           },
-          "department": {
-            "type": "string"
-          },
-          "position": {
-            "type": "string"
-          },
-          "joinDate": {
+          "transactionDate": {
             "type": "string",
             "format": "date-time"
           },
-          "isRegistered": {
-            "type": "boolean"
+          "expiryDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
           },
-          "userId": {
+          "relatedCouponId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "relatedSubscriptionId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "referenceId": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "VendorProfileDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "businessName": {
+            "type": "string"
+          },
+          "description": {
             "type": "string",
             "nullable": true
           },
-          "createdAt": {
+          "contactEmail": {
+            "type": "string"
+          },
+          "contactPhone": {
+            "type": "string",
+            "nullable": true
+          },
+          "address": {
+            "type": "string",
+            "nullable": true
+          },
+          "category": {
+            "type": "string"
+          },
+          "website": {
+            "type": "string",
+            "nullable": true
+          },
+          "approvalStatus": {
+            "type": "string"
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        }
+      },
+      "UpdateVendorProfileRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "businessName",
+          "contactEmail",
+          "category"
+        ],
+        "properties": {
+          "businessName": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 0
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 1000,
+            "minLength": 0,
+            "nullable": true
+          },
+          "contactEmail": {
+            "type": "string",
+            "format": "email",
+            "minLength": 1
+          },
+          "contactPhone": {
+            "type": "string",
+            "format": "phone",
+            "nullable": true
+          },
+          "address": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 0,
+            "nullable": true
+          },
+          "category": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 0
+          },
+          "website": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true
+          }
+        }
+      },
+      "VendorOfferDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "discountType": {
+            "type": "string"
+          },
+          "discountValue": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "pointsCost": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "validFrom": {
             "type": "string",
             "format": "date-time"
+          },
+          "validUntil": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expiryDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "VendorRedemptionResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "RedeemCouponRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "userCouponId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "uniqueCode": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "VendorRedemptionDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "userCouponId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "couponId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "uniqueCode": {
+            "type": "string"
+          },
+          "redeemedDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "title": {
+            "type": "string"
           }
         }
       },
@@ -3436,6 +5394,97 @@
             "items": {
               "$ref": "#/components/schemas/VendorSocialMediaDto"
             }
+          },
+          "coupons": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VendorCouponDto"
+            }
+          }
+        }
+      },
+      "VendorCouponDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "discountType": {
+            "$ref": "#/components/schemas/DiscountType"
+          },
+          "discountValue": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "discountDisplay": {
+            "type": "string"
+          },
+          "minCartValue": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true
+          },
+          "maxDiscountAmount": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true
+          },
+          "pointsCost": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "validFrom": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "validUntil": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expiryDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "maxRedemptions": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "currentRedemptions": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "isOnePerUser": {
+            "type": "boolean"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "status": {
+            "$ref": "#/components/schemas/CouponStatus"
+          },
+          "imageUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "isValid": {
+            "type": "boolean"
+          },
+          "isExpired": {
+            "type": "boolean"
           }
         }
       },

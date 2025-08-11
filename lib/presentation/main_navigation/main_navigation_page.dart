@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:savedge/presentation/profile/profile.dart';
 import 'package:savedge/presentation/home/widgets/widgets.dart';
+import 'package:savedge/presentation/home/widgets/subscription_plans_section.dart';
 
 /// Main navigation wrapper that handles bottom navigation
 class MainNavigationPage extends StatefulWidget {
@@ -178,8 +179,11 @@ class _HomeContentPageState extends State<HomeContentPage> {
             SliverToBoxAdapter(child: HotDealsSection(deals: _getHotDeals())),
             // Membership Section
             SliverToBoxAdapter(
-              child: MembershipSection(onJoinTap: _onMembershipJoinTap),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              child: const SubscriptionPlansSection(height: 200),
             ),
+          ),
             // Marketplace
             SliverToBoxAdapter(
               child: MarketplaceSection(
@@ -201,7 +205,6 @@ class _HomeContentPageState extends State<HomeContentPage> {
   void _onNotificationTap() => debugPrint('Notification tap');
   void _onSearchTap() => debugPrint('Search tap');
   void _onCategoriesSeeAllTap() => debugPrint('Categories see all tap');
-  void _onMembershipJoinTap() => debugPrint('Membership join tap');
   void _onMarketplaceSeeAllTap() => debugPrint('Marketplace see all tap');
 
   void _onMenuTap() {
