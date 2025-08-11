@@ -35,6 +35,7 @@ import 'package:savedge/features/subscription/data/repositories/subscription_pla
 import 'package:savedge/features/subscription/domain/repositories/subscription_plan_repository.dart';
 import 'package:savedge/features/subscription/domain/services/razorpay_payment_service.dart';
 import 'package:savedge/features/subscription/presentation/bloc/subscription_plan_bloc.dart';
+import 'package:savedge/features/coupons/domain/services/coupon_service.dart';
 import 'package:savedge/core/network/network_client.dart';
 
 final GetIt getIt = GetIt.instance;
@@ -120,6 +121,9 @@ Future<void> configureDependencies() async {
 
   // Payment service
   getIt.registerLazySingleton<RazorpayPaymentService>(() => RazorpayPaymentService());
+
+  // Coupon service
+  getIt.registerLazySingleton<CouponService>(() => CouponService());
 
   // Auth cubits
   getIt.registerFactory<PhoneAuthCubit>(() => PhoneAuthCubit(getIt<FirebaseAuth>()));

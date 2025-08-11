@@ -4,16 +4,19 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:savedge/core/injection/injection.dart';
 import 'package:savedge/features/vendors/domain/entities/coupon.dart';
 import 'package:savedge/features/vendors/presentation/bloc/coupons_bloc.dart';
+import 'package:savedge/presentation/qr_scanner/qr_scanner_page.dart';
 
 /// Widget for displaying vendor-specific offers/coupons
 class VendorOffersSection extends StatelessWidget {
   const VendorOffersSection({
     super.key,
     required this.vendorId,
+    required this.vendorName,
     this.title = 'Offer for you',
   });
 
   final int vendorId;
+  final String vendorName;
   final String title;
 
   @override
@@ -21,15 +24,26 @@ class VendorOffersSection extends StatelessWidget {
     return BlocProvider(
       create: (context) => getIt<CouponsBloc>()
         ..add(LoadVendorCoupons(vendorId: vendorId)),
-      child: VendorOffersView(title: title),
+      child: VendorOffersView(
+        title: title,
+        vendorId: vendorId,
+        vendorName: vendorName,
+      ),
     );
   }
 }
 
 class VendorOffersView extends StatelessWidget {
-  const VendorOffersView({super.key, required this.title});
+  const VendorOffersView({
+    super.key, 
+    required this.title,
+    required this.vendorId,
+    required this.vendorName,
+  });
 
   final String title;
+  final int vendorId;
+  final String vendorName;
 
   @override
   Widget build(BuildContext context) {
@@ -77,7 +91,11 @@ class VendorOffersView extends StatelessWidget {
     return Column(
       children: coupons.map((coupon) => Padding(
         padding: const EdgeInsets.only(bottom: 12),
-        child: VendorOfferCard(coupon: coupon),
+        child: VendorOfferCard(
+          coupon: coupon,
+          vendorId: vendorId,
+          vendorName: vendorName,
+        ),
       )).toList(),
     );
   }
@@ -126,9 +144,16 @@ class VendorOffersView extends StatelessWidget {
 
 /// Individual vendor offer card widget using real coupon data
 class VendorOfferCard extends StatelessWidget {
-  const VendorOfferCard({super.key, required this.coupon});
+  const VendorOfferCard({
+    super.key, 
+    required this.coupon,
+    required this.vendorId,
+    required this.vendorName,
+  });
 
   final Coupon coupon;
+  final int vendorId;
+  final String vendorName;
 
   @override
   Widget build(BuildContext context) {
@@ -180,7 +205,7 @@ class VendorOfferCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
-                'Use Now',
+                'Use Coupon',
                 style: TextStyle(
                   color: color,
                   fontSize: 12,
@@ -212,15 +237,48 @@ class VendorOfferCard extends StatelessWidget {
     }
   }
 
-  void _onCouponTap(BuildContext context) {
-    // TODO: Navigate to coupon details or show coupon usage dialog
-    debugPrint('Coupon tapped: ${coupon.title}');
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Coupon "${coupon.title}" activated!'),
-        backgroundColor: _getCouponColor(),
-        duration: const Duration(seconds: 2),
-      ),
-    );
+  void _onCouponTap(BuildContext context) async {
+    try {
+      // Navigate to QR scanner page
+      final result = await Navigator.of(context).push<bool>(
+        MaterialPageRoute(
+          builder: (context) => QRScannerPage(
+            couponId: coupon.id,
+            expectedVendorId: vendorId,
+            expectedVendorName: vendorName,
+          ),
+        ),
+      );
+
+      // Show result message
+      if (result == true) {
+        // Success - coupon was claimed
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Coupon "${coupon.title}" claimed successfully!'),
+            backgroundColor: Colors.green,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      } else if (result == false) {
+        // Failed to claim coupon
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to claim coupon "${coupon.title}"'),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+      // If result is null, user just cancelled/went back
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: ${e.toString()}'),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    }
   }
 }

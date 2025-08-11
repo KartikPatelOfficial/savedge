@@ -115,7 +115,10 @@ class _VendorDetailView extends StatelessWidget {
           // Vendor Info
           SliverToBoxAdapter(child: _buildVendorInfo()),
           // Offers Section
-          SliverToBoxAdapter(child: VendorOffersSection(vendorId: vendor.id)),
+          SliverToBoxAdapter(child: VendorOffersSection(
+            vendorId: vendor.id, 
+            vendorName: vendor.businessName,
+          )),
           // Yearly Subscription
           SliverToBoxAdapter(child: MembershipSection()),
           // Other Restaurants
