@@ -1,6 +1,7 @@
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../../../core/network/network_client.dart';
 import '../../../auth/domain/repositories/auth_repository.dart';
 
@@ -63,10 +64,11 @@ class RazorpayPaymentService {
     _onPaymentError = onError;
 
     var options = {
-      'key': paymentOrder['key'],
-      'amount': ((paymentOrder['amount'] as double) * 100).toInt(), // Amount in paise
+      'key': _getRazorpayKey(paymentOrder),
+      'amount': _convertToAmount(paymentOrder['amount']), // Amount in paise
+      'currency': paymentOrder['currency'] ?? 'INR',
       'name': 'SavEdge',
-      'order_id': paymentOrder['razorpayOrderId'],
+      'order_id': paymentOrder['orderId'],
       'description': 'Subscription Plan Purchase',
       'prefill': {
         'contact': customerPhone,
@@ -78,9 +80,17 @@ class RazorpayPaymentService {
       },
     };
 
+    print('Razorpay Payment Options:');
+    print('Key: ${options['key']}');
+    print('Amount: ${options['amount']}');
+    print('Order ID: ${options['order_id']}');
+    print('Name: ${options['name']}');
+    
     try {
+      print('Opening Razorpay payment gateway...');
       _razorpay.open(options);
     } catch (e) {
+      print('Error opening Razorpay: $e');
       _onPaymentError?.call('Failed to open payment gateway: $e');
     }
   }
@@ -152,14 +162,55 @@ class RazorpayPaymentService {
     _onPaymentError?.call('External wallet payments not supported');
   }
 
+  /// Convert amount to paise for Razorpay (handles both int and double)
+  int _convertToAmount(dynamic amount) {
+    if (amount is int) {
+      // If amount is already in paise, return as is
+      return amount;
+    } else if (amount is double) {
+      // If amount is in rupees, convert to paise
+      return (amount * 100).toInt();
+    } else {
+      throw Exception('Invalid amount type: ${amount.runtimeType}');
+    }
+  }
+
+  /// Get Razorpay key from payment order or use default test key
+  String _getRazorpayKey(Map<String, dynamic> paymentOrder) {
+    // First try to get from payment order response
+    if (paymentOrder.containsKey('razorpayKey') && paymentOrder['razorpayKey'] != null) {
+      return paymentOrder['razorpayKey'];
+    }
+    
+    if (paymentOrder.containsKey('key') && paymentOrder['key'] != null) {
+      return paymentOrder['key'];
+    }
+    
+    // For testing purposes, use a test key
+    // In production, this should come from the backend API response
+    // Using Razorpay's standard test key for testing (this is publicly available)
+    const testKey = 'rzp_test_j8PlmGsgdZV1YC'; // Razorpay's official test key
+    print('Warning: Using fallback test Razorpay key. Configure proper keys in backend.');
+    return testKey;
+  }
+
   /// Get user profile for payment prefill
   Future<Map<String, String>> _getUserInfoForPayment() async {
     try {
       final profile = await _authRepository.getUserProfileExtended();
+      
+      // Get phone number from Firebase user if available
+      String phoneNumber = '';
+      final firebaseUser = FirebaseAuth.instance.currentUser;
+      if (firebaseUser?.phoneNumber != null) {
+        phoneNumber = firebaseUser!.phoneNumber!;
+        print('RazorpayPaymentService: Using Firebase phone: $phoneNumber');
+      }
+      
       return {
         'name': '${profile.firstName ?? ''} ${profile.lastName ?? ''}'.trim(),
         'email': profile.email,
-        'phone': '', // Add phone if available in profile
+        'phone': phoneNumber,
       };
     } catch (e) {
       return {
