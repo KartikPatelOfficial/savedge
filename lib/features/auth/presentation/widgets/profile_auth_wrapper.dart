@@ -6,7 +6,7 @@ import 'package:savedge/features/auth/domain/repositories/auth_repository.dart';
 import 'package:savedge/features/auth/domain/entities/extended_user_profile.dart';
 import 'package:savedge/features/auth/data/models/auth_models.dart';
 import 'package:savedge/features/auth/presentation/pages/phone_auth_page.dart';
-import 'package:savedge/presentation/home/pages/home_page.dart';
+import 'package:savedge/presentation/main_navigation/main_navigation_page.dart';
 import 'package:savedge/features/auth/presentation/pages/register_individual_page.dart';
 import 'package:savedge/features/auth/presentation/pages/register_employee_page.dart';
 
@@ -278,7 +278,7 @@ class _ProfileAuthWrapperState extends State<ProfileAuthWrapper> {
         return const PhoneAuthPage();
         
       case ProfileAuthStatus.authenticated:
-        return const HomePage();
+        return const MainNavigationPage();
         
       case ProfileAuthStatus.needsRegistration:
         return const RegisterIndividualPage();
