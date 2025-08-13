@@ -39,14 +39,13 @@ class ExtendedUserProfile {
   final DateTime? joinDate;
 
   /// Check if user has completed their basic profile
-  bool get hasCompletedProfile => 
+  bool get hasCompletedProfile =>
       firstName?.isNotEmpty == true && lastName?.isNotEmpty == true;
 
   /// Check if user is an employee with organization
-  bool get isEmployeeWithOrganization => 
-      isEmployee && organizationId != null;
+  bool get isEmployeeWithOrganization => isEmployee && organizationId != null;
 
   /// Check if user needs employee profile completion
-  bool get needsEmployeeCompletion => 
+  bool get needsEmployeeCompletion =>
       isEmployee && organizationId != null && !hasCompletedProfile;
 }

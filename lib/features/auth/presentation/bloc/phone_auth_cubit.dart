@@ -21,12 +21,14 @@ class PhoneAuthCubit extends Cubit<PhoneAuthState> {
           emit(PhoneAuthError(e.toString()));
         }
       },
-      verificationFailed: (e) => emit(PhoneAuthError(e.message ?? 'Verification failed')),
+      verificationFailed: (e) =>
+          emit(PhoneAuthError(e.message ?? 'Verification failed')),
       codeSent: (verificationId, _) {
         _verificationId = verificationId;
         emit(const PhoneAuthCodeSent());
       },
-      codeAutoRetrievalTimeout: (verificationId) => _verificationId = verificationId,
+      codeAutoRetrievalTimeout: (verificationId) =>
+          _verificationId = verificationId,
     );
   }
 
@@ -37,7 +39,10 @@ class PhoneAuthCubit extends Cubit<PhoneAuthState> {
     }
     emit(const PhoneAuthLoading());
     try {
-      final credential = PhoneAuthProvider.credential(verificationId: _verificationId!, smsCode: smsCode);
+      final credential = PhoneAuthProvider.credential(
+        verificationId: _verificationId!,
+        smsCode: smsCode,
+      );
       final userCred = await _firebaseAuth.signInWithCredential(credential);
       emit(PhoneAuthVerified(userCred.user!));
     } catch (e) {

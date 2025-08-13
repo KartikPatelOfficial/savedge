@@ -39,10 +39,10 @@ class Coupon extends Equatable {
   /// Check if coupon is currently valid
   bool get isValid {
     final now = DateTime.now();
-    return isActive && 
-           now.isAfter(validFrom) && 
-           now.isBefore(validTo) &&
-           (maxUsageCount == null || usageCount < maxUsageCount!);
+    return isActive &&
+        now.isAfter(validFrom) &&
+        now.isBefore(validTo) &&
+        (maxUsageCount == null || usageCount < maxUsageCount!);
   }
 
   /// Get discount display text
@@ -65,20 +65,20 @@ class Coupon extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        title,
-        description,
-        discountValue,
-        discountType,
-        minimumOrderAmount,
-        maximumDiscountAmount,
-        validFrom,
-        validTo,
-        isActive,
-        vendorId,
-        status,
-        termsAndConditions,
-        usageCount,
-        maxUsageCount,
-      ];
+    id,
+    title,
+    description,
+    discountValue,
+    discountType,
+    minimumOrderAmount,
+    maximumDiscountAmount,
+    validFrom,
+    validTo,
+    isActive,
+    vendorId,
+    status,
+    termsAndConditions,
+    usageCount,
+    maxUsageCount,
+  ];
 }

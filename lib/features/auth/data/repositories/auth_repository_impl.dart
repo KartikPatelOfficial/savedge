@@ -19,47 +19,47 @@ class AuthRepositoryImpl implements AuthRepository {
     DateTime? pointsExpiry,
     bool? isActive,
     DateTime? createdAt,
-  }) =>
-      UserProfile(
-        id: id,
-        email: email,
-        firstName: firstName,
-        lastName: lastName,
-        firebaseUid: firebaseUid,
-        organizationId: organizationId,
-        pointsBalance: pointsBalance ?? 0,
-        pointsExpiry: pointsExpiry,
-        isActive: isActive,
-        createdAt: createdAt,
-      );
+  }) => UserProfile(
+    id: id,
+    email: email,
+    firstName: firstName,
+    lastName: lastName,
+    firebaseUid: firebaseUid,
+    organizationId: organizationId,
+    pointsBalance: pointsBalance ?? 0,
+    pointsExpiry: pointsExpiry,
+    isActive: isActive,
+    createdAt: createdAt,
+  );
 
   UserProfile _map(UserProfileResponse r) => _mapBase(
-        id: r.id,
-        email: r.email,
-        firstName: r.firstName,
-        lastName: r.lastName,
-        firebaseUid: r.firebaseUid,
-        organizationId: r.organizationId,
-        pointsBalance: r.pointsBalance,
-        pointsExpiry: r.pointsExpiry,
-        isActive: r.isActive,
-        createdAt: r.createdAt,
-      );
+    id: r.id,
+    email: r.email,
+    firstName: r.firstName,
+    lastName: r.lastName,
+    firebaseUid: r.firebaseUid,
+    organizationId: r.organizationId,
+    pointsBalance: r.pointsBalance,
+    pointsExpiry: r.pointsExpiry,
+    isActive: r.isActive,
+    createdAt: r.createdAt,
+  );
 
   UserProfile _map2(UserProfileResponse2 r) => _mapBase(
-        id: r.id,
-        email: r.email,
-        firstName: r.firstName,
-        lastName: r.lastName,
-        firebaseUid: r.firebaseUid,
-        organizationId: r.organizationId,
-        pointsBalance: r.pointsBalance,
-        pointsExpiry: r.pointsExpiry,
-        isActive: r.isActive,
-        createdAt: r.createdAt,
-      );
+    id: r.id,
+    email: r.email,
+    firstName: r.firstName,
+    lastName: r.lastName,
+    firebaseUid: r.firebaseUid,
+    organizationId: r.organizationId,
+    pointsBalance: r.pointsBalance,
+    pointsExpiry: r.pointsExpiry,
+    isActive: r.isActive,
+    createdAt: r.createdAt,
+  );
 
-  ExtendedUserProfile _mapExtended(UserProfileResponse2 r) => ExtendedUserProfile(
+  ExtendedUserProfile _mapExtended(UserProfileResponse2 r) =>
+      ExtendedUserProfile(
         id: r.id,
         email: r.email,
         firstName: r.firstName,
@@ -83,9 +83,14 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<UserProfile> getProfile() async => _map(await _remote.getProfile());
 
   @override
-  Future<UserProfile> syncUser({required String email, String? displayName}) async => _map(
-        await _remote.syncUser(SyncUserRequest(email: email, displayName: displayName)),
-      );
+  Future<UserProfile> syncUser({
+    required String email,
+    String? displayName,
+  }) async => _map(
+    await _remote.syncUser(
+      SyncUserRequest(email: email, displayName: displayName),
+    ),
+  );
 
   @override
   Future<void> validateToken(String idToken) async {
@@ -93,9 +98,17 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<UserProfile> updateProfile({required String email, String? firstName, String? lastName}) async {
+  Future<UserProfile> updateProfile({
+    required String email,
+    String? firstName,
+    String? lastName,
+  }) async {
     final res = await _remote.updateUserProfile(
-      UpdateUserProfileRequest(email: email, firstName: firstName, lastName: lastName),
+      UpdateUserProfileRequest(
+        email: email,
+        firstName: firstName,
+        lastName: lastName,
+      ),
     );
     return _map2(res);
   }

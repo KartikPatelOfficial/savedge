@@ -23,7 +23,8 @@ class _AuthFlowRootState extends State<AuthFlowRoot> {
   void _redirect(String route) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      if (ModalRoute.of(context)?.settings.name == route) return; // prevent loops
+      if (ModalRoute.of(context)?.settings.name == route)
+        return; // prevent loops
       Navigator.of(context).pushReplacementNamed(route);
     });
   }
@@ -49,7 +50,9 @@ class _AuthFlowRootState extends State<AuthFlowRoot> {
       },
       builder: (context, state) {
         if (state is AuthStatusLoading || state is AuthStatusInitial) {
-          return const Scaffold(body: Center(child: CircularProgressIndicator()));
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
         }
         if (state is AuthStatusError) {
           return Scaffold(
@@ -60,7 +63,8 @@ class _AuthFlowRootState extends State<AuthFlowRoot> {
                   Text(state.message),
                   const SizedBox(height: 12),
                   ElevatedButton(
-                    onPressed: () => context.read<AuthStatusCubit>().checkStatus(),
+                    onPressed: () =>
+                        context.read<AuthStatusCubit>().checkStatus(),
                     child: const Text('Retry'),
                   ),
                 ],
@@ -68,7 +72,8 @@ class _AuthFlowRootState extends State<AuthFlowRoot> {
             ),
           );
         }
-        if (state is AuthStatusLoaded && state.status == AuthFlowStatus.existingUser) {
+        if (state is AuthStatusLoaded &&
+            state.status == AuthFlowStatus.existingUser) {
           return widget.builder(context);
         }
         return const SizedBox.shrink();

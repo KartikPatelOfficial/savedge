@@ -39,7 +39,8 @@ class CouponsBloc extends Bloc<CouponsEvent, CouponsState> {
     );
 
     result.fold(
-      (failure) => emit(CouponsError(failure.message ?? 'Failed to load coupons')),
+      (failure) =>
+          emit(CouponsError(failure.message ?? 'Failed to load coupons')),
       (coupons) => emit(CouponsLoaded(coupons)),
     );
   }
@@ -54,7 +55,8 @@ class CouponsBloc extends Bloc<CouponsEvent, CouponsState> {
     );
 
     result.fold(
-      (failure) => emit(CouponsError(failure.message ?? 'Failed to refresh coupons')),
+      (failure) =>
+          emit(CouponsError(failure.message ?? 'Failed to refresh coupons')),
       (coupons) => emit(CouponsLoaded(coupons)),
     );
   }
@@ -76,7 +78,9 @@ class CouponsBloc extends Bloc<CouponsEvent, CouponsState> {
     );
 
     result.fold(
-      (failure) => emit(CouponsError(failure.message ?? 'Failed to load vendor coupons')),
+      (failure) => emit(
+        CouponsError(failure.message ?? 'Failed to load vendor coupons'),
+      ),
       (coupons) => emit(CouponsLoaded(coupons)),
     );
   }
@@ -91,7 +95,9 @@ class CouponsBloc extends Bloc<CouponsEvent, CouponsState> {
     );
 
     result.fold(
-      (failure) => emit(CouponsError(failure.message ?? 'Failed to refresh vendor coupons')),
+      (failure) => emit(
+        CouponsError(failure.message ?? 'Failed to refresh vendor coupons'),
+      ),
       (coupons) => emit(CouponsLoaded(coupons)),
     );
   }

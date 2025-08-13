@@ -33,9 +33,9 @@ import 'package:savedge/core/network/auth_token_interceptor.dart';
 import 'package:savedge/features/subscription/data/datasources/subscription_plan_remote_data_source.dart';
 import 'package:savedge/features/subscription/data/repositories/subscription_plan_repository_impl.dart';
 import 'package:savedge/features/subscription/domain/repositories/subscription_plan_repository.dart';
-import 'package:savedge/features/subscription/domain/services/razorpay_payment_service.dart';
+import 'package:savedge/features/subscription/data/services/razorpay_payment_service.dart';
 import 'package:savedge/features/subscription/presentation/bloc/subscription_plan_bloc.dart';
-import 'package:savedge/features/coupons/domain/services/coupon_service.dart';
+import 'package:savedge/features/coupons/data/services/coupon_service.dart';
 import 'package:savedge/core/network/network_client.dart';
 
 final GetIt getIt = GetIt.instance;
@@ -50,15 +50,23 @@ Future<void> configureDependencies() async {
 
   // Dio HTTP client
   getIt.registerSingleton<Dio>(_createDio());
-  
+
   // HTTP client wrapper
   getIt.registerSingleton<HttpClient>(DioHttpClient(getIt<Dio>()));
 
   // Auth layer
-  getIt.registerSingleton<AuthRemoteDataSource>(AuthRemoteDataSource(getIt<Dio>()));
-  getIt.registerSingleton<AuthRepository>(AuthRepositoryImpl(getIt<AuthRemoteDataSource>()));
-  getIt.registerSingleton<GetProfileUseCase>(GetProfileUseCase(getIt<AuthRepository>()));
-  getIt.registerSingleton<SyncUserUseCase>(SyncUserUseCase(getIt<AuthRepository>()));
+  getIt.registerSingleton<AuthRemoteDataSource>(
+    AuthRemoteDataSource(getIt<Dio>()),
+  );
+  getIt.registerSingleton<AuthRepository>(
+    AuthRepositoryImpl(getIt<AuthRemoteDataSource>()),
+  );
+  getIt.registerSingleton<GetProfileUseCase>(
+    GetProfileUseCase(getIt<AuthRepository>()),
+  );
+  getIt.registerSingleton<SyncUserUseCase>(
+    SyncUserUseCase(getIt<AuthRepository>()),
+  );
 
   getIt.registerSingleton<VendorsRemoteDataSource>(
     VendorsRemoteDataSource(getIt<Dio>()),
@@ -110,27 +118,37 @@ Future<void> configureDependencies() async {
     () => VendorDetailBloc(getVendorUseCase: getIt<GetVendorUseCase>()),
   );
 
-  getIt.registerFactory<CouponsBloc>(() => CouponsBloc(
-        getFeaturedCouponsUseCase: getIt<GetFeaturedCouponsUseCase>(),
-        getVendorCouponsUseCase: getIt<GetVendorCouponsUseCase>(),
-      ));
+  getIt.registerFactory<CouponsBloc>(
+    () => CouponsBloc(
+      getFeaturedCouponsUseCase: getIt<GetFeaturedCouponsUseCase>(),
+      getVendorCouponsUseCase: getIt<GetVendorCouponsUseCase>(),
+    ),
+  );
 
-  getIt.registerFactory<SubscriptionPlanBloc>(() => SubscriptionPlanBloc(
-        subscriptionPlanRepository: getIt<SubscriptionPlanRepository>(),
-      ));
+  getIt.registerFactory<SubscriptionPlanBloc>(
+    () => SubscriptionPlanBloc(
+      subscriptionPlanRepository: getIt<SubscriptionPlanRepository>(),
+    ),
+  );
 
   // Payment service
-  getIt.registerLazySingleton<RazorpayPaymentService>(() => RazorpayPaymentService());
+  getIt.registerLazySingleton<RazorpayPaymentService>(
+    () => RazorpayPaymentService(),
+  );
 
   // Coupon service
   getIt.registerLazySingleton<CouponService>(() => CouponService());
 
   // Auth cubits
-  getIt.registerFactory<PhoneAuthCubit>(() => PhoneAuthCubit(getIt<FirebaseAuth>()));
-  getIt.registerFactory<AuthStatusCubit>(() => AuthStatusCubit(
-        firebaseAuth: getIt<FirebaseAuth>(),
-        syncUserUseCase: getIt<SyncUserUseCase>(),
-      ));
+  getIt.registerFactory<PhoneAuthCubit>(
+    () => PhoneAuthCubit(getIt<FirebaseAuth>()),
+  );
+  getIt.registerFactory<AuthStatusCubit>(
+    () => AuthStatusCubit(
+      firebaseAuth: getIt<FirebaseAuth>(),
+      syncUserUseCase: getIt<SyncUserUseCase>(),
+    ),
+  );
 }
 
 Dio _createDio() {

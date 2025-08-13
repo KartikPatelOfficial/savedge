@@ -1,9 +1,15 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:savedge/core/utils/failure_message_mapper.dart';
 import 'package:savedge/features/vendors/domain/usecases/get_vendors_usecase.dart';
 import 'package:savedge/features/vendors/presentation/bloc/vendors_event.dart';
 import 'package:savedge/features/vendors/presentation/bloc/vendors_state.dart';
 
+/// BLoC for managing vendor list state
+///
+/// Handles loading, searching, filtering, and pagination of vendors.
+/// Uses the GetVendorsUseCase to fetch data and provides error handling
+/// with user-friendly messages.
 class VendorsBloc extends Bloc<VendorsEvent, VendorsState> {
   VendorsBloc({required this.getVendorsUseCase}) : super(VendorsInitial()) {
     on<LoadVendors>(_onLoadVendors);
@@ -33,7 +39,9 @@ class VendorsBloc extends Bloc<VendorsEvent, VendorsState> {
     );
 
     result.fold(
-      (failure) => emit(VendorsError(_mapFailureToMessage(failure))),
+      (failure) => emit(
+        VendorsError(FailureMessageMapper.mapVendorFailureToMessage(failure)),
+      ),
       (vendors) {
         if (event.refresh ||
             state is VendorsInitial ||
@@ -113,21 +121,6 @@ class VendorsBloc extends Bloc<VendorsEvent, VendorsState> {
       );
     } else {
       add(const LoadVendors(refresh: true));
-    }
-  }
-
-  String _mapFailureToMessage(failure) {
-    switch (failure.runtimeType.toString()) {
-      case 'NetworkFailure':
-        return 'No internet connection. Please check your network.';
-      case 'ServerFailure':
-        return 'Server error occurred. Please try again.';
-      case 'NotFoundFailure':
-        return 'No vendors found.';
-      case 'AuthFailure':
-        return 'Authentication failed. Please login again.';
-      default:
-        return 'An unexpected error occurred.';
     }
   }
 }

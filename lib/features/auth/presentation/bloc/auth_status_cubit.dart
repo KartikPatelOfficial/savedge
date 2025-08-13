@@ -9,10 +9,12 @@ part 'auth_status_state.dart';
 enum AuthFlowStatus { newUser, employeeFound, existingUser }
 
 class AuthStatusCubit extends Cubit<AuthStatusState> {
-  AuthStatusCubit({required FirebaseAuth firebaseAuth, required SyncUserUseCase syncUserUseCase})
-      : _firebaseAuth = firebaseAuth,
-        _syncUserUseCase = syncUserUseCase,
-        super(const AuthStatusInitial());
+  AuthStatusCubit({
+    required FirebaseAuth firebaseAuth,
+    required SyncUserUseCase syncUserUseCase,
+  }) : _firebaseAuth = firebaseAuth,
+       _syncUserUseCase = syncUserUseCase,
+       super(const AuthStatusInitial());
 
   final FirebaseAuth _firebaseAuth;
   final SyncUserUseCase _syncUserUseCase;
@@ -26,7 +28,10 @@ class AuthStatusCubit extends Cubit<AuthStatusState> {
         return;
       }
       final email = user.email ?? user.phoneNumber ?? '';
-      final profile = await _syncUserUseCase(email: email, displayName: user.displayName);
+      final profile = await _syncUserUseCase(
+        email: email,
+        displayName: user.displayName,
+      );
       emit(_mapProfile(profile));
     } catch (e) {
       emit(AuthStatusError(e.toString()));

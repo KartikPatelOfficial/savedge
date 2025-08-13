@@ -6,7 +6,7 @@ import 'package:savedge/features/auth/domain/repositories/auth_repository.dart';
 import 'package:savedge/features/auth/domain/entities/extended_user_profile.dart';
 import 'package:savedge/features/auth/data/models/auth_models.dart';
 import 'package:savedge/features/auth/presentation/pages/phone_auth_page.dart';
-import 'package:savedge/presentation/main_navigation/main_navigation_page.dart';
+import 'package:savedge/features/app/presentation/navigation/main_navigation_page.dart';
 import 'package:savedge/features/auth/presentation/pages/register_individual_page.dart';
 import 'package:savedge/features/auth/presentation/pages/register_employee_page.dart';
 
@@ -16,10 +16,10 @@ class ProfileAuthWrapper extends StatefulWidget {
 
   @override
   State<ProfileAuthWrapper> createState() => _ProfileAuthWrapperState();
-  
+
   /// Global key to access the ProfileAuthWrapper state from anywhere
   static final GlobalKey globalKey = GlobalKey<State<ProfileAuthWrapper>>();
-  
+
   /// Static method to trigger a recheck of auth status
   static void recheckAuthStatus() {
     final state = globalKey.currentState;
@@ -51,14 +51,14 @@ class _ProfileAuthWrapperState extends State<ProfileAuthWrapper> {
   }
 
   void _setupAuthListener() {
-    _authSubscription = FirebaseAuth.instance.authStateChanges().listen(
-      (User? user) {
-        // When auth state changes, recheck the status
-        if (mounted) {
-          _checkAuthStatus();
-        }
-      },
-    );
+    _authSubscription = FirebaseAuth.instance.authStateChanges().listen((
+      User? user,
+    ) {
+      // When auth state changes, recheck the status
+      if (mounted) {
+        _checkAuthStatus();
+      }
+    });
   }
 
   Future<void> _checkAuthStatus() async {
@@ -72,8 +72,10 @@ class _ProfileAuthWrapperState extends State<ProfileAuthWrapper> {
       }
 
       final firebaseUser = FirebaseAuth.instance.currentUser;
-      print('ProfileAuthWrapper: Firebase user: ${firebaseUser?.email ?? "null"}');
-      
+      print(
+        'ProfileAuthWrapper: Firebase user: ${firebaseUser?.email ?? "null"}',
+      );
+
       if (firebaseUser == null) {
         print('ProfileAuthWrapper: No Firebase user, showing phone auth');
         if (mounted) {
@@ -88,16 +90,19 @@ class _ProfileAuthWrapperState extends State<ProfileAuthWrapper> {
       // User is authenticated with Firebase, now check if user exists in backend
       try {
         print('ProfileAuthWrapper: Checking if user exists in backend...');
-        final userExistsResponse = await _authRepository.checkUserExists(firebaseUser.uid);
-        
-        if (userExistsResponse.exists && userExistsResponse.userProfile != null) {
+        final userExistsResponse = await _authRepository.checkUserExists(
+          firebaseUser.uid,
+        );
+
+        if (userExistsResponse.exists &&
+            userExistsResponse.userProfile != null) {
           // User exists, determine status based on profile completeness
           final profile = userExistsResponse.userProfile!;
           print('ProfileAuthWrapper: User exists: ${profile.email}');
           final extendedProfile = _mapToExtendedProfile(profile);
           final status = _determineAuthStatus(extendedProfile);
           print('ProfileAuthWrapper: Determined status: $status');
-          
+
           if (mounted) {
             setState(() {
               _authStatus = status;
@@ -106,14 +111,20 @@ class _ProfileAuthWrapperState extends State<ProfileAuthWrapper> {
           }
         } else {
           // User doesn't exist in backend, check if they're an employee
-          print('ProfileAuthWrapper: User not found, checking employee status...');
+          print(
+            'ProfileAuthWrapper: User not found, checking employee status...',
+          );
           final phoneNumber = firebaseUser.phoneNumber;
-          
+
           if (phoneNumber != null) {
-            final employeeInfo = await _authRepository.checkEmployeeByPhone(phoneNumber);
-            
+            final employeeInfo = await _authRepository.checkEmployeeByPhone(
+              phoneNumber,
+            );
+
             if (employeeInfo != null) {
-              print('ProfileAuthWrapper: Found employee, showing employee registration');
+              print(
+                'ProfileAuthWrapper: Found employee, showing employee registration',
+              );
               if (mounted) {
                 setState(() {
                   _authStatus = ProfileAuthStatus.employeeFound;
@@ -121,7 +132,9 @@ class _ProfileAuthWrapperState extends State<ProfileAuthWrapper> {
                 });
               }
             } else {
-              print('ProfileAuthWrapper: No employee found, showing individual registration');
+              print(
+                'ProfileAuthWrapper: No employee found, showing individual registration',
+              );
               if (mounted) {
                 setState(() {
                   _authStatus = ProfileAuthStatus.needsRegistration;
@@ -130,7 +143,9 @@ class _ProfileAuthWrapperState extends State<ProfileAuthWrapper> {
               }
             }
           } else {
-            print('ProfileAuthWrapper: No phone number, showing individual registration');
+            print(
+              'ProfileAuthWrapper: No phone number, showing individual registration',
+            );
             if (mounted) {
               setState(() {
                 _authStatus = ProfileAuthStatus.needsRegistration;
@@ -185,8 +200,9 @@ class _ProfileAuthWrapperState extends State<ProfileAuthWrapper> {
 
   ProfileAuthStatus _determineAuthStatus(dynamic profile) {
     // Determine status based on full profile data structure
-    final hasNames = (profile.firstName?.isNotEmpty == true) && 
-                    (profile.lastName?.isNotEmpty == true);
+    final hasNames =
+        (profile.firstName?.isNotEmpty == true) &&
+        (profile.lastName?.isNotEmpty == true);
     final hasOrganization = profile.organizationId != null;
     final isEmployee = profile.isEmployee == true;
     final isActive = profile.isActive == true;
@@ -276,19 +292,19 @@ class _ProfileAuthWrapperState extends State<ProfileAuthWrapper> {
     switch (_authStatus) {
       case ProfileAuthStatus.unauthenticated:
         return const PhoneAuthPage();
-        
+
       case ProfileAuthStatus.authenticated:
         return const MainNavigationPage();
-        
+
       case ProfileAuthStatus.needsRegistration:
         return const RegisterIndividualPage();
-        
+
       case ProfileAuthStatus.employeeFound:
         return const RegisterEmployeePage();
-        
+
       case ProfileAuthStatus.employeeIncomplete:
         return const RegisterEmployeePage();
-        
+
       case ProfileAuthStatus.inactive:
         return Scaffold(
           body: Center(
@@ -302,7 +318,9 @@ class _ProfileAuthWrapperState extends State<ProfileAuthWrapper> {
                   style: Theme.of(context).textTheme.headlineSmall,
                 ),
                 const SizedBox(height: 8),
-                const Text('Your account has been deactivated. Please contact support.'),
+                const Text(
+                  'Your account has been deactivated. Please contact support.',
+                ),
                 const SizedBox(height: 24),
                 TextButton(
                   onPressed: () async {
@@ -315,7 +333,7 @@ class _ProfileAuthWrapperState extends State<ProfileAuthWrapper> {
             ),
           ),
         );
-        
+
       default:
         return const PhoneAuthPage();
     }

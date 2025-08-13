@@ -1,6 +1,5 @@
 /// Coupon response model
 class CouponResponse {
-
   factory CouponResponse.fromJson(Map<String, dynamic> json) {
     return CouponResponse(
       id: json['id'] as int,
@@ -9,7 +8,8 @@ class CouponResponse {
       discountValue: (json['discountValue'] as num).toDouble(),
       discountType: _mapDiscountTypeFromInt(json['discountType'] as int),
       minimumOrderAmount: (json['minCartValue'] as num?)?.toDouble() ?? 0.0,
-      maximumDiscountAmount: (json['maxDiscountAmount'] as num?)?.toDouble() ?? 0.0,
+      maximumDiscountAmount:
+          (json['maxDiscountAmount'] as num?)?.toDouble() ?? 0.0,
       validFrom: DateTime.parse(json['validFrom'] as String),
       validTo: DateTime.parse(json['validUntil'] as String),
       isActive: json['isActive'] as bool,
@@ -18,11 +18,11 @@ class CouponResponse {
       termsAndConditions: json['termsAndConditions'] as String?,
       usageCount: json['currentRedemptions'] as int? ?? 0,
       maxUsageCount: json['maxRedemptions'] as int?,
-      createdAt: json['createdAt'] != null 
-          ? DateTime.parse(json['createdAt'] as String) 
+      createdAt: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'] as String)
           : null,
-      updatedAt: json['updatedAt'] != null 
-          ? DateTime.parse(json['updatedAt'] as String) 
+      updatedAt: json['updatedAt'] != null
+          ? DateTime.parse(json['updatedAt'] as String)
           : null,
       vendorName: json['vendorName'] as String?,
       discountTypeDisplay: json['discountTypeDisplay'] as String?,
@@ -153,7 +153,6 @@ class CouponResponse {
 
 /// Get coupons response wrapper
 class GetCouponsResponse {
-
   factory GetCouponsResponse.fromJson(Map<String, dynamic> json) {
     return GetCouponsResponse(
       items: (json['items'] as List<dynamic>)

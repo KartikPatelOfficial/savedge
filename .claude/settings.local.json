@@ -3,8 +3,18 @@
     "allow": [
       "Bash(flutter analyze:*)",
       "Bash(flutter packages pub run build_runner build:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(dart format:*)",
+      "Bash(mkdir:*)",
+      "Bash(move \"presentation\\app\\app.dart\" \"features\\app\\presentation\\pages\\app.dart\")",
+      "Bash(move \"presentation\\main_navigation\\main_navigation_page.dart\" \"features\\app\\presentation\\navigation\\main_navigation_page.dart\")",
+      "Bash(copy:*)",
+      "Bash(del \"presentation\\app\\app.dart\")",
+      "Bash(del \"presentation\\main_navigation\\main_navigation_page.dart\")",
+      "Bash(cp:*)",
+      "Bash(flutter pub:*)"
     ],
-    "deny": []
+    "deny": [],
+    "defaultMode": "acceptEdits"
   }
 }

@@ -6,9 +6,13 @@ abstract class AuthRepository {
   Future<UserProfile> syncUser({required String email, String? displayName});
   Future<UserProfile> getProfile();
   Future<void> validateToken(String idToken);
-  Future<UserProfile> updateProfile({required String email, String? firstName, String? lastName});
+  Future<UserProfile> updateProfile({
+    required String email,
+    String? firstName,
+    String? lastName,
+  });
   Future<ExtendedUserProfile> getUserProfileExtended();
-  
+
   // New phone-based authentication flow methods
   Future<CheckUserExistsResponse> checkUserExists(String firebaseUid);
   Future<EmployeeInfoResponse?> checkEmployeeByPhone(String phoneNumber);

@@ -18,26 +18,26 @@ abstract class UserProfileResponse with _$UserProfileResponse {
     DateTime? createdAt,
   }) = _UserProfileResponse;
 
-  factory UserProfileResponse.fromJson(Map<String, dynamic> json) => _$UserProfileResponseFromJson(json);
+  factory UserProfileResponse.fromJson(Map<String, dynamic> json) =>
+      _$UserProfileResponseFromJson(json);
 }
 
 @freezed
 abstract class SyncUserRequest with _$SyncUserRequest {
-  const factory SyncUserRequest({
-    required String email,
-    String? displayName,
-  }) = _SyncUserRequest;
+  const factory SyncUserRequest({required String email, String? displayName}) =
+      _SyncUserRequest;
 
-  factory SyncUserRequest.fromJson(Map<String, dynamic> json) => _$SyncUserRequestFromJson(json);
+  factory SyncUserRequest.fromJson(Map<String, dynamic> json) =>
+      _$SyncUserRequestFromJson(json);
 }
 
 @freezed
 abstract class ValidateTokenRequest with _$ValidateTokenRequest {
-  const factory ValidateTokenRequest({
-    required String idToken,
-  }) = _ValidateTokenRequest;
+  const factory ValidateTokenRequest({required String idToken}) =
+      _ValidateTokenRequest;
 
-  factory ValidateTokenRequest.fromJson(Map<String, dynamic> json) => _$ValidateTokenRequestFromJson(json);
+  factory ValidateTokenRequest.fromJson(Map<String, dynamic> json) =>
+      _$ValidateTokenRequestFromJson(json);
 }
 
 // Add extended profile response and update request
@@ -63,7 +63,8 @@ abstract class UserProfileResponse2 with _$UserProfileResponse2 {
     DateTime? joinDate,
   }) = _UserProfileResponse2;
 
-  factory UserProfileResponse2.fromJson(Map<String, dynamic> json) => _$UserProfileResponse2FromJson(json);
+  factory UserProfileResponse2.fromJson(Map<String, dynamic> json) =>
+      _$UserProfileResponse2FromJson(json);
 }
 
 @freezed
@@ -74,18 +75,19 @@ abstract class UpdateUserProfileRequest with _$UpdateUserProfileRequest {
     String? lastName,
   }) = _UpdateUserProfileRequest;
 
-  factory UpdateUserProfileRequest.fromJson(Map<String, dynamic> json) => _$UpdateUserProfileRequestFromJson(json);
+  factory UpdateUserProfileRequest.fromJson(Map<String, dynamic> json) =>
+      _$UpdateUserProfileRequestFromJson(json);
 }
 
 // New models for the phone-based authentication flow
 
 @freezed
 abstract class CheckUserExistsRequest with _$CheckUserExistsRequest {
-  const factory CheckUserExistsRequest({
-    required String firebaseUid,
-  }) = _CheckUserExistsRequest;
+  const factory CheckUserExistsRequest({required String firebaseUid}) =
+      _CheckUserExistsRequest;
 
-  factory CheckUserExistsRequest.fromJson(Map<String, dynamic> json) => _$CheckUserExistsRequestFromJson(json);
+  factory CheckUserExistsRequest.fromJson(Map<String, dynamic> json) =>
+      _$CheckUserExistsRequestFromJson(json);
 }
 
 @freezed
@@ -96,16 +98,17 @@ abstract class CheckUserExistsResponse with _$CheckUserExistsResponse {
     UserProfileResponse2? userProfile,
   }) = _CheckUserExistsResponse;
 
-  factory CheckUserExistsResponse.fromJson(Map<String, dynamic> json) => _$CheckUserExistsResponseFromJson(json);
+  factory CheckUserExistsResponse.fromJson(Map<String, dynamic> json) =>
+      _$CheckUserExistsResponseFromJson(json);
 }
 
 @freezed
 abstract class CheckEmployeeByPhoneRequest with _$CheckEmployeeByPhoneRequest {
-  const factory CheckEmployeeByPhoneRequest({
-    required String phoneNumber,
-  }) = _CheckEmployeeByPhoneRequest;
+  const factory CheckEmployeeByPhoneRequest({required String phoneNumber}) =
+      _CheckEmployeeByPhoneRequest;
 
-  factory CheckEmployeeByPhoneRequest.fromJson(Map<String, dynamic> json) => _$CheckEmployeeByPhoneRequestFromJson(json);
+  factory CheckEmployeeByPhoneRequest.fromJson(Map<String, dynamic> json) =>
+      _$CheckEmployeeByPhoneRequestFromJson(json);
 }
 
 @freezed
@@ -124,11 +127,13 @@ abstract class EmployeeInfoResponse with _$EmployeeInfoResponse {
     required bool isActive,
   }) = _EmployeeInfoResponse;
 
-  factory EmployeeInfoResponse.fromJson(Map<String, dynamic> json) => _$EmployeeInfoResponseFromJson(json);
+  factory EmployeeInfoResponse.fromJson(Map<String, dynamic> json) =>
+      _$EmployeeInfoResponseFromJson(json);
 }
 
 @freezed
-abstract class RegisterEmployeeByPhoneRequest with _$RegisterEmployeeByPhoneRequest {
+abstract class RegisterEmployeeByPhoneRequest
+    with _$RegisterEmployeeByPhoneRequest {
   const factory RegisterEmployeeByPhoneRequest({
     required String phoneNumber,
     required String email,
@@ -136,7 +141,8 @@ abstract class RegisterEmployeeByPhoneRequest with _$RegisterEmployeeByPhoneRequ
     required String lastName,
   }) = _RegisterEmployeeByPhoneRequest;
 
-  factory RegisterEmployeeByPhoneRequest.fromJson(Map<String, dynamic> json) => _$RegisterEmployeeByPhoneRequestFromJson(json);
+  factory RegisterEmployeeByPhoneRequest.fromJson(Map<String, dynamic> json) =>
+      _$RegisterEmployeeByPhoneRequestFromJson(json);
 }
 
 @freezed
@@ -148,7 +154,8 @@ abstract class RegisterUserByPhoneRequest with _$RegisterUserByPhoneRequest {
     required String lastName,
   }) = _RegisterUserByPhoneRequest;
 
-  factory RegisterUserByPhoneRequest.fromJson(Map<String, dynamic> json) => _$RegisterUserByPhoneRequestFromJson(json);
+  factory RegisterUserByPhoneRequest.fromJson(Map<String, dynamic> json) =>
+      _$RegisterUserByPhoneRequestFromJson(json);
 }
 
 @freezed
@@ -173,5 +180,6 @@ abstract class PhoneRegistrationResponse with _$PhoneRegistrationResponse {
     String? position,
   }) = _PhoneRegistrationResponse;
 
-  factory PhoneRegistrationResponse.fromJson(Map<String, dynamic> json) => _$PhoneRegistrationResponseFromJson(json);
+  factory PhoneRegistrationResponse.fromJson(Map<String, dynamic> json) =>
+      _$PhoneRegistrationResponseFromJson(json);
 }

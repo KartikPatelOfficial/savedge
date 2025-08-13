@@ -8,7 +8,8 @@ part 'coupons_remote_data_source.g.dart';
 /// Remote data source for coupons API calls
 @RestApi()
 abstract class CouponsRemoteDataSource {
-  factory CouponsRemoteDataSource(Dio dio, {String baseUrl}) = _CouponsRemoteDataSource;
+  factory CouponsRemoteDataSource(Dio dio, {String baseUrl}) =
+      _CouponsRemoteDataSource;
 
   /// Gets all coupons with pagination and filtering
   @GET('/api/Coupons')

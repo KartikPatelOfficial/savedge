@@ -61,9 +61,9 @@ class _CustomTextFieldState extends State<CustomTextField> {
       children: [
         Text(
           widget.label,
-          style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                fontWeight: FontWeight.w500,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w500),
         ),
         const SizedBox(height: 8),
         TextFormField(
@@ -82,11 +82,16 @@ class _CustomTextFieldState extends State<CustomTextField> {
           maxLength: widget.maxLength,
           decoration: InputDecoration(
             hintText: widget.hint,
-            prefixIcon: widget.prefixIcon != null ? Icon(widget.prefixIcon) : null,
+            prefixIcon: widget.prefixIcon != null
+                ? Icon(widget.prefixIcon)
+                : null,
             suffixIcon: widget.obscureText
                 ? IconButton(
-                    icon: Icon(_obscureText ? Icons.visibility : Icons.visibility_off),
-                    onPressed: () => setState(() => _obscureText = !_obscureText),
+                    icon: Icon(
+                      _obscureText ? Icons.visibility : Icons.visibility_off,
+                    ),
+                    onPressed: () =>
+                        setState(() => _obscureText = !_obscureText),
                   )
                 : widget.suffixIcon,
           ),

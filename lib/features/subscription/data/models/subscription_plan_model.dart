@@ -11,7 +11,8 @@ class SubscriptionPlanModel {
     required this.maxCoupons,
     this.features,
     this.imageUrl,
-    this.isActive = true, // Default to true since API doesn't provide this field
+    this.isActive =
+        true, // Default to true since API doesn't provide this field
   });
 
   final int id;
@@ -34,8 +35,12 @@ class SubscriptionPlanModel {
       durationMonths: json['durationMonths'] as int,
       bonusPoints: json['bonusPoints'] as int,
       maxCoupons: json['maxCoupons'] as int,
-      features: (json['features'] as String?)?.isEmpty == true ? null : json['features'] as String?,
-      imageUrl: (json['imageUrl'] as String?)?.isEmpty == true ? null : json['imageUrl'] as String?,
+      features: (json['features'] as String?)?.isEmpty == true
+          ? null
+          : json['features'] as String?,
+      imageUrl: (json['imageUrl'] as String?)?.isEmpty == true
+          ? null
+          : json['imageUrl'] as String?,
       // Note: API doesn't provide isActive field, so we default to true
     );
   }
@@ -56,15 +61,15 @@ class SubscriptionPlanModel {
   }
 
   SubscriptionPlan toEntity() => SubscriptionPlan(
-        id: id,
-        name: name,
-        description: description,
-        price: price,
-        durationMonths: durationMonths,
-        bonusPoints: bonusPoints,
-        maxCoupons: maxCoupons,
-        features: features,
-        imageUrl: imageUrl,
-        isActive: isActive,
-      );
+    id: id,
+    name: name,
+    description: description,
+    price: price,
+    durationMonths: durationMonths,
+    bonusPoints: bonusPoints,
+    maxCoupons: maxCoupons,
+    features: features,
+    imageUrl: imageUrl,
+    isActive: isActive,
+  );
 }

@@ -9,13 +9,16 @@ import 'package:savedge/features/vendors/domain/repositories/coupons_repository.
 
 /// Use case for getting coupons for a specific vendor
 @injectable
-class GetVendorCouponsUseCase implements UseCase<List<Coupon>, GetVendorCouponsParams> {
+class GetVendorCouponsUseCase
+    implements UseCase<List<Coupon>, GetVendorCouponsParams> {
   const GetVendorCouponsUseCase(this._repository);
 
   final CouponsRepository _repository;
 
   @override
-  Future<Either<Failure, List<Coupon>>> call(GetVendorCouponsParams params) async {
+  Future<Either<Failure, List<Coupon>>> call(
+    GetVendorCouponsParams params,
+  ) async {
     return _repository.getVendorCoupons(
       params.vendorId,
       pageNumber: params.pageNumber,
@@ -42,5 +45,11 @@ class GetVendorCouponsParams extends Equatable {
   final bool isExpired;
 
   @override
-  List<Object> get props => [vendorId, pageNumber, pageSize, isActive, isExpired];
+  List<Object> get props => [
+    vendorId,
+    pageNumber,
+    pageSize,
+    isActive,
+    isExpired,
+  ];
 }

@@ -1,10 +1,15 @@
 import 'package:dartz/dartz.dart';
+import 'package:equatable/equatable.dart';
 
 import 'package:savedge/core/error/failures.dart';
 import 'package:savedge/core/usecases/usecase.dart';
 import 'package:savedge/features/vendors/domain/entities/vendor.dart';
 import 'package:savedge/features/vendors/domain/repositories/vendors_repository.dart';
 
+/// Use case for retrieving a paginated list of vendors
+///
+/// This use case handles the business logic for fetching vendors
+/// with optional filtering by search term, category, and business type.
 class GetVendorsUseCase implements UseCase<List<Vendor>, GetVendorsParams> {
   const GetVendorsUseCase(this.repository);
 
@@ -24,7 +29,8 @@ class GetVendorsUseCase implements UseCase<List<Vendor>, GetVendorsParams> {
   }
 }
 
-class GetVendorsParams {
+/// Parameters for the GetVendorsUseCase
+class GetVendorsParams extends Equatable {
   const GetVendorsParams({
     this.pageNumber = 1,
     this.pageSize = 10,
@@ -42,4 +48,15 @@ class GetVendorsParams {
   final String? businessType;
   final bool? isApproved;
   final bool? isActive;
+
+  @override
+  List<Object?> get props => [
+    pageNumber,
+    pageSize,
+    searchTerm,
+    category,
+    businessType,
+    isApproved,
+    isActive,
+  ];
 }

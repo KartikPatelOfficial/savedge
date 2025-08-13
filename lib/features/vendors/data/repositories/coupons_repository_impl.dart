@@ -36,7 +36,7 @@ class CouponsRepositoryImpl implements CouponsRepository {
         isActive: isActive,
         isExpired: isExpired,
       );
-      
+
       final coupons = response.items.map(_mapResponseToEntity).toList();
       return Right(coupons);
     } catch (e) {
@@ -60,7 +60,7 @@ class CouponsRepositoryImpl implements CouponsRepository {
         isActive: isActive,
         isExpired: isExpired,
       );
-      
+
       final coupons = response.items.map(_mapResponseToEntity).toList();
       return Right(coupons);
     } catch (e) {
@@ -82,7 +82,7 @@ class CouponsRepositoryImpl implements CouponsRepository {
         isActive: isActive,
         isExpired: isExpired,
       );
-      
+
       final coupons = response.items.map(_mapResponseToEntity).toList();
       return Right(coupons);
     } catch (e) {

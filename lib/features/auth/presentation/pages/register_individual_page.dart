@@ -28,11 +28,11 @@ class _RegisterIndividualPageState extends State<RegisterIndividualPage> {
 
   Future<void> _submit() async {
     if (_saving) return;
-    
+
     final email = _emailController.text.trim();
     final firstName = _firstController.text.trim();
     final lastName = _lastController.text.trim();
-    
+
     if (email.isEmpty || firstName.isEmpty || lastName.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill in all fields')),
@@ -49,7 +49,7 @@ class _RegisterIndividualPageState extends State<RegisterIndividualPage> {
     }
 
     setState(() => _saving = true);
-    
+
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) {
@@ -76,9 +76,9 @@ class _RegisterIndividualPageState extends State<RegisterIndividualPage> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Registration failed: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Registration failed: $e')));
       }
     } finally {
       if (mounted) {
@@ -131,8 +131,8 @@ class _RegisterIndividualPageState extends State<RegisterIndividualPage> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: _saving ? null : _submit,
-                child: _saving 
-                    ? const CircularProgressIndicator.adaptive() 
+                child: _saving
+                    ? const CircularProgressIndicator.adaptive()
                     : const Text('Complete Registration'),
               ),
             ),

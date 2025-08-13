@@ -36,7 +36,8 @@ class _PhoneAuthPageState extends State<PhoneAuthPage> {
     super.dispose();
   }
 
-  bool get _isValidPhone => _phoneController.text.trim().length >= 8; // simplistic validation
+  bool get _isValidPhone =>
+      _phoneController.text.trim().length >= 8; // simplistic validation
 
   void _startVerification() {
     FocusScope.of(context).unfocus();
@@ -67,9 +68,9 @@ class _PhoneAuthPageState extends State<PhoneAuthPage> {
           // Pop back to ProfileAuthWrapper to re-check auth status
           Navigator.of(context).pop();
         } else if (state is PhoneAuthError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message)),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.message)));
         }
       },
       builder: (context, state) {
@@ -81,7 +82,9 @@ class _PhoneAuthPageState extends State<PhoneAuthPage> {
               body: SafeArea(
                 child: AnimatedSwitcher(
                   duration: const Duration(milliseconds: 300),
-                  child: _codeSent ? _buildOtpView(theme, isLoading) : _buildPhoneInputView(theme, isLoading),
+                  child: _codeSent
+                      ? _buildOtpView(theme, isLoading)
+                      : _buildPhoneInputView(theme, isLoading),
                 ),
               ),
             ),
@@ -111,11 +114,19 @@ class _PhoneAuthPageState extends State<PhoneAuthPage> {
           Center(
             child: Column(
               children: [
-                Text('Welcome to Savedge',
-                    style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
+                Text(
+                  'Welcome to Savedge',
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 const SizedBox(height: 8),
-                Text('Login to Break Price Chains!',
-                    style: theme.textTheme.bodyMedium?.copyWith(color: theme.textTheme.bodySmall?.color)),
+                Text(
+                  'Login to Break Price Chains!',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.textTheme.bodySmall?.color,
+                  ),
+                ),
               ],
             ),
           ),
@@ -127,7 +138,9 @@ class _PhoneAuthPageState extends State<PhoneAuthPage> {
             keyboardType: TextInputType.phone,
             decoration: InputDecoration(
               hintText: 'Enter mobile number',
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(6),
+              ),
               isDense: true,
             ),
             onChanged: (_) => setState(() {}),
@@ -136,7 +149,9 @@ class _PhoneAuthPageState extends State<PhoneAuthPage> {
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: !_isValidPhone || isLoading ? null : _startVerification,
+              onPressed: !_isValidPhone || isLoading
+                  ? null
+                  : _startVerification,
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: const StadiumBorder(),
@@ -193,13 +208,17 @@ class _PhoneAuthPageState extends State<PhoneAuthPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('OTP Verification',
-              style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w600)),
-          const SizedBox(height: 12),
-            Text(
-              "We've sent a verification code to your mobile number.\nPlease enter the code below to continue.",
-              style: theme.textTheme.bodyMedium,
+          Text(
+            'OTP Verification',
+            style: theme.textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.w600,
             ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            "We've sent a verification code to your mobile number.\nPlease enter the code below to continue.",
+            style: theme.textTheme.bodyMedium,
+          ),
           const SizedBox(height: 32),
           Text('Type your 6 digit code', style: theme.textTheme.labelLarge),
           const SizedBox(height: 12),

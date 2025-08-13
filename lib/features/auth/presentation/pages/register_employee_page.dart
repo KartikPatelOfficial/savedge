@@ -19,7 +19,7 @@ class _RegisterEmployeePageState extends State<RegisterEmployeePage> {
   bool _isLoading = true;
   EmployeeInfoResponse? _employeeInfo;
   String? _error;
-  
+
   AuthRepository get _repo => GetIt.I<AuthRepository>();
 
   @override
@@ -39,7 +39,9 @@ class _RegisterEmployeePageState extends State<RegisterEmployeePage> {
     try {
       final firebaseUser = FirebaseAuth.instance.currentUser;
       if (firebaseUser?.phoneNumber != null) {
-        final employeeInfo = await _repo.checkEmployeeByPhone(firebaseUser!.phoneNumber!);
+        final employeeInfo = await _repo.checkEmployeeByPhone(
+          firebaseUser!.phoneNumber!,
+        );
         if (mounted) {
           setState(() {
             _employeeInfo = employeeInfo;
@@ -66,17 +68,17 @@ class _RegisterEmployeePageState extends State<RegisterEmployeePage> {
 
   Future<void> _submit() async {
     if (_saving || _employeeInfo == null) return;
-    
+
     final firstName = _firstController.text.trim();
     final lastName = _lastController.text.trim();
-    
+
     if (firstName.isEmpty || lastName.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill in all fields')),
       );
       return;
     }
-    
+
     setState(() => _saving = true);
     try {
       final firebaseUser = FirebaseAuth.instance.currentUser;
@@ -87,12 +89,14 @@ class _RegisterEmployeePageState extends State<RegisterEmployeePage> {
           firstName: firstName,
           lastName: lastName,
         );
-        
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Registration successful! Redirecting...')),
+            const SnackBar(
+              content: Text('Registration successful! Redirecting...'),
+            ),
           );
-          
+
           // Trigger the ProfileAuthWrapper to recheck auth status
           // which will detect the user is now registered and redirect to home
           await Future.delayed(const Duration(seconds: 1));
@@ -101,9 +105,9 @@ class _RegisterEmployeePageState extends State<RegisterEmployeePage> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Registration failed: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Registration failed: $e')));
       }
     } finally {
       if (mounted) setState(() => _saving = false);
@@ -151,9 +155,7 @@ class _RegisterEmployeePageState extends State<RegisterEmployeePage> {
 
     if (_employeeInfo == null) {
       return const Scaffold(
-        body: Center(
-          child: Text('No employee information found'),
-        ),
+        body: Center(child: Text('No employee information found')),
       );
     }
 

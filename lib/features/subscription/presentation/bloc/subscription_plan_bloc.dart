@@ -54,7 +54,8 @@ class SubscriptionPlanError extends SubscriptionPlanState {
 }
 
 // BLoC
-class SubscriptionPlanBloc extends Bloc<SubscriptionPlanEvent, SubscriptionPlanState> {
+class SubscriptionPlanBloc
+    extends Bloc<SubscriptionPlanEvent, SubscriptionPlanState> {
   SubscriptionPlanBloc({
     required SubscriptionPlanRepository subscriptionPlanRepository,
   }) : _subscriptionPlanRepository = subscriptionPlanRepository,
@@ -70,7 +71,7 @@ class SubscriptionPlanBloc extends Bloc<SubscriptionPlanEvent, SubscriptionPlanS
     Emitter<SubscriptionPlanState> emit,
   ) async {
     emit(const SubscriptionPlanLoading());
-    
+
     try {
       final plans = await _subscriptionPlanRepository.getSubscriptionPlans();
       emit(SubscriptionPlanLoaded(plans));

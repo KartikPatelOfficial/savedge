@@ -1,14 +1,10 @@
 /// Model for coupon check request
 class CouponCheckRequest {
-  const CouponCheckRequest({
-    required this.couponId,
-  });
+  const CouponCheckRequest({required this.couponId});
 
   final int couponId;
 
-  Map<String, dynamic> toJson() => {
-    'couponId': couponId,
-  };
+  Map<String, dynamic> toJson() => {'couponId': couponId};
 }
 
 /// Model for coupon check response
@@ -129,15 +125,11 @@ class CouponCheckResponse {
 
 /// Model for coupon claim request
 class CouponClaimRequest {
-  const CouponClaimRequest({
-    required this.couponId,
-  });
+  const CouponClaimRequest({required this.couponId});
 
   final int couponId;
 
-  Map<String, dynamic> toJson() => {
-    'couponId': couponId,
-  };
+  Map<String, dynamic> toJson() => {'couponId': couponId};
 }
 
 /// Model for coupon claim response

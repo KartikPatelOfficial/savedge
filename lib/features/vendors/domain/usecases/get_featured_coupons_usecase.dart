@@ -9,13 +9,16 @@ import 'package:savedge/features/vendors/domain/repositories/coupons_repository.
 
 /// Use case for getting featured coupons for offers section
 @injectable
-class GetFeaturedCouponsUseCase implements UseCase<List<Coupon>, GetFeaturedCouponsParams> {
+class GetFeaturedCouponsUseCase
+    implements UseCase<List<Coupon>, GetFeaturedCouponsParams> {
   const GetFeaturedCouponsUseCase(this._repository);
 
   final CouponsRepository _repository;
 
   @override
-  Future<Either<Failure, List<Coupon>>> call(GetFeaturedCouponsParams params) async {
+  Future<Either<Failure, List<Coupon>>> call(
+    GetFeaturedCouponsParams params,
+  ) async {
     return _repository.getFeaturedCoupons(
       pageNumber: params.pageNumber,
       pageSize: params.pageSize,

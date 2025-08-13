@@ -10,10 +10,7 @@ abstract class CouponsEvent extends Equatable {
 
 /// Event to load featured coupons
 class LoadFeaturedCoupons extends CouponsEvent {
-  const LoadFeaturedCoupons({
-    this.pageNumber = 1,
-    this.pageSize = 5,
-  });
+  const LoadFeaturedCoupons({this.pageNumber = 1, this.pageSize = 5});
 
   final int pageNumber;
   final int pageSize;
@@ -44,7 +41,13 @@ class LoadVendorCoupons extends CouponsEvent {
   final bool isExpired;
 
   @override
-  List<Object> get props => [vendorId, pageNumber, pageSize, isActive, isExpired];
+  List<Object> get props => [
+    vendorId,
+    pageNumber,
+    pageSize,
+    isActive,
+    isExpired,
+  ];
 }
 
 /// Event to refresh vendor-specific coupons

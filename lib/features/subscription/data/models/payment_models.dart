@@ -11,7 +11,7 @@ abstract class CreatePaymentOrderRequest with _$CreatePaymentOrderRequest {
     required String currency,
   }) = _CreatePaymentOrderRequest;
 
-  factory CreatePaymentOrderRequest.fromJson(Map<String, dynamic> json) => 
+  factory CreatePaymentOrderRequest.fromJson(Map<String, dynamic> json) =>
       _$CreatePaymentOrderRequestFromJson(json);
 }
 
@@ -26,7 +26,7 @@ abstract class CreatePaymentOrderResponse with _$CreatePaymentOrderResponse {
     required int transactionId,
   }) = _CreatePaymentOrderResponse;
 
-  factory CreatePaymentOrderResponse.fromJson(Map<String, dynamic> json) => 
+  factory CreatePaymentOrderResponse.fromJson(Map<String, dynamic> json) =>
       _$CreatePaymentOrderResponseFromJson(json);
 }
 
@@ -39,7 +39,7 @@ abstract class VerifyPaymentRequest with _$VerifyPaymentRequest {
     required int transactionId,
   }) = _VerifyPaymentRequest;
 
-  factory VerifyPaymentRequest.fromJson(Map<String, dynamic> json) => 
+  factory VerifyPaymentRequest.fromJson(Map<String, dynamic> json) =>
       _$VerifyPaymentRequestFromJson(json);
 }
 
@@ -51,7 +51,7 @@ abstract class PaymentVerificationResponse with _$PaymentVerificationResponse {
     String? subscriptionId,
   }) = _PaymentVerificationResponse;
 
-  factory PaymentVerificationResponse.fromJson(Map<String, dynamic> json) => 
+  factory PaymentVerificationResponse.fromJson(Map<String, dynamic> json) =>
       _$PaymentVerificationResponseFromJson(json);
 }
 
@@ -63,12 +63,13 @@ abstract class PurchaseSubscriptionRequest with _$PurchaseSubscriptionRequest {
     String? paymentMethod, // 'points' or 'razorpay'
   }) = _PurchaseSubscriptionRequest;
 
-  factory PurchaseSubscriptionRequest.fromJson(Map<String, dynamic> json) => 
+  factory PurchaseSubscriptionRequest.fromJson(Map<String, dynamic> json) =>
       _$PurchaseSubscriptionRequestFromJson(json);
 }
 
 @freezed
-abstract class PurchaseSubscriptionResponse with _$PurchaseSubscriptionResponse {
+abstract class PurchaseSubscriptionResponse
+    with _$PurchaseSubscriptionResponse {
   const factory PurchaseSubscriptionResponse({
     required bool success,
     required String message,
@@ -77,6 +78,6 @@ abstract class PurchaseSubscriptionResponse with _$PurchaseSubscriptionResponse 
     DateTime? endDate,
   }) = _PurchaseSubscriptionResponse;
 
-  factory PurchaseSubscriptionResponse.fromJson(Map<String, dynamic> json) => 
+  factory PurchaseSubscriptionResponse.fromJson(Map<String, dynamic> json) =>
       _$PurchaseSubscriptionResponseFromJson(json);
 }

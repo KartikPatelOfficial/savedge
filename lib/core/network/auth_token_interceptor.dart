@@ -4,13 +4,19 @@ import 'package:flutter/foundation.dart';
 
 /// Interceptor that attaches Firebase ID token to each request.
 class AuthTokenInterceptor extends Interceptor {
-  AuthTokenInterceptor(this._firebaseAuth, {this.refreshThresholdSeconds = 120});
+  AuthTokenInterceptor(
+    this._firebaseAuth, {
+    this.refreshThresholdSeconds = 120,
+  });
 
   final FirebaseAuth _firebaseAuth;
   final int refreshThresholdSeconds;
 
   @override
-  void onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
+  void onRequest(
+    RequestOptions options,
+    RequestInterceptorHandler handler,
+  ) async {
     try {
       final user = _firebaseAuth.currentUser;
       if (user != null) {

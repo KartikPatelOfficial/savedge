@@ -129,7 +129,8 @@ class DioHttpClient implements HttpClient {
         );
       case DioExceptionType.badResponse:
         return ServerException(
-          message: 'Server error: ${error.response?.statusMessage ?? 'Unknown error'}',
+          message:
+              'Server error: ${error.response?.statusMessage ?? 'Unknown error'}',
           statusCode: error.response?.statusCode,
         );
       case DioExceptionType.cancel:

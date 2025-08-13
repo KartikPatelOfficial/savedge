@@ -34,45 +34,30 @@ class CustomButton extends StatelessWidget {
         : Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (icon != null) ...[
-                Icon(icon),
-                const SizedBox(width: 8),
-              ],
+              if (icon != null) ...[Icon(icon), const SizedBox(width: 8)],
               Text(text),
             ],
           );
 
-    final VoidCallback? effectiveOnPressed =
-        (isEnabled && !isLoading) ? onPressed : null;
+    final VoidCallback? effectiveOnPressed = (isEnabled && !isLoading)
+        ? onPressed
+        : null;
 
     Widget button;
     switch (buttonType) {
       case ButtonType.elevated:
-        button = ElevatedButton(
-          onPressed: effectiveOnPressed,
-          child: child,
-        );
+        button = ElevatedButton(onPressed: effectiveOnPressed, child: child);
         break;
       case ButtonType.outlined:
-        button = OutlinedButton(
-          onPressed: effectiveOnPressed,
-          child: child,
-        );
+        button = OutlinedButton(onPressed: effectiveOnPressed, child: child);
         break;
       case ButtonType.text:
-        button = TextButton(
-          onPressed: effectiveOnPressed,
-          child: child,
-        );
+        button = TextButton(onPressed: effectiveOnPressed, child: child);
         break;
     }
 
     if (width != null || height != null) {
-      return SizedBox(
-        width: width,
-        height: height,
-        child: button,
-      );
+      return SizedBox(width: width, height: height, child: button);
     }
 
     return button;
@@ -80,8 +65,4 @@ class CustomButton extends StatelessWidget {
 }
 
 /// Button type enumeration
-enum ButtonType {
-  elevated,
-  outlined,
-  text,
-}
+enum ButtonType { elevated, outlined, text }

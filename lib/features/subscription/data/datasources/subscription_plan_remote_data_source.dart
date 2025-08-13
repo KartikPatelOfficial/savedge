@@ -8,7 +8,8 @@ abstract class SubscriptionPlanRemoteDataSource {
 }
 
 /// Implementation of subscription plan remote data source
-class SubscriptionPlanRemoteDataSourceImpl implements SubscriptionPlanRemoteDataSource {
+class SubscriptionPlanRemoteDataSourceImpl
+    implements SubscriptionPlanRemoteDataSource {
   const SubscriptionPlanRemoteDataSourceImpl(this._dio);
 
   final Dio _dio;
@@ -17,14 +18,17 @@ class SubscriptionPlanRemoteDataSourceImpl implements SubscriptionPlanRemoteData
   Future<List<SubscriptionPlanModel>> getSubscriptionPlans() async {
     try {
       final response = await _dio.get('/api/subscriptions');
-      
+
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data as List<dynamic>;
         return data
-            .map((json) => SubscriptionPlanModel.fromJson(json as Map<String, dynamic>))
+            .map(
+              (json) =>
+                  SubscriptionPlanModel.fromJson(json as Map<String, dynamic>),
+            )
             .toList();
       }
-      
+
       throw Exception('Failed to fetch subscription plans');
     } on DioException catch (e) {
       throw Exception('Network error: ${e.message}');
@@ -37,11 +41,13 @@ class SubscriptionPlanRemoteDataSourceImpl implements SubscriptionPlanRemoteData
   Future<SubscriptionPlanModel?> getSubscriptionPlan(int id) async {
     try {
       final response = await _dio.get('/api/admin/subscriptions/$id');
-      
+
       if (response.statusCode == 200) {
-        return SubscriptionPlanModel.fromJson(response.data as Map<String, dynamic>);
+        return SubscriptionPlanModel.fromJson(
+          response.data as Map<String, dynamic>,
+        );
       }
-      
+
       return null;
     } on DioException catch (e) {
       if (e.response?.statusCode == 404) {

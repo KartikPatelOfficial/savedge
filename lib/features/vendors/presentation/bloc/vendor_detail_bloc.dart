@@ -7,7 +7,8 @@ import 'package:savedge/features/vendors/presentation/bloc/vendor_detail_state.d
 
 /// BLoC for managing vendor detail state
 class VendorDetailBloc extends Bloc<VendorDetailEvent, VendorDetailState> {
-  VendorDetailBloc({required this.getVendorUseCase}) : super(VendorDetailInitial()) {
+  VendorDetailBloc({required this.getVendorUseCase})
+    : super(VendorDetailInitial()) {
     on<LoadVendorDetail>(_onLoadVendorDetail);
     on<RefreshVendorDetail>(_onRefreshVendorDetail);
   }

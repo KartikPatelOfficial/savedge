@@ -25,8 +25,20 @@ class UserProfile extends Equatable {
   final bool? isActive;
   final DateTime? createdAt;
 
-  bool get hasCompletedProfile => (firstName?.isNotEmpty ?? false) || (lastName?.isNotEmpty ?? false);
+  bool get hasCompletedProfile =>
+      (firstName?.isNotEmpty ?? false) || (lastName?.isNotEmpty ?? false);
 
   @override
-  List<Object?> get props => [id, email, firstName, lastName, firebaseUid, organizationId, pointsBalance, pointsExpiry, isActive, createdAt];
+  List<Object?> get props => [
+    id,
+    email,
+    firstName,
+    lastName,
+    firebaseUid,
+    organizationId,
+    pointsBalance,
+    pointsExpiry,
+    isActive,
+    createdAt,
+  ];
 }
