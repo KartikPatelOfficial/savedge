@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:savedge/features/user_profile/presentation/pages/profile_page.dart';
 import 'package:savedge/features/home/presentation/widgets/widgets.dart';
+import 'package:savedge/features/coupons/presentation/pages/user_coupons_page.dart';
 
 /// Main navigation wrapper that handles bottom navigation
 class MainNavigationPage extends StatefulWidget {
@@ -17,7 +18,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
     const HomeContentPage(), // Home page content without bottom nav
     const CartPage(), // Placeholder for cart page
     const GiftPage(), // Placeholder for gift page
-    const CouponsPage(), // Placeholder for coupons page
+    const UserCouponsPage(), // User coupons page
     const ProfilePage(),
   ];
 
@@ -88,35 +89,6 @@ class GiftPage extends StatelessWidget {
             SizedBox(height: 16),
             Text(
               'No gift cards available',
-              style: TextStyle(fontSize: 18, color: Colors.grey),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// Coupons page placeholder
-class CouponsPage extends StatelessWidget {
-  const CouponsPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Coupons'),
-        backgroundColor: const Color(0xFF6F3FCC),
-        foregroundColor: Colors.white,
-      ),
-      body: const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.local_offer, size: 64, color: Colors.grey),
-            SizedBox(height: 16),
-            Text(
-              'No coupons available',
               style: TextStyle(fontSize: 18, color: Colors.grey),
             ),
           ],

@@ -36,6 +36,7 @@ import 'package:savedge/features/subscription/domain/repositories/subscription_p
 import 'package:savedge/features/subscription/data/services/razorpay_payment_service.dart';
 import 'package:savedge/features/subscription/presentation/bloc/subscription_plan_bloc.dart';
 import 'package:savedge/features/coupons/data/services/coupon_service.dart';
+import 'package:savedge/features/coupons/presentation/bloc/user_coupons_bloc.dart';
 import 'package:savedge/core/network/network_client.dart';
 
 final GetIt getIt = GetIt.instance;
@@ -129,6 +130,11 @@ Future<void> configureDependencies() async {
     () => SubscriptionPlanBloc(
       subscriptionPlanRepository: getIt<SubscriptionPlanRepository>(),
     ),
+  );
+
+  // Coupon BLoCs
+  getIt.registerFactory<UserCouponsBloc>(
+    () => UserCouponsBloc(),
   );
 
   // Payment service

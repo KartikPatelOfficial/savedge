@@ -82,8 +82,8 @@ class _SubscriptionPurchasePageState extends State<SubscriptionPurchasePage> {
   }
 
   int _calculatePointsCost() {
-    // Convert price to points (for example: ₹1 = 10 points)
-    return (plan.price * 10).round();
+    // Points cost should be same as the plan price
+    return plan.price.round();
   }
 
   @override
@@ -602,7 +602,9 @@ class _SubscriptionPurchasePageState extends State<SubscriptionPurchasePage> {
           _isProcessingPayment = false;
         });
 
-        if (result['success'] == true) {
+        // Check if the response contains a success message
+        final message = result['message'] ?? '';
+        if (message.toLowerCase().contains('successfully')) {
           _showSuccessDialog(
             'Subscription purchased successfully with points!',
           );
