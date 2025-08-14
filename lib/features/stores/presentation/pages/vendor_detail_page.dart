@@ -5,11 +5,11 @@ import 'package:cached_network_image/cached_network_image.dart';
 
 import 'package:savedge/core/injection/injection.dart';
 import 'package:savedge/core/network/image_cache_manager.dart';
+import 'package:savedge/features/home/presentation/widgets/subscription_plans_section.dart';
 import 'package:savedge/features/vendors/domain/entities/vendor.dart';
 import 'package:savedge/features/vendors/presentation/bloc/vendor_detail_bloc.dart';
 import 'package:savedge/features/vendors/presentation/bloc/vendor_detail_event.dart';
 import 'package:savedge/features/vendors/presentation/bloc/vendor_detail_state.dart';
-import 'package:savedge/features/home/presentation/widgets/membership_section.dart';
 import 'package:savedge/features/stores/presentation/widgets/vendor_offers_section.dart';
 
 class VendorDetailPage extends StatelessWidget {
@@ -117,7 +117,7 @@ class _VendorDetailView extends StatelessWidget {
             ),
           ),
           // Yearly Subscription
-          SliverToBoxAdapter(child: MembershipSection()),
+          SliverToBoxAdapter(child: SubscriptionPlansSection()),
           // Other Restaurants
           SliverToBoxAdapter(child: _buildOtherRestaurants()),
           // Bottom spacing

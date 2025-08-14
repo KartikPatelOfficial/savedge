@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:savedge/features/home/presentation/widgets/widgets.dart';
-import 'package:savedge/features/subscription/data/services/subscription_plan_service.dart';
-import 'package:savedge/features/subscription/presentation/pages/subscription_purchase_page.dart';
 
 /// Home page of the application
 class HomePage extends StatefulWidget {
@@ -55,10 +53,7 @@ class _HomePageState extends State<HomePage> {
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                child: SubscriptionPlansWidget(
-                  plans: SubscriptionPlanService.getSamplePlans(),
-                  onPlanTap: _onSubscriptionPlanTap,
-                ),
+                child: SubscriptionPlansSection(),
               ),
             ),
             // Marketplace
@@ -99,10 +94,6 @@ class _HomePageState extends State<HomePage> {
 
   void _onCategoriesSeeAllTap() {
     debugPrint('Categories see all tap');
-  }
-
-  void _onSubscriptionPlanTap(plan) {
-    Navigator.of(context).push(SubscriptionPurchasePage.route(plan));
   }
 
   void _onMarketplaceSeeAllTap() {

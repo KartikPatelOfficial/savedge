@@ -7,42 +7,59 @@ import 'package:savedge/features/subscription/presentation/pages/subscription_pu
 
 /// Widget to display subscription plans fetched from API with BLoC
 class SubscriptionPlansSection extends StatelessWidget {
-  const SubscriptionPlansSection({super.key, this.height = 200});
-
-  final double height;
+  const SubscriptionPlansSection({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) =>
-          getIt<SubscriptionPlanBloc>()..add(const LoadSubscriptionPlans()),
-      child: BlocBuilder<SubscriptionPlanBloc, SubscriptionPlanState>(
-        builder: (context, state) {
-          if (state is SubscriptionPlanLoading) {
-            return _buildLoadingWidget();
-          } else if (state is SubscriptionPlanLoaded) {
-            if (state.plans.isEmpty) {
-              return const SizedBox.shrink();
-            }
-            return _buildPlansWidget(context, state.plans);
-          } else if (state is SubscriptionPlanError) {
-            return _buildErrorWidget(context, state.message);
-          } else {
-            return const SizedBox.shrink();
-          }
-        },
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Section Header
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Text(
+            'Subscription Plans',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.grey[800],
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        // Plans Content
+        BlocProvider(
+          create: (_) =>
+              getIt<SubscriptionPlanBloc>()..add(const LoadSubscriptionPlans()),
+          child: BlocBuilder<SubscriptionPlanBloc, SubscriptionPlanState>(
+            builder: (context, state) {
+              if (state is SubscriptionPlanLoading) {
+                return _buildLoadingWidget();
+              } else if (state is SubscriptionPlanLoaded) {
+                if (state.plans.isEmpty) {
+                  return const SizedBox.shrink();
+                }
+                return _buildPlansWidget(context, state.plans);
+              } else if (state is SubscriptionPlanError) {
+                return _buildErrorWidget(context, state.message);
+              } else {
+                return const SizedBox.shrink();
+              }
+            },
+          ),
+        ),
+      ],
     );
   }
 
   Widget _buildLoadingWidget() {
     return Container(
-      height: height,
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Card(
-        child: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
             children: [
               CircularProgressIndicator(color: Colors.deepPurple[400]),
               const SizedBox(height: 16),
@@ -65,14 +82,13 @@ class SubscriptionPlansSection extends StatelessWidget {
         child: _SubscriptionPlanCard(
           plan: plans.first,
           onTap: (plan) => _navigateToDetails(context, plan),
-          height: height,
         ),
       );
     }
 
     // Multiple plans: show as horizontal carousel
     return SizedBox(
-      height: height,
+      height: 200, // Height for the horizontal scrolling area
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -85,7 +101,6 @@ class SubscriptionPlansSection extends StatelessWidget {
               child: _SubscriptionPlanCard(
                 plan: plans[index],
                 onTap: (plan) => _navigateToDetails(context, plan),
-                height: height,
               ),
             ),
           );
@@ -96,13 +111,12 @@ class SubscriptionPlansSection extends StatelessWidget {
 
   Widget _buildErrorWidget(BuildContext context, String message) {
     return Container(
-      height: height,
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Card(
         child: Padding(
           padding: const EdgeInsets.all(12),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
             children: [
               Icon(Icons.error_outline, color: Colors.red[400], size: 32),
               const SizedBox(height: 12),
@@ -160,12 +174,10 @@ class _SubscriptionPlanCard extends StatelessWidget {
   const _SubscriptionPlanCard({
     required this.plan,
     this.onTap,
-    required this.height,
   });
 
   final SubscriptionPlan plan;
   final Function(SubscriptionPlan)? onTap;
-  final double height;
 
   @override
   Widget build(BuildContext context) {
@@ -175,8 +187,6 @@ class _SubscriptionPlanCard extends StatelessWidget {
         constraints: BoxConstraints(
           minWidth: 280,
           maxWidth: MediaQuery.of(context).size.width - 40,
-          minHeight: height,
-          maxHeight: height,
         ),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
@@ -197,62 +207,20 @@ class _SubscriptionPlanCard extends StatelessWidget {
   }
 
   Widget _buildImageCard() {
-    return Stack(
-      children: [
-        Positioned.fill(
-          child: Image.network(
-            plan.imageUrl!,
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) {
-              return _buildFallbackCard();
-            },
-            loadingBuilder: (context, child, loadingProgress) {
-              if (loadingProgress == null) return child;
-              return Container(
-                color: Colors.grey[200],
-                child: const Center(child: CircularProgressIndicator()),
-              );
-            },
-          ),
-        ),
-        // Optional overlay with plan info
-        Positioned(
-          bottom: 0,
-          left: 0,
-          right: 0,
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [Colors.transparent, Colors.black.withOpacity(0.7)],
-              ),
-            ),
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  plan.name,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  plan.priceDisplay,
-                  style: const TextStyle(color: Colors.white, fontSize: 14),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
+    return Image.network(
+      plan.imageUrl!,
+      fit: BoxFit.cover,
+      errorBuilder: (context, error, stackTrace) {
+        return _buildFallbackCard();
+      },
+      loadingBuilder: (context, child, loadingProgress) {
+        if (loadingProgress == null) return child;
+        return Container(
+          height: 200, // Minimum height for loading indicator
+          color: Colors.grey[200],
+          child: const Center(child: CircularProgressIndicator()),
+        );
+      },
     );
   }
 
@@ -272,6 +240,7 @@ class _SubscriptionPlanCard extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
             Row(
               children: [
@@ -291,7 +260,7 @@ class _SubscriptionPlanCard extends StatelessWidget {
                 ),
               ],
             ),
-            const Spacer(),
+            const SizedBox(height: 16),
             Text(
               plan.priceDisplay,
               style: const TextStyle(
