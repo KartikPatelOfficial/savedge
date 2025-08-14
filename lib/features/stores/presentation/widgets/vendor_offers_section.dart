@@ -11,11 +11,13 @@ class VendorOffersSection extends StatelessWidget {
   const VendorOffersSection({
     super.key,
     required this.vendorId,
+    required this.vendorUid,
     required this.vendorName,
     this.title = 'Offer for you',
   });
 
   final int vendorId;
+  final String vendorUid;
   final String vendorName;
   final String title;
 
@@ -26,7 +28,7 @@ class VendorOffersSection extends StatelessWidget {
           getIt<CouponsBloc>()..add(LoadVendorCoupons(vendorId: vendorId)),
       child: VendorOffersView(
         title: title,
-        vendorId: vendorId,
+        vendorUid: vendorUid,
         vendorName: vendorName,
       ),
     );
@@ -37,12 +39,12 @@ class VendorOffersView extends StatelessWidget {
   const VendorOffersView({
     super.key,
     required this.title,
-    required this.vendorId,
+    required this.vendorUid,
     required this.vendorName,
   });
 
   final String title;
-  final int vendorId;
+  final String vendorUid;
   final String vendorName;
 
   @override
@@ -95,7 +97,7 @@ class VendorOffersView extends StatelessWidget {
               padding: const EdgeInsets.only(bottom: 12),
               child: VendorOfferCard(
                 coupon: coupon,
-                vendorId: vendorId,
+                vendorUid: vendorUid,
                 vendorName: vendorName,
               ),
             ),
@@ -151,12 +153,12 @@ class VendorOfferCard extends StatelessWidget {
   const VendorOfferCard({
     super.key,
     required this.coupon,
-    required this.vendorId,
+    required this.vendorUid,
     required this.vendorName,
   });
 
   final Coupon coupon;
-  final int vendorId;
+  final String vendorUid;
   final String vendorName;
 
   @override
@@ -248,7 +250,7 @@ class VendorOfferCard extends StatelessWidget {
         MaterialPageRoute(
           builder: (context) => QRScannerPage(
             couponId: coupon.id,
-            expectedVendorId: vendorId,
+            expectedVendorUid: vendorUid,
             expectedVendorName: vendorName,
           ),
         ),

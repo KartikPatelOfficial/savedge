@@ -113,6 +113,7 @@ class _VendorDetailView extends StatelessWidget {
           SliverToBoxAdapter(
             child: VendorOffersSection(
               vendorId: vendor.id,
+              vendorUid: vendor.firebaseUid ?? vendor.id.toString(),
               vendorName: vendor.businessName,
             ),
           ),

@@ -12,12 +12,12 @@ class QRScannerPage extends StatefulWidget {
   const QRScannerPage({
     super.key,
     required this.couponId,
-    required this.expectedVendorId,
+    required this.expectedVendorUid,
     required this.expectedVendorName,
   });
 
   final int couponId;
-  final int expectedVendorId;
+  final String expectedVendorUid;
   final String expectedVendorName;
 
   @override
@@ -209,25 +209,16 @@ class _QRScannerPageState extends State<QRScannerPage> {
     });
 
     try {
-      // Parse QR code format: vendorId-vendorName (e.g., "1-HappyBox")
-      final parts = qrCode.split('-');
-      if (parts.length < 2) {
+      // Parse QR code format: 'savedge://vendor/$vendorId';
+      final uri = Uri.parse(qrCode);
+      if (uri.scheme != 'savedge' || uri.host != 'vendor') {
         throw Exception('Invalid QR code format');
       }
 
-      final scannedVendorId = int.tryParse(parts[0]);
-      if (scannedVendorId == null) {
-        throw Exception('Invalid QR code format');
-      }
-
-      final scannedVendorName = parts
-          .sublist(1)
-          .join('-'); // Handle vendor names with hyphens
+      final scannedVendorId = uri.pathSegments[0];
 
       // Validate vendor matches
-      if (scannedVendorId != widget.expectedVendorId ||
-          scannedVendorName.toLowerCase() !=
-              widget.expectedVendorName.toLowerCase()) {
+      if (scannedVendorId != widget.expectedVendorUid) {
         throw Exception('This QR code is not valid for this vendor');
       }
 
