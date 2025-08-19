@@ -11,64 +11,57 @@ class SubscriptionPlansSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Section Header
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Text(
-            'Subscription Plans',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.grey[800],
-            ),
-          ),
-        ),
-        const SizedBox(height: 16),
-        // Plans Content
-        BlocProvider(
-          create: (_) =>
-              getIt<SubscriptionPlanBloc>()..add(const LoadSubscriptionPlans()),
-          child: BlocBuilder<SubscriptionPlanBloc, SubscriptionPlanState>(
-            builder: (context, state) {
-              if (state is SubscriptionPlanLoading) {
-                return _buildLoadingWidget();
-              } else if (state is SubscriptionPlanLoaded) {
-                if (state.plans.isEmpty) {
-                  return const SizedBox.shrink();
-                }
-                return _buildPlansWidget(context, state.plans);
-              } else if (state is SubscriptionPlanError) {
-                return _buildErrorWidget(context, state.message);
-              } else {
-                return const SizedBox.shrink();
-              }
-            },
-          ),
-        ),
-      ],
+    return BlocProvider(
+      create: (_) =>
+          getIt<SubscriptionPlanBloc>()..add(const LoadSubscriptionPlans()),
+      child: BlocBuilder<SubscriptionPlanBloc, SubscriptionPlanState>(
+        builder: (context, state) {
+          if (state is SubscriptionPlanLoading) {
+            return _buildLoadingWidget();
+          } else if (state is SubscriptionPlanLoaded) {
+            if (state.plans.isEmpty) {
+              return const SizedBox.shrink();
+            }
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Subscription Plans',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF1A202C),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Center(child: _buildPlansWidget(context, state.plans)),
+              ],
+            );
+          } else if (state is SubscriptionPlanError) {
+            return _buildErrorWidget(context, state.message);
+          } else {
+            return const SizedBox.shrink();
+          }
+        },
+      ),
     );
   }
 
   Widget _buildLoadingWidget() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Card(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CircularProgressIndicator(color: Colors.deepPurple[400]),
-              const SizedBox(height: 16),
-              Text(
-                'Loading subscription plans...',
-                style: TextStyle(color: Colors.grey[600], fontSize: 14),
-              ),
-            ],
-          ),
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircularProgressIndicator(color: Colors.deepPurple[400]),
+            const SizedBox(height: 16),
+            Text(
+              'Loading subscription plans...',
+              style: TextStyle(color: Colors.grey[600], fontSize: 14),
+            ),
+          ],
         ),
       ),
     );
@@ -77,18 +70,15 @@ class SubscriptionPlansSection extends StatelessWidget {
   Widget _buildPlansWidget(BuildContext context, List<SubscriptionPlan> plans) {
     // If only one plan, show it as a single card with full width
     if (plans.length == 1) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: _SubscriptionPlanCard(
-          plan: plans.first,
-          onTap: (plan) => _navigateToDetails(context, plan),
-        ),
+      return _SubscriptionPlanCard(
+        plan: plans.first,
+        onTap: (plan) => _navigateToDetails(context, plan),
       );
     }
 
     // Multiple plans: show as horizontal carousel
     return SizedBox(
-      height: 200, // Height for the horizontal scrolling area
+      height: 200,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 20),

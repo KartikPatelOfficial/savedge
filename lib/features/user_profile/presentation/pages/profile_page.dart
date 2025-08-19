@@ -5,6 +5,7 @@ import 'package:savedge/features/auth/domain/repositories/auth_repository.dart';
 import 'package:savedge/features/auth/domain/entities/extended_user_profile.dart';
 import 'package:savedge/features/user_profile/presentation/widgets/widgets.dart';
 import 'package:savedge/features/user_profile/presentation/pages/edit_profile_page.dart';
+import 'package:savedge/features/user_profile/presentation/pages/points_wallet_page.dart';
 
 /// Profile page displaying user information and account options
 class ProfilePage extends StatefulWidget {
@@ -194,6 +195,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           value: '${_userProfile!.pointsBalance}',
                           icon: Icons.stars_outlined,
                           color: const Color(0xFFD69E2E),
+                          onTap: _onPointsBalanceTap,
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -609,6 +611,15 @@ class _ProfilePageState extends State<ProfilePage> {
   void _onAboutTap() {
     debugPrint('About tapped');
     // TODO: Show about dialog
+  }
+
+  void _onPointsBalanceTap() {
+    debugPrint('Points Balance tapped');
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const PointsWalletPage(),
+      ),
+    );
   }
 
   void _onSignOutTap() {

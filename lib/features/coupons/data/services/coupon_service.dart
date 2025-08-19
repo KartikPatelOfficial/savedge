@@ -149,7 +149,24 @@ class CouponService {
         response.data as Map<String, dynamic>,
       );
     } catch (e) {
-      throw Exception('Failed to claim coupon with points: $e');
+      // Extract more meaningful error messages from DioException
+      String errorMessage = 'Failed to claim coupon with points';
+      
+      if (e.toString().contains('Bad Request')) {
+        if (e.toString().contains('insufficient points')) {
+          errorMessage = 'Insufficient points to claim this coupon';
+        } else if (e.toString().contains('already claimed')) {
+          errorMessage = 'You have already claimed this coupon';
+        } else if (e.toString().contains('redemption limit')) {
+          errorMessage = 'This coupon has reached its usage limit';
+        } else if (e.toString().contains('not valid')) {
+          errorMessage = 'This coupon is no longer valid';
+        } else {
+          errorMessage = 'Unable to claim coupon: ${e.toString()}';
+        }
+      }
+      
+      throw Exception(errorMessage);
     }
   }
 
@@ -167,7 +184,24 @@ class CouponService {
         response.data as Map<String, dynamic>,
       );
     } catch (e) {
-      throw Exception('Failed to claim coupon from subscription: $e');
+      // Extract more meaningful error messages from DioException
+      String errorMessage = 'Failed to claim coupon from subscription';
+      
+      if (e.toString().contains('Bad Request')) {
+        if (e.toString().contains('No active subscription')) {
+          errorMessage = 'You need an active subscription to claim this coupon';
+        } else if (e.toString().contains('not included in')) {
+          errorMessage = 'This coupon is not included in your subscription plan';
+        } else if (e.toString().contains('exceeded')) {
+          errorMessage = 'You have reached the limit for this coupon in your subscription';
+        } else if (e.toString().contains('one per user')) {
+          errorMessage = 'You can only claim this coupon once';
+        } else {
+          errorMessage = 'Unable to claim coupon: ${e.toString()}';
+        }
+      }
+      
+      throw Exception(errorMessage);
     }
   }
 

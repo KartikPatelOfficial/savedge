@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:savedge/features/static_pages/presentation/pages/about_us_page.dart';
+import 'package:savedge/features/static_pages/presentation/pages/contact_us_page.dart';
+import 'package:savedge/features/static_pages/presentation/pages/follow_us_page.dart';
 import 'package:savedge/features/stores/presentation/pages/stores_page.dart';
+import 'package:savedge/features/brand_vouchers/presentation/pages/brand_vouchers_page.dart';
 
 /// Model class for drawer menu items
 class DrawerMenuItem {
@@ -57,13 +61,26 @@ class HomeDrawer extends StatelessWidget {
         title: 'Stores',
         onTap: () => _navigateToStores(context),
       ),
-      const DrawerMenuItem(icon: Icons.info_outline, title: 'About Us'),
+      DrawerMenuItem(
+        icon: Icons.info_outline,
+        title: 'About Us',
+        onTap: () => _navigateToAboutUs(context),
+      ),
       const DrawerMenuItem(icon: Icons.feedback_outlined, title: 'Feedback'),
-      const DrawerMenuItem(icon: Icons.phone_outlined, title: 'Contact Us'),
-      const DrawerMenuItem(icon: Icons.group_outlined, title: 'Follow Us'),
-      const DrawerMenuItem(
+      DrawerMenuItem(
+        icon: Icons.phone_outlined,
+        title: 'Contact Us',
+        onTap: () => _navigateToContactUs(context),
+      ),
+      DrawerMenuItem(
+        icon: Icons.group_outlined,
+        title: 'Follow Us',
+        onTap: () => _navigateToFollowUs(context),
+      ),
+      DrawerMenuItem(
         icon: Icons.card_giftcard_outlined,
         title: 'Brand Vouchers',
+        onTap: () => _navigateToBrandVouchers(context),
       ),
     ];
   }
@@ -73,6 +90,38 @@ class HomeDrawer extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const StoresPage()),
+    );
+  }
+
+  void _navigateToAboutUs(BuildContext context) {
+    Navigator.pop(context); // Close drawer first
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const AboutUsPage()),
+    );
+  }
+
+  void _navigateToContactUs(BuildContext context) {
+    Navigator.pop(context); // Close drawer first
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const ContactUsPage()),
+    );
+  }
+
+  void _navigateToFollowUs(BuildContext context) {
+    Navigator.pop(context); // Close drawer first
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const FollowUsPage()),
+    );
+  }
+
+  void _navigateToBrandVouchers(BuildContext context) {
+    Navigator.pop(context); // Close drawer first
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const BrandVouchersPage()),
     );
   }
 }
@@ -160,8 +209,13 @@ class _MenuItemsList extends StatelessWidget {
         return _DrawerMenuItemTile(
           item: item,
           onTap: () {
-            onItemTap?.call(item.title);
-            Navigator.pop(context);
+            // First try the item's specific onTap, then fall back to the general onItemTap
+            if (item.onTap != null) {
+              item.onTap!();
+            } else {
+              onItemTap?.call(item.title);
+              Navigator.pop(context);
+            }
           },
         );
       },

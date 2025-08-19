@@ -34,16 +34,13 @@ class CategoriesSection extends StatelessWidget {
         ? _getDefaultCategories()
         : categories;
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20.0, 24.0, 20.0, 16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _SectionHeader(title: title, onSeeAllTap: onSeeAllTap),
-          const SizedBox(height: 24),
-          _CategoriesGrid(categories: defaultCategories),
-        ],
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _SectionHeader(title: title, onSeeAllTap: onSeeAllTap),
+        const SizedBox(height: 24),
+        _CategoriesGrid(categories: defaultCategories),
+      ],
     );
   }
 

@@ -452,7 +452,8 @@ class _QRScannerPageState extends State<QRScannerPage>
       // Check if coupon can be redeemed
       final couponCheck = await _couponService.checkCoupon(widget.couponId);
 
-      if (!couponCheck.canUserRedeem) {
+      // Allow to proceed if user has unused coupons or can still claim more
+      if (!couponCheck.canUserRedeem && !couponCheck.hasUnusedCoupons) {
         throw Exception(
           'Coupon cannot be redeemed: ${couponCheck.redeemabilityReasons.join(', ')}',
         );

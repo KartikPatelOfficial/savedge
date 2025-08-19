@@ -17,153 +17,93 @@ class ElegantCouponCard extends StatefulWidget {
   State<ElegantCouponCard> createState() => _ElegantCouponCardState();
 }
 
-class _ElegantCouponCardState extends State<ElegantCouponCard>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _scaleAnimation;
-  bool _isPressed = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 200),
-      vsync: this,
-    );
-    _scaleAnimation = Tween<double>(
-      begin: 1.0,
-      end: 0.98,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeInOut,
-    ));
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
+class _ElegantCouponCardState extends State<ElegantCouponCard> {
 
   @override
   Widget build(BuildContext context) {
     final isActive = _isActiveStatus();
     final theme = _getCardTheme();
 
-    return AnimatedBuilder(
-      animation: _scaleAnimation,
-      builder: (context, child) {
-        return Transform.scale(
-          scale: _scaleAnimation.value,
-          child: Container(
-            margin: const EdgeInsets.only(bottom: 16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.08),
-                  blurRadius: 16,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Material(
-              color: Colors.transparent,
-              borderRadius: BorderRadius.circular(16),
-              child: InkWell(
-                borderRadius: BorderRadius.circular(16),
-                onTap: widget.onTap ?? () => _handleTap(context),
-                onTapDown: (_) => _onTapDown(),
-                onTapUp: (_) => _onTapUp(),
-                onTapCancel: () => _onTapUp(),
-                child: Container(
-                  height: 140,
-                  child: Row(
-                    children: [
-                      // Left section - Discount
-                      _buildDiscountSection(theme, isActive),
-                      
-                      // Right section - Details
-                      Expanded(
-                        child: _buildDetailsSection(isActive),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
+    return Container(
+      height: 120,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isActive 
+              ? theme['primary']!.withOpacity(0.3)
+              : Colors.grey.withOpacity(0.2),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
-        );
-      },
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(12),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: widget.onTap ?? () => _handleTap(context),
+          child: Row(
+            children: [
+              // Left section - Discount
+              _buildDiscountSection(theme, isActive),
+              
+              // Divider
+              Container(
+                width: 1,
+                height: 60,
+                color: Colors.grey.withOpacity(0.2),
+              ),
+              
+              // Right section - Details
+              Expanded(
+                child: _buildDetailsSection(isActive),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
   Widget _buildDiscountSection(Map<String, Color> theme, bool isActive) {
     return Container(
-      width: 120,
-      height: 140,
+      width: 100,
+      height: 120,
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: isActive ? [
-            theme['primary']!,
-            theme['secondary']!,
-          ] : [
-            Colors.grey[300]!,
-            Colors.grey[400]!,
-          ],
-        ),
+        color: isActive ? theme['primary']!.withOpacity(0.1) : Colors.grey.withOpacity(0.1),
         borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(16),
-          bottomLeft: Radius.circular(16),
+          topLeft: Radius.circular(12),
+          bottomLeft: Radius.circular(12),
         ),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Status indicator
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              _getStatusText(),
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 10,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 0.5,
-              ),
-            ),
-          ),
-          const SizedBox(height: 12),
-          
-          // Discount value
           Text(
-            _getDiscountValue(),
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 28,
-              fontWeight: FontWeight.w900,
-              height: 1.0,
+            widget.coupon.discountDisplay,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: isActive ? theme['primary'] : Colors.grey[600],
             ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 4),
-          
-          // Discount type
           Text(
-            _getDiscountType(),
+            'OFF',
             style: TextStyle(
-              color: Colors.white.withOpacity(0.9),
               fontSize: 12,
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w600,
+              color: isActive ? theme['primary'] : Colors.grey[600],
             ),
-            textAlign: TextAlign.center,
           ),
         ],
       ),
@@ -172,119 +112,59 @@ class _ElegantCouponCardState extends State<ElegantCouponCard>
 
   Widget _buildDetailsSection(bool isActive) {
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Top section
+          // Title and vendor
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Title
               Text(
                 widget.coupon.title,
                 style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                  color: isActive ? Colors.grey[900] : Colors.grey[600],
-                  height: 1.2,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: isActive ? Colors.black87 : Colors.grey[600],
                 ),
-                maxLines: 2,
+                maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(height: 6),
-              
-              // Vendor
-              Row(
-                children: [
-                  Container(
-                    width: 16,
-                    height: 16,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[200],
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Icon(
-                      Icons.store_rounded,
-                      size: 10,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      widget.coupon.vendorName,
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.grey[600],
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
+              const SizedBox(height: 2),
+              Text(
+                widget.coupon.vendorName,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: isActive ? Colors.grey[600] : Colors.grey[500],
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 2),
+              Text(
+                'ID: ${widget.coupon.id}',
+                style: TextStyle(
+                  fontSize: 10,
+                  color: Colors.grey[500],
+                  fontFamily: 'monospace',
+                ),
               ),
             ],
           ),
           
-          // Bottom section
+          // Status and expiry
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Expiry
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Expires',
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.grey[500],
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    _getExpiryText(),
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: _isExpiringSoon() ? Colors.orange[600] : Colors.grey[700],
-                    ),
-                  ),
-                ],
-              ),
-              
-              // Action button
-              if (isActive)
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[100],
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.visibility_rounded,
-                        size: 14,
-                        color: Colors.grey[600],
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        'View',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.grey[700],
-                        ),
-                      ),
-                    ],
-                  ),
+              _buildStatusChip(isActive),
+              Text(
+                _formatExpiryDate(),
+                style: TextStyle(
+                  fontSize: 10,
+                  color: Colors.grey[500],
                 ),
+              ),
             ],
           ),
         ],
@@ -292,49 +172,39 @@ class _ElegantCouponCardState extends State<ElegantCouponCard>
     );
   }
 
-  // Helper methods
-  bool _isActiveStatus() {
-    return widget.coupon.status.toLowerCase() == 'active' && !_isExpired();
-  }
-
-  bool _isExpired() {
-    return DateTime.now().isAfter(widget.coupon.expiryDate);
-  }
-
-  bool _isExpiringSoon() {
-    final difference = widget.coupon.expiryDate.difference(DateTime.now()).inDays;
-    return difference <= 7 && difference >= 0;
-  }
-
-  String _getStatusText() {
-    if (widget.coupon.status.toLowerCase() == 'used') {
-      return 'USED';
-    } else if (_isExpired()) {
-      return 'EXPIRED';
-    } else if (_isExpiringSoon()) {
-      return 'EXPIRING';
+  Widget _buildStatusChip(bool isActive) {
+    final status = widget.coupon.statusDisplay;
+    Color chipColor;
+    
+    if (status == 'Active') {
+      chipColor = Colors.green;
+    } else if (status == 'Used') {
+      chipColor = Colors.blue;
+    } else if (status == 'Expired') {
+      chipColor = Colors.red;
     } else {
-      return 'ACTIVE';
+      chipColor = Colors.grey;
     }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: chipColor.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: chipColor.withOpacity(0.3), width: 1),
+      ),
+      child: Text(
+        status,
+        style: TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.w600,
+          color: chipColor,
+        ),
+      ),
+    );
   }
 
-  String _getDiscountValue() {
-    if (widget.coupon.discountType.toLowerCase() == 'percentage') {
-      return '${widget.coupon.discountValue.toInt()}%';
-    } else {
-      return '₹${widget.coupon.discountValue.toInt()}';
-    }
-  }
-
-  String _getDiscountType() {
-    if (widget.coupon.discountType.toLowerCase() == 'percentage') {
-      return 'OFF';
-    } else {
-      return 'OFF';
-    }
-  }
-
-  String _getExpiryText() {
+  String _formatExpiryDate() {
     final now = DateTime.now();
     final expiry = widget.coupon.expiryDate;
     final difference = expiry.difference(now).inDays;
@@ -346,10 +216,19 @@ class _ElegantCouponCardState extends State<ElegantCouponCard>
     } else if (difference == 1) {
       return 'Tomorrow';
     } else if (difference <= 30) {
-      return '${difference} days';
+      return '${difference}d left';
     } else {
       return '${expiry.day}/${expiry.month}';
     }
+  }
+
+  // Helper methods
+  bool _isActiveStatus() {
+    return widget.coupon.status.toLowerCase() == 'active' && !_isExpired();
+  }
+
+  bool _isExpired() {
+    return DateTime.now().isAfter(widget.coupon.expiryDate);
   }
 
   Map<String, Color> _getCardTheme() {
@@ -364,17 +243,6 @@ class _ElegantCouponCardState extends State<ElegantCouponCard>
         'secondary': const Color(0xFF047857),
       };
     }
-  }
-
-  void _onTapDown() {
-    setState(() => _isPressed = true);
-    _controller.forward();
-    HapticFeedback.lightImpact();
-  }
-
-  void _onTapUp() {
-    setState(() => _isPressed = false);
-    _controller.reverse();
   }
 
   void _handleTap(BuildContext context) {
@@ -506,7 +374,7 @@ class _ElegantCouponCardState extends State<ElegantCouponCard>
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(_getStatusText()),
+        title: Text(widget.coupon.statusDisplay),
         content: Text(message),
         actions: [
           TextButton(

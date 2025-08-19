@@ -25,12 +25,10 @@ class MarketplaceItem {
 class MarketplaceSection extends StatelessWidget {
   const MarketplaceSection({
     super.key,
-    this.title = 'Shop from Marketplaces',
     this.items = const [],
     this.onSeeAllTap,
   });
 
-  final String title;
   final List<MarketplaceItem> items;
   final VoidCallback? onSeeAllTap;
 
@@ -38,24 +36,7 @@ class MarketplaceSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final defaultItems = items.isEmpty ? _getDefaultItems() : items;
 
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
-            ),
-          ),
-          const SizedBox(height: 16),
-          _MarketplaceGrid(items: defaultItems),
-        ],
-      ),
-    );
+    return _MarketplaceGrid(items: defaultItems);
   }
 
   List<MarketplaceItem> _getDefaultItems() {

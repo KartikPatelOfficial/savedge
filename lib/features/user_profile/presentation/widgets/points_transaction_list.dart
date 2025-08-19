@@ -33,16 +33,37 @@ class TransactionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    return Container(
       margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.withOpacity(0.1), width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
       child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: transaction.isCredit
-              ? Colors.green.withOpacity(0.1)
-              : Colors.red.withOpacity(0.1),
-          child: Text(
-            transaction.transactionType.icon,
-            style: const TextStyle(fontSize: 20),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        leading: Container(
+          width: 48,
+          height: 48,
+          decoration: BoxDecoration(
+            color: transaction.isCredit
+                ? Colors.green.withOpacity(0.1)
+                : Colors.red.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(
+            transaction.isCredit 
+                ? Icons.add_circle_outline
+                : Icons.remove_circle_outline,
+            color: transaction.isCredit ? Colors.green : Colors.red,
+            size: 24,
           ),
         ),
         title: Text(
@@ -84,24 +105,28 @@ class TransactionTile extends StatelessWidget {
               transaction.formattedPointsDelta,
               style: TextStyle(
                 color: transaction.isCredit ? Colors.green : Colors.red,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w700,
                 fontSize: 16,
               ),
             ),
             const SizedBox(height: 4),
             if (transaction.isCredit)
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: _getStatusColor(transaction.status).withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(8),
+                  color: _getStatusColor(transaction.status).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: _getStatusColor(transaction.status).withOpacity(0.3),
+                    width: 1,
+                  ),
                 ),
                 child: Text(
                   _getStatusText(transaction.status),
                   style: TextStyle(
                     color: _getStatusColor(transaction.status),
                     fontSize: 10,
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),

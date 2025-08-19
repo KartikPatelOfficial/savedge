@@ -3,6 +3,7 @@ import 'package:get_it/get_it.dart';
 
 import 'package:savedge/features/coupons/data/services/coupon_service.dart';
 import 'package:savedge/features/coupons/data/models/coupon_claim_models.dart';
+import 'package:savedge/features/coupons/data/models/coupon_gifting_models.dart';
 import 'coupon_confirmation_page.dart';
 
 /// Modern coupon claiming page with beautiful UI and smooth animations
@@ -366,9 +367,11 @@ class _CouponRedemptionOptionsPageState
               ),
             ),
             const SizedBox(width: 12),
-            const Text(
-              'Choose Your Method',
-              style: TextStyle(
+            Text(
+              widget.couponData.hasUnusedCoupons 
+                  ? 'You Have ${widget.couponData.unusedCoupons.length} Unused Coupon${widget.couponData.unusedCoupons.length > 1 ? 's' : ''}'
+                  : 'Choose Your Method',
+              style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w800,
                 color: Colors.black87,
@@ -376,7 +379,55 @@ class _CouponRedemptionOptionsPageState
             ),
           ],
         ),
+        if (widget.couponData.hasUnusedCoupons) ...[
+          const SizedBox(height: 12),
+          Text(
+            'You can redeem one of your existing unused coupons or claim a new one.',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.grey[600],
+              height: 1.4,
+            ),
+          ),
+        ],
         const SizedBox(height: 20),
+
+        // Show "Use Existing" option if user has unused coupons
+        if (widget.couponData.hasUnusedCoupons) ...[
+          _buildModernRedemptionOption(
+            method: RedemptionMethod.existing,
+            icon: Icons.redeem,
+            title: 'Use Existing Coupon',
+            subtitle: '${widget.couponData.unusedCoupons.length} available',
+            description: 'Redeem one of your unused coupons',
+            color: const Color(0xFF00BF63),
+            gradient: const LinearGradient(
+              colors: [Color(0xFF00BF63), Color(0xFF00A047)],
+            ),
+            isEnabled: true,
+          ),
+          const SizedBox(height: 16),
+          
+          // Divider with "OR" text
+          Row(
+            children: [
+              const Expanded(child: Divider()),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Text(
+                  'OR CLAIM NEW',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.grey[500],
+                  ),
+                ),
+              ),
+              const Expanded(child: Divider()),
+            ],
+          ),
+          const SizedBox(height: 16),
+        ],
 
         // Points Option
         _buildModernRedemptionOption(
@@ -410,8 +461,8 @@ class _CouponRedemptionOptionsPageState
 
         const SizedBox(height: 16),
 
-        // Membership Option
-        if (widget.couponData.userMaxRedemptions != null)
+        // Subscription/Membership Option - Show if user has active subscription allowance
+        if (widget.couponData.userMaxRedemptions != null && widget.couponData.userMaxRedemptions! > 0)
           _buildModernMembershipOption(),
       ],
     );
@@ -738,11 +789,13 @@ class _CouponRedemptionOptionsPageState
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
-                    selectedMethod == RedemptionMethod.points 
-                        ? Icons.auto_awesome
-                        : selectedMethod == RedemptionMethod.membership
-                            ? Icons.workspace_premium
-                            : Icons.credit_card,
+                    selectedMethod == RedemptionMethod.existing
+                        ? Icons.redeem
+                        : selectedMethod == RedemptionMethod.points 
+                            ? Icons.auto_awesome
+                            : selectedMethod == RedemptionMethod.membership
+                                ? Icons.workspace_premium
+                                : Icons.credit_card,
                     size: 20,
                   ),
                   const SizedBox(width: 8),
@@ -763,6 +816,8 @@ class _CouponRedemptionOptionsPageState
     if (selectedMethod == null) return 'Select a Method';
 
     switch (selectedMethod!) {
+      case RedemptionMethod.existing:
+        return 'Use Existing Coupon';
       case RedemptionMethod.points:
         return 'Claim with SavPoints';
       case RedemptionMethod.razorpay:
@@ -783,17 +838,68 @@ class _CouponRedemptionOptionsPageState
       
       if (!mounted) return;
       
-      final result = await Navigator.of(context).push<bool>(
-        MaterialPageRoute(
-          builder: (context) => CouponConfirmationPage(
-            claimCoupon: widget.couponData,
-            redemptionMethod: _getRedemptionMethodString(),
-            confirmationType: CouponConfirmationType.claim,
+      bool result = false;
+      
+      if (selectedMethod == RedemptionMethod.existing) {
+        // For existing coupons, use the "use" confirmation type
+        if (widget.couponData.unusedCoupons.isNotEmpty) {
+          final firstUnusedCoupon = widget.couponData.unusedCoupons.first as Map<String, dynamic>;
+          
+          // Create UserCouponDetailModel from unused coupon data with safe casting
+          final userCouponId = firstUnusedCoupon['id'];
+          if (userCouponId == null) {
+            throw Exception('Invalid unused coupon data: missing ID');
+          }
+          
+          final userCoupon = UserCouponDetailModel(
+            id: userCouponId is int ? userCouponId : int.tryParse(userCouponId.toString()) ?? 0,
+            couponId: widget.couponData.couponId,
+            title: widget.couponData.title,
+            description: widget.couponData.description,
+            vendorId: widget.couponData.vendorId,
+            vendorName: widget.couponData.vendorName,
+            status: firstUnusedCoupon['status']?.toString() ?? 'Unused',
+            acquiredDate: _parseDateTime(firstUnusedCoupon['acquiredDate']) ?? DateTime.now(),
+            redeemedDate: _parseDateTime(firstUnusedCoupon['redeemedDate']),
+            expiryDate: DateTime.tryParse(widget.couponData.expiryDate) ?? DateTime.now(),
+            uniqueCode: firstUnusedCoupon['uniqueCode']?.toString() ?? '',
+            qrCode: firstUnusedCoupon['qrCode']?.toString(),
+            discountType: widget.couponData.discountType.toString(),
+            discountValue: widget.couponData.discountValue,
+            minCartValue: widget.couponData.minCartValue,
+            imageUrl: widget.couponData.imageUrl,
+            isGifted: firstUnusedCoupon['isGifted'] == true,
+            giftedFromUserId: firstUnusedCoupon['giftedFromUserId']?.toString(),
+            giftedToUserId: firstUnusedCoupon['giftedToUserId']?.toString(),
+            giftedDate: _parseDateTime(firstUnusedCoupon['giftedDate']),
+            giftMessage: firstUnusedCoupon['giftMessage']?.toString(),
+          );
+          
+          result = await Navigator.of(context).push<bool>(
+            MaterialPageRoute(
+              builder: (context) => CouponConfirmationPage(
+                userCoupon: userCoupon,
+                confirmationType: CouponConfirmationType.use,
+              ),
+            ),
+          ) ?? false;
+        } else {
+          throw Exception('No unused coupons available');
+        }
+      } else {
+        // For new claims, use the "claim" confirmation type
+        result = await Navigator.of(context).push<bool>(
+          MaterialPageRoute(
+            builder: (context) => CouponConfirmationPage(
+              claimCoupon: widget.couponData,
+              redemptionMethod: _getRedemptionMethodString(),
+              confirmationType: CouponConfirmationType.claim,
+            ),
           ),
-        ),
-      );
+        ) ?? false;
+      }
 
-      if (result == true && mounted) {
+      if (result && mounted) {
         // If confirmation was successful, navigate back to previous screens
         Navigator.of(context).pop(true); // Return to QR scanner
       }
@@ -808,6 +914,8 @@ class _CouponRedemptionOptionsPageState
 
   String _getRedemptionMethodString() {
     switch (selectedMethod!) {
+      case RedemptionMethod.existing:
+        return 'existing';
       case RedemptionMethod.points:
         return 'points';
       case RedemptionMethod.razorpay:
@@ -815,6 +923,13 @@ class _CouponRedemptionOptionsPageState
       case RedemptionMethod.membership:
         return 'membership';
     }
+  }
+
+  // Helper method for safe date parsing
+  DateTime? _parseDateTime(dynamic dateValue) {
+    if (dateValue == null) return null;
+    if (dateValue is DateTime) return dateValue;
+    return DateTime.tryParse(dateValue.toString());
   }
 
   // These methods are no longer needed as we navigate to confirmation page
@@ -845,4 +960,4 @@ class _CouponRedemptionOptionsPageState
   }
 }
 
-enum RedemptionMethod { points, razorpay, membership }
+enum RedemptionMethod { existing, points, razorpay, membership }

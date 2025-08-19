@@ -9,3 +9,6 @@ export 'marketplace_section.dart';
 export 'special_offers_section.dart';
 export 'subscription_plans_section.dart';
 export 'subscription_plans_widget.dart';
+
+// Export home content page
+export '../pages/home_content_page.dart';

@@ -1,16 +1,15 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-
 import 'package:savedge/core/injection/injection.dart';
 import 'package:savedge/core/network/image_cache_manager.dart';
 import 'package:savedge/features/home/presentation/widgets/subscription_plans_section.dart';
+import 'package:savedge/features/stores/presentation/widgets/vendor_offers_section.dart';
 import 'package:savedge/features/vendors/domain/entities/vendor.dart';
 import 'package:savedge/features/vendors/presentation/bloc/vendor_detail_bloc.dart';
 import 'package:savedge/features/vendors/presentation/bloc/vendor_detail_event.dart';
 import 'package:savedge/features/vendors/presentation/bloc/vendor_detail_state.dart';
-import 'package:savedge/features/stores/presentation/widgets/vendor_offers_section.dart';
 
 class VendorDetailPage extends StatelessWidget {
   const VendorDetailPage({super.key, this.vendor, this.vendorId})
@@ -171,13 +170,20 @@ class _VendorDetailView extends StatelessWidget {
             ),
           ),
           // Yearly Subscription
-          SliverToBoxAdapter(child: SubscriptionPlansSection()),
+          SliverToBoxAdapter(child: _buildSubscriptionPlansSection()),
           // Other Restaurants
           SliverToBoxAdapter(child: _buildOtherRestaurants()),
           // Bottom spacing
           const SliverToBoxAdapter(child: SizedBox(height: 100)),
         ],
       ),
+    );
+  }
+
+  Widget _buildSubscriptionPlansSection() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      child: SubscriptionPlansSection(),
     );
   }
 
