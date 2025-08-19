@@ -29,15 +29,29 @@ abstract class AuthRemoteDataSource {
     @Body() UpdateUserProfileRequest request,
   );
 
-  // New phone-based authentication flow endpoints
-  @POST('/api/users/check-exists')
-  Future<CheckUserExistsResponse> checkUserExists(
-    @Body() CheckUserExistsRequest request,
-  );
+  // Unified authentication flow endpoints
+  @POST('/api/users/check-auth-status')
+  Future<AuthStatusResponse> checkAuthStatus();
 
   @POST('/api/employees/check-by-phone')
   Future<EmployeeInfoResponse> checkEmployeeByPhone(
     @Body() CheckEmployeeByPhoneRequest request,
+  );
+
+  @POST('/api/users/register-individual')
+  Future<PhoneRegistrationResponse> registerIndividualUser(
+    @Body() IndividualRegistrationRequest request,
+  );
+
+  @POST('/api/users/register-employee')
+  Future<PhoneRegistrationResponse> registerEmployeeUser(
+    @Body() EmployeeRegistrationRequest request,
+  );
+
+  // Legacy endpoints - deprecated
+  @POST('/api/users/check-exists')
+  Future<CheckUserExistsResponse> checkUserExists(
+    @Body() CheckUserExistsRequest request,
   );
 
   @POST('/api/employees/register-by-phone')

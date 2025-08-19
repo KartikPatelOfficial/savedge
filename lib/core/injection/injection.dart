@@ -37,7 +37,24 @@ import 'package:savedge/features/subscription/data/services/razorpay_payment_ser
 import 'package:savedge/features/subscription/presentation/bloc/subscription_plan_bloc.dart';
 import 'package:savedge/features/coupons/data/services/coupon_service.dart';
 import 'package:savedge/features/coupons/presentation/bloc/user_coupons_bloc.dart';
+// Enhanced coupon imports
+import 'package:savedge/features/coupons/data/services/enhanced_coupon_service.dart';
+import 'package:savedge/features/coupons/data/services/gifting_service.dart';
+import 'package:savedge/features/coupons/presentation/bloc/coupon_manager_bloc.dart';
+import 'package:savedge/features/coupons/presentation/bloc/gifting_bloc.dart';
 import 'package:savedge/core/network/network_client.dart';
+// Points and Subscription imports
+import 'package:savedge/features/user_profile/data/datasources/points_remote_data_source.dart';
+import 'package:savedge/features/user_profile/data/repositories/points_repository_impl.dart';
+import 'package:savedge/features/user_profile/domain/repositories/points_repository.dart';
+import 'package:savedge/features/user_profile/domain/usecases/get_user_points_usecase.dart';
+import 'package:savedge/features/user_profile/presentation/bloc/points_bloc.dart';
+import 'package:savedge/features/subscription/data/datasources/subscription_remote_data_source.dart';
+import 'package:savedge/features/subscription/data/repositories/subscription_repository_impl.dart';
+import 'package:savedge/features/subscription/domain/repositories/subscription_repository.dart';
+import 'package:savedge/features/subscription/domain/usecases/subscription_usecases.dart';
+import 'package:savedge/features/subscription/presentation/bloc/subscription_bloc.dart';
+import 'package:savedge/features/subscription/data/services/razorpay_service.dart';
 
 final GetIt getIt = GetIt.instance;
 
@@ -77,9 +94,18 @@ Future<void> configureDependencies() async {
     CouponsRemoteDataSource(getIt<Dio>()),
   );
 
+  // Points layer
+  getIt.registerSingleton<PointsRemoteDataSource>(
+    PointsRemoteDataSource(getIt<Dio>()),
+  );
+
   // Subscription layer
   getIt.registerSingleton<SubscriptionPlanRemoteDataSource>(
     SubscriptionPlanRemoteDataSourceImpl(getIt<Dio>()),
+  );
+
+  getIt.registerSingleton<SubscriptionRemoteDataSource>(
+    SubscriptionRemoteDataSource(getIt<Dio>()),
   );
 
   // Repositories
@@ -91,8 +117,18 @@ Future<void> configureDependencies() async {
     CouponsRepositoryImpl(getIt<CouponsRemoteDataSource>()),
   );
 
+  getIt.registerSingleton<PointsRepository>(
+    PointsRepositoryImpl(remoteDataSource: getIt<PointsRemoteDataSource>()),
+  );
+
   getIt.registerSingleton<SubscriptionPlanRepository>(
     SubscriptionPlanRepositoryImpl(getIt<SubscriptionPlanRemoteDataSource>()),
+  );
+
+  getIt.registerSingleton<SubscriptionRepository>(
+    SubscriptionRepositoryImpl(
+      remoteDataSource: getIt<SubscriptionRemoteDataSource>(),
+    ),
   );
 
   getIt.registerSingleton<GetVendorsUseCase>(
@@ -109,6 +145,60 @@ Future<void> configureDependencies() async {
 
   getIt.registerSingleton<GetVendorCouponsUseCase>(
     GetVendorCouponsUseCase(getIt<CouponsRepository>()),
+  );
+
+  // Points Use Cases
+  getIt.registerSingleton<GetUserPointsUseCase>(
+    GetUserPointsUseCase(getIt<PointsRepository>()),
+  );
+
+  getIt.registerSingleton<GetPointsLedgerUseCase>(
+    GetPointsLedgerUseCase(getIt<PointsRepository>()),
+  );
+
+  getIt.registerSingleton<AllocatePointsUseCase>(
+    AllocatePointsUseCase(getIt<PointsRepository>()),
+  );
+
+  getIt.registerSingleton<GetPointsExpiringUseCase>(
+    GetPointsExpiringUseCase(getIt<PointsRepository>()),
+  );
+
+  getIt.registerSingleton<GetExpiredPointsCountUseCase>(
+    GetExpiredPointsCountUseCase(getIt<PointsRepository>()),
+  );
+
+  // Subscription Use Cases
+  getIt.registerSingleton<GetSubscriptionPlansUseCase>(
+    GetSubscriptionPlansUseCase(getIt<SubscriptionRepository>()),
+  );
+
+  getIt.registerSingleton<GetUserSubscriptionUseCase>(
+    GetUserSubscriptionUseCase(getIt<SubscriptionRepository>()),
+  );
+
+  getIt.registerSingleton<PurchaseSubscriptionUseCase>(
+    PurchaseSubscriptionUseCase(getIt<SubscriptionRepository>()),
+  );
+
+  getIt.registerSingleton<PurchaseSubscriptionWithPointsUseCase>(
+    PurchaseSubscriptionWithPointsUseCase(getIt<SubscriptionRepository>()),
+  );
+
+  getIt.registerSingleton<CreatePaymentOrderUseCase>(
+    CreatePaymentOrderUseCase(getIt<SubscriptionRepository>()),
+  );
+
+  getIt.registerSingleton<VerifyPaymentUseCase>(
+    VerifyPaymentUseCase(getIt<SubscriptionRepository>()),
+  );
+
+  getIt.registerSingleton<GetPaymentHistoryUseCase>(
+    GetPaymentHistoryUseCase(getIt<SubscriptionRepository>()),
+  );
+
+  getIt.registerSingleton<CancelSubscriptionUseCase>(
+    CancelSubscriptionUseCase(getIt<SubscriptionRepository>()),
   );
 
   getIt.registerFactory<VendorsBloc>(
@@ -133,17 +223,58 @@ Future<void> configureDependencies() async {
   );
 
   // Coupon BLoCs
-  getIt.registerFactory<UserCouponsBloc>(
-    () => UserCouponsBloc(),
+  getIt.registerFactory<UserCouponsBloc>(() => UserCouponsBloc());
+
+  // Enhanced coupon BLoCs
+  getIt.registerFactory<CouponManagerBloc>(
+    () => CouponManagerBloc(getIt<EnhancedCouponService>()),
   );
 
-  // Payment service
+  getIt.registerFactory<GiftingBloc>(
+    () => GiftingBloc(getIt<GiftingService>()),
+  );
+
+  // Points BLoC
+  getIt.registerFactory<PointsBloc>(
+    () => PointsBloc(
+      getUserPointsUseCase: getIt<GetUserPointsUseCase>(),
+      getPointsLedgerUseCase: getIt<GetPointsLedgerUseCase>(),
+      getPointsExpiringUseCase: getIt<GetPointsExpiringUseCase>(),
+      getExpiredPointsCountUseCase: getIt<GetExpiredPointsCountUseCase>(),
+    ),
+  );
+
+  // Subscription BLoC
+  getIt.registerFactory<SubscriptionBloc>(
+    () => SubscriptionBloc(
+      getSubscriptionPlansUseCase: getIt<GetSubscriptionPlansUseCase>(),
+      getUserSubscriptionUseCase: getIt<GetUserSubscriptionUseCase>(),
+      purchaseSubscriptionUseCase: getIt<PurchaseSubscriptionUseCase>(),
+      purchaseSubscriptionWithPointsUseCase:
+          getIt<PurchaseSubscriptionWithPointsUseCase>(),
+      createPaymentOrderUseCase: getIt<CreatePaymentOrderUseCase>(),
+      verifyPaymentUseCase: getIt<VerifyPaymentUseCase>(),
+      getPaymentHistoryUseCase: getIt<GetPaymentHistoryUseCase>(),
+      cancelSubscriptionUseCase: getIt<CancelSubscriptionUseCase>(),
+    ),
+  );
+
+  // Payment services
   getIt.registerLazySingleton<RazorpayPaymentService>(
     () => RazorpayPaymentService(),
   );
 
-  // Coupon service
+  getIt.registerLazySingleton<RazorpayService>(() => RazorpayService());
+
+  // Coupon services
   getIt.registerLazySingleton<CouponService>(() => CouponService());
+
+  // Enhanced coupon services
+  getIt.registerSingleton<EnhancedCouponService>(
+    EnhancedCouponService(getIt<Dio>()),
+  );
+
+  getIt.registerSingleton<GiftingService>(GiftingService(getIt<Dio>()));
 
   // Auth cubits
   getIt.registerFactory<PhoneAuthCubit>(

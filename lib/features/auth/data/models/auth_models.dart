@@ -61,6 +61,7 @@ abstract class UserProfileResponse2 with _$UserProfileResponse2 {
     String? department,
     String? position,
     DateTime? joinDate,
+    Map<String, dynamic>? activeSubscription,
   }) = _UserProfileResponse2;
 
   factory UserProfileResponse2.fromJson(Map<String, dynamic> json) =>
@@ -80,6 +81,29 @@ abstract class UpdateUserProfileRequest with _$UpdateUserProfileRequest {
 }
 
 // New models for the phone-based authentication flow
+
+// New unified authentication status models
+@freezed
+abstract class AuthStatusResponse with _$AuthStatusResponse {
+  const factory AuthStatusResponse({
+    required AuthStatusEnum status,
+    UserProfileResponse2? userProfile,
+    EmployeeInfoResponse? employeeInfo,
+    required String message,
+  }) = _AuthStatusResponse;
+
+  factory AuthStatusResponse.fromJson(Map<String, dynamic> json) =>
+      _$AuthStatusResponseFromJson(json);
+}
+
+enum AuthStatusEnum {
+  @JsonValue('UserExists')
+  userExists,
+  @JsonValue('EmployeeFound')
+  employeeFound,
+  @JsonValue('NewUser')
+  newUser,
+}
 
 @freezed
 abstract class CheckUserExistsRequest with _$CheckUserExistsRequest {
@@ -129,6 +153,32 @@ abstract class EmployeeInfoResponse with _$EmployeeInfoResponse {
 
   factory EmployeeInfoResponse.fromJson(Map<String, dynamic> json) =>
       _$EmployeeInfoResponseFromJson(json);
+}
+
+// New unified registration models
+@freezed
+abstract class IndividualRegistrationRequest
+    with _$IndividualRegistrationRequest {
+  const factory IndividualRegistrationRequest({
+    required String email,
+    required String firstName,
+    required String lastName,
+  }) = _IndividualRegistrationRequest;
+
+  factory IndividualRegistrationRequest.fromJson(Map<String, dynamic> json) =>
+      _$IndividualRegistrationRequestFromJson(json);
+}
+
+@freezed
+abstract class EmployeeRegistrationRequest with _$EmployeeRegistrationRequest {
+  const factory EmployeeRegistrationRequest({
+    required String email,
+    required String firstName,
+    required String lastName,
+  }) = _EmployeeRegistrationRequest;
+
+  factory EmployeeRegistrationRequest.fromJson(Map<String, dynamic> json) =>
+      _$EmployeeRegistrationRequestFromJson(json);
 }
 
 @freezed

@@ -3,6 +3,7 @@ import 'package:savedge/features/auth/data/models/auth_models.dart';
 import 'package:savedge/features/auth/domain/entities/user_profile.dart';
 import 'package:savedge/features/auth/domain/entities/extended_user_profile.dart';
 import 'package:savedge/features/auth/domain/repositories/auth_repository.dart';
+import 'package:savedge/features/subscription/data/models/active_subscription_model.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   const AuthRepositoryImpl(this._remote);
@@ -77,6 +78,9 @@ class AuthRepositoryImpl implements AuthRepository {
         department: r.department,
         position: r.position,
         joinDate: r.joinDate,
+        activeSubscription: r.activeSubscription != null
+            ? ActiveSubscriptionModel.fromJson(r.activeSubscription!).toDomain()
+            : null,
       );
 
   @override
@@ -119,6 +123,46 @@ class AuthRepositoryImpl implements AuthRepository {
     return _mapExtended(res);
   }
 
+  // New unified authentication flow methods
+  @override
+  Future<AuthStatusResponse> checkAuthStatus() async {
+    final res = await _remote.checkAuthStatus();
+    return res;
+  }
+
+  @override
+  Future<PhoneRegistrationResponse> registerIndividualUser({
+    required String email,
+    required String firstName,
+    required String lastName,
+  }) async {
+    final res = await _remote.registerIndividualUser(
+      IndividualRegistrationRequest(
+        email: email,
+        firstName: firstName,
+        lastName: lastName,
+      ),
+    );
+    return res;
+  }
+
+  @override
+  Future<PhoneRegistrationResponse> registerEmployeeUser({
+    required String email,
+    required String firstName,
+    required String lastName,
+  }) async {
+    final res = await _remote.registerEmployeeUser(
+      EmployeeRegistrationRequest(
+        email: email,
+        firstName: firstName,
+        lastName: lastName,
+      ),
+    );
+    return res;
+  }
+
+  // Legacy methods
   @override
   Future<CheckUserExistsResponse> checkUserExists(String firebaseUid) async {
     final res = await _remote.checkUserExists(

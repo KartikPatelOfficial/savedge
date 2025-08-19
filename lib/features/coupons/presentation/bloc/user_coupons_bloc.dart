@@ -1,9 +1,10 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 
-import '../../data/services/coupon_service.dart';
-import 'user_coupons_event.dart';
-import 'user_coupons_state.dart';
+import 'package:savedge/features/coupons/data/services/coupon_service.dart';
+import 'package:savedge/features/coupons/data/models/user_coupon_model.dart';
+import 'package:savedge/features/coupons/presentation/bloc/user_coupons_event.dart';
+import 'package:savedge/features/coupons/presentation/bloc/user_coupons_state.dart';
 
 /// BLoC for managing user coupons
 class UserCouponsBloc extends Bloc<UserCouponsEvent, UserCouponsState> {
@@ -33,26 +34,48 @@ class UserCouponsBloc extends Bloc<UserCouponsEvent, UserCouponsState> {
         status: event.status,
       );
 
+      // Apply client-side filtering if status is specified
+      List<UserCouponModel> filteredCoupons = response.coupons;
+      if (event.status != null) {
+        switch (event.status) {
+          case 'active':
+            filteredCoupons = response.coupons.where((c) => c.isValid).toList();
+            break;
+          case 'used':
+            filteredCoupons = response.coupons.where((c) => c.isUsed).toList();
+            break;
+          case 'expired':
+            filteredCoupons = response.coupons
+                .where((c) => c.isExpired && !c.isUsed)
+                .toList();
+            break;
+        }
+      }
+
       final currentState = state;
       if (currentState is UserCouponsLoaded && event.pageNumber > 1) {
         // Loading more data
         final updatedCoupons = List.of(currentState.coupons)
-          ..addAll(response.coupons);
-        
-        emit(currentState.copyWith(
-          coupons: updatedCoupons,
-          hasReachedMax: response.coupons.isEmpty,
-        ));
+          ..addAll(filteredCoupons);
+
+        emit(
+          currentState.copyWith(
+            coupons: updatedCoupons,
+            hasReachedMax: filteredCoupons.isEmpty,
+          ),
+        );
       } else {
         // Fresh load
-        emit(UserCouponsLoaded(
-          coupons: response.coupons,
-          totalCount: response.totalCount,
-          activeCount: response.activeCount,
-          usedCount: response.usedCount,
-          expiredCount: response.expiredCount,
-          hasReachedMax: response.coupons.isEmpty,
-        ));
+        emit(
+          UserCouponsLoaded(
+            coupons: filteredCoupons,
+            totalCount: response.totalCount,
+            activeCount: response.activeCount,
+            usedCount: response.usedCount,
+            expiredCount: response.expiredCount,
+            hasReachedMax: filteredCoupons.isEmpty,
+          ),
+        );
       }
 
       _currentPage = event.pageNumber;
@@ -73,10 +96,9 @@ class UserCouponsBloc extends Bloc<UserCouponsEvent, UserCouponsState> {
   void loadNextPage() {
     final currentState = state;
     if (currentState is UserCouponsLoaded && !currentState.hasReachedMax) {
-      add(LoadUserCoupons(
-        pageNumber: _currentPage + 1,
-        status: _currentStatus,
-      ));
+      add(
+        LoadUserCoupons(pageNumber: _currentPage + 1, status: _currentStatus),
+      );
     }
   }
 }

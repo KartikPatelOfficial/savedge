@@ -24,12 +24,13 @@ class HomeHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
+      color: Colors.white,
       child: Row(
         children: [
-          // Menu/Profile button with purple background
+          // Menu/Profile button with modern design
           _MenuButton(onTap: onMenuTap),
-          const SizedBox(width: 12),
+          const SizedBox(width: 16),
           // Location selector
           _LocationSelector(
             location: location,
@@ -39,6 +40,7 @@ class HomeHeader extends StatelessWidget {
           const Spacer(),
           // Action buttons
           _ActionButton(icon: Icons.favorite_border, onPressed: onFavoriteTap),
+          const SizedBox(width: 8),
           _NotificationButton(
             count: notificationCount,
             onPressed: onNotificationTap,
@@ -59,13 +61,13 @@ class _MenuButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 40,
-        height: 40,
-        decoration: const BoxDecoration(
-          color: Color(0xFF6F3FCC),
-          shape: BoxShape.circle,
+        width: 44,
+        height: 44,
+        decoration: BoxDecoration(
+          color: const Color(0xFF6F3FCC),
+          borderRadius: BorderRadius.circular(12),
         ),
-        child: const Icon(Icons.menu, color: Colors.white, size: 20),
+        child: const Icon(Icons.menu, color: Colors.white, size: 22),
       ),
     );
   }
@@ -97,24 +99,24 @@ class _LocationSelector extends StatelessWidget {
                 location,
                 style: const TextStyle(
                   fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF1A202C),
                 ),
               ),
               const SizedBox(width: 4),
               const Icon(
                 Icons.keyboard_arrow_down,
-                color: Colors.black87,
+                color: Color(0xFF1A202C),
                 size: 20,
               ),
             ],
           ),
           Text(
             city,
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey[600],
-              fontWeight: FontWeight.w400,
+            style: const TextStyle(
+              fontSize: 13,
+              color: Color(0xFF718096),
+              fontWeight: FontWeight.w500,
             ),
           ),
         ],
@@ -131,10 +133,18 @@ class _ActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-      onPressed: onPressed,
-      icon: Icon(icon, color: Colors.grey[600]),
-      iconSize: 24,
+    return Container(
+      width: 44,
+      height: 44,
+      decoration: BoxDecoration(
+        color: const Color(0xFF6F3FCC).withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: IconButton(
+        onPressed: onPressed,
+        icon: Icon(icon, color: const Color(0xFF6F3FCC)),
+        iconSize: 22,
+      ),
     );
   }
 }
@@ -149,20 +159,31 @@ class _NotificationButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        IconButton(
-          onPressed: onPressed,
-          icon: Icon(Icons.notifications_outlined, color: Colors.grey[600]),
-          iconSize: 24,
+        Container(
+          width: 44,
+          height: 44,
+          decoration: BoxDecoration(
+            color: const Color(0xFF6F3FCC).withOpacity(0.1),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: IconButton(
+            onPressed: onPressed,
+            icon: const Icon(
+              Icons.notifications_outlined,
+              color: Color(0xFF6F3FCC),
+            ),
+            iconSize: 22,
+          ),
         ),
         if (count > 0)
           Positioned(
-            right: 6,
-            top: 6,
+            right: 4,
+            top: 4,
             child: Container(
-              width: 18,
-              height: 18,
+              width: 20,
+              height: 20,
               decoration: const BoxDecoration(
-                color: Colors.red,
+                color: Color(0xFFE53E3E),
                 shape: BoxShape.circle,
               ),
               child: Center(
@@ -170,8 +191,8 @@ class _NotificationButton extends StatelessWidget {
                   count.toString(),
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),

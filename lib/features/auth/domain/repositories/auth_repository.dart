@@ -13,9 +13,22 @@ abstract class AuthRepository {
   });
   Future<ExtendedUserProfile> getUserProfileExtended();
 
-  // New phone-based authentication flow methods
-  Future<CheckUserExistsResponse> checkUserExists(String firebaseUid);
+  // Unified authentication flow methods
+  Future<AuthStatusResponse> checkAuthStatus();
   Future<EmployeeInfoResponse?> checkEmployeeByPhone(String phoneNumber);
+  Future<PhoneRegistrationResponse> registerIndividualUser({
+    required String email,
+    required String firstName,
+    required String lastName,
+  });
+  Future<PhoneRegistrationResponse> registerEmployeeUser({
+    required String email,
+    required String firstName,
+    required String lastName,
+  });
+
+  // Legacy methods - kept for compatibility
+  Future<CheckUserExistsResponse> checkUserExists(String firebaseUid);
   Future<PhoneRegistrationResponse> registerEmployeeByPhone({
     required String phoneNumber,
     required String email,

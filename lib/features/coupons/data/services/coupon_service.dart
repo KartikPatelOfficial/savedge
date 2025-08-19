@@ -3,6 +3,7 @@ import 'package:get_it/get_it.dart';
 import 'package:savedge/core/network/network_client.dart';
 import 'package:savedge/features/coupons/data/models/coupon_claim_models.dart';
 import 'package:savedge/features/coupons/data/models/user_coupon_model.dart';
+import 'package:savedge/features/coupons/data/models/coupon_redemption_models.dart';
 
 /// Service class to handle coupon-related API calls
 class CouponService {
@@ -38,69 +39,6 @@ class CouponService {
     }
   }
 
-  /// Claim a coupon using points
-  Future<CouponClaimResponse> claimCouponWithPoints(
-    int couponId,
-    int pointsCost,
-  ) async {
-    try {
-      final requestData = {
-        'couponId': couponId,
-        'paymentMethod': 'points',
-        'pointsCost': pointsCost,
-      };
-
-      final response = await _httpClient.post(
-        '/api/user/coupons/claim',
-        data: requestData,
-      );
-
-      return CouponClaimResponse.fromJson(
-        response.data as Map<String, dynamic>,
-      );
-    } catch (e) {
-      throw Exception('Failed to claim coupon with points: $e');
-    }
-  }
-
-  /// Purchase and claim a coupon with payment
-  Future<CouponClaimResponse> purchaseCoupon(
-    int couponId,
-    double amount,
-  ) async {
-    try {
-      final requestData = {'couponId': couponId, 'amount': amount};
-
-      final response = await _httpClient.post(
-        '/api/user/coupons/purchase',
-        data: requestData,
-      );
-
-      return CouponClaimResponse.fromJson(
-        response.data as Map<String, dynamic>,
-      );
-    } catch (e) {
-      throw Exception('Failed to purchase coupon: $e');
-    }
-  }
-
-  /// Claim a coupon using membership benefits
-  Future<CouponClaimResponse> claimCouponWithMembership(int couponId) async {
-    try {
-      final requestData = {'couponId': couponId, 'paymentMethod': 'membership'};
-
-      final response = await _httpClient.post(
-        '/api/user/coupons/claim',
-        data: requestData,
-      );
-
-      return CouponClaimResponse.fromJson(
-        response.data as Map<String, dynamic>,
-      );
-    } catch (e) {
-      throw Exception('Failed to claim coupon with membership: $e');
-    }
-  }
 
   /// Get user's claimed coupons
   Future<UserCouponsResponse> getUserCoupons({
@@ -119,25 +57,51 @@ class CouponService {
         queryParameters: queryParams,
       );
 
-      // Handle direct array response
-      final List<dynamic> couponsData;
-      if (response.data is List) {
-        couponsData = response.data as List<dynamic>;
-      } else if (response.data is Map && (response.data as Map).containsKey('data')) {
-        couponsData = (response.data as Map)['data'] as List<dynamic>;
-      } else {
-        couponsData = [];
+      // Handle the new structured response format
+      final List<dynamic> allCouponsData = [];
+      int totalCount = 0;
+      int activeCount = 0;
+      int usedCount = 0;
+      int giftedCount = 0;
+
+      if (response.data is Map<String, dynamic>) {
+        final data = response.data as Map<String, dynamic>;
+        
+        // Combine all coupon types into one list
+        if (data.containsKey('purchasedCoupons') && data['purchasedCoupons'] is List) {
+          allCouponsData.addAll(data['purchasedCoupons'] as List<dynamic>);
+        }
+        if (data.containsKey('usedCoupons') && data['usedCoupons'] is List) {
+          allCouponsData.addAll(data['usedCoupons'] as List<dynamic>);
+        }
+        if (data.containsKey('giftedReceivedCoupons') && data['giftedReceivedCoupons'] is List) {
+          allCouponsData.addAll(data['giftedReceivedCoupons'] as List<dynamic>);
+        }
+        if (data.containsKey('giftedSentCoupons') && data['giftedSentCoupons'] is List) {
+          allCouponsData.addAll(data['giftedSentCoupons'] as List<dynamic>);
+        }
+
+        // Use counts from API if available
+        totalCount = data['totalCount'] as int? ?? allCouponsData.length;
+        activeCount = data['activeCount'] as int? ?? 0;
+        usedCount = data['usedCount'] as int? ?? 0;
+        giftedCount = data['giftedCount'] as int? ?? 0;
+      } else if (response.data is List) {
+        // Fallback for old direct array response
+        allCouponsData.addAll(response.data as List<dynamic>);
       }
 
-      final coupons = couponsData
-          .map((coupon) => UserCouponModel.fromJson(coupon as Map<String, dynamic>))
+      final coupons = allCouponsData
+          .map(
+            (coupon) =>
+                UserCouponModel.fromJson(coupon as Map<String, dynamic>),
+          )
           .toList();
 
-      // Calculate statistics
-      final totalCount = coupons.length;
-      final activeCount = coupons.where((c) => c.isValid).length;
-      final usedCount = coupons.where((c) => c.isUsed).length;
-      final expiredCount = coupons.where((c) => c.isExpired && !c.isUsed).length;
+      // Calculate expired count if not provided
+      final expiredCount = coupons
+          .where((c) => c.isExpired && !c.isUsed)
+          .length;
 
       return UserCouponsResponse(
         success: true,
@@ -150,6 +114,81 @@ class CouponService {
       );
     } catch (e) {
       throw Exception('Failed to get user coupons: $e');
+    }
+  }
+
+  /// Redeem a user's owned coupon
+  Future<RedeemCouponResponse> redeemMyCoupon(int userCouponId) async {
+    try {
+      final request = RedeemMyCouponRequest(userCouponId: userCouponId);
+
+      final response = await _httpClient.post(
+        '/api/user/coupons/redeem',
+        data: request.toJson(),
+      );
+
+      return RedeemCouponResponse.fromJson(
+        response.data as Map<String, dynamic>,
+      );
+    } catch (e) {
+      throw Exception('Failed to redeem coupon: $e');
+    }
+  }
+
+  /// Claim a coupon using points
+  Future<ClaimCouponResponse> claimCouponWithPoints(int couponId) async {
+    try {
+      final request = ClaimCouponRequest(couponId: couponId);
+
+      final response = await _httpClient.post(
+        '/api/user/coupons/claim',
+        data: request.toJson(),
+      );
+
+      return ClaimCouponResponse.fromJson(
+        response.data as Map<String, dynamic>,
+      );
+    } catch (e) {
+      throw Exception('Failed to claim coupon with points: $e');
+    }
+  }
+
+  /// Claim a coupon from subscription
+  Future<ClaimCouponResponse> claimCouponFromSubscription(int couponId) async {
+    try {
+      final request = ClaimFromSubscriptionRequest(couponId: couponId);
+
+      final response = await _httpClient.post(
+        '/api/user/coupons/claim/subscription',
+        data: request.toJson(),
+      );
+
+      return ClaimCouponResponse.fromJson(
+        response.data as Map<String, dynamic>,
+      );
+    } catch (e) {
+      throw Exception('Failed to claim coupon from subscription: $e');
+    }
+  }
+
+  /// Purchase a coupon with payment
+  Future<ClaimCouponResponse> purchaseCouponWithPayment(int couponId) async {
+    try {
+      final request = {
+        'couponId': couponId,
+        'paymentMethod': 'razorpay',
+      };
+
+      final response = await _httpClient.post(
+        '/api/user/coupons/purchase',
+        data: request,
+      );
+
+      return ClaimCouponResponse.fromJson(
+        response.data as Map<String, dynamic>,
+      );
+    } catch (e) {
+      throw Exception('Failed to purchase coupon: $e');
     }
   }
 }

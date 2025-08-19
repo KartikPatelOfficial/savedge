@@ -33,20 +33,13 @@ class HomeBottomNavBar extends StatelessWidget {
     final defaultItems = items.isEmpty ? _getDefaultItems() : items;
 
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
-            spreadRadius: 0,
-            blurRadius: 10,
-            offset: const Offset(0, -2),
-          ),
-        ],
+        border: Border(top: BorderSide(color: Color(0xFFE2E8F0), width: 1)),
       ),
       child: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: defaultItems.asMap().entries.map((entry) {
@@ -70,11 +63,6 @@ class HomeBottomNavBar extends StatelessWidget {
         icon: Icons.home_outlined,
         selectedIcon: Icons.home,
         label: 'Home',
-      ),
-      BottomNavItem(
-        icon: Icons.shopping_cart_outlined,
-        selectedIcon: Icons.shopping_cart,
-        label: 'Cart',
       ),
       BottomNavItem(
         icon: Icons.card_giftcard_outlined,
@@ -107,23 +95,38 @@ class _NavBarItem extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              isSelected ? (item.selectedIcon ?? item.icon) : item.icon,
-              color: isSelected ? const Color(0xFF6F3FCC) : Colors.grey[600],
-              size: 24,
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? const Color(0xFF6F3FCC).withOpacity(0.1)
+                    : Colors.transparent,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                isSelected ? (item.selectedIcon ?? item.icon) : item.icon,
+                color: isSelected
+                    ? const Color(0xFF6F3FCC)
+                    : const Color(0xFF718096),
+                size: 24,
+              ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 6),
             Text(
               item.label,
               style: TextStyle(
                 fontSize: 12,
-                color: isSelected ? const Color(0xFF6F3FCC) : Colors.grey[600],
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                color: isSelected
+                    ? const Color(0xFF6F3FCC)
+                    : const Color(0xFF718096),
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
               ),
             ),
           ],

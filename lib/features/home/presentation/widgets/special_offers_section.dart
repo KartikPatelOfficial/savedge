@@ -48,12 +48,14 @@ class SpecialOffersView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 16),
-      height: 200,
+      padding: const EdgeInsets.symmetric(vertical: 20),
+      height: 220,
       child: BlocBuilder<CouponsBloc, CouponsState>(
         builder: (context, state) {
           if (state is CouponsLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(
+              child: CircularProgressIndicator(color: Color(0xFF6F3FCC)),
+            );
           } else if (state is CouponsError) {
             return _buildErrorWidget(state.message);
           } else if (state is CouponsLoaded) {
@@ -77,8 +79,8 @@ class SpecialOffersView extends StatelessWidget {
         final coupon = coupons[index];
         return Padding(
           padding: EdgeInsets.only(
-            left: index == 0 ? 16 : 8,
-            right: index == coupons.length - 1 ? 16 : 8,
+            left: index == 0 ? 20 : 10,
+            right: index == coupons.length - 1 ? 20 : 10,
           ),
           child: CouponOfferCard(coupon: coupon),
         );
@@ -91,11 +93,27 @@ class SpecialOffersView extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.error_outline, size: 48, color: Colors.grey[400]),
-          const SizedBox(height: 8),
-          Text(
+          Container(
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+              color: const Color(0xFFE53E3E).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(40),
+            ),
+            child: const Icon(
+              Icons.error_outline,
+              size: 40,
+              color: Color(0xFFE53E3E),
+            ),
+          ),
+          const SizedBox(height: 16),
+          const Text(
             'Failed to load offers',
-            style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+            style: TextStyle(
+              fontSize: 16,
+              color: Color(0xFF4A5568),
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ],
       ),
@@ -107,11 +125,27 @@ class SpecialOffersView extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.local_offer_outlined, size: 48, color: Colors.grey[400]),
-          const SizedBox(height: 8),
-          Text(
+          Container(
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+              color: const Color(0xFF6F3FCC).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(40),
+            ),
+            child: const Icon(
+              Icons.local_offer_outlined,
+              size: 40,
+              color: Color(0xFF6F3FCC),
+            ),
+          ),
+          const SizedBox(height: 16),
+          const Text(
             'No special offers available',
-            style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+            style: TextStyle(
+              fontSize: 16,
+              color: Color(0xFF4A5568),
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ],
       ),
@@ -135,7 +169,14 @@ class CouponOfferCard extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: colors.backgroundColor,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: colors.backgroundColor.withOpacity(0.2),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Stack(
           children: [
@@ -166,13 +207,14 @@ class CouponOfferCard extends StatelessWidget {
             ),
             // Content
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(24),
               child: Row(
                 children: [
                   Expanded(
                     flex: 3,
                     child: _CouponContent(coupon: coupon, colors: colors),
                   ),
+                  const SizedBox(width: 16),
                   Expanded(flex: 2, child: _CouponImage(coupon: coupon)),
                 ],
               ),
@@ -236,35 +278,35 @@ class _CouponContent extends StatelessWidget {
           coupon.discountDisplay,
           style: const TextStyle(
             color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
+            fontSize: 24,
+            fontWeight: FontWeight.w700,
             height: 1.2,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 12),
         Text(
           coupon.title,
           style: const TextStyle(
             color: Colors.white,
-            fontSize: 14,
+            fontSize: 15,
             fontWeight: FontWeight.w400,
-            height: 1.3,
+            height: 1.4,
           ),
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 20),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(25),
           ),
           child: Text(
             'Get Coupon',
             style: TextStyle(
               color: colors.backgroundColor,
-              fontSize: 12,
+              fontSize: 13,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -283,7 +325,7 @@ class _CouponImage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 120,
-      decoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(16)),
       child: _PlaceholderImage(),
     );
   }
@@ -429,11 +471,11 @@ class _PlaceholderImage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(12),
+        color: Colors.white.withOpacity(0.15),
+        borderRadius: BorderRadius.circular(16),
       ),
       child: const Center(
-        child: Icon(Icons.fastfood, size: 40, color: Colors.white),
+        child: Icon(Icons.local_offer_outlined, size: 44, color: Colors.white),
       ),
     );
   }

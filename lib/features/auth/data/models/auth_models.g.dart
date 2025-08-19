@@ -83,6 +83,7 @@ _UserProfileResponse2 _$UserProfileResponse2FromJson(
   joinDate: json['joinDate'] == null
       ? null
       : DateTime.parse(json['joinDate'] as String),
+  activeSubscription: json['activeSubscription'] as Map<String, dynamic>?,
 );
 
 Map<String, dynamic> _$UserProfileResponse2ToJson(
@@ -105,6 +106,7 @@ Map<String, dynamic> _$UserProfileResponse2ToJson(
   'department': instance.department,
   'position': instance.position,
   'joinDate': instance.joinDate?.toIso8601String(),
+  'activeSubscription': instance.activeSubscription,
 };
 
 _UpdateUserProfileRequest _$UpdateUserProfileRequestFromJson(
@@ -121,6 +123,36 @@ Map<String, dynamic> _$UpdateUserProfileRequestToJson(
   'email': instance.email,
   'firstName': instance.firstName,
   'lastName': instance.lastName,
+};
+
+_AuthStatusResponse _$AuthStatusResponseFromJson(Map<String, dynamic> json) =>
+    _AuthStatusResponse(
+      status: $enumDecode(_$AuthStatusEnumEnumMap, json['status']),
+      userProfile: json['userProfile'] == null
+          ? null
+          : UserProfileResponse2.fromJson(
+              json['userProfile'] as Map<String, dynamic>,
+            ),
+      employeeInfo: json['employeeInfo'] == null
+          ? null
+          : EmployeeInfoResponse.fromJson(
+              json['employeeInfo'] as Map<String, dynamic>,
+            ),
+      message: json['message'] as String,
+    );
+
+Map<String, dynamic> _$AuthStatusResponseToJson(_AuthStatusResponse instance) =>
+    <String, dynamic>{
+      'status': _$AuthStatusEnumEnumMap[instance.status]!,
+      'userProfile': instance.userProfile,
+      'employeeInfo': instance.employeeInfo,
+      'message': instance.message,
+    };
+
+const _$AuthStatusEnumEnumMap = {
+  AuthStatusEnum.userExists: 'UserExists',
+  AuthStatusEnum.employeeFound: 'EmployeeFound',
+  AuthStatusEnum.newUser: 'NewUser',
 };
 
 _CheckUserExistsRequest _$CheckUserExistsRequestFromJson(
@@ -189,6 +221,38 @@ Map<String, dynamic> _$EmployeeInfoResponseToJson(
   'organizationId': instance.organizationId,
   'organizationName': instance.organizationName,
   'isActive': instance.isActive,
+};
+
+_IndividualRegistrationRequest _$IndividualRegistrationRequestFromJson(
+  Map<String, dynamic> json,
+) => _IndividualRegistrationRequest(
+  email: json['email'] as String,
+  firstName: json['firstName'] as String,
+  lastName: json['lastName'] as String,
+);
+
+Map<String, dynamic> _$IndividualRegistrationRequestToJson(
+  _IndividualRegistrationRequest instance,
+) => <String, dynamic>{
+  'email': instance.email,
+  'firstName': instance.firstName,
+  'lastName': instance.lastName,
+};
+
+_EmployeeRegistrationRequest _$EmployeeRegistrationRequestFromJson(
+  Map<String, dynamic> json,
+) => _EmployeeRegistrationRequest(
+  email: json['email'] as String,
+  firstName: json['firstName'] as String,
+  lastName: json['lastName'] as String,
+);
+
+Map<String, dynamic> _$EmployeeRegistrationRequestToJson(
+  _EmployeeRegistrationRequest instance,
+) => <String, dynamic>{
+  'email': instance.email,
+  'firstName': instance.firstName,
+  'lastName': instance.lastName,
 };
 
 _RegisterEmployeeByPhoneRequest _$RegisterEmployeeByPhoneRequestFromJson(

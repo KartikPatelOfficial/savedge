@@ -48,9 +48,11 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: Colors.white,
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(
+              child: CircularProgressIndicator(color: Color(0xFF6F3FCC)),
+            )
           : _error != null
           ? _buildErrorView()
           : _buildProfileView(),
@@ -59,27 +61,67 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Widget _buildErrorView() {
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.error_outline, size: 64, color: Colors.red[300]),
-          const SizedBox(height: 16),
-          Text(
-            'Failed to load profile',
-            style: Theme.of(context).textTheme.headlineSmall,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            _error ?? 'Unknown error occurred',
-            style: Theme.of(context).textTheme.bodyMedium,
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: _loadUserProfile,
-            child: const Text('Retry'),
-          ),
-        ],
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                color: const Color(0xFFE53E3E).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(50),
+              ),
+              child: const Icon(
+                Icons.error_outline,
+                size: 48,
+                color: Color(0xFFE53E3E),
+              ),
+            ),
+            const SizedBox(height: 32),
+            const Text(
+              'Failed to load profile',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF1A202C),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              _error ?? 'Unknown error occurred',
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 16,
+                color: Color(0xFF4A5568),
+                height: 1.4,
+              ),
+            ),
+            const SizedBox(height: 32),
+            ElevatedButton(
+              onPressed: _loadUserProfile,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF6F3FCC),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 16,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: const Text(
+                'Try Again',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -91,32 +133,38 @@ class _ProfilePageState extends State<ProfilePage> {
       slivers: [
         // Custom App Bar
         SliverAppBar(
-          expandedHeight: 120,
-          backgroundColor: const Color(0xFF6F3FCC),
+          expandedHeight: 140,
+          backgroundColor: Colors.white,
           pinned: true,
           elevation: 0,
+          scrolledUnderElevation: 0,
+          surfaceTintColor: Colors.transparent,
           flexibleSpace: FlexibleSpaceBar(
-            background: Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [Color(0xFF6F3FCC), Color(0xFF9C27B0)],
-                ),
-              ),
-            ),
+            background: Container(color: Colors.white),
             title: const Text(
               'Profile',
               style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
+                color: Color(0xFF1A202C),
+                fontSize: 24,
+                fontWeight: FontWeight.w700,
               ),
             ),
+            titlePadding: const EdgeInsets.only(left: 20, bottom: 16),
           ),
           actions: [
-            IconButton(
-              icon: const Icon(Icons.settings, color: Colors.white),
-              onPressed: _onSettingsTap,
+            Container(
+              margin: const EdgeInsets.only(right: 20),
+              decoration: BoxDecoration(
+                color: const Color(0xFF6F3FCC).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: IconButton(
+                icon: const Icon(
+                  Icons.settings_outlined,
+                  color: Color(0xFF6F3FCC),
+                ),
+                onPressed: _onSettingsTap,
+              ),
             ),
           ],
         ),
@@ -124,7 +172,7 @@ class _ProfilePageState extends State<ProfilePage> {
         // Profile Content
         SliverToBoxAdapter(
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(20.0),
             child: Column(
               children: [
                 // Profile Header
@@ -144,8 +192,8 @@ class _ProfilePageState extends State<ProfilePage> {
                         child: ProfileStatsCard(
                           title: 'Points Balance',
                           value: '${_userProfile!.pointsBalance}',
-                          icon: Icons.stars,
-                          color: Colors.orange,
+                          icon: Icons.stars_outlined,
+                          color: const Color(0xFFD69E2E),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -156,9 +204,9 @@ class _ProfilePageState extends State<ProfilePage> {
                               : 'Orders',
                           value: '12', // This would come from appropriate API
                           icon: _userProfile!.isEmployee
-                              ? Icons.redeem
-                              : Icons.shopping_bag,
-                          color: Colors.green,
+                              ? Icons.redeem_outlined
+                              : Icons.shopping_bag_outlined,
+                          color: const Color(0xFF38A169),
                         ),
                       ),
                     ],
@@ -167,39 +215,35 @@ class _ProfilePageState extends State<ProfilePage> {
                   // Employee-specific stats (only show for employees)
                   if (_userProfile!.isEmployee &&
                       _userProfile!.organizationName != null) ...[
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 16),
                     Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.1),
-                            spreadRadius: 0,
-                            blurRadius: 10,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: const Color(0xFFE2E8F0),
+                          width: 1,
+                        ),
                       ),
                       child: Column(
                         children: [
                           Row(
                             children: [
                               Container(
-                                width: 32,
-                                height: 32,
+                                width: 40,
+                                height: 40,
                                 decoration: BoxDecoration(
                                   color: const Color(
                                     0xFF6F3FCC,
                                   ).withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(8),
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: const Icon(
-                                  Icons.business,
+                                  Icons.business_outlined,
                                   color: Color(0xFF6F3FCC),
-                                  size: 18,
+                                  size: 22,
                                 ),
                               ),
                               const SizedBox(width: 12),
@@ -209,21 +253,19 @@ class _ProfilePageState extends State<ProfilePage> {
                                   children: [
                                     Text(
                                       _userProfile!.organizationName!,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleMedium
-                                          ?.copyWith(
-                                            fontWeight: FontWeight.w600,
-                                            color: Colors.grey[800],
-                                          ),
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w700,
+                                        color: Color(0xFF1A202C),
+                                      ),
                                     ),
                                     if (_userProfile!.department != null)
                                       Text(
                                         _userProfile!.department!,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodySmall
-                                            ?.copyWith(color: Colors.grey[600]),
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          color: Color(0xFF718096),
+                                        ),
                                       ),
                                   ],
                                 ),
@@ -232,9 +274,13 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                           if (_userProfile!.employeeCode != null ||
                               _userProfile!.position != null) ...[
-                            const SizedBox(height: 12),
-                            const Divider(height: 1),
-                            const SizedBox(height: 12),
+                            const SizedBox(height: 16),
+                            const Divider(
+                              color: Color(0xFFE2E8F0),
+                              height: 1,
+                              thickness: 1,
+                            ),
+                            const SizedBox(height: 16),
                             Row(
                               children: [
                                 if (_userProfile!.employeeCode != null) ...[
@@ -243,24 +289,22 @@ class _ProfilePageState extends State<ProfilePage> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        Text(
+                                        const Text(
                                           'Employee ID',
                                           style: TextStyle(
                                             fontSize: 12,
-                                            color: Colors.grey[600],
-                                            fontWeight: FontWeight.w500,
+                                            color: Color(0xFF718096),
+                                            fontWeight: FontWeight.w600,
                                           ),
                                         ),
-                                        const SizedBox(height: 2),
+                                        const SizedBox(height: 4),
                                         Text(
                                           _userProfile!.employeeCode!,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodyMedium
-                                              ?.copyWith(
-                                                fontWeight: FontWeight.w500,
-                                                color: Colors.grey[800],
-                                              ),
+                                          style: const TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w600,
+                                            color: Color(0xFF2D3748),
+                                          ),
                                         ),
                                       ],
                                     ),
@@ -274,24 +318,22 @@ class _ProfilePageState extends State<ProfilePage> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        Text(
+                                        const Text(
                                           'Position',
                                           style: TextStyle(
                                             fontSize: 12,
-                                            color: Colors.grey[600],
-                                            fontWeight: FontWeight.w500,
+                                            color: Color(0xFF718096),
+                                            fontWeight: FontWeight.w600,
                                           ),
                                         ),
-                                        const SizedBox(height: 2),
+                                        const SizedBox(height: 4),
                                         Text(
                                           _userProfile!.position!,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodyMedium
-                                              ?.copyWith(
-                                                fontWeight: FontWeight.w500,
-                                                color: Colors.grey[800],
-                                              ),
+                                          style: const TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w600,
+                                            color: Color(0xFF2D3748),
+                                          ),
                                         ),
                                       ],
                                     ),
@@ -306,7 +348,17 @@ class _ProfilePageState extends State<ProfilePage> {
                   ],
                 ],
 
-                const SizedBox(height: 24),
+                const SizedBox(height: 20),
+
+                // Subscription Status Card (show for non-employees only)
+                if (_userProfile != null && !_userProfile!.isEmployee) ...[
+                  SubscriptionStatusCard(
+                    activeSubscription: _userProfile!.activeSubscription,
+                    onManageSubscriptionTap: _onManageSubscriptionTap,
+                    onUpgradeTap: _onUpgradeSubscriptionTap,
+                  ),
+                  const SizedBox(height: 20),
+                ],
 
                 // Menu Items
                 if (_userProfile != null) ...[
@@ -320,6 +372,18 @@ class _ProfilePageState extends State<ProfilePage> {
                       onTap: _onEditProfileTap,
                     ),
                     if (!_userProfile!.isEmployee) ...[
+                      ProfileMenuItem(
+                        icon: Icons.card_membership,
+                        title: _userProfile!.hasActiveSubscription
+                            ? 'Manage Subscription'
+                            : 'Get Premium',
+                        subtitle: _userProfile!.hasActiveSubscription
+                            ? 'Manage your subscription plan'
+                            : 'Unlock premium features',
+                        onTap: _userProfile!.hasActiveSubscription
+                            ? _onManageSubscriptionTap
+                            : _onUpgradeSubscriptionTap,
+                      ),
                       ProfileMenuItem(
                         icon: Icons.security,
                         title: 'Privacy & Security',
@@ -418,24 +482,18 @@ class _ProfilePageState extends State<ProfilePage> {
           padding: const EdgeInsets.only(left: 4, bottom: 12),
           child: Text(
             title,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: Colors.grey[800],
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF1A202C),
             ),
           ),
         ),
         Container(
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.1),
-                spreadRadius: 0,
-                blurRadius: 10,
-                offset: const Offset(0, 2),
-              ),
-            ],
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
           ),
           child: Column(children: items),
         ),
@@ -448,22 +506,18 @@ class _ProfilePageState extends State<ProfilePage> {
       width: double.infinity,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 0,
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: const Color(0xFFE53E3E).withOpacity(0.2),
+          width: 1.5,
+        ),
       ),
       child: ProfileMenuItem(
         icon: Icons.logout,
         title: 'Sign Out',
         subtitle: 'Sign out of your account',
-        titleColor: Colors.red[600],
-        iconColor: Colors.red[600],
+        titleColor: const Color(0xFFE53E3E),
+        iconColor: const Color(0xFFE53E3E),
         showArrow: false,
         onTap: _onSignOutTap,
       ),
@@ -531,6 +585,17 @@ class _ProfilePageState extends State<ProfilePage> {
     // TODO: Navigate to redemption history for employees
   }
 
+  void _onManageSubscriptionTap() {
+    debugPrint('Manage Subscription tapped');
+    // TODO: Navigate to subscription management page
+  }
+
+  void _onUpgradeSubscriptionTap() {
+    debugPrint('Upgrade Subscription tapped');
+    // Navigate to subscription purchase page
+    Navigator.of(context).pushNamed('/subscription-purchase');
+  }
+
   void _onHelpTap() {
     debugPrint('Help & Support tapped');
     // TODO: Navigate to help center
@@ -550,14 +615,32 @@ class _ProfilePageState extends State<ProfilePage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Sign Out'),
-        content: const Text('Are you sure you want to sign out?'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text(
+          'Sign Out',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF1A202C),
+          ),
+        ),
+        content: const Text(
+          'Are you sure you want to sign out of your account?',
+          style: TextStyle(fontSize: 16, color: Color(0xFF4A5568)),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            style: TextButton.styleFrom(
+              foregroundColor: const Color(0xFF718096),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            ),
+            child: const Text(
+              'Cancel',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            ),
           ),
-          TextButton(
+          ElevatedButton(
             onPressed: () async {
               Navigator.of(context).pop();
               try {
@@ -571,8 +654,18 @@ class _ProfilePageState extends State<ProfilePage> {
                 }
               }
             },
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Sign Out'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFE53E3E),
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: const Text(
+              'Sign Out',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            ),
           ),
         ],
       ),

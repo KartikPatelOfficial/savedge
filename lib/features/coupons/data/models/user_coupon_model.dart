@@ -16,6 +16,7 @@ class UserCouponModel {
     required this.isUsed,
     required this.usedAt,
     required this.claimedAt,
+    required this.isGifted,
     this.terms,
     this.imageUrl,
     this.redemptionCode,
@@ -36,6 +37,7 @@ class UserCouponModel {
   final bool isUsed;
   final String? usedAt;
   final String claimedAt;
+  final bool isGifted;
   final String? terms;
   final String? imageUrl;
   final String? redemptionCode;
@@ -65,25 +67,32 @@ class UserCouponModel {
       id: json['id'] as int,
       couponId: json['couponId'] as int,
       title: json['title'] as String,
-      description: json['title'] as String, // Using title as description for now
+      description: json['description'] as String? ?? json['title'] as String,
       discountValue: (json['discountValue'] as num).toDouble(),
       discountType: json['discountType'] as String,
-      discountDisplay: _generateDiscountDisplay(json['discountType'] as String, json['discountValue'] as num),
-      minCartValue: 0.0, // Not provided in API response
-      maxDiscountAmount: 0.0, // Not provided in API response
+      discountDisplay: json['discountDisplay'] as String? ?? _generateDiscountDisplay(
+        json['discountType'] as String,
+        json['discountValue'] as num,
+      ),
+      minCartValue: (json['minCartValue'] as num?)?.toDouble() ?? 0.0,
+      maxDiscountAmount: (json['maxDiscountAmount'] as num?)?.toDouble() ?? 0.0,
       vendorId: json['vendorId'] as int,
-      vendorName: 'Vendor ${json['vendorId']}', // Placeholder, not provided in API
+      vendorName: json['vendorName'] as String? ?? 'Vendor ${json['vendorId']}',
       expiryDate: json['expiryDate'] as String,
-      isUsed: json['status'] == 'Used',
+      isUsed: json['status'] == 'Used' || json['isUsed'] == true,
       usedAt: json['redeemedDate'] as String?,
       claimedAt: json['acquiredDate'] as String,
-      terms: null, // Not provided in API response
+      isGifted: json['isGifted'] as bool? ?? false,
+      terms: json['terms'] as String?,
       imageUrl: json['imageUrl'] as String?,
       redemptionCode: json['uniqueCode'] as String?,
     );
   }
 
-  static String _generateDiscountDisplay(String discountType, num discountValue) {
+  static String _generateDiscountDisplay(
+    String discountType,
+    num discountValue,
+  ) {
     switch (discountType.toLowerCase()) {
       case 'percentage':
         return '${discountValue.toInt()}% Off';
@@ -111,6 +120,7 @@ class UserCouponModel {
       'isUsed': isUsed,
       'usedAt': usedAt,
       'claimedAt': claimedAt,
+      'isGifted': isGifted,
       'terms': terms,
       'imageUrl': imageUrl,
       'redemptionCode': redemptionCode,
@@ -143,9 +153,12 @@ class UserCouponsResponse {
     if (json.containsKey('data') && json['data'] is List) {
       final couponsList = json['data'] as List<dynamic>;
       final coupons = couponsList
-          .map((coupon) => UserCouponModel.fromJson(coupon as Map<String, dynamic>))
+          .map(
+            (coupon) =>
+                UserCouponModel.fromJson(coupon as Map<String, dynamic>),
+          )
           .toList();
-      
+
       return UserCouponsResponse(
         success: json['success'] as bool? ?? true,
         message: json['message'] as String? ?? '',
@@ -164,7 +177,10 @@ class UserCouponsResponse {
         success: json['success'] as bool? ?? true,
         message: json['message'] as String? ?? '',
         coupons: couponsList
-            .map((coupon) => UserCouponModel.fromJson(coupon as Map<String, dynamic>))
+            .map(
+              (coupon) =>
+                  UserCouponModel.fromJson(coupon as Map<String, dynamic>),
+            )
             .toList(),
         totalCount: couponsData['totalCount'] as int? ?? 0,
         activeCount: couponsData['activeCount'] as int? ?? 0,

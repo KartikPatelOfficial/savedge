@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import '../../data/models/user_coupon_model.dart';
+import 'package:savedge/features/coupons/data/models/user_coupon_model.dart';
 
 /// States for user coupons
 abstract class UserCouponsState extends Equatable {
@@ -53,13 +53,13 @@ class UserCouponsLoaded extends UserCouponsState {
 
   @override
   List<Object?> get props => [
-        coupons,
-        totalCount,
-        activeCount,
-        usedCount,
-        expiredCount,
-        hasReachedMax,
-      ];
+    coupons,
+    totalCount,
+    activeCount,
+    usedCount,
+    expiredCount,
+    hasReachedMax,
+  ];
 }
 
 /// Error state

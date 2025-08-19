@@ -16,26 +16,30 @@ class HomeSearchBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           decoration: BoxDecoration(
-            color: Colors.grey[100],
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey[300]!),
+            color: const Color(0xFFF7FAFC),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
           ),
           child: Row(
             children: [
-              Icon(Icons.search, color: Colors.grey[500], size: 20),
-              const SizedBox(width: 12),
+              const Icon(
+                Icons.search_outlined,
+                color: Color(0xFF718096),
+                size: 22,
+              ),
+              const SizedBox(width: 16),
               Expanded(
                 child: Text(
                   hintText,
-                  style: TextStyle(
-                    color: Colors.grey[600],
-                    fontSize: 14,
+                  style: const TextStyle(
+                    color: Color(0xFF718096),
+                    fontSize: 16,
                     fontWeight: FontWeight.w400,
                   ),
                 ),

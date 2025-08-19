@@ -171,10 +171,7 @@ class SubscriptionPlansSection extends StatelessWidget {
 }
 
 class _SubscriptionPlanCard extends StatelessWidget {
-  const _SubscriptionPlanCard({
-    required this.plan,
-    this.onTap,
-  });
+  const _SubscriptionPlanCard({required this.plan, this.onTap});
 
   final SubscriptionPlan plan;
   final Function(SubscriptionPlan)? onTap;

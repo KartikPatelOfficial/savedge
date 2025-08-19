@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:savedge/core/injection/injection.dart';
@@ -148,8 +149,8 @@ class VendorOffersView extends StatelessWidget {
   }
 }
 
-/// Individual vendor offer card widget using real coupon data
-class VendorOfferCard extends StatelessWidget {
+/// Modern, beautiful vendor offer card with enhanced animations
+class VendorOfferCard extends StatefulWidget {
   const VendorOfferCard({
     super.key,
     required this.coupon,
@@ -162,127 +163,425 @@ class VendorOfferCard extends StatelessWidget {
   final String vendorName;
 
   @override
+  State<VendorOfferCard> createState() => _VendorOfferCardState();
+}
+
+class _VendorOfferCardState extends State<VendorOfferCard>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _scaleAnimation;
+  bool _isPressed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 150),
+      vsync: this,
+    );
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 0.95,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    ));
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final color = _getCouponColor();
+    final gradient = _getCouponGradient();
+    final primaryColor = _getPrimaryColor();
 
     return GestureDetector(
-      onTap: () => _onCouponTap(context),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+      onTapDown: (_) {
+        setState(() => _isPressed = true);
+        _animationController.forward();
+      },
+      onTapUp: (_) {
+        setState(() => _isPressed = false);
+        _animationController.reverse();
+        _onCouponTap(context);
+      },
+      onTapCancel: () {
+        setState(() => _isPressed = false);
+        _animationController.reverse();
+      },
+      child: AnimatedBuilder(
+        animation: _scaleAnimation,
+        builder: (context, child) => Transform.scale(
+          scale: _scaleAnimation.value,
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 4),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: primaryColor.withOpacity(0.2),
+                  blurRadius: _isPressed ? 8 : 15,
+                  offset: Offset(0, _isPressed ? 2 : 6),
+                ),
+              ],
+            ),
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                gradient: gradient,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Stack(
                 children: [
-                  Text(
-                    'Get ${coupon.discountDisplay}',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                  // Background decorative elements
+                  Positioned(
+                    right: -20,
+                    top: -20,
+                    child: Container(
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white.withOpacity(0.1),
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    coupon.minimumAmountDisplay.isNotEmpty
-                        ? coupon.minimumAmountDisplay
-                        : coupon.title,
-                    style: const TextStyle(color: Colors.white, fontSize: 14),
+                  Positioned(
+                    left: -10,
+                    bottom: -10,
+                    child: Container(
+                      width: 50,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white.withOpacity(0.05),
+                      ),
+                    ),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    coupon.termsAndConditions ?? 'Limited time offer',
-                    style: const TextStyle(color: Colors.white70, fontSize: 11),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+                  // Content
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                'SPECIAL OFFER',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              'Save ${widget.coupon.discountDisplay}',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w800,
+                                height: 1.2,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              widget.coupon.minimumAmountDisplay.isNotEmpty
+                                  ? widget.coupon.minimumAmountDisplay
+                                  : widget.coupon.title,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              widget.coupon.termsAndConditions ?? 'Limited time offer',
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(0.8),
+                                fontSize: 12,
+                                fontWeight: FontWeight.w400,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 12,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 8,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.qr_code_scanner,
+                              color: primaryColor,
+                              size: 18,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              'Claim',
+                              style: TextStyle(
+                                color: primaryColor,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Text(
-                'Use Coupon',
-                style: TextStyle(
-                  color: color,
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
   }
 
-  Color _getCouponColor() {
-    // Determine color based on discount type
-    switch (coupon.discountType.toLowerCase()) {
+  LinearGradient _getCouponGradient() {
+    switch (widget.coupon.discountType.toLowerCase()) {
       case 'percentage':
-        return const Color(0xFF6F3FCC);
+        return const LinearGradient(
+          colors: [Color(0xFF667eea), Color(0xFF764ba2)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        );
       case 'fixedamount':
-        return const Color(0xFF4CAF50);
+        return const LinearGradient(
+          colors: [Color(0xFF56ab2f), Color(0xFFa8e6cf)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        );
+      default:
+        final gradients = [
+          const LinearGradient(
+            colors: [Color(0xFF667eea), Color(0xFF764ba2)],
+          ),
+          const LinearGradient(
+            colors: [Color(0xFFFF6B35), Color(0xFFF7931E)],
+          ),
+          const LinearGradient(
+            colors: [Color(0xFFff6a88), Color(0xFFff99ac)],
+          ),
+          const LinearGradient(
+            colors: [Color(0xFF56ab2f), Color(0xFFa8e6cf)],
+          ),
+        ];
+        return gradients[widget.coupon.id % gradients.length];
+    }
+  }
+  
+  Color _getPrimaryColor() {
+    switch (widget.coupon.discountType.toLowerCase()) {
+      case 'percentage':
+        return const Color(0xFF667eea);
+      case 'fixedamount':
+        return const Color(0xFF56ab2f);
       default:
         final colors = [
-          const Color(0xFF6F3FCC),
-          const Color(0xFFFF9800),
-          const Color(0xFFE91E63),
-          const Color(0xFF4CAF50),
+          const Color(0xFF667eea),
+          const Color(0xFFFF6B35),
+          const Color(0xFFff6a88),
+          const Color(0xFF56ab2f),
         ];
-        return colors[coupon.id % colors.length];
+        return colors[widget.coupon.id % colors.length];
     }
   }
 
   void _onCouponTap(BuildContext context) async {
     try {
-      // Navigate to QR scanner page
+      // Show loading indicator with haptic feedback
+      HapticFeedback.lightImpact();
+      
+      // Navigate to QR scanner page with hero animation
       final result = await Navigator.of(context).push<bool>(
-        MaterialPageRoute(
-          builder: (context) => QRScannerPage(
-            couponId: coupon.id,
-            expectedVendorUid: vendorUid,
-            expectedVendorName: vendorName,
+        PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) => QRScannerPage(
+            couponId: widget.coupon.id,
+            expectedVendorUid: widget.vendorUid,
+            expectedVendorName: widget.vendorName,
           ),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            const begin = Offset(1.0, 0.0);
+            const end = Offset.zero;
+            const curve = Curves.easeInOutCubic;
+            
+            final tween = Tween(begin: begin, end: end);
+            final curvedAnimation = CurvedAnimation(
+              parent: animation,
+              curve: curve,
+            );
+            
+            return SlideTransition(
+              position: tween.animate(curvedAnimation),
+              child: FadeTransition(
+                opacity: animation,
+                child: child,
+              ),
+            );
+          },
+          transitionDuration: const Duration(milliseconds: 300),
         ),
       );
 
-      // Show result message
+      // Show enhanced result feedback
+      if (!mounted) return;
+      
       if (result == true) {
-        // Success - coupon was claimed
+        // Success - show modern snackbar
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Coupon "${coupon.title}" claimed successfully!'),
-            backgroundColor: Colors.green,
-            duration: const Duration(seconds: 3),
+            content: Container(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Row(
+                children: [
+                  Container(
+                    width: 32,
+                    height: 32,
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.check,
+                      color: Color(0xFF4CAF50),
+                      size: 18,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text(
+                          'Coupon Claimed! 🎉',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 16,
+                          ),
+                        ),
+                        Text(
+                          widget.coupon.title,
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.9),
+                            fontSize: 13,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            backgroundColor: const Color(0xFF4CAF50),
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.all(16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            duration: const Duration(seconds: 4),
           ),
         );
       } else if (result == false) {
-        // Failed to claim coupon
+        // Failed - show error with retry option
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to claim coupon "${coupon.title}"'),
-            backgroundColor: Colors.red,
-            duration: const Duration(seconds: 3),
+            content: Container(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Row(
+                children: [
+                  Container(
+                    width: 32,
+                    height: 32,
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.error_outline,
+                      color: Color(0xFFE53E3E),
+                      size: 18,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  const Expanded(
+                    child: Text(
+                      'Couldn\'t claim coupon. Please try again.',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            backgroundColor: const Color(0xFFE53E3E),
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.all(16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            duration: const Duration(seconds: 4),
+            action: SnackBarAction(
+              label: 'RETRY',
+              textColor: Colors.white,
+              onPressed: () => _onCouponTap(context),
+            ),
           ),
         );
       }
-      // If result is null, user just cancelled/went back
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error: ${e.toString()}'),
-          backgroundColor: Colors.red,
-          duration: const Duration(seconds: 3),
+          backgroundColor: const Color(0xFFE53E3E),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.all(16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
         ),
       );
     }

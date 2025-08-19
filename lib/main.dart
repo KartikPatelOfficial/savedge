@@ -1,12 +1,13 @@
 import 'dart:io';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import 'package:savedge/core/injection/injection.dart';
-import 'package:savedge/firebase_options.dart';
 import 'package:savedge/features/app/presentation/pages/app.dart';
+import 'package:savedge/features/vendors/presentation/bloc/vendors_bloc.dart';
+import 'package:savedge/firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,17 +17,49 @@ void main() async {
     HttpOverrides.global = DevHttpOverrides();
   }
 
-  // Initialize Firebase
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  try {
+    // Initialize Firebase
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
 
-  // Configure dependencies
-  await configureDependencies();
+    // Configure dependencies
+    await configureDependencies();
 
-  // Set up global BLoC observer for debugging
-  Bloc.observer = AppBlocObserver();
+    // Verify critical dependencies are registered
+    if (kDebugMode) {
+      _verifyDependencies();
+    }
 
-  // Run the main app with new auth system
-  runApp(const SavedgeApp());
+    // Set up global BLoC observer for debugging
+    Bloc.observer = AppBlocObserver();
+
+    // Run the main app with new auth system
+    runApp(const SavedgeApp());
+  } catch (e, stackTrace) {
+    debugPrint('Error during app initialization: $e');
+    debugPrint('Stack trace: $stackTrace');
+    // You might want to show an error screen here
+    runApp(
+      MaterialApp(
+        home: Scaffold(
+          body: Center(child: Text('Failed to initialize app: $e')),
+        ),
+      ),
+    );
+  }
+}
+
+/// Verify that critical dependencies are properly registered
+void _verifyDependencies() {
+  try {
+    final vendorsBloc = getIt<VendorsBloc>();
+    debugPrint(
+      '✓ VendorsBloc successfully registered: ${vendorsBloc.runtimeType}',
+    );
+  } catch (e) {
+    debugPrint('✗ VendorsBloc registration failed: $e');
+  }
 }
 
 /// Custom HTTP overrides for development to bypass SSL certificate validation

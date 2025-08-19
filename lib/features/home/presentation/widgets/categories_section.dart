@@ -35,12 +35,12 @@ class CategoriesSection extends StatelessWidget {
         : categories;
 
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.fromLTRB(20.0, 24.0, 20.0, 16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _SectionHeader(title: title, onSeeAllTap: onSeeAllTap),
-          const SizedBox(height: 20),
+          const SizedBox(height: 24),
           _CategoriesGrid(categories: defaultCategories),
         ],
       ),
@@ -87,19 +87,19 @@ class _SectionHeader extends StatelessWidget {
         Text(
           title,
           style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF1A202C),
           ),
         ),
         GestureDetector(
           onTap: onSeeAllTap,
-          child: Text(
+          child: const Text(
             'See all',
             style: TextStyle(
               fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: Colors.grey[600],
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF6F3FCC),
             ),
           ),
         ),
@@ -135,29 +135,25 @@ class CategoryItemWidget extends StatelessWidget {
     return GestureDetector(
       onTap: category.onTap,
       child: SizedBox(
-        width: 70,
+        width: 76,
         child: Column(
           children: [
             Container(
-              width: 56,
-              height: 56,
+              width: 64,
+              height: 64,
               decoration: BoxDecoration(
-                color: category.color.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: category.color.withOpacity(0.2),
-                  width: 1,
-                ),
+                color: category.color.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(20),
               ),
-              child: Icon(category.icon, color: category.color, size: 28),
+              child: Icon(category.icon, color: category.color, size: 32),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             Text(
               category.title,
               style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-                color: Colors.black87,
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF2D3748),
               ),
               textAlign: TextAlign.center,
               maxLines: 1,

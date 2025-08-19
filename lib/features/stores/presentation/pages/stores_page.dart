@@ -1,22 +1,57 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:savedge/core/injection/injection.dart';
+import 'package:savedge/features/stores/presentation/pages/vendor_detail_page.dart';
 import 'package:savedge/features/vendors/domain/entities/vendor.dart';
 import 'package:savedge/features/vendors/presentation/bloc/vendors_bloc.dart';
 import 'package:savedge/features/vendors/presentation/bloc/vendors_event.dart';
 import 'package:savedge/features/vendors/presentation/bloc/vendors_state.dart';
-
-import 'package:savedge/core/injection/injection.dart';
-import 'package:savedge/features/stores/presentation/pages/vendor_detail_page.dart';
 
 class StoresPage extends StatelessWidget {
   const StoresPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => getIt<VendorsBloc>()..add(const LoadVendors()),
-      child: const StoresView(),
-    );
+    try {
+      return BlocProvider(
+        create: (context) => getIt<VendorsBloc>()..add(const LoadVendors()),
+        child: const StoresView(),
+      );
+    } catch (e) {
+      // Handle dependency injection error gracefully
+      return Scaffold(
+        appBar: AppBar(title: const Text('Stores')),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.error_outline, size: 64, color: Colors.red),
+              const SizedBox(height: 16),
+              Text(
+                'Failed to load stores',
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Error: $e',
+                style: Theme.of(context).textTheme.bodyMedium,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () {
+                  // Try to refresh the page
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(builder: (_) => const StoresPage()),
+                  );
+                },
+                child: const Text('Retry'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
   }
 }
 
@@ -75,15 +110,16 @@ class _StoresViewState extends State<StoresView> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
+        scrolledUnderElevation: 0,
         title: const Text(
           'Stores',
           style: TextStyle(
-            color: Colors.black87,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
+            color: Color(0xFF1A202C),
+            fontSize: 24,
+            fontWeight: FontWeight.w700,
           ),
         ),
-        iconTheme: const IconThemeData(color: Colors.black87),
+        iconTheme: const IconThemeData(color: Color(0xFF1A202C)),
       ),
       body: Column(
         children: [
@@ -96,7 +132,9 @@ class _StoresViewState extends State<StoresView> {
             child: BlocBuilder<VendorsBloc, VendorsState>(
               builder: (context, state) {
                 if (state is VendorsLoading) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center(
+                    child: CircularProgressIndicator(color: Color(0xFF6F3FCC)),
+                  );
                 } else if (state is VendorsError) {
                   return _buildErrorWidget(state.message);
                 } else if (state is VendorsLoaded) {
@@ -113,35 +151,47 @@ class _StoresViewState extends State<StoresView> {
 
   Widget _buildSearchBar() {
     return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: TextField(
-        controller: _searchController,
-        decoration: InputDecoration(
-          hintText: 'Search stores...',
-          prefixIcon: const Icon(Icons.search, color: Colors.grey),
-          suffixIcon: _searchController.text.isNotEmpty
-              ? IconButton(
-                  icon: const Icon(Icons.clear, color: Colors.grey),
-                  onPressed: () {
-                    _searchController.clear();
-                    context.read<VendorsBloc>().add(const SearchVendors(''));
-                  },
-                )
-              : null,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: Colors.grey[300]!),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: Color(0xFF6F3FCC)),
-          ),
-          filled: true,
-          fillColor: Colors.grey[50],
+      padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 16.0),
+      child: Container(
+        decoration: BoxDecoration(
+          color: const Color(0xFFF7FAFC),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
         ),
-        onChanged: (value) {
-          context.read<VendorsBloc>().add(SearchVendors(value));
-        },
+        child: TextField(
+          controller: _searchController,
+          style: const TextStyle(fontSize: 16, color: Color(0xFF1A202C)),
+          decoration: InputDecoration(
+            hintText: 'Search stores and restaurants...',
+            hintStyle: const TextStyle(color: Color(0xFF718096), fontSize: 16),
+            prefixIcon: const Icon(
+              Icons.search_outlined,
+              color: Color(0xFF6F3FCC),
+              size: 22,
+            ),
+            suffixIcon: _searchController.text.isNotEmpty
+                ? IconButton(
+                    icon: const Icon(
+                      Icons.clear,
+                      color: Color(0xFF718096),
+                      size: 22,
+                    ),
+                    onPressed: () {
+                      _searchController.clear();
+                      context.read<VendorsBloc>().add(const SearchVendors(''));
+                    },
+                  )
+                : null,
+            border: InputBorder.none,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 20,
+              vertical: 16,
+            ),
+          ),
+          onChanged: (value) {
+            context.read<VendorsBloc>().add(SearchVendors(value));
+          },
+        ),
       ),
     );
   }
@@ -151,7 +201,7 @@ class _StoresViewState extends State<StoresView> {
       height: 50,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 20),
         itemCount: _categories.length,
         itemBuilder: (context, index) {
           final category = _categories[index];
@@ -161,10 +211,8 @@ class _StoresViewState extends State<StoresView> {
 
           return Padding(
             padding: const EdgeInsets.only(right: 8),
-            child: FilterChip(
-              label: Text(category),
-              selected: isSelected,
-              onSelected: (selected) {
+            child: GestureDetector(
+              onTap: () {
                 setState(() {
                   _selectedCategory = category == 'All' ? null : category;
                 });
@@ -172,11 +220,30 @@ class _StoresViewState extends State<StoresView> {
                   FilterVendorsByCategory(_selectedCategory),
                 );
               },
-              selectedColor: const Color(0xFF6F3FCC).withOpacity(0.2),
-              checkmarkColor: const Color(0xFF6F3FCC),
-              labelStyle: TextStyle(
-                color: isSelected ? const Color(0xFF6F3FCC) : Colors.grey[700],
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
+                decoration: BoxDecoration(
+                  color: isSelected ? const Color(0xFF6F3FCC) : Colors.white,
+                  borderRadius: BorderRadius.circular(25),
+                  border: Border.all(
+                    color: isSelected
+                        ? const Color(0xFF6F3FCC)
+                        : const Color(0xFFE2E8F0),
+                    width: 1.5,
+                  ),
+                ),
+                child: Text(
+                  category,
+                  style: TextStyle(
+                    color: isSelected ? Colors.white : const Color(0xFF4A5568),
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  ),
+                ),
               ),
             ),
           );
@@ -196,7 +263,7 @@ class _StoresViewState extends State<StoresView> {
       },
       child: ListView.builder(
         controller: _scrollController,
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         itemCount: state.hasReachedMax
             ? state.vendors.length
             : state.vendors.length + 1,
@@ -204,8 +271,8 @@ class _StoresViewState extends State<StoresView> {
           if (index >= state.vendors.length) {
             return const Center(
               child: Padding(
-                padding: EdgeInsets.all(16),
-                child: CircularProgressIndicator(),
+                padding: const EdgeInsets.all(20),
+                child: CircularProgressIndicator(color: Color(0xFF6F3FCC)),
               ),
             );
           }
@@ -222,54 +289,111 @@ class _StoresViewState extends State<StoresView> {
 
   Widget _buildErrorWidget(String message) {
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.error_outline, size: 64, color: Colors.grey[400]),
-          const SizedBox(height: 16),
-          Text(
-            message,
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-          ),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: () {
-              context.read<VendorsBloc>().add(const RefreshVendors());
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF6F3FCC),
-              foregroundColor: Colors.white,
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                color: const Color(0xFFE53E3E).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(50),
+              ),
+              child: const Icon(
+                Icons.error_outline,
+                color: Color(0xFFE53E3E),
+                size: 48,
+              ),
             ),
-            child: const Text('Try Again'),
-          ),
-        ],
+            const SizedBox(height: 32),
+            const Text(
+              'Something went wrong',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF1A202C),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 16,
+                color: Color(0xFF4A5568),
+                height: 1.4,
+              ),
+            ),
+            const SizedBox(height: 32),
+            ElevatedButton(
+              onPressed: () {
+                context.read<VendorsBloc>().add(const RefreshVendors());
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF6F3FCC),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 16,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: const Text(
+                'Try Again',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildEmptyWidget() {
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.store_outlined, size: 64, color: Colors.grey[400]),
-          const SizedBox(height: 16),
-          Text(
-            'No stores found',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: Colors.grey[700],
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                color: const Color(0xFF6F3FCC).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(50),
+              ),
+              child: const Icon(
+                Icons.store_outlined,
+                color: Color(0xFF6F3FCC),
+                size: 48,
+              ),
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Try adjusting your search or filter criteria',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-          ),
-        ],
+            const SizedBox(height: 32),
+            const Text(
+              'No stores found',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF1A202C),
+              ),
+            ),
+            const SizedBox(height: 12),
+            const Text(
+              'Try adjusting your search or filter criteria to find more stores',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 16,
+                color: Color(0xFF4A5568),
+                height: 1.4,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -292,24 +416,30 @@ class VendorCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    return Container(
       margin: const EdgeInsets.only(bottom: 16),
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
+      ),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(20),
           child: Row(
             children: [
               // Vendor Image
               ClipRRect(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(12),
                 child: Container(
-                  width: 80,
-                  height: 80,
-                  color: Colors.grey[200],
+                  width: 90,
+                  height: 90,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF7FAFC),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                   child: vendor.primaryImageUrl != null
                       ? Image.network(
                           vendor.primaryImageUrl!,
@@ -320,7 +450,7 @@ class VendorCard extends StatelessWidget {
                       : _buildPlaceholderImage(),
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 20),
               // Vendor Details
               Expanded(
                 child: Column(
@@ -329,27 +459,40 @@ class VendorCard extends StatelessWidget {
                     Text(
                       vendor.businessName,
                       style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF1A202C),
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 6),
                     Text(
                       vendor.fullAddress,
-                      style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Color(0xFF718096),
+                      ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      vendor.category,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[700],
-                        fontWeight: FontWeight.w500,
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF6F3FCC).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        vendor.category,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Color(0xFF6F3FCC),
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -358,12 +501,12 @@ class VendorCard extends StatelessWidget {
                         if (vendor.rating != null) ...[
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 2,
+                              horizontal: 12,
+                              vertical: 6,
                             ),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF4CAF50),
-                              borderRadius: BorderRadius.circular(4),
+                              color: const Color(0xFF38A169),
+                              borderRadius: BorderRadius.circular(20),
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
@@ -371,38 +514,38 @@ class VendorCard extends StatelessWidget {
                                 const Icon(
                                   Icons.star,
                                   color: Colors.white,
-                                  size: 12,
+                                  size: 14,
                                 ),
-                                const SizedBox(width: 4),
+                                const SizedBox(width: 6),
                                 Text(
                                   vendor.ratingDisplay,
                                   style: const TextStyle(
                                     color: Colors.white,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: 12),
                         ],
                         if (vendor.isCurrentlyOpen)
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 2,
+                              horizontal: 12,
+                              vertical: 6,
                             ),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF4CAF50),
-                              borderRadius: BorderRadius.circular(4),
+                              color: const Color(0xFF38A169),
+                              borderRadius: BorderRadius.circular(20),
                             ),
                             child: const Text(
-                              'Open',
+                              'Open Now',
                               style: TextStyle(
                                 color: Colors.white,
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                           ),
@@ -420,8 +563,12 @@ class VendorCard extends StatelessWidget {
 
   Widget _buildPlaceholderImage() {
     return Container(
-      color: Colors.grey[300],
-      child: Icon(Icons.store, color: Colors.grey[500], size: 32),
+      color: const Color(0xFFF7FAFC),
+      child: const Icon(
+        Icons.store_outlined,
+        color: Color(0xFF6F3FCC),
+        size: 36,
+      ),
     );
   }
 }

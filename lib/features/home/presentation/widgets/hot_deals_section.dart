@@ -38,28 +38,30 @@ class HotDealsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: 16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
             child: Text(
               title,
               style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF1A202C),
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           SizedBox(
-            height: 220,
+            height: 240,
             child: BlocBuilder<VendorsBloc, VendorsState>(
               builder: (context, state) {
                 if (state is VendorsLoading) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center(
+                    child: CircularProgressIndicator(color: Color(0xFF6F3FCC)),
+                  );
                 } else if (state is VendorsError) {
                   return _buildErrorWidget(state.message);
                 } else if (state is VendorsLoaded) {
@@ -76,22 +78,45 @@ class HotDealsView extends StatelessWidget {
 
   Widget _buildVendorsList(List<Vendor> vendors) {
     if (vendors.isEmpty) {
-      return const Center(
-        child: Text(
-          'No deals available',
-          style: TextStyle(fontSize: 16, color: Colors.grey),
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: const Color(0xFF6F3FCC).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(40),
+              ),
+              child: const Icon(
+                Icons.local_offer_outlined,
+                size: 40,
+                color: Color(0xFF6F3FCC),
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'No deals available',
+              style: TextStyle(
+                fontSize: 16,
+                color: Color(0xFF4A5568),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
         ),
       );
     }
 
     return ListView.builder(
       scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       itemCount: vendors.length,
       itemBuilder: (context, index) {
         final vendor = vendors[index];
         return Padding(
-          padding: EdgeInsets.only(right: index == vendors.length - 1 ? 0 : 12),
+          padding: EdgeInsets.only(right: index == vendors.length - 1 ? 0 : 16),
           child: HotDealCard(
             vendor: vendor,
             onTap: () => _navigateToVendorDetail(context, vendor),
@@ -106,11 +131,27 @@ class HotDealsView extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.error_outline, size: 48, color: Colors.grey[400]),
-          const SizedBox(height: 8),
-          Text(
+          Container(
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+              color: const Color(0xFFE53E3E).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(40),
+            ),
+            child: const Icon(
+              Icons.error_outline,
+              size: 40,
+              color: Color(0xFFE53E3E),
+            ),
+          ),
+          const SizedBox(height: 16),
+          const Text(
             'Failed to load deals',
-            style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+            style: TextStyle(
+              fontSize: 16,
+              color: Color(0xFF4A5568),
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ],
       ),
@@ -164,17 +205,11 @@ class HotDealCard extends StatelessWidget {
       child: Container(
         width: width,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(20),
           child: Stack(
             children: [
               // Background image
@@ -185,17 +220,17 @@ class HotDealCard extends StatelessWidget {
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [Colors.transparent, Colors.black.withOpacity(0.7)],
-                    stops: const [0.5, 1.0],
+                    colors: [Colors.transparent, Colors.black.withOpacity(0.6)],
+                    stops: const [0.6, 1.0],
                   ),
                 ),
               ),
               // Content
               Positioned(
-                left: 16,
-                right: 16,
-                top: 16,
-                bottom: 16,
+                left: 20,
+                right: 20,
+                top: 20,
+                bottom: 20,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -264,22 +299,22 @@ class _OfferBadge extends StatelessWidget {
     final offerPercentage = 20 + (vendor.id % 4) * 10; // 20%, 30%, 40%, or 50%
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
         color: const Color(0xFF6F3FCC),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(25),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.local_offer, color: Colors.white, size: 14),
-          const SizedBox(width: 4),
+          const Icon(Icons.local_offer, color: Colors.white, size: 16),
+          const SizedBox(width: 6),
           Text(
             'Up to $offerPercentage% OFF',
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ],
@@ -302,31 +337,31 @@ class _DealInfo extends StatelessWidget {
           vendor.businessName,
           style: const TextStyle(
             color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
           ),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 12),
         Row(
           children: [
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(12),
+                color: Colors.white.withOpacity(0.25),
+                borderRadius: BorderRadius.circular(16),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.star, color: Colors.amber, size: 16),
-                  const SizedBox(width: 4),
+                  const Icon(Icons.star, color: Colors.amber, size: 18),
+                  const SizedBox(width: 6),
                   Text(
                     vendor.ratingDisplay,
                     style: const TextStyle(
                       color: Colors.white,
-                      fontSize: 14,
+                      fontSize: 15,
                       fontWeight: FontWeight.w600,
                     ),
                   ),

@@ -51,20 +51,8 @@ class _RegisterIndividualPageState extends State<RegisterIndividualPage> {
     setState(() => _saving = true);
 
     try {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user == null) {
-        throw 'No authenticated user found';
-      }
-
-      // Use the phone number from Firebase user
-      final phoneNumber = user.phoneNumber;
-      if (phoneNumber == null) {
-        throw 'No phone number found';
-      }
-
-      // Register as individual user
-      await _repo.registerUserByPhone(
-        phoneNumber: phoneNumber,
+      // Register as individual user using new unified API
+      await _repo.registerIndividualUser(
         email: email,
         firstName: firstName,
         lastName: lastName,
@@ -90,55 +78,153 @@ class _RegisterIndividualPageState extends State<RegisterIndividualPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Complete Registration')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Please provide your details to complete registration:',
-              style: TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 24),
-            TextField(
-              controller: _emailController,
-              keyboardType: TextInputType.emailAddress,
-              decoration: const InputDecoration(
-                labelText: 'Email Address',
-                border: OutlineInputBorder(),
-                hintText: 'your.email@example.com',
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: const Text('Complete Registration'),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+      ),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 20),
+              // Welcome text
+              const Text(
+                'Welcome to Savedge!',
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF1A202C),
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _firstController,
-              decoration: const InputDecoration(
-                labelText: 'First Name',
-                border: OutlineInputBorder(),
+              const SizedBox(height: 8),
+              const Text(
+                'Complete your profile to get started with amazing deals and offers.',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Color(0xFF4A5568),
+                  height: 1.4,
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _lastController,
-              decoration: const InputDecoration(
-                labelText: 'Last Name',
-                border: OutlineInputBorder(),
+              const SizedBox(height: 40),
+              // Email Field
+              _buildTextField(
+                controller: _emailController,
+                label: 'Email Address',
+                hint: 'your.email@example.com',
+                keyboardType: TextInputType.emailAddress,
+                icon: Icons.email_outlined,
               ),
-            ),
-            const Spacer(),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: _saving ? null : _submit,
-                child: _saving
-                    ? const CircularProgressIndicator.adaptive()
-                    : const Text('Complete Registration'),
+              const SizedBox(height: 20),
+              // First Name Field
+              _buildTextField(
+                controller: _firstController,
+                label: 'First Name',
+                hint: 'Enter your first name',
+                icon: Icons.person_outline,
               ),
-            ),
-          ],
+              const SizedBox(height: 20),
+              // Last Name Field
+              _buildTextField(
+                controller: _lastController,
+                label: 'Last Name',
+                hint: 'Enter your last name',
+                icon: Icons.person_outline,
+              ),
+              const Spacer(),
+              // Submit Button
+              SizedBox(
+                width: double.infinity,
+                height: 56,
+                child: ElevatedButton(
+                  onPressed: _saving ? null : _submit,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF6F3FCC),
+                    disabledBackgroundColor: const Color(
+                      0xFF6F3FCC,
+                    ).withOpacity(0.6),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                  child: _saving
+                      ? const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : const Text(
+                          'Complete Registration',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
+                ),
+              ),
+              const SizedBox(height: 20),
+            ],
+          ),
         ),
       ),
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required String hint,
+    TextInputType? keyboardType,
+    IconData? icon,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF2D3748),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color(0xFFE2E8F0), width: 1.5),
+          ),
+          child: TextField(
+            controller: controller,
+            keyboardType: keyboardType,
+            style: const TextStyle(fontSize: 16, color: Color(0xFF1A202C)),
+            decoration: InputDecoration(
+              hintText: hint,
+              hintStyle: const TextStyle(
+                color: Color(0xFF718096),
+                fontSize: 16,
+              ),
+              prefixIcon: icon != null
+                  ? Icon(icon, color: const Color(0xFF6F3FCC), size: 22)
+                  : null,
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: icon != null ? 16 : 20,
+                vertical: 18,
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

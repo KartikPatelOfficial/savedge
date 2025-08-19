@@ -1,3 +1,5 @@
+import 'package:savedge/features/subscription/domain/entities/active_subscription.dart';
+
 /// Extended user profile entity with complete profile information
 class ExtendedUserProfile {
   const ExtendedUserProfile({
@@ -18,6 +20,7 @@ class ExtendedUserProfile {
     this.department,
     this.position,
     this.joinDate,
+    this.activeSubscription,
   });
 
   final String id;
@@ -37,6 +40,7 @@ class ExtendedUserProfile {
   final String? department;
   final String? position;
   final DateTime? joinDate;
+  final ActiveSubscription? activeSubscription;
 
   /// Check if user has completed their basic profile
   bool get hasCompletedProfile =>
@@ -48,4 +52,12 @@ class ExtendedUserProfile {
   /// Check if user needs employee profile completion
   bool get needsEmployeeCompletion =>
       isEmployee && organizationId != null && !hasCompletedProfile;
+
+  /// Check if user has an active subscription
+  bool get hasActiveSubscription =>
+      activeSubscription != null && activeSubscription!.isActive;
+
+  /// Check if subscription is expiring soon
+  bool get hasExpiringSoonSubscription =>
+      hasActiveSubscription && activeSubscription!.isExpiringSoon;
 }

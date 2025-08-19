@@ -36,11 +36,17 @@ class VendorDetailPage extends StatelessWidget {
               backgroundColor: Colors.white,
               appBar: AppBar(
                 backgroundColor: Colors.white,
-                foregroundColor: Colors.black87,
+                foregroundColor: const Color(0xFF1A202C),
                 elevation: 0,
-                title: const Text('Loading...'),
+                scrolledUnderElevation: 0,
+                title: const Text(
+                  'Loading...',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                ),
               ),
-              body: const Center(child: CircularProgressIndicator()),
+              body: const Center(
+                child: CircularProgressIndicator(color: Color(0xFF6F3FCC)),
+              ),
             );
           } else if (state is VendorDetailLoaded) {
             return _VendorDetailView(vendor: state.vendor);
@@ -49,35 +55,80 @@ class VendorDetailPage extends StatelessWidget {
               backgroundColor: Colors.white,
               appBar: AppBar(
                 backgroundColor: Colors.white,
-                foregroundColor: Colors.black87,
+                foregroundColor: const Color(0xFF1A202C),
                 elevation: 0,
-                title: const Text('Error'),
+                scrolledUnderElevation: 0,
+                title: const Text(
+                  'Error',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                ),
               ),
               body: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.error_outline,
-                      size: 64,
-                      color: Colors.grey[400],
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      state.message,
-                      style: Theme.of(context).textTheme.bodyLarge,
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: () {
-                        context.read<VendorDetailBloc>().add(
-                          RefreshVendorDetail(id),
-                        );
-                      },
-                      child: const Text('Retry'),
-                    ),
-                  ],
+                child: Padding(
+                  padding: const EdgeInsets.all(32),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 100,
+                        height: 100,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFE53E3E).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(50),
+                        ),
+                        child: const Icon(
+                          Icons.error_outline,
+                          size: 48,
+                          color: Color(0xFFE53E3E),
+                        ),
+                      ),
+                      const SizedBox(height: 32),
+                      const Text(
+                        'Failed to load store',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF1A202C),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        state.message,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Color(0xFF4A5568),
+                          height: 1.4,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 32),
+                      ElevatedButton(
+                        onPressed: () {
+                          context.read<VendorDetailBloc>().add(
+                            RefreshVendorDetail(id),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF6F3FCC),
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 32,
+                            vertical: 16,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text(
+                          'Try Again',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             );
@@ -86,7 +137,9 @@ class VendorDetailPage extends StatelessWidget {
           // Initial state - should not reach here due to bloc initialization
           return const Scaffold(
             backgroundColor: Colors.white,
-            body: Center(child: CircularProgressIndicator()),
+            body: Center(
+              child: CircularProgressIndicator(color: Color(0xFF6F3FCC)),
+            ),
           );
         },
       ),
@@ -159,7 +212,10 @@ class _VendorDetailView extends StatelessWidget {
       expandedHeight: 300,
       pinned: true,
       backgroundColor: Colors.white,
-      foregroundColor: Colors.black87,
+      foregroundColor: const Color(0xFF1A202C),
+      elevation: 0,
+      scrolledUnderElevation: 0,
+      surfaceTintColor: Colors.transparent,
       flexibleSpace: FlexibleSpaceBar(
         background: Stack(
           children: [
@@ -291,18 +347,18 @@ class _VendorDetailView extends StatelessWidget {
                 ),
               ),
             ],
-            // Gradient overlay at bottom
+            // Modern overlay at bottom
             Positioned(
               bottom: 0,
               left: 0,
               right: 0,
-              height: 100,
+              height: 80,
               child: Container(
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [Colors.transparent, Colors.black.withOpacity(0.7)],
+                    colors: [Colors.transparent, Colors.black54],
                   ),
                 ),
               ),
@@ -315,7 +371,13 @@ class _VendorDetailView extends StatelessWidget {
 
   Widget _buildVendorInfo() {
     return Container(
-      padding: const EdgeInsets.all(20),
+      margin: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -327,21 +389,21 @@ class _VendorDetailView extends StatelessWidget {
                 child: Text(
                   vendor.businessName,
                   style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    fontSize: 28,
+                    fontWeight: FontWeight.w800,
+                    color: Color(0xFF1A202C),
                   ),
                 ),
               ),
               if (vendor.rating != null)
                 Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
+                    horizontal: 16,
+                    vertical: 8,
                   ),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF4CAF50),
-                    borderRadius: BorderRadius.circular(8),
+                    color: const Color(0xFF38A169),
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -351,98 +413,238 @@ class _VendorDetailView extends StatelessWidget {
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                       const SizedBox(width: 4),
-                      const Icon(Icons.star, color: Colors.white, size: 16),
+                      const Icon(
+                        Icons.star_rounded,
+                        color: Colors.white,
+                        size: 18,
+                      ),
                     ],
                   ),
                 ),
             ],
           ),
-          const SizedBox(height: 12),
-          // Address
-          Text(
-            vendor.fullAddress,
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[600],
-              height: 1.4,
-            ),
-          ),
-          const SizedBox(height: 12),
-          // Cuisine types
-          Text(
-            vendor.category,
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[700],
-              fontWeight: FontWeight.w500,
-            ),
-          ),
           const SizedBox(height: 16),
-          // Price and timing
-          if (vendor.averagePrice != null)
-            Text(
-              vendor.averagePriceDisplay,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: Colors.black87,
-              ),
-            ),
-          const SizedBox(height: 12),
-          // Open status and timing
+
+          // Address with icon
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                width: 8,
-                height: 8,
+                width: 32,
+                height: 32,
                 decoration: BoxDecoration(
-                  color: vendor.isCurrentlyOpen ? Colors.green : Colors.red,
-                  shape: BoxShape.circle,
+                  color: const Color(0xFF6F3FCC).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.location_on_outlined,
+                  color: Color(0xFF6F3FCC),
+                  size: 18,
                 ),
               ),
-              const SizedBox(width: 8),
-              Text(
-                vendor.isCurrentlyOpen
-                    ? 'Open now | ${vendor.openingHours ?? "11:00 AM"} to ${vendor.closingHours ?? "3:00 PM"}'
-                    : 'Closed',
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black87,
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  vendor.fullAddress,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Color(0xFF4A5568),
+                    height: 1.4,
+                  ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 20),
-          // Action buttons
+
+          const SizedBox(height: 16),
+
+          // Category and price row
           Row(
             children: [
               Container(
-                width: 50,
-                height: 50,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF6F3FCC),
-                  shape: BoxShape.circle,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
                 ),
-                child: const Icon(
-                  Icons.favorite_border,
-                  color: Colors.white,
-                  size: 24,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF6F3FCC).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: const Color(0xFF6F3FCC).withOpacity(0.2),
+                    width: 1,
+                  ),
+                ),
+                child: Text(
+                  vendor.category,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Color(0xFF6F3FCC),
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
-              const SizedBox(width: 16),
-              Container(
-                width: 50,
-                height: 50,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF4CAF50),
-                  shape: BoxShape.circle,
+              if (vendor.averagePrice != null) ...[
+                const SizedBox(width: 12),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFD69E2E).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: const Color(0xFFD69E2E).withOpacity(0.2),
+                      width: 1,
+                    ),
+                  ),
+                  child: Text(
+                    vendor.averagePriceDisplay,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Color(0xFFD69E2E),
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
-                child: const Icon(Icons.call, color: Colors.white, size: 24),
+              ],
+            ],
+          ),
+          const SizedBox(height: 16),
+
+          // Open status and timing in modern card
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: vendor.isCurrentlyOpen
+                  ? const Color(0xFF38A169).withOpacity(0.1)
+                  : const Color(0xFFE53E3E).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: vendor.isCurrentlyOpen
+                    ? const Color(0xFF38A169).withOpacity(0.2)
+                    : const Color(0xFFE53E3E).withOpacity(0.2),
+                width: 1,
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: vendor.isCurrentlyOpen
+                        ? const Color(0xFF38A169)
+                        : const Color(0xFFE53E3E),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    vendor.isCurrentlyOpen
+                        ? Icons.access_time_rounded
+                        : Icons.schedule_rounded,
+                    color: Colors.white,
+                    size: 18,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        vendor.isCurrentlyOpen
+                            ? 'Open Now'
+                            : 'Currently Closed',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: vendor.isCurrentlyOpen
+                              ? const Color(0xFF38A169)
+                              : const Color(0xFFE53E3E),
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        vendor.isCurrentlyOpen
+                            ? '${vendor.openingHours ?? "11:00 AM"} to ${vendor.closingHours ?? "3:00 PM"}'
+                            : 'Opens at ${vendor.openingHours ?? "11:00 AM"}',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Color(0xFF4A5568),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 24),
+
+          // Action buttons row
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  height: 56,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF6F3FCC),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.favorite_border_rounded,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                      SizedBox(width: 8),
+                      Text(
+                        'Add to Favorites',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Container(
+                height: 56,
+                width: 56,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF38A169),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: const Icon(
+                  Icons.call_rounded,
+                  color: Colors.white,
+                  size: 22,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Container(
+                height: 56,
+                width: 56,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFD69E2E),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: const Icon(
+                  Icons.directions_rounded,
+                  color: Colors.white,
+                  size: 22,
+                ),
               ),
             ],
           ),
@@ -473,24 +675,49 @@ class _VendorDetailView extends StatelessWidget {
     ];
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      margin: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Explore Other Restaurant',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
-            ),
+          Row(
+            children: [
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF6F3FCC).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.explore_outlined,
+                  color: Color(0xFF6F3FCC),
+                  size: 18,
+                ),
+              ),
+              const SizedBox(width: 12),
+              const Text(
+                'Explore Other Restaurants',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
+                  color: Color(0xFF1A202C),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 16),
-          ...otherRestaurants.map(
-            (restaurant) => _buildRestaurantItem(
-              restaurant['name']!,
-              restaurant['location']!,
-              restaurant['rating']!,
+          const SizedBox(height: 20),
+          ...otherRestaurants.asMap().entries.map(
+            (entry) => _buildRestaurantItem(
+              entry.value['name']!,
+              entry.value['location']!,
+              entry.value['rating']!,
+              isLast: entry.key == otherRestaurants.length - 1,
             ),
           ),
         ],
@@ -498,68 +725,120 @@ class _VendorDetailView extends StatelessWidget {
     );
   }
 
-  Widget _buildRestaurantItem(String name, String location, String rating) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      child: Row(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: Container(
-              width: 60,
-              height: 60,
-              color: Colors.grey[300],
-              child: Icon(Icons.restaurant, color: Colors.grey[500], size: 30),
-            ),
+  Widget _buildRestaurantItem(
+    String name,
+    String location,
+    String rating, {
+    bool isLast = false,
+  }) {
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF8FAFC),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
           ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  name,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+          child: Row(
+            children: [
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF6F3FCC).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: const Color(0xFF6F3FCC).withOpacity(0.2),
+                    width: 1,
                   ),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  location,
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
+                child: const Icon(
+                  Icons.restaurant_rounded,
+                  color: Color(0xFF6F3FCC),
+                  size: 28,
                 ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 12),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: const Color(0xFF4CAF50),
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  rating,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF1A202C),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      location,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Color(0xFF4A5568),
+                        height: 1.3,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 16),
+              Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF38A169),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          rating,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        const Icon(
+                          Icons.star_rounded,
+                          color: Colors.white,
+                          size: 14,
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                const SizedBox(width: 2),
-                const Icon(Icons.star, color: Colors.white, size: 12),
-              ],
-            ),
+                  const SizedBox(height: 8),
+                  Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF6F3FCC).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(
+                      Icons.arrow_forward_ios_rounded,
+                      color: Color(0xFF6F3FCC),
+                      size: 16,
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+        if (!isLast) const SizedBox(height: 16),
+      ],
     );
   }
 }

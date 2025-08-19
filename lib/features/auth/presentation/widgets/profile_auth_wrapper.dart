@@ -4,6 +4,7 @@ import 'package:get_it/get_it.dart';
 import 'dart:async';
 import 'package:savedge/features/auth/domain/repositories/auth_repository.dart';
 import 'package:savedge/features/auth/domain/entities/extended_user_profile.dart';
+import 'package:savedge/features/subscription/data/models/active_subscription_model.dart';
 import 'package:savedge/features/auth/data/models/auth_models.dart';
 import 'package:savedge/features/auth/presentation/pages/phone_auth_page.dart';
 import 'package:savedge/features/app/presentation/navigation/main_navigation_page.dart';
@@ -87,72 +88,50 @@ class _ProfileAuthWrapperState extends State<ProfileAuthWrapper> {
         return;
       }
 
-      // User is authenticated with Firebase, now check if user exists in backend
+      // User is authenticated with Firebase, now check auth status from unified API
       try {
-        print('ProfileAuthWrapper: Checking if user exists in backend...');
-        final userExistsResponse = await _authRepository.checkUserExists(
-          firebaseUser.uid,
+        print('ProfileAuthWrapper: Checking auth status from backend...');
+        final authStatusResponse = await _authRepository.checkAuthStatus();
+
+        print(
+          'ProfileAuthWrapper: Auth status response: ${authStatusResponse.status}, ${authStatusResponse.message}',
         );
 
-        if (userExistsResponse.exists &&
-            userExistsResponse.userProfile != null) {
-          // User exists, determine status based on profile completeness
-          final profile = userExistsResponse.userProfile!;
-          print('ProfileAuthWrapper: User exists: ${profile.email}');
-          final extendedProfile = _mapToExtendedProfile(profile);
-          final status = _determineAuthStatus(extendedProfile);
-          print('ProfileAuthWrapper: Determined status: $status');
+        ProfileAuthStatus profileAuthStatus;
 
-          if (mounted) {
-            setState(() {
-              _authStatus = status;
-              _isLoading = false;
-            });
-          }
-        } else {
-          // User doesn't exist in backend, check if they're an employee
-          print(
-            'ProfileAuthWrapper: User not found, checking employee status...',
-          );
-          final phoneNumber = firebaseUser.phoneNumber;
-
-          if (phoneNumber != null) {
-            final employeeInfo = await _authRepository.checkEmployeeByPhone(
-              phoneNumber,
-            );
-
-            if (employeeInfo != null) {
+        switch (authStatusResponse.status) {
+          case AuthStatusEnum.userExists:
+            if (authStatusResponse.userProfile != null) {
+              final profile = authStatusResponse.userProfile!;
+              final extendedProfile = _mapToExtendedProfile(profile);
+              profileAuthStatus = _determineAuthStatus(extendedProfile);
               print(
-                'ProfileAuthWrapper: Found employee, showing employee registration',
+                'ProfileAuthWrapper: User exists with status: $profileAuthStatus',
               );
-              if (mounted) {
-                setState(() {
-                  _authStatus = ProfileAuthStatus.employeeFound;
-                  _isLoading = false;
-                });
-              }
             } else {
-              print(
-                'ProfileAuthWrapper: No employee found, showing individual registration',
-              );
-              if (mounted) {
-                setState(() {
-                  _authStatus = ProfileAuthStatus.needsRegistration;
-                  _isLoading = false;
-                });
-              }
+              profileAuthStatus = ProfileAuthStatus.authenticated;
+              print('ProfileAuthWrapper: User exists but no profile data');
             }
-          } else {
+            break;
+
+          case AuthStatusEnum.employeeFound:
+            print('ProfileAuthWrapper: Employee found, showing registration');
+            profileAuthStatus = ProfileAuthStatus.employeeFound;
+            break;
+
+          case AuthStatusEnum.newUser:
             print(
-              'ProfileAuthWrapper: No phone number, showing individual registration',
+              'ProfileAuthWrapper: New user, showing individual registration',
             );
-            if (mounted) {
-              setState(() {
-                _authStatus = ProfileAuthStatus.needsRegistration;
-                _isLoading = false;
-              });
-            }
-          }
+            profileAuthStatus = ProfileAuthStatus.needsRegistration;
+            break;
+        }
+
+        if (mounted) {
+          setState(() {
+            _authStatus = profileAuthStatus;
+            _isLoading = false;
+          });
         }
       } catch (e) {
         print('ProfileAuthWrapper: Error checking user status: $e');
@@ -195,6 +174,11 @@ class _ProfileAuthWrapperState extends State<ProfileAuthWrapper> {
       department: profile.department,
       position: profile.position,
       joinDate: profile.joinDate,
+      activeSubscription: profile.activeSubscription != null
+          ? ActiveSubscriptionModel.fromJson(
+              profile.activeSubscription!,
+            ).toDomain()
+          : null,
     );
   }
 

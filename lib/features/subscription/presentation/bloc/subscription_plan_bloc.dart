@@ -98,7 +98,8 @@ class SubscriptionPlanBloc
         durationMonths: 12,
         bonusPoints: 5000,
         maxCoupons: 50,
-        imageUrl: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+        imageUrl:
+            'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
         isActive: true,
       ),
       SubscriptionPlan(
@@ -109,7 +110,8 @@ class SubscriptionPlanBloc
         durationMonths: 6,
         bonusPoints: 2000,
         maxCoupons: 20,
-        imageUrl: 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+        imageUrl:
+            'https://images.unsplash.com/photo-1563013544-824ae1b704d3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
         isActive: true,
       ),
     ];
