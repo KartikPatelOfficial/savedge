@@ -1,3 +1,30 @@
+/// Model for unused coupon data in check response
+class UnusedCouponData {
+  const UnusedCouponData({
+    required this.userCouponId,
+    required this.uniqueCode,
+    required this.acquiredDate,
+    required this.status,
+  });
+
+  final int userCouponId;
+  final String uniqueCode;
+  final String acquiredDate;
+  final String status;
+
+  // Map to match expected field names
+  int get id => userCouponId;
+
+  factory UnusedCouponData.fromJson(Map<String, dynamic> json) {
+    return UnusedCouponData(
+      userCouponId: json['userCouponId'] as int,
+      uniqueCode: json['uniqueCode'] as String,
+      acquiredDate: json['acquiredDate'] as String,
+      status: json['status'] as String,
+    );
+  }
+}
+
 /// Model for coupon check request
 class CouponCheckRequest {
   const CouponCheckRequest({required this.couponId});
@@ -79,7 +106,7 @@ class CouponCheckResponse {
   final String? userLastRedemptionDate;
   final String? userLastAcquisitionDate;
   final bool hasUnusedCoupons;
-  final List<dynamic> unusedCoupons;
+  final List<UnusedCouponData> unusedCoupons;
 
   factory CouponCheckResponse.fromJson(Map<String, dynamic> json) {
     return CouponCheckResponse(
@@ -118,7 +145,9 @@ class CouponCheckResponse {
       userLastRedemptionDate: json['userLastRedemptionDate'] as String?,
       userLastAcquisitionDate: json['userLastAcquisitionDate'] as String?,
       hasUnusedCoupons: json['hasUnusedCoupons'] as bool,
-      unusedCoupons: json['unusedCoupons'] as List<dynamic>,
+      unusedCoupons: (json['unusedCoupons'] as List<dynamic>)
+          .map((e) => UnusedCouponData.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 }

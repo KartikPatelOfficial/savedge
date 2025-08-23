@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../data/models/coupon_gifting_models.dart';
+import '../pages/coupon_confirmation_page.dart';
 
 class ModernCouponCard extends StatefulWidget {
   const ModernCouponCard({super.key, required this.coupon, this.onTap});
@@ -133,7 +134,7 @@ class _ModernCouponCardState extends State<ModernCouponCard>
     return Container(
       width: 120,
       height: 140,
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -149,40 +150,41 @@ class _ModernCouponCardState extends State<ModernCouponCard>
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
         children: [
           // Discount value with modern styling
           Text(
             widget.coupon.discountDisplay,
             style: const TextStyle(
-              fontSize: 24,
+              fontSize: 20,
               fontWeight: FontWeight.w800,
               color: Colors.white,
               letterSpacing: -0.5,
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 2),
           Text(
             'OFF',
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 12,
               fontWeight: FontWeight.w600,
               color: Colors.white.withOpacity(0.9),
               letterSpacing: 1.2,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           // Status indicator
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
               _getStatusDisplay(),
               style: const TextStyle(
-                fontSize: 10,
+                fontSize: 9,
                 fontWeight: FontWeight.w600,
                 color: Colors.white,
               ),
@@ -195,15 +197,18 @@ class _ModernCouponCardState extends State<ModernCouponCard>
 
   Widget _buildModernDetailsSection(bool isActive, Map<String, Color> theme) {
     return Padding(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisSize: MainAxisSize.min,
         children: [
           // Title and vendor with enhanced styling
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+          Flexible(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
               Text(
                 widget.coupon.title,
                 style: TextStyle(
@@ -238,8 +243,11 @@ class _ModernCouponCardState extends State<ModernCouponCard>
                   ),
                 ],
               ),
-            ],
+              ],
+            ),
           ),
+
+          const SizedBox(height: 8),
 
           // Bottom section with expiry and ID
           Row(
@@ -327,11 +335,15 @@ class _ModernCouponCardState extends State<ModernCouponCard>
 
   void _handleTap(BuildContext context) {
     if (widget.coupon.isActive) {
-      // Navigate to coupon details or redemption page
-      Navigator.pushNamed(
+      // Navigate to coupon confirmation/redemption page
+      Navigator.push(
         context,
-        '/coupon-redemption',
-        arguments: widget.coupon,
+        MaterialPageRoute(
+          builder: (context) => CouponConfirmationPage(
+            userCoupon: widget.coupon,
+            confirmationType: CouponConfirmationType.use,
+          ),
+        ),
       );
     } else {
       // Show a message for inactive coupons

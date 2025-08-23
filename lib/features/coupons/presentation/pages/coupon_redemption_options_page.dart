@@ -843,36 +843,31 @@ class _CouponRedemptionOptionsPageState
       if (selectedMethod == RedemptionMethod.existing) {
         // For existing coupons, use the "use" confirmation type
         if (widget.couponData.unusedCoupons.isNotEmpty) {
-          final firstUnusedCoupon = widget.couponData.unusedCoupons.first as Map<String, dynamic>;
+          final firstUnusedCoupon = widget.couponData.unusedCoupons.first;
           
-          // Create UserCouponDetailModel from unused coupon data with safe casting
-          final userCouponId = firstUnusedCoupon['id'];
-          if (userCouponId == null) {
-            throw Exception('Invalid unused coupon data: missing ID');
-          }
-          
+          // Create UserCouponDetailModel from unused coupon data
           final userCoupon = UserCouponDetailModel(
-            id: userCouponId is int ? userCouponId : int.tryParse(userCouponId.toString()) ?? 0,
+            id: firstUnusedCoupon.id,
             couponId: widget.couponData.couponId,
             title: widget.couponData.title,
             description: widget.couponData.description,
             vendorId: widget.couponData.vendorId,
             vendorName: widget.couponData.vendorName,
-            status: firstUnusedCoupon['status']?.toString() ?? 'Unused',
-            acquiredDate: _parseDateTime(firstUnusedCoupon['acquiredDate']) ?? DateTime.now(),
-            redeemedDate: _parseDateTime(firstUnusedCoupon['redeemedDate']),
+            status: firstUnusedCoupon.status,
+            acquiredDate: DateTime.tryParse(firstUnusedCoupon.acquiredDate) ?? DateTime.now(),
+            redeemedDate: null, // Unused coupons don't have redemption date
             expiryDate: DateTime.tryParse(widget.couponData.expiryDate) ?? DateTime.now(),
-            uniqueCode: firstUnusedCoupon['uniqueCode']?.toString() ?? '',
-            qrCode: firstUnusedCoupon['qrCode']?.toString(),
+            uniqueCode: firstUnusedCoupon.uniqueCode,
+            qrCode: null, // QR code may not be in unused coupon data
             discountType: widget.couponData.discountType.toString(),
             discountValue: widget.couponData.discountValue,
             minCartValue: widget.couponData.minCartValue,
             imageUrl: widget.couponData.imageUrl,
-            isGifted: firstUnusedCoupon['isGifted'] == true,
-            giftedFromUserId: firstUnusedCoupon['giftedFromUserId']?.toString(),
-            giftedToUserId: firstUnusedCoupon['giftedToUserId']?.toString(),
-            giftedDate: _parseDateTime(firstUnusedCoupon['giftedDate']),
-            giftMessage: firstUnusedCoupon['giftMessage']?.toString(),
+            isGifted: false, // Assuming unused coupons are not gifted
+            giftedFromUserId: null,
+            giftedToUserId: null,
+            giftedDate: null,
+            giftMessage: null,
           );
           
           result = await Navigator.of(context).push<bool>(
