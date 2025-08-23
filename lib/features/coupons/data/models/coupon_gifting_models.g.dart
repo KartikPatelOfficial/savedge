@@ -151,22 +151,46 @@ Map<String, dynamic> _$UserCouponDetailModelToJson(
 _UserCouponsResponseModel _$UserCouponsResponseModelFromJson(
   Map<String, dynamic> json,
 ) => _UserCouponsResponseModel(
-  purchasedCoupons: (json['purchasedCoupons'] as List<dynamic>)
-      .map((e) => UserCouponDetailModel.fromJson(e as Map<String, dynamic>))
-      .toList(),
-  usedCoupons: (json['usedCoupons'] as List<dynamic>)
-      .map((e) => UserCouponDetailModel.fromJson(e as Map<String, dynamic>))
-      .toList(),
-  giftedReceivedCoupons: (json['giftedReceivedCoupons'] as List<dynamic>)
-      .map((e) => UserCouponDetailModel.fromJson(e as Map<String, dynamic>))
-      .toList(),
-  giftedSentCoupons: (json['giftedSentCoupons'] as List<dynamic>)
-      .map((e) => UserCouponDetailModel.fromJson(e as Map<String, dynamic>))
-      .toList(),
-  totalCount: (json['totalCount'] as num).toInt(),
-  activeCount: (json['activeCount'] as num).toInt(),
-  usedCount: (json['usedCount'] as num).toInt(),
-  giftedCount: (json['giftedCount'] as num).toInt(),
+  purchasedCoupons:
+      (json['purchasedCoupons'] as List<dynamic>?)
+          ?.map(
+            (e) => UserCouponDetailModel.fromJson(e as Map<String, dynamic>),
+          )
+          .toList() ??
+      const [],
+  usedCoupons:
+      (json['usedCoupons'] as List<dynamic>?)
+          ?.map(
+            (e) => UserCouponDetailModel.fromJson(e as Map<String, dynamic>),
+          )
+          .toList() ??
+      const [],
+  expiredCoupons:
+      (json['expiredCoupons'] as List<dynamic>?)
+          ?.map(
+            (e) => UserCouponDetailModel.fromJson(e as Map<String, dynamic>),
+          )
+          .toList() ??
+      const [],
+  giftedReceivedCoupons:
+      (json['giftedReceivedCoupons'] as List<dynamic>?)
+          ?.map(
+            (e) => UserCouponDetailModel.fromJson(e as Map<String, dynamic>),
+          )
+          .toList() ??
+      const [],
+  giftedSentCoupons:
+      (json['giftedSentCoupons'] as List<dynamic>?)
+          ?.map(
+            (e) => UserCouponDetailModel.fromJson(e as Map<String, dynamic>),
+          )
+          .toList() ??
+      const [],
+  totalCount: (json['totalCount'] as num?)?.toInt() ?? 0,
+  activeCount: (json['activeCount'] as num?)?.toInt() ?? 0,
+  usedCount: (json['usedCount'] as num?)?.toInt() ?? 0,
+  expiredCount: (json['expiredCount'] as num?)?.toInt() ?? 0,
+  giftedCount: (json['giftedCount'] as num?)?.toInt() ?? 0,
 );
 
 Map<String, dynamic> _$UserCouponsResponseModelToJson(
@@ -174,11 +198,13 @@ Map<String, dynamic> _$UserCouponsResponseModelToJson(
 ) => <String, dynamic>{
   'purchasedCoupons': instance.purchasedCoupons,
   'usedCoupons': instance.usedCoupons,
+  'expiredCoupons': instance.expiredCoupons,
   'giftedReceivedCoupons': instance.giftedReceivedCoupons,
   'giftedSentCoupons': instance.giftedSentCoupons,
   'totalCount': instance.totalCount,
   'activeCount': instance.activeCount,
   'usedCount': instance.usedCount,
+  'expiredCount': instance.expiredCount,
   'giftedCount': instance.giftedCount,
 };
 

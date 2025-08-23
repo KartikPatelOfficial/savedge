@@ -125,14 +125,16 @@ extension UserCouponDetailModelX on UserCouponDetailModel {
 @freezed
 abstract class UserCouponsResponseModel with _$UserCouponsResponseModel {
   const factory UserCouponsResponseModel({
-    required List<UserCouponDetailModel> purchasedCoupons,
-    required List<UserCouponDetailModel> usedCoupons,
-    required List<UserCouponDetailModel> giftedReceivedCoupons,
-    required List<UserCouponDetailModel> giftedSentCoupons,
-    required int totalCount,
-    required int activeCount,
-    required int usedCount,
-    required int giftedCount,
+    @Default([]) List<UserCouponDetailModel> purchasedCoupons,
+    @Default([]) List<UserCouponDetailModel> usedCoupons,
+    @Default([]) List<UserCouponDetailModel> expiredCoupons,
+    @Default([]) List<UserCouponDetailModel> giftedReceivedCoupons,
+    @Default([]) List<UserCouponDetailModel> giftedSentCoupons,
+    @Default(0) int totalCount,
+    @Default(0) int activeCount,
+    @Default(0) int usedCount,
+    @Default(0) int expiredCount,
+    @Default(0) int giftedCount,
   }) = _UserCouponsResponseModel;
 
   factory UserCouponsResponseModel.fromJson(Map<String, dynamic> json) =>

@@ -1701,7 +1701,7 @@ as String?,
 /// @nodoc
 mixin _$UserCouponsResponseModel {
 
- List<UserCouponDetailModel> get purchasedCoupons; List<UserCouponDetailModel> get usedCoupons; List<UserCouponDetailModel> get giftedReceivedCoupons; List<UserCouponDetailModel> get giftedSentCoupons; int get totalCount; int get activeCount; int get usedCount; int get giftedCount;
+ List<UserCouponDetailModel> get purchasedCoupons; List<UserCouponDetailModel> get usedCoupons; List<UserCouponDetailModel> get expiredCoupons; List<UserCouponDetailModel> get giftedReceivedCoupons; List<UserCouponDetailModel> get giftedSentCoupons; int get totalCount; int get activeCount; int get usedCount; int get expiredCount; int get giftedCount;
 /// Create a copy of UserCouponsResponseModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1714,16 +1714,16 @@ $UserCouponsResponseModelCopyWith<UserCouponsResponseModel> get copyWith => _$Us
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is UserCouponsResponseModel&&const DeepCollectionEquality().equals(other.purchasedCoupons, purchasedCoupons)&&const DeepCollectionEquality().equals(other.usedCoupons, usedCoupons)&&const DeepCollectionEquality().equals(other.giftedReceivedCoupons, giftedReceivedCoupons)&&const DeepCollectionEquality().equals(other.giftedSentCoupons, giftedSentCoupons)&&(identical(other.totalCount, totalCount) || other.totalCount == totalCount)&&(identical(other.activeCount, activeCount) || other.activeCount == activeCount)&&(identical(other.usedCount, usedCount) || other.usedCount == usedCount)&&(identical(other.giftedCount, giftedCount) || other.giftedCount == giftedCount));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is UserCouponsResponseModel&&const DeepCollectionEquality().equals(other.purchasedCoupons, purchasedCoupons)&&const DeepCollectionEquality().equals(other.usedCoupons, usedCoupons)&&const DeepCollectionEquality().equals(other.expiredCoupons, expiredCoupons)&&const DeepCollectionEquality().equals(other.giftedReceivedCoupons, giftedReceivedCoupons)&&const DeepCollectionEquality().equals(other.giftedSentCoupons, giftedSentCoupons)&&(identical(other.totalCount, totalCount) || other.totalCount == totalCount)&&(identical(other.activeCount, activeCount) || other.activeCount == activeCount)&&(identical(other.usedCount, usedCount) || other.usedCount == usedCount)&&(identical(other.expiredCount, expiredCount) || other.expiredCount == expiredCount)&&(identical(other.giftedCount, giftedCount) || other.giftedCount == giftedCount));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(purchasedCoupons),const DeepCollectionEquality().hash(usedCoupons),const DeepCollectionEquality().hash(giftedReceivedCoupons),const DeepCollectionEquality().hash(giftedSentCoupons),totalCount,activeCount,usedCount,giftedCount);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(purchasedCoupons),const DeepCollectionEquality().hash(usedCoupons),const DeepCollectionEquality().hash(expiredCoupons),const DeepCollectionEquality().hash(giftedReceivedCoupons),const DeepCollectionEquality().hash(giftedSentCoupons),totalCount,activeCount,usedCount,expiredCount,giftedCount);
 
 @override
 String toString() {
-  return 'UserCouponsResponseModel(purchasedCoupons: $purchasedCoupons, usedCoupons: $usedCoupons, giftedReceivedCoupons: $giftedReceivedCoupons, giftedSentCoupons: $giftedSentCoupons, totalCount: $totalCount, activeCount: $activeCount, usedCount: $usedCount, giftedCount: $giftedCount)';
+  return 'UserCouponsResponseModel(purchasedCoupons: $purchasedCoupons, usedCoupons: $usedCoupons, expiredCoupons: $expiredCoupons, giftedReceivedCoupons: $giftedReceivedCoupons, giftedSentCoupons: $giftedSentCoupons, totalCount: $totalCount, activeCount: $activeCount, usedCount: $usedCount, expiredCount: $expiredCount, giftedCount: $giftedCount)';
 }
 
 
@@ -1734,7 +1734,7 @@ abstract mixin class $UserCouponsResponseModelCopyWith<$Res>  {
   factory $UserCouponsResponseModelCopyWith(UserCouponsResponseModel value, $Res Function(UserCouponsResponseModel) _then) = _$UserCouponsResponseModelCopyWithImpl;
 @useResult
 $Res call({
- List<UserCouponDetailModel> purchasedCoupons, List<UserCouponDetailModel> usedCoupons, List<UserCouponDetailModel> giftedReceivedCoupons, List<UserCouponDetailModel> giftedSentCoupons, int totalCount, int activeCount, int usedCount, int giftedCount
+ List<UserCouponDetailModel> purchasedCoupons, List<UserCouponDetailModel> usedCoupons, List<UserCouponDetailModel> expiredCoupons, List<UserCouponDetailModel> giftedReceivedCoupons, List<UserCouponDetailModel> giftedSentCoupons, int totalCount, int activeCount, int usedCount, int expiredCount, int giftedCount
 });
 
 
@@ -1751,15 +1751,17 @@ class _$UserCouponsResponseModelCopyWithImpl<$Res>
 
 /// Create a copy of UserCouponsResponseModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? purchasedCoupons = null,Object? usedCoupons = null,Object? giftedReceivedCoupons = null,Object? giftedSentCoupons = null,Object? totalCount = null,Object? activeCount = null,Object? usedCount = null,Object? giftedCount = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? purchasedCoupons = null,Object? usedCoupons = null,Object? expiredCoupons = null,Object? giftedReceivedCoupons = null,Object? giftedSentCoupons = null,Object? totalCount = null,Object? activeCount = null,Object? usedCount = null,Object? expiredCount = null,Object? giftedCount = null,}) {
   return _then(_self.copyWith(
 purchasedCoupons: null == purchasedCoupons ? _self.purchasedCoupons : purchasedCoupons // ignore: cast_nullable_to_non_nullable
 as List<UserCouponDetailModel>,usedCoupons: null == usedCoupons ? _self.usedCoupons : usedCoupons // ignore: cast_nullable_to_non_nullable
+as List<UserCouponDetailModel>,expiredCoupons: null == expiredCoupons ? _self.expiredCoupons : expiredCoupons // ignore: cast_nullable_to_non_nullable
 as List<UserCouponDetailModel>,giftedReceivedCoupons: null == giftedReceivedCoupons ? _self.giftedReceivedCoupons : giftedReceivedCoupons // ignore: cast_nullable_to_non_nullable
 as List<UserCouponDetailModel>,giftedSentCoupons: null == giftedSentCoupons ? _self.giftedSentCoupons : giftedSentCoupons // ignore: cast_nullable_to_non_nullable
 as List<UserCouponDetailModel>,totalCount: null == totalCount ? _self.totalCount : totalCount // ignore: cast_nullable_to_non_nullable
 as int,activeCount: null == activeCount ? _self.activeCount : activeCount // ignore: cast_nullable_to_non_nullable
 as int,usedCount: null == usedCount ? _self.usedCount : usedCount // ignore: cast_nullable_to_non_nullable
+as int,expiredCount: null == expiredCount ? _self.expiredCount : expiredCount // ignore: cast_nullable_to_non_nullable
 as int,giftedCount: null == giftedCount ? _self.giftedCount : giftedCount // ignore: cast_nullable_to_non_nullable
 as int,
   ));
@@ -1846,10 +1848,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<UserCouponDetailModel> purchasedCoupons,  List<UserCouponDetailModel> usedCoupons,  List<UserCouponDetailModel> giftedReceivedCoupons,  List<UserCouponDetailModel> giftedSentCoupons,  int totalCount,  int activeCount,  int usedCount,  int giftedCount)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<UserCouponDetailModel> purchasedCoupons,  List<UserCouponDetailModel> usedCoupons,  List<UserCouponDetailModel> expiredCoupons,  List<UserCouponDetailModel> giftedReceivedCoupons,  List<UserCouponDetailModel> giftedSentCoupons,  int totalCount,  int activeCount,  int usedCount,  int expiredCount,  int giftedCount)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _UserCouponsResponseModel() when $default != null:
-return $default(_that.purchasedCoupons,_that.usedCoupons,_that.giftedReceivedCoupons,_that.giftedSentCoupons,_that.totalCount,_that.activeCount,_that.usedCount,_that.giftedCount);case _:
+return $default(_that.purchasedCoupons,_that.usedCoupons,_that.expiredCoupons,_that.giftedReceivedCoupons,_that.giftedSentCoupons,_that.totalCount,_that.activeCount,_that.usedCount,_that.expiredCount,_that.giftedCount);case _:
   return orElse();
 
 }
@@ -1867,10 +1869,10 @@ return $default(_that.purchasedCoupons,_that.usedCoupons,_that.giftedReceivedCou
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<UserCouponDetailModel> purchasedCoupons,  List<UserCouponDetailModel> usedCoupons,  List<UserCouponDetailModel> giftedReceivedCoupons,  List<UserCouponDetailModel> giftedSentCoupons,  int totalCount,  int activeCount,  int usedCount,  int giftedCount)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<UserCouponDetailModel> purchasedCoupons,  List<UserCouponDetailModel> usedCoupons,  List<UserCouponDetailModel> expiredCoupons,  List<UserCouponDetailModel> giftedReceivedCoupons,  List<UserCouponDetailModel> giftedSentCoupons,  int totalCount,  int activeCount,  int usedCount,  int expiredCount,  int giftedCount)  $default,) {final _that = this;
 switch (_that) {
 case _UserCouponsResponseModel():
-return $default(_that.purchasedCoupons,_that.usedCoupons,_that.giftedReceivedCoupons,_that.giftedSentCoupons,_that.totalCount,_that.activeCount,_that.usedCount,_that.giftedCount);case _:
+return $default(_that.purchasedCoupons,_that.usedCoupons,_that.expiredCoupons,_that.giftedReceivedCoupons,_that.giftedSentCoupons,_that.totalCount,_that.activeCount,_that.usedCount,_that.expiredCount,_that.giftedCount);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -1887,10 +1889,10 @@ return $default(_that.purchasedCoupons,_that.usedCoupons,_that.giftedReceivedCou
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<UserCouponDetailModel> purchasedCoupons,  List<UserCouponDetailModel> usedCoupons,  List<UserCouponDetailModel> giftedReceivedCoupons,  List<UserCouponDetailModel> giftedSentCoupons,  int totalCount,  int activeCount,  int usedCount,  int giftedCount)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<UserCouponDetailModel> purchasedCoupons,  List<UserCouponDetailModel> usedCoupons,  List<UserCouponDetailModel> expiredCoupons,  List<UserCouponDetailModel> giftedReceivedCoupons,  List<UserCouponDetailModel> giftedSentCoupons,  int totalCount,  int activeCount,  int usedCount,  int expiredCount,  int giftedCount)?  $default,) {final _that = this;
 switch (_that) {
 case _UserCouponsResponseModel() when $default != null:
-return $default(_that.purchasedCoupons,_that.usedCoupons,_that.giftedReceivedCoupons,_that.giftedSentCoupons,_that.totalCount,_that.activeCount,_that.usedCount,_that.giftedCount);case _:
+return $default(_that.purchasedCoupons,_that.usedCoupons,_that.expiredCoupons,_that.giftedReceivedCoupons,_that.giftedSentCoupons,_that.totalCount,_that.activeCount,_that.usedCount,_that.expiredCount,_that.giftedCount);case _:
   return null;
 
 }
@@ -1902,41 +1904,49 @@ return $default(_that.purchasedCoupons,_that.usedCoupons,_that.giftedReceivedCou
 @JsonSerializable()
 
 class _UserCouponsResponseModel implements UserCouponsResponseModel {
-  const _UserCouponsResponseModel({required final  List<UserCouponDetailModel> purchasedCoupons, required final  List<UserCouponDetailModel> usedCoupons, required final  List<UserCouponDetailModel> giftedReceivedCoupons, required final  List<UserCouponDetailModel> giftedSentCoupons, required this.totalCount, required this.activeCount, required this.usedCount, required this.giftedCount}): _purchasedCoupons = purchasedCoupons,_usedCoupons = usedCoupons,_giftedReceivedCoupons = giftedReceivedCoupons,_giftedSentCoupons = giftedSentCoupons;
+  const _UserCouponsResponseModel({final  List<UserCouponDetailModel> purchasedCoupons = const [], final  List<UserCouponDetailModel> usedCoupons = const [], final  List<UserCouponDetailModel> expiredCoupons = const [], final  List<UserCouponDetailModel> giftedReceivedCoupons = const [], final  List<UserCouponDetailModel> giftedSentCoupons = const [], this.totalCount = 0, this.activeCount = 0, this.usedCount = 0, this.expiredCount = 0, this.giftedCount = 0}): _purchasedCoupons = purchasedCoupons,_usedCoupons = usedCoupons,_expiredCoupons = expiredCoupons,_giftedReceivedCoupons = giftedReceivedCoupons,_giftedSentCoupons = giftedSentCoupons;
   factory _UserCouponsResponseModel.fromJson(Map<String, dynamic> json) => _$UserCouponsResponseModelFromJson(json);
 
  final  List<UserCouponDetailModel> _purchasedCoupons;
-@override List<UserCouponDetailModel> get purchasedCoupons {
+@override@JsonKey() List<UserCouponDetailModel> get purchasedCoupons {
   if (_purchasedCoupons is EqualUnmodifiableListView) return _purchasedCoupons;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_purchasedCoupons);
 }
 
  final  List<UserCouponDetailModel> _usedCoupons;
-@override List<UserCouponDetailModel> get usedCoupons {
+@override@JsonKey() List<UserCouponDetailModel> get usedCoupons {
   if (_usedCoupons is EqualUnmodifiableListView) return _usedCoupons;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_usedCoupons);
 }
 
+ final  List<UserCouponDetailModel> _expiredCoupons;
+@override@JsonKey() List<UserCouponDetailModel> get expiredCoupons {
+  if (_expiredCoupons is EqualUnmodifiableListView) return _expiredCoupons;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_expiredCoupons);
+}
+
  final  List<UserCouponDetailModel> _giftedReceivedCoupons;
-@override List<UserCouponDetailModel> get giftedReceivedCoupons {
+@override@JsonKey() List<UserCouponDetailModel> get giftedReceivedCoupons {
   if (_giftedReceivedCoupons is EqualUnmodifiableListView) return _giftedReceivedCoupons;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_giftedReceivedCoupons);
 }
 
  final  List<UserCouponDetailModel> _giftedSentCoupons;
-@override List<UserCouponDetailModel> get giftedSentCoupons {
+@override@JsonKey() List<UserCouponDetailModel> get giftedSentCoupons {
   if (_giftedSentCoupons is EqualUnmodifiableListView) return _giftedSentCoupons;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_giftedSentCoupons);
 }
 
-@override final  int totalCount;
-@override final  int activeCount;
-@override final  int usedCount;
-@override final  int giftedCount;
+@override@JsonKey() final  int totalCount;
+@override@JsonKey() final  int activeCount;
+@override@JsonKey() final  int usedCount;
+@override@JsonKey() final  int expiredCount;
+@override@JsonKey() final  int giftedCount;
 
 /// Create a copy of UserCouponsResponseModel
 /// with the given fields replaced by the non-null parameter values.
@@ -1951,16 +1961,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UserCouponsResponseModel&&const DeepCollectionEquality().equals(other._purchasedCoupons, _purchasedCoupons)&&const DeepCollectionEquality().equals(other._usedCoupons, _usedCoupons)&&const DeepCollectionEquality().equals(other._giftedReceivedCoupons, _giftedReceivedCoupons)&&const DeepCollectionEquality().equals(other._giftedSentCoupons, _giftedSentCoupons)&&(identical(other.totalCount, totalCount) || other.totalCount == totalCount)&&(identical(other.activeCount, activeCount) || other.activeCount == activeCount)&&(identical(other.usedCount, usedCount) || other.usedCount == usedCount)&&(identical(other.giftedCount, giftedCount) || other.giftedCount == giftedCount));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UserCouponsResponseModel&&const DeepCollectionEquality().equals(other._purchasedCoupons, _purchasedCoupons)&&const DeepCollectionEquality().equals(other._usedCoupons, _usedCoupons)&&const DeepCollectionEquality().equals(other._expiredCoupons, _expiredCoupons)&&const DeepCollectionEquality().equals(other._giftedReceivedCoupons, _giftedReceivedCoupons)&&const DeepCollectionEquality().equals(other._giftedSentCoupons, _giftedSentCoupons)&&(identical(other.totalCount, totalCount) || other.totalCount == totalCount)&&(identical(other.activeCount, activeCount) || other.activeCount == activeCount)&&(identical(other.usedCount, usedCount) || other.usedCount == usedCount)&&(identical(other.expiredCount, expiredCount) || other.expiredCount == expiredCount)&&(identical(other.giftedCount, giftedCount) || other.giftedCount == giftedCount));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_purchasedCoupons),const DeepCollectionEquality().hash(_usedCoupons),const DeepCollectionEquality().hash(_giftedReceivedCoupons),const DeepCollectionEquality().hash(_giftedSentCoupons),totalCount,activeCount,usedCount,giftedCount);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_purchasedCoupons),const DeepCollectionEquality().hash(_usedCoupons),const DeepCollectionEquality().hash(_expiredCoupons),const DeepCollectionEquality().hash(_giftedReceivedCoupons),const DeepCollectionEquality().hash(_giftedSentCoupons),totalCount,activeCount,usedCount,expiredCount,giftedCount);
 
 @override
 String toString() {
-  return 'UserCouponsResponseModel(purchasedCoupons: $purchasedCoupons, usedCoupons: $usedCoupons, giftedReceivedCoupons: $giftedReceivedCoupons, giftedSentCoupons: $giftedSentCoupons, totalCount: $totalCount, activeCount: $activeCount, usedCount: $usedCount, giftedCount: $giftedCount)';
+  return 'UserCouponsResponseModel(purchasedCoupons: $purchasedCoupons, usedCoupons: $usedCoupons, expiredCoupons: $expiredCoupons, giftedReceivedCoupons: $giftedReceivedCoupons, giftedSentCoupons: $giftedSentCoupons, totalCount: $totalCount, activeCount: $activeCount, usedCount: $usedCount, expiredCount: $expiredCount, giftedCount: $giftedCount)';
 }
 
 
@@ -1971,7 +1981,7 @@ abstract mixin class _$UserCouponsResponseModelCopyWith<$Res> implements $UserCo
   factory _$UserCouponsResponseModelCopyWith(_UserCouponsResponseModel value, $Res Function(_UserCouponsResponseModel) _then) = __$UserCouponsResponseModelCopyWithImpl;
 @override @useResult
 $Res call({
- List<UserCouponDetailModel> purchasedCoupons, List<UserCouponDetailModel> usedCoupons, List<UserCouponDetailModel> giftedReceivedCoupons, List<UserCouponDetailModel> giftedSentCoupons, int totalCount, int activeCount, int usedCount, int giftedCount
+ List<UserCouponDetailModel> purchasedCoupons, List<UserCouponDetailModel> usedCoupons, List<UserCouponDetailModel> expiredCoupons, List<UserCouponDetailModel> giftedReceivedCoupons, List<UserCouponDetailModel> giftedSentCoupons, int totalCount, int activeCount, int usedCount, int expiredCount, int giftedCount
 });
 
 
@@ -1988,15 +1998,17 @@ class __$UserCouponsResponseModelCopyWithImpl<$Res>
 
 /// Create a copy of UserCouponsResponseModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? purchasedCoupons = null,Object? usedCoupons = null,Object? giftedReceivedCoupons = null,Object? giftedSentCoupons = null,Object? totalCount = null,Object? activeCount = null,Object? usedCount = null,Object? giftedCount = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? purchasedCoupons = null,Object? usedCoupons = null,Object? expiredCoupons = null,Object? giftedReceivedCoupons = null,Object? giftedSentCoupons = null,Object? totalCount = null,Object? activeCount = null,Object? usedCount = null,Object? expiredCount = null,Object? giftedCount = null,}) {
   return _then(_UserCouponsResponseModel(
 purchasedCoupons: null == purchasedCoupons ? _self._purchasedCoupons : purchasedCoupons // ignore: cast_nullable_to_non_nullable
 as List<UserCouponDetailModel>,usedCoupons: null == usedCoupons ? _self._usedCoupons : usedCoupons // ignore: cast_nullable_to_non_nullable
+as List<UserCouponDetailModel>,expiredCoupons: null == expiredCoupons ? _self._expiredCoupons : expiredCoupons // ignore: cast_nullable_to_non_nullable
 as List<UserCouponDetailModel>,giftedReceivedCoupons: null == giftedReceivedCoupons ? _self._giftedReceivedCoupons : giftedReceivedCoupons // ignore: cast_nullable_to_non_nullable
 as List<UserCouponDetailModel>,giftedSentCoupons: null == giftedSentCoupons ? _self._giftedSentCoupons : giftedSentCoupons // ignore: cast_nullable_to_non_nullable
 as List<UserCouponDetailModel>,totalCount: null == totalCount ? _self.totalCount : totalCount // ignore: cast_nullable_to_non_nullable
 as int,activeCount: null == activeCount ? _self.activeCount : activeCount // ignore: cast_nullable_to_non_nullable
 as int,usedCount: null == usedCount ? _self.usedCount : usedCount // ignore: cast_nullable_to_non_nullable
+as int,expiredCount: null == expiredCount ? _self.expiredCount : expiredCount // ignore: cast_nullable_to_non_nullable
 as int,giftedCount: null == giftedCount ? _self.giftedCount : giftedCount // ignore: cast_nullable_to_non_nullable
 as int,
   ));

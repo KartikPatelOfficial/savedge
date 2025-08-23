@@ -7,7 +7,7 @@ import '../../data/models/coupon_gifting_models.dart';
 import '../bloc/coupon_manager_bloc.dart';
 import '../bloc/coupon_manager_event.dart';
 import '../bloc/coupon_manager_state.dart';
-import '../widgets/elegant_coupon_card.dart';
+import '../widgets/modern_coupon_card.dart';
 
 class CleanCouponsPage extends StatelessWidget {
   const CleanCouponsPage({super.key});
@@ -48,7 +48,7 @@ class _CleanCouponsViewState extends State<CleanCouponsView>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFFAFBFC),
       body: BlocBuilder<CouponManagerBloc, CouponManagerState>(
         builder: (context, state) {
           if (state is CouponManagerLoading) {
@@ -66,30 +66,59 @@ class _CleanCouponsViewState extends State<CleanCouponsView>
 
   Widget _buildLoadingView() {
     return Scaffold(
-      appBar: _buildSimpleAppBar(),
+      backgroundColor: const Color(0xFFFAFBFC),
+      appBar: _buildModernAppBar(),
       body: const Center(
-        child: Padding(
-          padding: EdgeInsets.all(40),
-          child: CircularProgressIndicator(color: Color(0xFF6F3FCC)),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(color: Color(0xFF6F3FCC), strokeWidth: 3),
+            SizedBox(height: 24),
+            Text(
+              'Loading your coupons...',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: Color(0xFF4A5568),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
   Widget _buildCouponsView(CouponManagerLoaded state) {
+    final allCoupons = _getAllCoupons(state.couponsData);
+    final activeCoupons = _getActiveCoupons(state.couponsData);
+    final usedCoupons = state.couponsData.usedCoupons;
+    final expiredCoupons = state.couponsData.expiredCoupons;
+
     return Scaffold(
-      appBar: _buildSimpleAppBar(),
+      backgroundColor: const Color(0xFFFAFBFC),
+      appBar: _buildModernAppBar(),
       body: Column(
         children: [
-          _buildTabBar(),
+          // Statistics Cards
+          _buildStatsSection(
+            allCoupons,
+            activeCoupons,
+            usedCoupons,
+            expiredCoupons,
+          ),
+
+          // Tab Bar
+          _buildModernTabBar(),
+
+          // Content
           Expanded(
             child: TabBarView(
               controller: _tabController,
               children: [
-                _buildCouponsList(_getAllCoupons(state.couponsData)),
-                _buildCouponsList(_getActiveCoupons(state.couponsData)),
-                _buildCouponsList(state.couponsData.usedCoupons),
-                _buildCouponsList(_getExpiredCoupons(state.couponsData)),
+                _buildCouponsList(allCoupons, 'All Coupons'),
+                _buildCouponsList(activeCoupons, 'Active Coupons'),
+                _buildCouponsList(usedCoupons, 'Used Coupons'),
+                _buildCouponsList(expiredCoupons, 'Expired Coupons'),
               ],
             ),
           ),
@@ -98,48 +127,173 @@ class _CleanCouponsViewState extends State<CleanCouponsView>
     );
   }
 
-  AppBar _buildSimpleAppBar() {
+  PreferredSizeWidget _buildModernAppBar() {
     return AppBar(
       backgroundColor: Colors.white,
       elevation: 0,
       scrolledUnderElevation: 1,
       surfaceTintColor: Colors.transparent,
       systemOverlayStyle: SystemUiOverlayStyle.dark,
-      title: const Text(
-        'My Coupons',
-        style: TextStyle(
-          color: Color(0xFF1A202C),
-          fontSize: 20,
-          fontWeight: FontWeight.w700,
-        ),
+      title: const Row(
+        children: [
+          Icon(Icons.local_offer_outlined, color: Color(0xFF6F3FCC), size: 24),
+          SizedBox(width: 12),
+          Text(
+            'My Coupons',
+            style: TextStyle(
+              color: Color(0xFF1A202C),
+              fontSize: 24,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
       ),
       actions: [
-        IconButton(
-          icon: const Icon(
-            Icons.refresh_rounded,
-            color: Color(0xFF6F3FCC),
+        Container(
+          margin: const EdgeInsets.only(right: 8),
+          decoration: BoxDecoration(
+            color: const Color(0xFF6F3FCC).withOpacity(0.1),
+            borderRadius: BorderRadius.circular(12),
           ),
-          onPressed: () {
-            context.read<CouponManagerBloc>().add(const RefreshAllCoupons());
-          },
+          child: IconButton(
+            icon: const Icon(
+              Icons.refresh_rounded,
+              color: Color(0xFF6F3FCC),
+              size: 22,
+            ),
+            onPressed: () {
+              HapticFeedback.lightImpact();
+              context.read<CouponManagerBloc>().add(const RefreshAllCoupons());
+            },
+          ),
         ),
+        const SizedBox(width: 8),
       ],
     );
   }
 
-  Widget _buildTabBar() {
+  Widget _buildStatsSection(
+    List<UserCouponDetailModel> allCoupons,
+    List<UserCouponDetailModel> activeCoupons,
+    List<UserCouponDetailModel> usedCoupons,
+    List<UserCouponDetailModel> expiredCoupons,
+  ) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      margin: const EdgeInsets.all(20),
+      child: Row(
+        children: [
+          Expanded(
+            child: _buildStatCard(
+              '${activeCoupons.length}',
+              'Active',
+              const Color(0xFF10B981),
+              Icons.check_circle_outline,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: _buildStatCard(
+              '${usedCoupons.length}',
+              'Used',
+              const Color(0xFF6366F1),
+              Icons.history,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: _buildStatCard(
+              '${expiredCoupons.length}',
+              'Expired',
+              const Color(0xFFEF4444),
+              Icons.schedule,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: _buildStatCard(
+              '${allCoupons.length}',
+              'Total',
+              const Color(0xFF8B5CF6),
+              Icons.receipt_long,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatCard(
+    String value,
+    String label,
+    Color color,
+    IconData icon,
+  ) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, color: color, size: 20),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF1A202C),
+            ),
+          ),
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: Color(0xFF6B7280),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildModernTabBar() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+      ),
       child: TabBar(
         controller: _tabController,
-        indicatorColor: const Color(0xFF6F3FCC),
-        indicatorWeight: 2,
-        labelColor: const Color(0xFF6F3FCC),
-        unselectedLabelColor: const Color(0xFF718096),
-        labelStyle: const TextStyle(
-          fontWeight: FontWeight.w600,
-          fontSize: 14,
+        indicator: BoxDecoration(
+          color: const Color(0xFF6F3FCC),
+          borderRadius: BorderRadius.circular(8),
         ),
+        indicatorSize: TabBarIndicatorSize.tab,
+        dividerColor: Colors.transparent,
+        labelColor: Colors.white,
+        unselectedLabelColor: const Color(0xFF6B7280),
+        labelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
         unselectedLabelStyle: const TextStyle(
           fontWeight: FontWeight.w500,
           fontSize: 14,
@@ -154,51 +308,61 @@ class _CleanCouponsViewState extends State<CleanCouponsView>
     );
   }
 
-  Widget _buildCouponsList(List<UserCouponDetailModel> coupons) {
+  Widget _buildCouponsList(List<UserCouponDetailModel> coupons, String title) {
     if (coupons.isEmpty) {
-      return _buildEmptyState();
+      return _buildEmptyState(title);
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       itemCount: coupons.length,
       itemBuilder: (context, index) {
         return Padding(
-          padding: const EdgeInsets.only(bottom: 8),
-          child: ElegantCouponCard(coupon: coupons[index]),
+          padding: const EdgeInsets.only(bottom: 16),
+          child: ModernCouponCard(coupon: coupons[index]),
         );
       },
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(String title) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(40),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.receipt_long_rounded,
-              size: 64,
-              color: const Color(0xFF6F3FCC).withOpacity(0.3),
+            Container(
+              width: 120,
+              height: 120,
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: const Color(0xFF6F3FCC).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(60),
+              ),
+              child: Icon(
+                Icons.receipt_long_outlined,
+                size: 72,
+                color: const Color(0xFF6F3FCC).withOpacity(0.6),
+              ),
             ),
-            const SizedBox(height: 24),
-            const Text(
-              'No coupons found',
-              style: TextStyle(
-                fontSize: 18,
+            const SizedBox(height: 32),
+            Text(
+              'No ${title.toLowerCase()}',
+              style: const TextStyle(
+                fontSize: 20,
                 fontWeight: FontWeight.w600,
                 color: Color(0xFF1A202C),
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Your coupons will appear here',
+            Text(
+              _getEmptyStateMessage(title),
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 14,
-                color: Color(0xFF4A5568),
+              style: const TextStyle(
+                fontSize: 16,
+                color: Color(0xFF6B7280),
+                height: 1.5,
               ),
             ),
           ],
@@ -207,25 +371,48 @@ class _CleanCouponsViewState extends State<CleanCouponsView>
     );
   }
 
+  String _getEmptyStateMessage(String title) {
+    switch (title) {
+      case 'Active Coupons':
+        return 'You don\'t have any active coupons.\nCheck back later for new deals!';
+      case 'Used Coupons':
+        return 'You haven\'t used any coupons yet.\nStart saving with your active coupons!';
+      case 'Expired Coupons':
+        return 'No expired coupons.\nGreat job using your coupons on time!';
+      default:
+        return 'Your coupons will appear here.\nPull down to refresh.';
+    }
+  }
+
   Widget _buildErrorStateView(String message) {
     return Scaffold(
-      appBar: _buildSimpleAppBar(),
+      backgroundColor: const Color(0xFFFAFBFC),
+      appBar: _buildModernAppBar(),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(40),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                Icons.error_outline,
-                size: 64,
-                color: const Color(0xFFE53E3E).withOpacity(0.5),
+              Container(
+                width: 120,
+                height: 120,
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFEF4444).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(60),
+                ),
+                child: Icon(
+                  Icons.error_outline,
+                  size: 72,
+                  color: const Color(0xFFEF4444).withOpacity(0.8),
+                ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 32),
               const Text(
                 'Something went wrong',
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 20,
                   fontWeight: FontWeight.w600,
                   color: Color(0xFF1A202C),
                 ),
@@ -235,31 +422,33 @@ class _CleanCouponsViewState extends State<CleanCouponsView>
                 message,
                 textAlign: TextAlign.center,
                 style: const TextStyle(
-                  fontSize: 14,
-                  color: Color(0xFF4A5568),
+                  fontSize: 16,
+                  color: Color(0xFF6B7280),
+                  height: 1.5,
                 ),
               ),
-              const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: () {
-                  context.read<CouponManagerBloc>().add(const RefreshAllCoupons());
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF6F3FCC),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 12,
+              const SizedBox(height: 32),
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: ElevatedButton(
+                  onPressed: () {
+                    HapticFeedback.lightImpact();
+                    context.read<CouponManagerBloc>().add(
+                      const RefreshAllCoupons(),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF6F3FCC),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 0,
                   ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                child: const Text(
-                  'Try Again',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
+                  child: const Text(
+                    'Try Again',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                   ),
                 ),
               ),
@@ -276,25 +465,16 @@ class _CleanCouponsViewState extends State<CleanCouponsView>
       ...data.purchasedCoupons,
       ...data.giftedReceivedCoupons,
       ...data.usedCoupons,
+      ...data.expiredCoupons,
     ];
   }
 
   List<UserCouponDetailModel> _getActiveCoupons(UserCouponsResponseModel data) {
-    final allCoupons = _getAllCoupons(data);
-    return allCoupons.where((coupon) {
-      return coupon.status.toLowerCase() == 'active' &&
-          DateTime.now().isBefore(coupon.expiryDate);
-    }).toList();
+    // Use purchased and gifted received coupons that are active (unused and not expired)
+    return [
+      ...data.purchasedCoupons.where((coupon) => coupon.isActive),
+      ...data.giftedReceivedCoupons.where((coupon) => coupon.isActive),
+    ];
   }
 
-  List<UserCouponDetailModel> _getExpiredCoupons(
-    UserCouponsResponseModel data,
-  ) {
-    final allCoupons = _getAllCoupons(data);
-    return allCoupons.where((coupon) {
-      // Only show expired if: expired by date AND not already used
-      return DateTime.now().isAfter(coupon.expiryDate) && 
-             coupon.status.toLowerCase() != 'used';
-    }).toList();
-  }
 }

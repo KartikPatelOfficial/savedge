@@ -12,38 +12,58 @@ class CouponStatsHeader extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       color: Colors.white,
-      child: Row(
+      child: Column(
         children: [
-          Expanded(
-            child: _buildStatCard(
-              'Total',
-              couponsData.totalCount.toString(),
-              const Color(0xFF6F3FCC),
-            ),
+          // First row
+          Row(
+            children: [
+              Expanded(
+                child: _buildStatCard(
+                  'Total',
+                  couponsData.totalCount.toString(),
+                  const Color(0xFF6F3FCC),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildStatCard(
+                  'Active',
+                  couponsData.activeCount.toString(),
+                  const Color(0xFF38A169),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildStatCard(
+                  'Used',
+                  couponsData.usedCount.toString(),
+                  const Color(0xFFD69E2E),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: _buildStatCard(
-              'Active',
-              couponsData.activeCount.toString(),
-              const Color(0xFF38A169),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: _buildStatCard(
-              'Used',
-              couponsData.usedCount.toString(),
-              const Color(0xFFD69E2E),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: _buildStatCard(
-              'Gifted',
-              couponsData.giftedCount.toString(),
-              const Color(0xFF805AD5),
-            ),
+          const SizedBox(height: 12),
+          // Second row
+          Row(
+            children: [
+              Expanded(
+                child: _buildStatCard(
+                  'Expired',
+                  couponsData.expiredCount.toString(),
+                  const Color(0xFFE53E3E),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildStatCard(
+                  'Gifted',
+                  couponsData.giftedCount.toString(),
+                  const Color(0xFF805AD5),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(child: Container()), // Empty space for alignment
+            ],
           ),
         ],
       ),

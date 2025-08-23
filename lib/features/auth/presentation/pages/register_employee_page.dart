@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:savedge/features/auth/data/models/auth_models.dart';
 import 'package:savedge/features/auth/domain/repositories/auth_repository.dart';
-import 'package:savedge/features/auth/presentation/widgets/profile_auth_wrapper.dart';
 
 class RegisterEmployeePage extends StatefulWidget {
   const RegisterEmployeePage({super.key});
@@ -13,6 +12,7 @@ class RegisterEmployeePage extends StatefulWidget {
 }
 
 class _RegisterEmployeePageState extends State<RegisterEmployeePage> {
+  final _formKey = GlobalKey<FormState>();
   final _firstController = TextEditingController();
   final _lastController = TextEditingController();
   bool _saving = false;
@@ -66,116 +66,230 @@ class _RegisterEmployeePageState extends State<RegisterEmployeePage> {
     }
   }
 
+  String? _validateName(String? value, String fieldName) {
+    if (value == null || value.trim().isEmpty) {
+      return '$fieldName is required';
+    }
+    if (value.trim().length < 2) {
+      return '$fieldName must be at least 2 characters';
+    }
+    return null;
+  }
+
   Future<void> _submit() async {
     if (_saving || _employeeInfo == null) return;
 
-    final firstName = _firstController.text.trim();
-    final lastName = _lastController.text.trim();
+    FocusScope.of(context).unfocus();
 
-    if (firstName.isEmpty || lastName.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill in all fields')),
-      );
+    if (!_formKey.currentState!.validate()) {
       return;
     }
 
     setState(() => _saving = true);
+
     try {
       final firebaseUser = FirebaseAuth.instance.currentUser;
       if (firebaseUser != null) {
         await _repo.registerEmployeeUser(
-          email: _employeeInfo!.email, // Use email from employee API
-          firstName: firstName,
-          lastName: lastName,
+          email: _employeeInfo!.email,
+          firstName: _firstController.text.trim(),
+          lastName: _lastController.text.trim(),
         );
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Registration successful! Redirecting...'),
+            SnackBar(
+              content: const Row(
+                children: [
+                  Icon(Icons.check_circle_outline, color: Colors.white),
+                  SizedBox(width: 12),
+                  Text('Employee registration successful! Welcome aboard!'),
+                ],
+              ),
+              backgroundColor: const Color(0xFF10B981),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              margin: const EdgeInsets.all(20),
             ),
           );
 
-          // Trigger the ProfileAuthWrapper to recheck auth status
-          // which will detect the user is now registered and redirect to home
-          await Future.delayed(const Duration(seconds: 1));
-          ProfileAuthWrapper.recheckAuthStatus();
+          await Future.delayed(const Duration(milliseconds: 1500));
+          Navigator.of(context).pop();
         }
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Registration failed: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.error_outline, color: Colors.white),
+                const SizedBox(width: 12),
+                Expanded(child: Text('Registration failed: $e')),
+              ],
+            ),
+            backgroundColor: const Color(0xFFE53E3E),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            margin: const EdgeInsets.all(20),
+          ),
+        );
       }
     } finally {
-      if (mounted) setState(() => _saving = false);
+      if (mounted) {
+        setState(() => _saving = false);
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
-      return Scaffold(
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
         backgroundColor: Colors.white,
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF6F3FCC).withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(40),
-                ),
-                child: const Center(
-                  child: CircularProgressIndicator(color: Color(0xFF6F3FCC)),
-                ),
-              ),
-              const SizedBox(height: 24),
-              const Text(
-                'Loading employee information...',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Color(0xFF4A5568),
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
+        elevation: 0,
+        leading: Container(
+          margin: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF9FAFB),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: const Color(0xFFE2E8F0)),
+          ),
+          child: IconButton(
+            onPressed: () => Navigator.of(context).pop(),
+            icon: const Icon(
+              Icons.arrow_back,
+              color: Color(0xFF374151),
+              size: 20,
+            ),
           ),
         ),
-      );
-    }
+        title: const Text(
+          'Step 2 of 2',
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: Color(0xFF6B7280),
+          ),
+        ),
+        centerTitle: true,
+      ),
+      body: Stack(
+        children: [
+          if (_isLoading)
+            _buildLoadingView()
+          else if (_error != null)
+            _buildErrorView()
+          else
+            _buildMainContent(),
 
-    if (_error != null) {
-      return Scaffold(
-        backgroundColor: Colors.white,
-        body: Center(
+          // Loading Overlay
+          if (_saving)
+            Container(
+              color: const Color(0xFF6F3FCC).withOpacity(0.1),
+              child: const Center(
+                child: Card(
+                  elevation: 0,
+                  margin: EdgeInsets.all(40),
+                  child: Padding(
+                    padding: EdgeInsets.all(32),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        CircularProgressIndicator(
+                          color: Color(0xFF6F3FCC),
+                          strokeWidth: 3,
+                        ),
+                        SizedBox(height: 16),
+                        Text(
+                          'Creating your employee account...',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFF374151),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLoadingView() {
+    return Center(
+      child: Container(
+        color: const Color(0xFF6F3FCC).withOpacity(0.1),
+        child: const Center(
+          child: Card(
+            elevation: 0,
+            margin: EdgeInsets.all(40),
+            child: Padding(
+              padding: EdgeInsets.all(32),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircularProgressIndicator(
+                    color: Color(0xFF6F3FCC),
+                    strokeWidth: 3,
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    'Loading employee information...',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xFF374151),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildErrorView() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(40),
+        child: Card(
+          elevation: 0,
           child: Padding(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(32),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
-                  width: 100,
-                  height: 100,
+                  width: 64,
+                  height: 64,
                   decoration: BoxDecoration(
                     color: const Color(0xFFE53E3E).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(50),
+                    borderRadius: BorderRadius.circular(16),
                   ),
                   child: const Icon(
                     Icons.error_outline,
+                    size: 32,
                     color: Color(0xFFE53E3E),
-                    size: 48,
                   ),
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 24),
                 const Text(
-                  'Something went wrong',
+                  'Unable to Load Information',
                   style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w700,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
                     color: Color(0xFF1A202C),
                   ),
                 ),
@@ -185,132 +299,199 @@ class _RegisterEmployeePageState extends State<RegisterEmployeePage> {
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontSize: 16,
-                    color: Color(0xFF4A5568),
-                    height: 1.4,
+                    color: Color(0xFF6B7280),
+                    height: 1.5,
                   ),
                 ),
-                const SizedBox(height: 32),
-                ElevatedButton(
-                  onPressed: _loadEmployeeInfo,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF6F3FCC),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 32,
-                      vertical: 16,
+                const SizedBox(height: 24),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () {
+                          setState(() {
+                            _isLoading = true;
+                            _error = null;
+                          });
+                          _loadEmployeeInfo();
+                        },
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: const Color(0xFF6F3FCC),
+                          side: const BorderSide(color: Color(0xFF6F3FCC)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                        child: const Text(
+                          'Retry',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
                     ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF6F3FCC),
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                        child: const Text(
+                          'Go Back',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                  child: const Text(
-                    'Try Again',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
-                  ),
+                  ],
                 ),
               ],
             ),
           ),
         ),
-      );
-    }
-
-    if (_employeeInfo == null) {
-      return const Scaffold(
-        body: Center(child: Text('No employee information found')),
-      );
-    }
-
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text('Employee Registration'),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        scrolledUnderElevation: 0,
       ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
+    );
+  }
+
+  Widget _buildMainContent() {
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Form(
+          key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 20),
-              // Welcome text
+              // Header Section
               const Text(
-                'Welcome, Employee!',
+                'Employee Registration',
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.w700,
                   color: Color(0xFF1A202C),
+                  height: 1.2,
                 ),
               ),
               const SizedBox(height: 8),
               const Text(
-                'Complete your profile to access exclusive employee benefits.',
+                'Complete your employee profile to access exclusive features and team benefits.',
                 style: TextStyle(
                   fontSize: 16,
+                  fontWeight: FontWeight.w500,
                   color: Color(0xFF4A5568),
-                  height: 1.4,
+                  height: 1.5,
                 ),
               ),
+
               const SizedBox(height: 32),
-              // Employee Information Card
+
+              // Employee Status Badge
               Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF6F3FCC).withOpacity(0.05),
-                  borderRadius: BorderRadius.circular(16),
+                  color: const Color(0xFF10B981).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: const Color(0xFF6F3FCC).withOpacity(0.1),
-                    width: 1,
+                    color: const Color(0xFF10B981).withOpacity(0.2),
                   ),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text(
-                      'Employee Information',
+                    Icon(Icons.verified, size: 16, color: Color(0xFF10B981)),
+                    SizedBox(width: 6),
+                    Text(
+                      'Employee Verified',
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFF6F3FCC),
+                        color: Color(0xFF10B981),
                       ),
                     ),
-                    const SizedBox(height: 16),
-                    _buildInfoRow('Employee Code', _employeeInfo!.employeeCode),
-                    _buildInfoRow('Department', _employeeInfo!.department),
-                    _buildInfoRow('Position', _employeeInfo!.position),
-                    _buildInfoRow(
-                      'Organization',
-                      _employeeInfo!.organizationName,
-                    ),
-                    _buildInfoRow('Email', _employeeInfo!.email, isLast: true),
                   ],
                 ),
               ),
-              const SizedBox(height: 32),
-              // First Name Field
+
+              const SizedBox(height: 24),
+
+              // Employee Info Card
+              if (_employeeInfo != null) ...[
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF9FAFB),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: const Color(0xFFE2E8F0)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Organization Details',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF1A202C),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      _buildInfoRow(
+                        Icons.business,
+                        'Company',
+                        _employeeInfo!.organizationName,
+                      ),
+                      Container(
+                        height: 1,
+                        color: const Color(0xFFCBD5E0),
+                        margin: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                      _buildInfoRow(
+                        Icons.email_outlined,
+                        'Email',
+                        _employeeInfo!.email,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 32),
+              ],
+
+              // Form Fields
               _buildTextField(
                 controller: _firstController,
                 label: 'First Name',
                 hint: 'Enter your first name',
                 icon: Icons.person_outline,
+                validator: (value) => _validateName(value, 'First name'),
               ),
+
               const SizedBox(height: 20),
-              // Last Name Field
+
               _buildTextField(
                 controller: _lastController,
                 label: 'Last Name',
                 hint: 'Enter your last name',
                 icon: Icons.person_outline,
+                validator: (value) => _validateName(value, 'Last name'),
               ),
-              const Spacer(),
-              // Submit Button
+
+              const SizedBox(height: 40),
+
+              // Primary Button
               SizedBox(
                 width: double.infinity,
                 height: 56,
@@ -318,12 +499,14 @@ class _RegisterEmployeePageState extends State<RegisterEmployeePage> {
                   onPressed: _saving ? null : _submit,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF6F3FCC),
+                    foregroundColor: Colors.white,
                     disabledBackgroundColor: const Color(
                       0xFF6F3FCC,
                     ).withOpacity(0.6),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
+                    elevation: 0,
                   ),
                   child: _saving
                       ? const SizedBox(
@@ -339,11 +522,16 @@ class _RegisterEmployeePageState extends State<RegisterEmployeePage> {
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
-                            color: Colors.white,
                           ),
                         ),
                 ),
               ),
+
+              const SizedBox(height: 40),
+
+              // Privacy Footer
+              _buildPrivacyFooter(),
+
               const SizedBox(height: 20),
             ],
           ),
@@ -352,46 +540,12 @@ class _RegisterEmployeePageState extends State<RegisterEmployeePage> {
     );
   }
 
-  Widget _buildInfoRow(String label, String value, {bool isLast = false}) {
-    return Column(
-      children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              width: 100,
-              child: Text(
-                '$label:',
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF2D3748),
-                ),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                value,
-                style: const TextStyle(fontSize: 14, color: Color(0xFF4A5568)),
-              ),
-            ),
-          ],
-        ),
-        if (!isLast) ...[
-          const SizedBox(height: 12),
-          const Divider(color: Color(0xFF6F3FCC), thickness: 0.5),
-          const SizedBox(height: 12),
-        ],
-      ],
-    );
-  }
-
   Widget _buildTextField({
     required TextEditingController controller,
     required String label,
     required String hint,
-    IconData? icon,
+    required IconData icon,
+    String? Function(String?)? validator,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -405,33 +559,145 @@ class _RegisterEmployeePageState extends State<RegisterEmployeePage> {
           ),
         ),
         const SizedBox(height: 8),
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xFFE2E8F0), width: 1.5),
+        TextFormField(
+          controller: controller,
+          validator: validator,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: Color(0xFF1A202C),
           ),
-          child: TextField(
-            controller: controller,
-            style: const TextStyle(fontSize: 16, color: Color(0xFF1A202C)),
-            decoration: InputDecoration(
-              hintText: hint,
-              hintStyle: const TextStyle(
-                color: Color(0xFF718096),
-                fontSize: 16,
-              ),
-              prefixIcon: icon != null
-                  ? Icon(icon, color: const Color(0xFF6F3FCC), size: 22)
-                  : null,
-              border: InputBorder.none,
-              contentPadding: EdgeInsets.symmetric(
-                horizontal: icon != null ? 16 : 20,
-                vertical: 18,
-              ),
+          decoration: InputDecoration(
+            hintText: hint,
+            hintStyle: const TextStyle(
+              color: Color(0xFF9CA3AF),
+              fontSize: 16,
+              fontWeight: FontWeight.w400,
+            ),
+            prefixIcon: Icon(icon, color: const Color(0xFF6B7280), size: 20),
+            filled: true,
+            fillColor: const Color(0xFFF9FAFB),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Color(0xFFE2E8F0), width: 1),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Color(0xFFE2E8F0), width: 1),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Color(0xFF6F3FCC), width: 2),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Color(0xFFE53E3E), width: 1),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Color(0xFFE53E3E), width: 2),
+            ),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 16,
+            ),
+            errorStyle: const TextStyle(
+              color: Color(0xFFE53E3E),
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildInfoRow(IconData icon, String label, String value) {
+    return Row(
+      children: [
+        Icon(icon, size: 18, color: const Color(0xFF6B7280)),
+        const SizedBox(width: 12),
+        Text(
+          '$label: ',
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF374151),
+          ),
+        ),
+        Expanded(
+          child: Text(
+            value,
+            style: const TextStyle(fontSize: 14, color: Color(0xFF6B7280)),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPrivacyFooter() {
+    return Center(
+      child: Text.rich(
+        TextSpan(
+          text: 'By continuing, you agree to our ',
+          style: const TextStyle(
+            color: Color(0xFF6B7280),
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
+          ),
+          children: [
+            WidgetSpan(
+              child: GestureDetector(
+                onTap: () {
+                  // TODO: Open privacy policy
+                },
+                child: const Text(
+                  'Privacy Policy',
+                  style: TextStyle(
+                    color: Color(0xFF6F3FCC),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+              ),
+            ),
+            const TextSpan(
+              text: ' and ',
+              style: TextStyle(
+                color: Color(0xFF6B7280),
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+            WidgetSpan(
+              child: GestureDetector(
+                onTap: () {
+                  // TODO: Open terms of service
+                },
+                child: const Text(
+                  'Terms of Service',
+                  style: TextStyle(
+                    color: Color(0xFF6F3FCC),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+              ),
+            ),
+            const TextSpan(
+              text: '.',
+              style: TextStyle(
+                color: Color(0xFF6B7280),
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+          ],
+        ),
+        textAlign: TextAlign.center,
+      ),
     );
   }
 }
