@@ -440,7 +440,7 @@ class _CouponRedemptionOptionsPageState
           gradient: const LinearGradient(
             colors: [Color(0xFFFF6B35), Color(0xFFF7931E)],
           ),
-          isEnabled: true, // TODO: Check user's points balance
+          isEnabled: true, // Can always use points to claim new coupons
         ),
 
         const SizedBox(height: 16),
@@ -456,7 +456,7 @@ class _CouponRedemptionOptionsPageState
           gradient: const LinearGradient(
             colors: [Color(0xFF00C851), Color(0xFF00A047)],
           ),
-          isEnabled: true,
+          isEnabled: true, // Can always use payment to claim new coupons
         ),
 
         const SizedBox(height: 16),

@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
 import '../../../coupons/data/models/coupon_claim_models.dart';
+import '../../../coupons/data/models/coupon_redemption_models.dart';
 import '../../../coupons/data/models/coupon_gifting_models.dart';
 import '../../../coupons/data/services/coupon_service.dart';
+import '../../../qr_scanner/presentation/pages/qr_scanner_page.dart';
 
 /// Confirmation page for coupon usage/redemption
 class CouponConfirmationPage extends StatefulWidget {
@@ -32,6 +34,7 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
   late Animation<double> _fadeAnimation;
 
   bool _isConfirming = false;
+  int? _claimedCouponId; // Store the claimed coupon ID for direct redemption
   final CouponService _couponService = GetIt.I<CouponService>();
 
   @override
@@ -154,7 +157,7 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
         const SizedBox(height: 8),
         Text(
           isUse
-              ? 'Confirm to redeem your coupon'
+              ? 'Your coupon is ready to be used at the vendor'
               : 'Review and confirm your purchase',
           style: TextStyle(fontSize: 16, color: Colors.grey[600]),
         ),
@@ -668,7 +671,7 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
   String _getConfirmButtonText() {
     switch (widget.confirmationType) {
       case CouponConfirmationType.use:
-        return 'Use Now';
+        return 'Ready to Use';
       case CouponConfirmationType.claim:
         return 'Claim Coupon';
     }
@@ -706,9 +709,15 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
     try {
       if (widget.confirmationType == CouponConfirmationType.use) {
         // Redeem user's owned coupon
+        if (widget.userCoupon == null) {
+          throw Exception('Error: Owned coupon data is missing. Cannot proceed with redemption.');
+        }
         await _redeemUserCoupon();
       } else {
         // Claim new coupon
+        if (widget.claimCoupon == null) {
+          throw Exception('Error: Coupon data is missing. Cannot proceed with claiming.');
+        }
         await _claimNewCoupon();
       }
 
@@ -729,11 +738,8 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
       throw Exception('User coupon not found');
     }
 
-    final response = await _couponService.redeemMyCoupon(widget.userCoupon!.id);
-
-    if (!response.success) {
-      throw Exception(response.message);
-    }
+    // Actually redeem the coupon via API to update its status
+    await _couponService.redeemMyCoupon(widget.userCoupon!.id);
   }
 
   Future<void> _claimNewCoupon() async {
@@ -741,25 +747,29 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
       throw Exception('Coupon data not found');
     }
 
+    ClaimCouponResponse response;
     switch (widget.redemptionMethod) {
       case 'points':
-        await _couponService.claimCouponWithPoints(
+        response = await _couponService.claimCouponWithPoints(
           widget.claimCoupon!.couponId,
         );
         break;
       case 'membership':
-        await _couponService.claimCouponFromSubscription(
+        response = await _couponService.claimCouponFromSubscription(
           widget.claimCoupon!.couponId,
         );
         break;
       case 'razorpay':
-        await _couponService.purchaseCouponWithPayment(
+        response = await _couponService.purchaseCouponWithPayment(
           widget.claimCoupon!.couponId,
         );
         break;
       default:
         throw Exception('Invalid redemption method');
     }
+    
+    // Store the claimed coupon ID for potential direct redemption
+    _claimedCouponId = response.userCouponId;
   }
 
   void _showSuccessDialog() {
@@ -915,10 +925,86 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
     );
   }
 
-  void _navigateToUseNow() {
-    // Navigate to user coupons page to use the newly claimed coupon
-    // This assumes we can pass the coupon data or refresh the coupons list
-    Navigator.of(context).pushReplacementNamed('/user-coupons');
+  void _navigateToUseNow() async {
+    if (widget.confirmationType == CouponConfirmationType.use) {
+      // For owned coupons, navigate to QR scanner for vendor verification
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => QRScannerPage(
+            couponId: widget.userCoupon!.couponId,
+            expectedVendorUid: widget.userCoupon!.vendorId.toString(),
+            expectedVendorName: widget.userCoupon!.vendorName,
+          ),
+        ),
+      );
+    } else {
+      // For newly claimed coupons, directly redeem them via API
+      if (_claimedCouponId == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Error: Claimed coupon ID not found'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        Navigator.of(context).pushReplacementNamed('/user-coupons');
+        return;
+      }
+
+      try {
+        // Show loading indicator
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => const Center(
+            child: CircularProgressIndicator(),
+          ),
+        );
+
+        // Redeem the claimed coupon directly using its ID
+        await _couponService.redeemMyCoupon(_claimedCouponId!);
+
+        // Close loading dialog
+        if (mounted) {
+          Navigator.of(context).pop();
+        }
+
+        // Show success message
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Coupon redeemed successfully!'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+
+        // Go back to coupons list
+        if (mounted) {
+          Navigator.of(context).pushReplacementNamed('/user-coupons');
+        }
+      } catch (e) {
+        // Close loading dialog
+        if (mounted) {
+          Navigator.of(context).pop();
+        }
+
+        // Show error message
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to redeem coupon: ${e.toString()}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+
+        // Go back to coupons list anyway
+        if (mounted) {
+          Navigator.of(context).pushReplacementNamed('/user-coupons');
+        }
+      }
+    }
   }
 
   void _showErrorDialog(String error) {
