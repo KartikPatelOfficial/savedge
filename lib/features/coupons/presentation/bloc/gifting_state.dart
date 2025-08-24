@@ -61,3 +61,29 @@ class PointsHistoryLoaded extends GiftingState {
   @override
   List<Object?> get props => [history];
 }
+
+class GiftingHistoryLoaded extends GiftingState {
+  const GiftingHistoryLoaded({
+    required this.giftedCoupons,
+    required this.transferredPoints,
+  });
+
+  final List<dynamic> giftedCoupons;
+  final List<dynamic> transferredPoints;
+
+  @override
+  List<Object?> get props => [giftedCoupons, transferredPoints];
+}
+
+class ReceivedGiftsLoaded extends GiftingState {
+  const ReceivedGiftsLoaded({
+    required this.receivedCoupons,
+    required this.receivedPoints,
+  });
+
+  final List<dynamic> receivedCoupons;
+  final List<dynamic> receivedPoints;
+
+  @override
+  List<Object?> get props => [receivedCoupons, receivedPoints];
+}

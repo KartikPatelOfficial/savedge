@@ -38,3 +38,11 @@ class LoadGiftHistory extends GiftingEvent {
 class LoadPointsHistory extends GiftingEvent {
   const LoadPointsHistory();
 }
+
+class LoadGiftingHistory extends GiftingEvent {
+  const LoadGiftingHistory();
+}
+
+class LoadReceivedGifts extends GiftingEvent {
+  const LoadReceivedGifts();
+}

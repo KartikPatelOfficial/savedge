@@ -6,6 +6,7 @@ import 'package:savedge/features/auth/domain/entities/extended_user_profile.dart
 import 'package:savedge/features/user_profile/presentation/widgets/widgets.dart';
 import 'package:savedge/features/user_profile/presentation/pages/edit_profile_page.dart';
 import 'package:savedge/features/user_profile/presentation/pages/points_wallet_page.dart';
+import 'package:savedge/features/coupons/presentation/pages/gift_page.dart';
 
 /// Profile page displaying user information and account options
 class ProfilePage extends StatefulWidget {
@@ -462,6 +463,15 @@ class _ProfilePageState extends State<ProfilePage> {
                           : 'Manage your rewards',
                       onTap: _onGiftCardsTap,
                     ),
+                    // Gift to colleagues (show for employees only)
+                    if (_userProfile!.isEmployee) ...[
+                      ProfileMenuItem(
+                        icon: Icons.card_giftcard_outlined,
+                        title: 'Send & Receive Gifts',
+                        subtitle: 'Gift coupons or points to colleagues',
+                        onTap: _onSendGiftsTap,
+                      ),
+                    ],
                     if (_userProfile!.isEmployee) ...[
                       ProfileMenuItem(
                         icon: Icons.redeem,
@@ -614,6 +624,15 @@ class _ProfilePageState extends State<ProfilePage> {
   void _onGiftCardsTap() {
     debugPrint('Gift Cards tapped');
     // TODO: Navigate to gift cards/coupons
+  }
+
+  void _onSendGiftsTap() {
+    debugPrint('Send & Receive Gifts tapped');
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const GiftPage(),
+      ),
+    );
   }
 
   void _onRedemptionHistoryTap() {

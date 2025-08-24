@@ -13,6 +13,8 @@ class GiftingBloc extends Bloc<GiftingEvent, GiftingState> {
     on<TransferPoints>(_onTransferPoints);
     on<LoadGiftHistory>(_onLoadGiftHistory);
     on<LoadPointsHistory>(_onLoadPointsHistory);
+    on<LoadGiftingHistory>(_onLoadGiftingHistory);
+    on<LoadReceivedGifts>(_onLoadReceivedGifts);
   }
 
   final GiftingService _giftingService;
@@ -92,6 +94,44 @@ class GiftingBloc extends Bloc<GiftingEvent, GiftingState> {
       emit(PointsHistoryLoaded(history));
     } catch (e) {
       emit(GiftingError('Failed to load points history: ${e.toString()}'));
+    }
+  }
+
+  Future<void> _onLoadGiftingHistory(
+    LoadGiftingHistory event,
+    Emitter<GiftingState> emit,
+  ) async {
+    emit(const GiftingLoading());
+
+    try {
+      // Load both gifted coupons and transferred points history
+      final giftedCoupons = await _giftingService.getGiftedCouponsHistory();
+      final transferredPoints = await _giftingService
+          .getPointsTransferHistory();
+
+      emit(
+        GiftingHistoryLoaded(
+          giftedCoupons: [],
+          transferredPoints: transferredPoints,
+        ),
+      );
+    } catch (e) {
+      emit(GiftingError('Failed to load gifting history: ${e.toString()}'));
+    }
+  }
+
+  Future<void> _onLoadReceivedGifts(
+    LoadReceivedGifts event,
+    Emitter<GiftingState> emit,
+  ) async {
+    emit(const GiftingLoading());
+
+    try {
+      // For now, return empty lists as the backend might not have these endpoints yet
+      // These can be implemented when the backend APIs are ready
+      emit(const ReceivedGiftsLoaded(receivedCoupons: [], receivedPoints: []));
+    } catch (e) {
+      emit(GiftingError('Failed to load received gifts: ${e.toString()}'));
     }
   }
 }
