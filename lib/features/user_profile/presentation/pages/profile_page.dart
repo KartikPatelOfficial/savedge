@@ -187,32 +187,64 @@ class _ProfilePageState extends State<ProfilePage> {
 
                 // Stats Cards
                 if (_userProfile != null) ...[
-                  Row(
-                    children: [
-                      Expanded(
-                        child: ProfileStatsCard(
-                          title: 'Points Balance',
-                          value: '${_userProfile!.pointsBalance}',
-                          icon: Icons.stars_outlined,
-                          color: const Color(0xFFD69E2E),
-                          onTap: _onPointsBalanceTap,
+                  // Show subscription status in stats if user has active subscription
+                  if (_userProfile!.hasActiveSubscription) ...[
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ProfileStatsCard(
+                            title: 'Points Balance',
+                            value: '${_userProfile!.pointsBalance}',
+                            icon: Icons.stars_outlined,
+                            color: const Color(0xFFD69E2E),
+                            onTap: _onPointsBalanceTap,
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: ProfileStatsCard(
-                          title: _userProfile!.isEmployee
-                              ? 'Redemptions'
-                              : 'Orders',
-                          value: '12', // This would come from appropriate API
-                          icon: _userProfile!.isEmployee
-                              ? Icons.redeem_outlined
-                              : Icons.shopping_bag_outlined,
-                          color: const Color(0xFF38A169),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: ProfileStatsCard(
+                            title: 'Subscription',
+                            value: _userProfile!.activeSubscription!.statusDisplay,
+                            icon: Icons.star,
+                            color: _userProfile!.activeSubscription!.hasExpired
+                                ? Colors.red
+                                : _userProfile!.activeSubscription!.isExpiringSoon
+                                    ? Colors.orange
+                                    : Colors.green,
+                            onTap: _onManageSubscriptionTap,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
+                      ],
+                    ),
+                  ] else ...[
+                    // For users without subscriptions, show original layout
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ProfileStatsCard(
+                            title: 'Points Balance',
+                            value: '${_userProfile!.pointsBalance}',
+                            icon: Icons.stars_outlined,
+                            color: const Color(0xFFD69E2E),
+                            onTap: _onPointsBalanceTap,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: ProfileStatsCard(
+                            title: _userProfile!.isEmployee
+                                ? 'Redemptions'
+                                : 'Orders',
+                            value: '12', // This would come from appropriate API
+                            icon: _userProfile!.isEmployee
+                                ? Icons.redeem_outlined
+                                : Icons.shopping_bag_outlined,
+                            color: const Color(0xFF38A169),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
 
                   // Employee-specific stats (only show for employees)
                   if (_userProfile!.isEmployee &&
@@ -352,8 +384,9 @@ class _ProfilePageState extends State<ProfilePage> {
 
                 const SizedBox(height: 20),
 
-                // Subscription Status Card (show for non-employees only)
-                if (_userProfile != null && !_userProfile!.isEmployee) ...[
+
+                // Subscription Status Card (show for all users who have subscriptions)
+                if (_userProfile != null && _userProfile!.activeSubscription != null) ...[
                   SubscriptionStatusCard(
                     activeSubscription: _userProfile!.activeSubscription,
                     onManageSubscriptionTap: _onManageSubscriptionTap,
@@ -373,19 +406,20 @@ class _ProfilePageState extends State<ProfilePage> {
                           : 'Update your personal information',
                       onTap: _onEditProfileTap,
                     ),
+                    // Show subscription menu for all users (employees and non-employees)
+                    ProfileMenuItem(
+                      icon: Icons.card_membership,
+                      title: _userProfile!.hasActiveSubscription
+                          ? 'Manage Subscription'
+                          : 'Get Premium',
+                      subtitle: _userProfile!.hasActiveSubscription
+                          ? 'Manage your subscription plan'
+                          : 'Unlock premium features',
+                      onTap: _userProfile!.hasActiveSubscription
+                          ? _onManageSubscriptionTap
+                          : _onUpgradeSubscriptionTap,
+                    ),
                     if (!_userProfile!.isEmployee) ...[
-                      ProfileMenuItem(
-                        icon: Icons.card_membership,
-                        title: _userProfile!.hasActiveSubscription
-                            ? 'Manage Subscription'
-                            : 'Get Premium',
-                        subtitle: _userProfile!.hasActiveSubscription
-                            ? 'Manage your subscription plan'
-                            : 'Unlock premium features',
-                        onTap: _userProfile!.hasActiveSubscription
-                            ? _onManageSubscriptionTap
-                            : _onUpgradeSubscriptionTap,
-                      ),
                       ProfileMenuItem(
                         icon: Icons.security,
                         title: 'Privacy & Security',

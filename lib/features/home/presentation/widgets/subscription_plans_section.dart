@@ -1,16 +1,76 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:get_it/get_it.dart';
 import 'package:savedge/core/injection/injection.dart';
+import 'package:savedge/features/auth/domain/repositories/auth_repository.dart';
+import 'package:savedge/features/auth/domain/entities/extended_user_profile.dart';
 import 'package:savedge/features/subscription/domain/entities/subscription_plan.dart';
 import 'package:savedge/features/subscription/presentation/bloc/subscription_plan_bloc.dart';
 import 'package:savedge/features/subscription/presentation/pages/subscription_purchase_page.dart';
 
 /// Widget to display subscription plans fetched from API with BLoC
-class SubscriptionPlansSection extends StatelessWidget {
+/// Automatically hides for users with active subscriptions
+class SubscriptionPlansSection extends StatefulWidget {
   const SubscriptionPlansSection({super.key});
 
   @override
+  State<SubscriptionPlansSection> createState() => _SubscriptionPlansSectionState();
+}
+
+class _SubscriptionPlansSectionState extends State<SubscriptionPlansSection> {
+  bool _isLoading = true;
+  bool _hasActiveSubscription = false;
+  String? _error;
+
+  AuthRepository get _authRepository => GetIt.I<AuthRepository>();
+
+  @override
+  void initState() {
+    super.initState();
+    _checkSubscriptionStatus();
+  }
+
+  Future<void> _checkSubscriptionStatus() async {
+    try {
+      setState(() => _isLoading = true);
+
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        setState(() {
+          _isLoading = false;
+          _hasActiveSubscription = false;
+        });
+        return;
+      }
+
+      final profile = await _authRepository.getUserProfileExtended();
+      setState(() {
+        _hasActiveSubscription = profile.hasActiveSubscription;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _error = e.toString();
+        _isLoading = false;
+        _hasActiveSubscription = false;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    // Show loading while checking subscription status
+    if (_isLoading) {
+      return const SizedBox.shrink();
+    }
+
+    // Hide subscription plans if user has an active subscription
+    if (_hasActiveSubscription) {
+      return const SizedBox.shrink();
+    }
+
+    // Show subscription plans for users without active subscriptions
     return BlocProvider(
       create: (_) =>
           getIt<SubscriptionPlanBloc>()..add(const LoadSubscriptionPlans()),

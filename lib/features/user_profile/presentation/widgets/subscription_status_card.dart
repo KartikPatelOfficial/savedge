@@ -309,35 +309,7 @@ class SubscriptionStatusCard extends StatelessWidget {
                     child: const Text('Renew Subscription'),
                   ),
                 ),
-              ] else ...[
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: onManageSubscriptionTap,
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: const Text('Manage'),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: onUpgradeTap,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF6F3FCC),
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: const Text('Upgrade'),
-                  ),
-                ),
-              ],
+              ]
             ],
           ),
         ],
