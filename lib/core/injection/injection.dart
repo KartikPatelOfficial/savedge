@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 import 'package:savedge/core/constants/app_constants.dart';
@@ -26,9 +25,16 @@ import 'package:savedge/features/auth/data/repositories/auth_repository_impl.dar
 import 'package:savedge/features/auth/domain/repositories/auth_repository.dart';
 import 'package:savedge/features/auth/domain/usecases/get_profile_usecase.dart';
 import 'package:savedge/features/auth/domain/usecases/sync_user_usecase.dart';
-import 'package:savedge/features/auth/presentation/bloc/phone_auth_cubit.dart';
 import 'package:savedge/features/auth/presentation/bloc/auth_status_cubit.dart';
-import 'package:savedge/core/network/auth_token_interceptor.dart';
+// New OTP Auth imports
+import 'package:savedge/features/auth/data/datasources/otp_auth_remote_data_source.dart';
+import 'package:savedge/features/auth/data/repositories/otp_auth_repository_impl.dart';
+import 'package:savedge/features/auth/domain/repositories/otp_auth_repository.dart';
+import 'package:savedge/features/auth/domain/usecases/send_otp_usecase.dart';
+import 'package:savedge/features/auth/domain/usecases/verify_otp_usecase.dart';
+import 'package:savedge/features/auth/domain/usecases/register_individual_usecase.dart';
+import 'package:savedge/features/auth/presentation/bloc/otp_auth_cubit.dart';
+import 'package:savedge/core/network/jwt_token_interceptor.dart';
 // Subscription imports
 import 'package:savedge/features/subscription/data/datasources/subscription_plan_remote_data_source.dart';
 import 'package:savedge/features/subscription/data/repositories/subscription_plan_repository_impl.dart';
@@ -71,8 +77,6 @@ Future<void> configureDependencies() async {
   final sharedPreferences = await SharedPreferences.getInstance();
   getIt.registerSingleton<SharedPreferences>(sharedPreferences);
 
-  // Firebase Auth
-  getIt.registerSingleton<FirebaseAuth>(FirebaseAuth.instance);
 
   // Dio HTTP client
   getIt.registerSingleton<Dio>(_createDio());
@@ -92,6 +96,23 @@ Future<void> configureDependencies() async {
   );
   getIt.registerSingleton<SyncUserUseCase>(
     SyncUserUseCase(getIt<AuthRepository>()),
+  );
+
+  // New OTP Auth layer
+  getIt.registerSingleton<OtpAuthRemoteDataSource>(
+    OtpAuthRemoteDataSource(getIt<Dio>()),
+  );
+  getIt.registerSingleton<OtpAuthRepository>(
+    OtpAuthRepositoryImpl(getIt<OtpAuthRemoteDataSource>()),
+  );
+  getIt.registerSingleton<SendOtpUseCase>(
+    SendOtpUseCase(getIt<OtpAuthRepository>()),
+  );
+  getIt.registerSingleton<VerifyOtpUseCase>(
+    VerifyOtpUseCase(getIt<OtpAuthRepository>()),
+  );
+  getIt.registerSingleton<RegisterIndividualUseCase>(
+    RegisterIndividualUseCase(getIt<OtpAuthRepository>()),
   );
 
   getIt.registerSingleton<VendorsRemoteDataSource>(
@@ -316,13 +337,11 @@ Future<void> configureDependencies() async {
   getIt.registerSingleton<GiftingService>(GiftingService(getIt<Dio>()));
 
   // Auth cubits
-  getIt.registerFactory<PhoneAuthCubit>(
-    () => PhoneAuthCubit(getIt<FirebaseAuth>()),
-  );
-  getIt.registerFactory<AuthStatusCubit>(
-    () => AuthStatusCubit(
-      firebaseAuth: getIt<FirebaseAuth>(),
-      syncUserUseCase: getIt<SyncUserUseCase>(),
+  getIt.registerFactory<OtpAuthCubit>(
+    () => OtpAuthCubit(
+      getIt<SendOtpUseCase>(),
+      getIt<VerifyOtpUseCase>(),
+      getIt<RegisterIndividualUseCase>(),
     ),
   );
 }
@@ -362,8 +381,8 @@ Dio _createDio() {
     );
   }
 
-  // Auth token interceptor
-  dio.interceptors.add(AuthTokenInterceptor(FirebaseAuth.instance));
+  // JWT token interceptor for OTP-based authentication
+  dio.interceptors.add(JwtTokenInterceptor());
 
   return dio;
 }

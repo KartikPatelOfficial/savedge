@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import 'package:savedge/core/injection/injection.dart';
+import 'package:savedge/core/network/image_cache_manager.dart';
 import 'package:savedge/features/vendors/domain/entities/vendor.dart';
 import 'package:savedge/features/vendors/presentation/bloc/vendors_bloc.dart';
 import 'package:savedge/features/vendors/presentation/bloc/vendors_event.dart';
@@ -255,35 +257,69 @@ class _DealBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        image: vendor.primaryImageUrl != null
-            ? DecorationImage(
-                image: NetworkImage(vendor.primaryImageUrl!),
-                fit: BoxFit.cover,
-                onError: (error, stackTrace) {},
-              )
-            : null,
-        gradient: vendor.primaryImageUrl == null
-            ? LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Colors.brown[300]!.withOpacity(0.8),
-                  Colors.brown[600]!.withOpacity(0.8),
-                ],
-              )
-            : null,
+    if (vendor.primaryImageUrl == null) {
+      return Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Colors.brown[300]!.withOpacity(0.8),
+              Colors.brown[600]!.withOpacity(0.8),
+            ],
+          ),
+        ),
+        child: Center(
+          child: Icon(
+            Icons.restaurant,
+            size: 60,
+            color: Colors.white.withOpacity(0.3),
+          ),
+        ),
+      );
+    }
+
+    return CachedNetworkImage(
+      imageUrl: vendor.primaryImageUrl!,
+      cacheManager: CustomImageCacheManager(),
+      fit: BoxFit.cover,
+      placeholder: (context, url) => Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Colors.brown[300]!.withOpacity(0.8),
+              Colors.brown[600]!.withOpacity(0.8),
+            ],
+          ),
+        ),
+        child: const Center(
+          child: CircularProgressIndicator(
+            color: Colors.white,
+            strokeWidth: 2,
+          ),
+        ),
       ),
-      child: vendor.primaryImageUrl == null
-          ? Center(
-              child: Icon(
-                Icons.restaurant,
-                size: 60,
-                color: Colors.white.withOpacity(0.3),
-              ),
-            )
-          : null,
+      errorWidget: (context, url, error) => Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Colors.brown[300]!.withOpacity(0.8),
+              Colors.brown[600]!.withOpacity(0.8),
+            ],
+          ),
+        ),
+        child: Center(
+          child: Icon(
+            Icons.restaurant,
+            size: 60,
+            color: Colors.white.withOpacity(0.3),
+          ),
+        ),
+      ),
     );
   }
 }

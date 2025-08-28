@@ -42,7 +42,4 @@ class AppConstants {
   /// Cache keys
   static const String userCacheKey = 'CACHED_USER';
 
-  /// Firebase collections
-  static const String usersCollection = 'users';
-  static const String organizationsCollection = 'organizations';
 }

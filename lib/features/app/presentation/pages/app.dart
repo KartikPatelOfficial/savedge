@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:savedge/core/injection/injection.dart';
 import 'package:savedge/core/themes/app_theme.dart';
-import 'package:savedge/features/auth/presentation/bloc/phone_auth_cubit.dart';
-import 'package:savedge/features/auth/presentation/widgets/profile_auth_wrapper.dart';
+import 'package:savedge/features/auth/presentation/pages/phone_verification_page.dart';
 import 'package:savedge/features/brand_vouchers/presentation/pages/voucher_purchase_page.dart';
 import 'package:savedge/features/brand_vouchers/presentation/pages/voucher_orders_page.dart';
 import 'package:savedge/features/brand_vouchers/domain/entities/brand_voucher_entity.dart';
@@ -14,21 +13,24 @@ class SavedgeApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => getIt<PhoneAuthCubit>(),
-      child: MaterialApp(
-        title: 'Savedge',
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.lightTheme,
-        themeMode: ThemeMode.light,
-        home: ProfileAuthWrapper(key: ProfileAuthWrapper.globalKey),
-        onGenerateRoute: _generateRoute,
-      ),
+    return MaterialApp(
+      title: 'Savedge',
+      debugShowCheckedModeBanner: false,
+      theme: AppTheme.lightTheme,
+      themeMode: ThemeMode.light,
+      home: const PhoneVerificationPage(),
+      onGenerateRoute: _generateRoute,
     );
   }
 
   static Route<dynamic> _generateRoute(RouteSettings settings) {
     switch (settings.name) {
+      case '/home':
+        return MaterialPageRoute(
+          builder: (_) => const Scaffold(
+            body: Center(child: Text('Main App - Coming Soon')),
+          ),
+        );
       case '/voucher-purchase':
         final voucher = settings.arguments as BrandVoucherEntity;
         return MaterialPageRoute(
