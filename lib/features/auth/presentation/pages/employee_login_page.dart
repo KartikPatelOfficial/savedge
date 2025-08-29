@@ -1,4 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:savedge/core/injection/injection.dart';
+import 'package:savedge/core/storage/secure_storage_service.dart';
 import 'package:savedge/features/auth/data/models/otp_auth_models.dart';
 
 class EmployeeLoginPage extends StatelessWidget {
@@ -15,12 +19,29 @@ class EmployeeLoginPage extends StatelessWidget {
     required this.expiresAt,
   });
 
-  void _continueToApp(BuildContext context) {
-    // TODO: Save employee auth tokens to secure storage
-    Navigator.of(context).pushNamedAndRemoveUntil(
-      '/home',
-      (route) => false,
-    );
+  Future<void> _continueToApp(BuildContext context) async {
+    try {
+      final secureStorage = getIt<SecureStorageService>();
+
+      // Save tokens
+      await secureStorage.saveTokens(
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+        expiresAt: expiresAt,
+      );
+
+      // Save employee data
+      await secureStorage.saveUserId(employee.id.toString());
+      await secureStorage.saveUserData(jsonEncode(employee.toJson()));
+
+      debugPrint('Employee auth tokens and data saved successfully');
+
+      Navigator.of(context).pushNamedAndRemoveUntil('/home', (route) => false);
+    } catch (e) {
+      debugPrint('Error saving employee auth tokens: $e');
+      // Still navigate even if saving fails
+      Navigator.of(context).pushNamedAndRemoveUntil('/home', (route) => false);
+    }
   }
 
   @override
@@ -42,11 +63,7 @@ class EmployeeLoginPage extends StatelessWidget {
                   color: const Color(0xFF10B981),
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: const Icon(
-                  Icons.check,
-                  color: Colors.white,
-                  size: 40,
-                ),
+                child: const Icon(Icons.check, color: Colors.white, size: 40),
               ),
 
               const SizedBox(height: 32),
@@ -84,113 +101,125 @@ class EmployeeLoginPage extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: const Color(0xFFF9FAFB),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: const Color(0xFFE5E7EB),
-                    width: 1,
-                  ),
+                  border: Border.all(color: const Color(0xFFE5E7EB), width: 1),
                 ),
-                child: Column(
-                  children: [
-                    // Organization Logo/Name
-                    if (employee.organization.logoUrl != null)
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Image.network(
-                          employee.organization.logoUrl!,
-                          width: 60,
-                          height: 60,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) =>
-                              _buildOrganizationPlaceholder(),
-                        ),
-                      )
-                    else
-                      _buildOrganizationPlaceholder(),
-
-                    const SizedBox(height: 16),
-
-                    Text(
-                      employee.organization.name,
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF111827),
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    // Employee Information
-                    _buildInfoRow('Name', '${employee.firstName} ${employee.lastName}'),
-                    _buildInfoRow('Employee ID', employee.employeeId),
-                    _buildInfoRow('Department', employee.department.isNotEmpty ? employee.department : 'N/A'),
-                    _buildInfoRow('Position', employee.position.isNotEmpty ? employee.position : 'N/A'),
-                    _buildInfoRow('Phone', employee.phoneNumber),
-                    _buildInfoRow('Email', employee.email),
-
-                    const SizedBox(height: 16),
-
-                    // Points Balance
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF6F3FCC), Color(0xFF8B5FE6)],
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                        ),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Column(
-                        children: [
-                          const Text(
-                            'Available Points',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.white70,
-                              fontWeight: FontWeight.w500,
-                            ),
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      // Organization Logo/Name
+                      if (employee.organization.logoUrl != null)
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.network(
+                            employee.organization.logoUrl!,
+                            width: 60,
+                            height: 60,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) =>
+                                _buildOrganizationPlaceholder(),
                           ),
-                          const SizedBox(height: 4),
-                          Text(
-                            employee.availablePoints.toStringAsFixed(0),
-                            style: const TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                        )
+                      else
+                        _buildOrganizationPlaceholder(),
 
-                    // Status Badge
-                    const SizedBox(height: 16),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: employee.isActive
-                            ? const Color(0xFF10B981).withOpacity(0.1)
-                            : const Color(0xFFDC2626).withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        employee.isActive ? 'Active' : 'Inactive',
-                        style: TextStyle(
-                          fontSize: 12,
+                      const SizedBox(height: 16),
+
+                      Text(
+                        employee.organization.name,
+                        style: const TextStyle(
+                          fontSize: 20,
                           fontWeight: FontWeight.w600,
-                          color: employee.isActive
-                              ? const Color(0xFF10B981)
-                              : const Color(0xFFDC2626),
+                          color: Color(0xFF111827),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      // Employee Information
+                      _buildInfoRow(
+                        'Name',
+                        '${employee.firstName} ${employee.lastName}',
+                      ),
+                      _buildInfoRow('Employee ID', employee.employeeId),
+                      _buildInfoRow(
+                        'Department',
+                        employee.department.isNotEmpty
+                            ? employee.department
+                            : 'N/A',
+                      ),
+                      _buildInfoRow(
+                        'Position',
+                        employee.position.isNotEmpty
+                            ? employee.position
+                            : 'N/A',
+                      ),
+                      _buildInfoRow('Phone', employee.phoneNumber),
+                      _buildInfoRow('Email', employee.email),
+
+                      const SizedBox(height: 16),
+
+                      // Points Balance
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFF6F3FCC), Color(0xFF8B5FE6)],
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Column(
+                          children: [
+                            const Text(
+                              'Available Points',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.white70,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              employee.availablePoints.toStringAsFixed(0),
+                              style: const TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ),
-                  ],
+
+                      // Status Badge
+                      const SizedBox(height: 16),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: employee.isActive
+                              ? const Color(0xFF10B981).withOpacity(0.1)
+                              : const Color(0xFFDC2626).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          employee.isActive ? 'Active' : 'Inactive',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: employee.isActive
+                                ? const Color(0xFF10B981)
+                                : const Color(0xFFDC2626),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
 
@@ -213,10 +242,7 @@ class EmployeeLoginPage extends StatelessWidget {
                   ),
                   child: const Text(
                     'Continue to App',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                   ),
                 ),
               ),
@@ -251,11 +277,7 @@ class EmployeeLoginPage extends StatelessWidget {
         color: const Color(0xFF6F3FCC).withOpacity(0.1),
         borderRadius: BorderRadius.circular(8),
       ),
-      child: const Icon(
-        Icons.business,
-        color: Color(0xFF6F3FCC),
-        size: 30,
-      ),
+      child: const Icon(Icons.business, color: Color(0xFF6F3FCC), size: 30),
     );
   }
 

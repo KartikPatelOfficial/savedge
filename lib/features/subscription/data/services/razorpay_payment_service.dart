@@ -1,8 +1,8 @@
-import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:savedge/core/network/network_client.dart';
+import 'package:savedge/core/storage/secure_storage_service.dart';
 import 'package:savedge/features/auth/domain/repositories/auth_repository.dart';
 
 /// Service class to handle Razorpay payment integration for subscriptions
@@ -12,7 +12,10 @@ class RazorpayPaymentService {
   Function(String)? _onPaymentError;
 
   HttpClient get _httpClient => GetIt.I<HttpClient>();
+
   AuthRepository get _authRepository => GetIt.I<AuthRepository>();
+
+  SecureStorageService get _secureStorage => GetIt.I<SecureStorageService>();
 
   /// Initialize Razorpay
   void initialize() {
@@ -200,13 +203,8 @@ class RazorpayPaymentService {
     try {
       final profile = await _authRepository.getUserProfileExtended();
 
-      // Get phone number from Firebase user if available
-      String phoneNumber = '';
-      final firebaseUser = FirebaseAuth.instance.currentUser;
-      if (firebaseUser?.phoneNumber != null) {
-        phoneNumber = firebaseUser!.phoneNumber!;
-        print('RazorpayPaymentService: Using Firebase phone: $phoneNumber');
-      }
+      // Get phone number from user profile if available
+      String phoneNumber = profile.phoneNumber ?? '';
 
       return {
         'name': '${profile.firstName ?? ''} ${profile.lastName ?? ''}'.trim(),

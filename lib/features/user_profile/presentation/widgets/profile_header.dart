@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:savedge/features/auth/domain/entities/extended_user_profile.dart';
 
 /// Profile header widget displaying user avatar and basic info
 class ProfileHeader extends StatelessWidget {
-  const ProfileHeader({super.key, this.userProfile, this.user, this.onEditTap});
+  const ProfileHeader({super.key, this.userProfile, this.onEditTap});
 
   final ExtendedUserProfile? userProfile;
-  final User? user;
   final VoidCallback? onEditTap;
 
   @override
@@ -36,16 +34,11 @@ class ProfileHeader extends StatelessWidget {
                   CircleAvatar(
                     radius: 40,
                     backgroundColor: const Color(0xFF6F3FCC).withOpacity(0.1),
-                    backgroundImage: user?.photoURL != null
-                        ? NetworkImage(user!.photoURL!)
-                        : null,
-                    child: user?.photoURL == null
-                        ? Icon(
-                            Icons.person,
-                            size: 40,
-                            color: const Color(0xFF6F3FCC),
-                          )
-                        : null,
+                    child: Icon(
+                      Icons.person,
+                      size: 40,
+                      color: const Color(0xFF6F3FCC),
+                    ),
                   ),
                   Positioned(
                     bottom: 0,
@@ -90,9 +83,9 @@ class ProfileHeader extends StatelessWidget {
                           ),
                     ),
                     const SizedBox(height: 4),
-                    if (userProfile?.email != null || user?.email != null)
+                    if (userProfile?.email != null)
                       Text(
-                        userProfile?.email ?? user!.email!,
+                        userProfile!.email!,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Colors.grey[600],
                         ),
@@ -181,10 +174,6 @@ class ProfileHeader extends StatelessWidget {
       if (firstName.isNotEmpty || lastName.isNotEmpty) {
         return '$firstName $lastName'.trim();
       }
-    }
-
-    if (user?.displayName?.isNotEmpty == true) {
-      return user!.displayName!;
     }
 
     return 'User';

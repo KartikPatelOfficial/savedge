@@ -7,7 +7,7 @@ class ExtendedUserProfile {
     required this.email,
     this.firstName,
     this.lastName,
-    this.firebaseUid,
+    this.phoneNumber,
     this.organizationId,
     this.organizationName,
     required this.pointsBalance,
@@ -27,7 +27,7 @@ class ExtendedUserProfile {
   final String email;
   final String? firstName;
   final String? lastName;
-  final String? firebaseUid;
+  final String? phoneNumber;
   final int? organizationId;
   final String? organizationName;
   final int pointsBalance;

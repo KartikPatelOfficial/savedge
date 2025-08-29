@@ -25,7 +25,6 @@ import 'package:savedge/features/auth/data/repositories/auth_repository_impl.dar
 import 'package:savedge/features/auth/domain/repositories/auth_repository.dart';
 import 'package:savedge/features/auth/domain/usecases/get_profile_usecase.dart';
 import 'package:savedge/features/auth/domain/usecases/sync_user_usecase.dart';
-import 'package:savedge/features/auth/presentation/bloc/auth_status_cubit.dart';
 // New OTP Auth imports
 import 'package:savedge/features/auth/data/datasources/otp_auth_remote_data_source.dart';
 import 'package:savedge/features/auth/data/repositories/otp_auth_repository_impl.dart';
@@ -69,6 +68,7 @@ import 'package:savedge/features/brand_vouchers/domain/usecases/get_brand_vouche
 import 'package:savedge/features/brand_vouchers/domain/usecases/create_voucher_order_usecase.dart';
 import 'package:savedge/features/brand_vouchers/domain/usecases/get_voucher_orders_usecase.dart';
 import 'package:savedge/features/brand_vouchers/presentation/bloc/brand_vouchers_bloc.dart';
+import 'package:savedge/core/storage/secure_storage_service.dart';
 
 final GetIt getIt = GetIt.instance;
 
@@ -77,6 +77,8 @@ Future<void> configureDependencies() async {
   final sharedPreferences = await SharedPreferences.getInstance();
   getIt.registerSingleton<SharedPreferences>(sharedPreferences);
 
+  // Secure storage service
+  getIt.registerSingleton<SecureStorageService>(SecureStorageService());
 
   // Dio HTTP client
   getIt.registerSingleton<Dio>(_createDio());

@@ -1,6 +1,7 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
+import 'package:savedge/core/storage/secure_storage_service.dart';
 import 'package:savedge/features/auth/domain/repositories/auth_repository.dart';
 import 'package:savedge/features/auth/domain/entities/extended_user_profile.dart';
 import 'package:savedge/features/user_profile/presentation/widgets/widgets.dart';
@@ -22,6 +23,7 @@ class _ProfilePageState extends State<ProfilePage> {
   String? _error;
 
   AuthRepository get _authRepository => GetIt.I<AuthRepository>();
+  SecureStorageService get _secureStorage => GetIt.I<SecureStorageService>();
 
   @override
   void initState() {
@@ -33,13 +35,47 @@ class _ProfilePageState extends State<ProfilePage> {
     try {
       setState(() => _isLoading = true);
 
-      final user = FirebaseAuth.instance.currentUser;
-      if (user == null) {
+      // Check if user is authenticated
+      final isAuthenticated = await _secureStorage.isAuthenticated();
+      if (!isAuthenticated) {
         throw Exception('No authenticated user found');
       }
 
-      final profile = await _authRepository.getUserProfileExtended();
-      setState(() => _userProfile = profile);
+      // Try to get user data from secure storage first
+      final userData = await _secureStorage.getUserData();
+      if (userData != null) {
+        // For now, create a basic profile from stored data
+        // In a full implementation, you would have a proper user profile model
+        try {
+          final userJson = jsonDecode(userData);
+          // Create a basic ExtendedUserProfile from stored data
+          // This is a simplified implementation
+          setState(() {
+            _userProfile = ExtendedUserProfile(
+              id: userJson['id']?.toString() ?? '',
+              email: userJson['email'] ?? '',
+              firstName: userJson['firstName'],
+              lastName: userJson['lastName'],
+              phoneNumber: userJson['phoneNumber'],
+              pointsBalance: userJson['pointsBalance'] ?? 0,
+              isActive: userJson['isActive'] ?? true,
+              createdAt: DateTime.parse(userJson['createdAt'] ?? DateTime.now().toIso8601String()),
+              roles: List<String>.from(userJson['roles'] ?? ['Individual']),
+              isEmployee: userJson['isEmployee'] ?? false,
+              organizationName: userJson['organizationName'],
+            );
+          });
+        } catch (e) {
+          debugPrint('Error parsing user data: $e');
+          // Fallback to API call
+          final profile = await _authRepository.getUserProfileExtended();
+          setState(() => _userProfile = profile);
+        }
+      } else {
+        // Fallback to API call if no stored data
+        final profile = await _authRepository.getUserProfileExtended();
+        setState(() => _userProfile = profile);
+      }
     } catch (e) {
       setState(() => _error = e.toString());
     } finally {
@@ -129,8 +165,6 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget _buildProfileView() {
-    final user = FirebaseAuth.instance.currentUser;
-
     return CustomScrollView(
       slivers: [
         // Custom App Bar
@@ -180,7 +214,6 @@ class _ProfilePageState extends State<ProfilePage> {
                 // Profile Header
                 ProfileHeader(
                   userProfile: _userProfile,
-                  user: user,
                   onEditTap: _onEditProfileTap,
                 ),
 
@@ -708,8 +741,14 @@ class _ProfilePageState extends State<ProfilePage> {
             onPressed: () async {
               Navigator.of(context).pop();
               try {
-                await FirebaseAuth.instance.signOut();
-                // Navigation will be handled by ProfileAuthWrapper
+                await _secureStorage.clearAll();
+                // Navigate back to authentication flow
+                if (mounted) {
+                  Navigator.of(context).pushNamedAndRemoveUntil(
+                    '/',
+                    (route) => false,
+                  );
+                }
               } catch (e) {
                 if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(

@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
 import 'package:savedge/core/injection/injection.dart';
+import 'package:savedge/core/storage/secure_storage_service.dart';
 import 'package:savedge/features/auth/domain/repositories/auth_repository.dart';
-import 'package:savedge/features/auth/domain/entities/extended_user_profile.dart';
 import 'package:savedge/features/subscription/domain/entities/subscription_plan.dart';
 import 'package:savedge/features/subscription/presentation/bloc/subscription_plan_bloc.dart';
 import 'package:savedge/features/subscription/presentation/pages/subscription_purchase_page.dart';
@@ -15,7 +14,8 @@ class SubscriptionPlansSection extends StatefulWidget {
   const SubscriptionPlansSection({super.key});
 
   @override
-  State<SubscriptionPlansSection> createState() => _SubscriptionPlansSectionState();
+  State<SubscriptionPlansSection> createState() =>
+      _SubscriptionPlansSectionState();
 }
 
 class _SubscriptionPlansSectionState extends State<SubscriptionPlansSection> {
@@ -35,8 +35,10 @@ class _SubscriptionPlansSectionState extends State<SubscriptionPlansSection> {
     try {
       setState(() => _isLoading = true);
 
-      final user = FirebaseAuth.instance.currentUser;
-      if (user == null) {
+      // Check if user is authenticated via secure storage
+      final secureStorage = getIt<SecureStorageService>();
+      final isAuthenticated = await secureStorage.isAuthenticated();
+      if (!isAuthenticated) {
         setState(() {
           _isLoading = false;
           _hasActiveSubscription = false;

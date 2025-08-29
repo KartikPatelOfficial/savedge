@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pinput/pinput.dart';
+import 'dart:convert';
 import 'package:savedge/core/injection/injection.dart';
+import 'package:savedge/core/storage/secure_storage_service.dart';
 import 'package:savedge/features/auth/presentation/bloc/otp_auth_cubit.dart';
 import 'package:savedge/features/auth/presentation/pages/individual_signup_page.dart';
 import 'package:savedge/features/auth/presentation/pages/employee_login_page.dart';
@@ -37,9 +39,7 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => getIt<OtpAuthCubit>(),
-      child: BlocConsumer<OtpAuthCubit, OtpAuthState>(
+    return BlocConsumer<OtpAuthCubit, OtpAuthState>(
         listener: (context, state) {
           if (state is OtpAuthNewUser) {
             Navigator.pushReplacement(
@@ -52,7 +52,12 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
             );
           } else if (state is OtpAuthIndividualUserAuthenticated) {
             // Store auth tokens and navigate to home
-            // TODO: Save tokens to secure storage
+            _saveAuthTokens(
+              accessToken: state.accessToken,
+              refreshToken: state.refreshToken,
+              expiresAt: state.expiresAt,
+              user: state.user,
+            );
             Navigator.of(context).pushNamedAndRemoveUntil(
               '/home',
               (route) => false,
@@ -308,7 +313,36 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
             ),
           );
         },
-      ),
     );
+  }
+
+  Future<void> _saveAuthTokens({
+    required String accessToken,
+    required String refreshToken,
+    required DateTime expiresAt,
+    required dynamic user,
+  }) async {
+    try {
+      final secureStorage = getIt<SecureStorageService>();
+      
+      // Save tokens
+      await secureStorage.saveTokens(
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+        expiresAt: expiresAt,
+      );
+
+      // Save user data
+      if (user.id != null) {
+        await secureStorage.saveUserId(user.id.toString());
+      }
+      
+      // Save full user data as JSON
+      await secureStorage.saveUserData(jsonEncode(user.toJson()));
+      
+      debugPrint('Auth tokens and user data saved successfully');
+    } catch (e) {
+      debugPrint('Error saving auth tokens: $e');
+    }
   }
 }
