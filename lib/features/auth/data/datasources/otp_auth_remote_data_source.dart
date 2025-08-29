@@ -9,13 +9,13 @@ abstract class OtpAuthRemoteDataSource {
   factory OtpAuthRemoteDataSource(Dio dio, {String baseUrl}) =
       _OtpAuthRemoteDataSource;
 
-  @POST('/api/user-auth/send-otp')
+  @POST('/api/auth/user-auth/send-otp')
   Future<OtpResponse> sendOtp(@Body() SendOtpRequest request);
 
-  @POST('/api/user-auth/verify-otp')
+  @POST('/api/auth/user-auth/verify-otp')
   Future<UserVerificationResponse> verifyOtp(@Body() VerifyOtpRequest request);
 
-  @POST('/api/user-auth/register-individual')
+  @POST('/api/auth/user-auth/register-individual')
   Future<IndividualRegistrationResponse> registerIndividual(
     @Body() RegisterIndividualRequest request,
   );

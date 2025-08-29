@@ -1,6 +1,7 @@
 import 'package:savedge/features/auth/domain/entities/user_profile.dart';
 import 'package:savedge/features/auth/domain/entities/extended_user_profile.dart';
 import 'package:savedge/features/auth/data/models/auth_models.dart';
+import 'package:savedge/features/auth/data/models/user_profile_models.dart';
 
 abstract class AuthRepository {
   Future<UserProfile> syncUser({required String email, String? displayName});
@@ -12,6 +13,13 @@ abstract class AuthRepository {
     String? lastName,
   });
   Future<ExtendedUserProfile> getUserProfileExtended();
+  Future<UserProfileResponse3> getCurrentUserProfile();
+  Future<UserProfileResponse3> updateCurrentUserProfile({
+    String? firstName,
+    String? lastName,
+    String? email,
+    String? profileImageUrl,
+  });
 
   // Unified authentication flow methods
   Future<AuthStatusResponse> checkAuthStatus();

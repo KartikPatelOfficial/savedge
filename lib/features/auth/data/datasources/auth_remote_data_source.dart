@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
 import 'package:savedge/features/auth/data/models/auth_models.dart';
+import 'package:savedge/features/auth/data/models/user_profile_models.dart';
 
 part 'auth_remote_data_source.g.dart';
 
@@ -21,12 +22,12 @@ abstract class AuthRemoteDataSource {
   );
 
   // Extended user profile endpoints
-  @GET('/api/users/profile')
-  Future<UserProfileResponse2> getUserProfile();
+  @GET('/api/users/me')
+  Future<UserProfileResponse3> getUserProfile();
 
-  @PUT('/api/users/profile')
-  Future<UserProfileResponse2> updateUserProfile(
-    @Body() UpdateUserProfileRequest request,
+  @PUT('/api/users/me')
+  Future<UserProfileResponse3> updateUserProfile(
+    @Body() UpdateUserProfileRequest3 request,
   );
 
   // Unified authentication flow endpoints

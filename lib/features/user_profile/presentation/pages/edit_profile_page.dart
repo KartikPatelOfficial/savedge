@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:savedge/features/auth/data/models/user_profile_models.dart';
 import 'package:savedge/features/auth/domain/repositories/auth_repository.dart';
-import 'package:savedge/features/auth/domain/entities/extended_user_profile.dart';
 
 /// Edit profile page for updating user information
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({super.key, required this.userProfile});
 
-  final ExtendedUserProfile userProfile;
+  final UserProfileResponse3 userProfile;
 
   @override
   State<EditProfilePage> createState() => _EditProfilePageState();
@@ -136,27 +136,25 @@ class _EditProfilePageState extends State<EditProfilePage> {
           ),
           const SizedBox(height: 12),
           _buildReadOnlyField('Email', widget.userProfile.email),
-          if (widget.userProfile.organizationName != null) ...[
+          if (widget.userProfile.employeeInfo?.organizationName != null) ...[
             const SizedBox(height: 12),
             _buildReadOnlyField(
               'Organization',
-              widget.userProfile.organizationName!,
+              widget.userProfile.employeeInfo!.organizationName,
             ),
           ],
-          if (widget.userProfile.employeeCode != null) ...[
+          const SizedBox(height: 12),
+          _buildReadOnlyField(
+            'Employee ID',
+            widget.userProfile.employeeInfo!.employeeCode,
+          ),
+          if (widget.userProfile.employeeInfo?.department != null) ...[
             const SizedBox(height: 12),
-            _buildReadOnlyField(
-              'Employee ID',
-              widget.userProfile.employeeCode!,
-            ),
+            _buildReadOnlyField('Department', widget.userProfile.employeeInfo!.department!),
           ],
-          if (widget.userProfile.department != null) ...[
+          if (widget.userProfile.employeeInfo?.position != null) ...[
             const SizedBox(height: 12),
-            _buildReadOnlyField('Department', widget.userProfile.department!),
-          ],
-          if (widget.userProfile.position != null) ...[
-            const SizedBox(height: 12),
-            _buildReadOnlyField('Position', widget.userProfile.position!),
+            _buildReadOnlyField('Position', widget.userProfile.employeeInfo!.position!),
           ],
         ],
       ),

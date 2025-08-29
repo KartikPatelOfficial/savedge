@@ -49,10 +49,6 @@ class _GiftPageState extends State<GiftPage> with TickerProviderStateMixin {
           elevation: 0,
           scrolledUnderElevation: 0,
           surfaceTintColor: Colors.white,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Color(0xFF1A202C)),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
           title: const Text(
             'Send & Receive Gifts',
             style: TextStyle(

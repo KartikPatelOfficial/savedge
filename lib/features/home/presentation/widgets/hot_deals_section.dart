@@ -1,16 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-
 import 'package:savedge/core/injection/injection.dart';
-import 'package:savedge/core/network/image_cache_manager.dart';
-import 'package:savedge/features/vendors/domain/entities/vendor.dart';
-import 'package:savedge/features/vendors/presentation/bloc/vendors_bloc.dart';
-import 'package:savedge/features/vendors/presentation/bloc/vendors_event.dart';
-import 'package:savedge/features/vendors/presentation/bloc/vendors_state.dart';
 import 'package:savedge/features/stores/presentation/pages/vendor_detail_page.dart';
+import 'package:savedge/features/vendors/domain/entities/coupon.dart';
+import 'package:savedge/features/vendors/presentation/bloc/coupons_bloc.dart';
 
-/// Hot deals section widget with real vendor data
+/// Hot deals section widget with real coupon data
 class HotDealsSection extends StatelessWidget {
   const HotDealsSection({
     super.key,
@@ -25,8 +20,8 @@ class HotDealsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) =>
-          getIt<VendorsBloc>()
-            ..add(const LoadVendors(pageSize: 5)), // Load only 5 for hot deals
+          getIt<CouponsBloc>()..add(const LoadFeaturedCoupons(pageSize: 5)),
+      // Load only 5 featured coupons
       child: HotDealsView(title: title),
     );
   }
@@ -58,16 +53,16 @@ class HotDealsView extends StatelessWidget {
           const SizedBox(height: 20),
           SizedBox(
             height: 240,
-            child: BlocBuilder<VendorsBloc, VendorsState>(
+            child: BlocBuilder<CouponsBloc, CouponsState>(
               builder: (context, state) {
-                if (state is VendorsLoading) {
+                if (state is CouponsLoading) {
                   return const Center(
                     child: CircularProgressIndicator(color: Color(0xFF6F3FCC)),
                   );
-                } else if (state is VendorsError) {
+                } else if (state is CouponsError) {
                   return _buildErrorWidget(state.message);
-                } else if (state is VendorsLoaded) {
-                  return _buildVendorsList(state.vendors);
+                } else if (state is CouponsLoaded) {
+                  return _buildCouponsList(state.coupons);
                 }
                 return const SizedBox.shrink();
               },
@@ -78,8 +73,8 @@ class HotDealsView extends StatelessWidget {
     );
   }
 
-  Widget _buildVendorsList(List<Vendor> vendors) {
-    if (vendors.isEmpty) {
+  Widget _buildCouponsList(List<Coupon> coupons) {
+    if (coupons.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -114,14 +109,14 @@ class HotDealsView extends StatelessWidget {
     return ListView.builder(
       scrollDirection: Axis.horizontal,
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      itemCount: vendors.length,
+      itemCount: coupons.length,
       itemBuilder: (context, index) {
-        final vendor = vendors[index];
+        final coupon = coupons[index];
         return Padding(
-          padding: EdgeInsets.only(right: index == vendors.length - 1 ? 0 : 16),
+          padding: EdgeInsets.only(right: index == coupons.length - 1 ? 0 : 16),
           child: HotDealCard(
-            vendor: vendor,
-            onTap: () => _navigateToVendorDetail(context, vendor),
+            coupon: coupon,
+            onTap: () => _navigateToCouponDetail(context, coupon),
           ),
         );
       },
@@ -160,11 +155,12 @@ class HotDealsView extends StatelessWidget {
     );
   }
 
-  void _navigateToVendorDetail(BuildContext context, Vendor vendor) {
+  void _navigateToCouponDetail(BuildContext context, Coupon coupon) {
+    // Navigate to vendor detail page to see the coupon
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => VendorDetailPage(vendorId: vendor.id),
+        builder: (context) => VendorDetailPage(vendorId: coupon.vendorId),
       ),
     );
   }
@@ -187,16 +183,16 @@ class HotDeal {
   final VoidCallback? onTap;
 }
 
-/// Individual hot deal card widget using vendor data
+/// Individual hot deal card widget using coupon data
 class HotDealCard extends StatelessWidget {
   const HotDealCard({
     super.key,
-    required this.vendor,
+    required this.coupon,
     this.width = 280,
     this.onTap,
   });
 
-  final Vendor vendor;
+  final Coupon coupon;
   final double width;
   final VoidCallback? onTap;
 
@@ -215,7 +211,7 @@ class HotDealCard extends StatelessWidget {
           child: Stack(
             children: [
               // Background image
-              _DealBackground(vendor: vendor),
+              _DealBackground(coupon: coupon),
               // Gradient overlay
               Container(
                 decoration: BoxDecoration(
@@ -236,9 +232,9 @@ class HotDealCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _OfferBadge(vendor: vendor),
+                    _OfferBadge(coupon: coupon),
                     const Spacer(),
-                    _DealInfo(vendor: vendor),
+                    _DealInfo(coupon: coupon),
                   ],
                 ),
               ),
@@ -251,73 +247,29 @@ class HotDealCard extends StatelessWidget {
 }
 
 class _DealBackground extends StatelessWidget {
-  const _DealBackground({required this.vendor});
+  const _DealBackground({required this.coupon});
 
-  final Vendor vendor;
+  final Coupon coupon;
 
   @override
   Widget build(BuildContext context) {
-    if (vendor.primaryImageUrl == null) {
-      return Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Colors.brown[300]!.withOpacity(0.8),
-              Colors.brown[600]!.withOpacity(0.8),
-            ],
-          ),
-        ),
-        child: Center(
-          child: Icon(
-            Icons.restaurant,
-            size: 60,
-            color: Colors.white.withOpacity(0.3),
-          ),
-        ),
-      );
-    }
-
-    return CachedNetworkImage(
-      imageUrl: vendor.primaryImageUrl!,
-      cacheManager: CustomImageCacheManager(),
-      fit: BoxFit.cover,
-      placeholder: (context, url) => Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Colors.brown[300]!.withOpacity(0.8),
-              Colors.brown[600]!.withOpacity(0.8),
-            ],
-          ),
-        ),
-        child: const Center(
-          child: CircularProgressIndicator(
-            color: Colors.white,
-            strokeWidth: 2,
-          ),
+    // Since Coupon entity doesn't have imageUrl, show gradient background
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.purple[300]!.withOpacity(0.8),
+            Colors.purple[600]!.withOpacity(0.8),
+          ],
         ),
       ),
-      errorWidget: (context, url, error) => Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Colors.brown[300]!.withOpacity(0.8),
-              Colors.brown[600]!.withOpacity(0.8),
-            ],
-          ),
-        ),
-        child: Center(
-          child: Icon(
-            Icons.restaurant,
-            size: 60,
-            color: Colors.white.withOpacity(0.3),
-          ),
+      child: Center(
+        child: Icon(
+          Icons.local_offer,
+          size: 60,
+          color: Colors.white.withOpacity(0.3),
         ),
       ),
     );
@@ -325,14 +277,18 @@ class _DealBackground extends StatelessWidget {
 }
 
 class _OfferBadge extends StatelessWidget {
-  const _OfferBadge({required this.vendor});
+  const _OfferBadge({required this.coupon});
 
-  final Vendor vendor;
+  final Coupon coupon;
 
   @override
   Widget build(BuildContext context) {
-    // Generate dynamic offer based on vendor ID
-    final offerPercentage = 20 + (vendor.id % 4) * 10; // 20%, 30%, 40%, or 50%
+    String discountText;
+    if (coupon.discountType.toLowerCase() == 'percentage') {
+      discountText = '${coupon.discountValue.toInt()}% OFF';
+    } else {
+      discountText = '₹${coupon.discountValue.toInt()} OFF';
+    }
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
@@ -346,7 +302,7 @@ class _OfferBadge extends StatelessWidget {
           const Icon(Icons.local_offer, color: Colors.white, size: 16),
           const SizedBox(width: 6),
           Text(
-            'Up to $offerPercentage% OFF',
+            discountText,
             style: const TextStyle(
               color: Colors.white,
               fontSize: 13,
@@ -360,9 +316,9 @@ class _OfferBadge extends StatelessWidget {
 }
 
 class _DealInfo extends StatelessWidget {
-  const _DealInfo({required this.vendor});
+  const _DealInfo({required this.coupon});
 
-  final Vendor vendor;
+  final Coupon coupon;
 
   @override
   Widget build(BuildContext context) {
@@ -370,7 +326,7 @@ class _DealInfo extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          vendor.businessName,
+          coupon.title,
           style: const TextStyle(
             color: Colors.white,
             fontSize: 20,
@@ -379,6 +335,18 @@ class _DealInfo extends StatelessWidget {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
+        const SizedBox(height: 8),
+        if (coupon.description.isNotEmpty)
+          Text(
+            coupon.description,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
         const SizedBox(height: 12),
         Row(
           children: [
@@ -391,10 +359,12 @@ class _DealInfo extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.star, color: Colors.amber, size: 18),
+                  const Icon(Icons.shopping_cart, color: Colors.white, size: 18),
                   const SizedBox(width: 6),
                   Text(
-                    vendor.ratingDisplay,
+                    coupon.minimumAmountDisplay.isEmpty 
+                        ? 'No minimum' 
+                        : coupon.minimumAmountDisplay,
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 15,

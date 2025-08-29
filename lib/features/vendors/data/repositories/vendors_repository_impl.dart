@@ -68,12 +68,14 @@ class VendorsRepositoryImpl implements VendorsRepository {
   Future<Either<Failure, Vendor>> getVendor(int id) async {
     try {
       final response = await remoteDataSource.getVendor(id);
+      
       final vendor = _mapVendorResponseToEntity(response.data);
+      
       return Right(vendor);
     } on DioException catch (e) {
       return Left(_handleDioError(e));
-    } catch (e) {
-      return Left(ServerFailure(e.toString()));
+    } catch (e, stackTrace) {
+      return Left(ServerFailure('Error: ${e.toString()}'));
     }
   }
 
@@ -99,7 +101,7 @@ class VendorsRepositoryImpl implements VendorsRepository {
       id: response.id,
       businessName: response.businessName,
       description: response.description,
-      contactEmail: response.contactEmail,
+      contactEmail: response.contactEmail ?? '',
       contactPhone: response.contactPhone,
       address: response.address,
       city: response.city,
@@ -111,11 +113,11 @@ class VendorsRepositoryImpl implements VendorsRepository {
       isActive: response.isActive,
       approvedAt: response.approvedAt,
       approvedBy: response.approvedBy,
-      createdAt: response.createdAt,
+      createdAt: response.createdAt ?? DateTime.now(),
       firebaseUid: response.firebaseUid,
       vendorFirstName: response.vendorFirstName,
       vendorLastName: response.vendorLastName,
-      vendorFullName: response.vendorFullName,
+      vendorFullName: response.vendorFullName ?? response.businessName,
       images: response.images.map(_mapVendorImageDtoToEntity).toList(),
       socialMediaLinks: response.socialMediaLinks
           .map(_mapVendorSocialMediaDtoToEntity)
@@ -146,12 +148,13 @@ class VendorsRepositoryImpl implements VendorsRepository {
   VendorSocialMedia _mapVendorSocialMediaDtoToEntity(VendorSocialMediaDto dto) {
     return VendorSocialMedia(
       id: dto.id,
-      platform: dto.platformName,
-      platformName: dto.platformName,
+      platform: dto.platformName ?? 'Other',
+      platformName: dto.platformName ?? 'Other',
       url: dto.url,
       isActive: dto.isActive,
     );
   }
+
 
   Failure _handleDioError(DioException error) {
     switch (error.type) {

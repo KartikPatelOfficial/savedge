@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$VendorResponse {
 
- int get id; String get businessName; String? get description; String get contactEmail; String? get contactPhone; String? get address; String? get city; String? get state; String? get pinCode; String get category; String? get website; String get approvalStatus; bool get isActive; DateTime? get approvedAt; String? get approvedBy; DateTime get createdAt; String? get firebaseUid; String? get vendorFirstName; String? get vendorLastName; String get vendorFullName; List<VendorImageDto> get images; List<VendorSocialMediaDto> get socialMediaLinks;
+ int get id; String get businessName; String? get description; String? get contactEmail; String? get contactPhone; String? get address; String? get city; String? get state; String? get pinCode; String get category; String? get website; String get approvalStatus; bool get isActive; DateTime? get approvedAt; String? get approvedBy; DateTime? get createdAt; String? get firebaseUid; String? get vendorFirstName; String? get vendorLastName; String? get vendorFullName; List<VendorImageDto> get images; List<VendorSocialMediaDto> get socialMediaLinks;
 /// Create a copy of VendorResponse
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -48,7 +48,7 @@ abstract mixin class $VendorResponseCopyWith<$Res>  {
   factory $VendorResponseCopyWith(VendorResponse value, $Res Function(VendorResponse) _then) = _$VendorResponseCopyWithImpl;
 @useResult
 $Res call({
- int id, String businessName, String? description, String contactEmail, String? contactPhone, String? address, String? city, String? state, String? pinCode, String category, String? website, String approvalStatus, bool isActive, DateTime? approvedAt, String? approvedBy, DateTime createdAt, String? firebaseUid, String? vendorFirstName, String? vendorLastName, String vendorFullName, List<VendorImageDto> images, List<VendorSocialMediaDto> socialMediaLinks
+ int id, String businessName, String? description, String? contactEmail, String? contactPhone, String? address, String? city, String? state, String? pinCode, String category, String? website, String approvalStatus, bool isActive, DateTime? approvedAt, String? approvedBy, DateTime? createdAt, String? firebaseUid, String? vendorFirstName, String? vendorLastName, String? vendorFullName, List<VendorImageDto> images, List<VendorSocialMediaDto> socialMediaLinks
 });
 
 
@@ -65,13 +65,13 @@ class _$VendorResponseCopyWithImpl<$Res>
 
 /// Create a copy of VendorResponse
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? businessName = null,Object? description = freezed,Object? contactEmail = null,Object? contactPhone = freezed,Object? address = freezed,Object? city = freezed,Object? state = freezed,Object? pinCode = freezed,Object? category = null,Object? website = freezed,Object? approvalStatus = null,Object? isActive = null,Object? approvedAt = freezed,Object? approvedBy = freezed,Object? createdAt = null,Object? firebaseUid = freezed,Object? vendorFirstName = freezed,Object? vendorLastName = freezed,Object? vendorFullName = null,Object? images = null,Object? socialMediaLinks = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? businessName = null,Object? description = freezed,Object? contactEmail = freezed,Object? contactPhone = freezed,Object? address = freezed,Object? city = freezed,Object? state = freezed,Object? pinCode = freezed,Object? category = null,Object? website = freezed,Object? approvalStatus = null,Object? isActive = null,Object? approvedAt = freezed,Object? approvedBy = freezed,Object? createdAt = freezed,Object? firebaseUid = freezed,Object? vendorFirstName = freezed,Object? vendorLastName = freezed,Object? vendorFullName = freezed,Object? images = null,Object? socialMediaLinks = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,businessName: null == businessName ? _self.businessName : businessName // ignore: cast_nullable_to_non_nullable
 as String,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
-as String?,contactEmail: null == contactEmail ? _self.contactEmail : contactEmail // ignore: cast_nullable_to_non_nullable
-as String,contactPhone: freezed == contactPhone ? _self.contactPhone : contactPhone // ignore: cast_nullable_to_non_nullable
+as String?,contactEmail: freezed == contactEmail ? _self.contactEmail : contactEmail // ignore: cast_nullable_to_non_nullable
+as String?,contactPhone: freezed == contactPhone ? _self.contactPhone : contactPhone // ignore: cast_nullable_to_non_nullable
 as String?,address: freezed == address ? _self.address : address // ignore: cast_nullable_to_non_nullable
 as String?,city: freezed == city ? _self.city : city // ignore: cast_nullable_to_non_nullable
 as String?,state: freezed == state ? _self.state : state // ignore: cast_nullable_to_non_nullable
@@ -82,12 +82,12 @@ as String?,approvalStatus: null == approvalStatus ? _self.approvalStatus : appro
 as String,isActive: null == isActive ? _self.isActive : isActive // ignore: cast_nullable_to_non_nullable
 as bool,approvedAt: freezed == approvedAt ? _self.approvedAt : approvedAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,approvedBy: freezed == approvedBy ? _self.approvedBy : approvedBy // ignore: cast_nullable_to_non_nullable
-as String?,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
-as DateTime,firebaseUid: freezed == firebaseUid ? _self.firebaseUid : firebaseUid // ignore: cast_nullable_to_non_nullable
+as String?,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,firebaseUid: freezed == firebaseUid ? _self.firebaseUid : firebaseUid // ignore: cast_nullable_to_non_nullable
 as String?,vendorFirstName: freezed == vendorFirstName ? _self.vendorFirstName : vendorFirstName // ignore: cast_nullable_to_non_nullable
 as String?,vendorLastName: freezed == vendorLastName ? _self.vendorLastName : vendorLastName // ignore: cast_nullable_to_non_nullable
-as String?,vendorFullName: null == vendorFullName ? _self.vendorFullName : vendorFullName // ignore: cast_nullable_to_non_nullable
-as String,images: null == images ? _self.images : images // ignore: cast_nullable_to_non_nullable
+as String?,vendorFullName: freezed == vendorFullName ? _self.vendorFullName : vendorFullName // ignore: cast_nullable_to_non_nullable
+as String?,images: null == images ? _self.images : images // ignore: cast_nullable_to_non_nullable
 as List<VendorImageDto>,socialMediaLinks: null == socialMediaLinks ? _self.socialMediaLinks : socialMediaLinks // ignore: cast_nullable_to_non_nullable
 as List<VendorSocialMediaDto>,
   ));
@@ -174,7 +174,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String businessName,  String? description,  String contactEmail,  String? contactPhone,  String? address,  String? city,  String? state,  String? pinCode,  String category,  String? website,  String approvalStatus,  bool isActive,  DateTime? approvedAt,  String? approvedBy,  DateTime createdAt,  String? firebaseUid,  String? vendorFirstName,  String? vendorLastName,  String vendorFullName,  List<VendorImageDto> images,  List<VendorSocialMediaDto> socialMediaLinks)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String businessName,  String? description,  String? contactEmail,  String? contactPhone,  String? address,  String? city,  String? state,  String? pinCode,  String category,  String? website,  String approvalStatus,  bool isActive,  DateTime? approvedAt,  String? approvedBy,  DateTime? createdAt,  String? firebaseUid,  String? vendorFirstName,  String? vendorLastName,  String? vendorFullName,  List<VendorImageDto> images,  List<VendorSocialMediaDto> socialMediaLinks)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _VendorResponse() when $default != null:
 return $default(_that.id,_that.businessName,_that.description,_that.contactEmail,_that.contactPhone,_that.address,_that.city,_that.state,_that.pinCode,_that.category,_that.website,_that.approvalStatus,_that.isActive,_that.approvedAt,_that.approvedBy,_that.createdAt,_that.firebaseUid,_that.vendorFirstName,_that.vendorLastName,_that.vendorFullName,_that.images,_that.socialMediaLinks);case _:
@@ -195,7 +195,7 @@ return $default(_that.id,_that.businessName,_that.description,_that.contactEmail
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String businessName,  String? description,  String contactEmail,  String? contactPhone,  String? address,  String? city,  String? state,  String? pinCode,  String category,  String? website,  String approvalStatus,  bool isActive,  DateTime? approvedAt,  String? approvedBy,  DateTime createdAt,  String? firebaseUid,  String? vendorFirstName,  String? vendorLastName,  String vendorFullName,  List<VendorImageDto> images,  List<VendorSocialMediaDto> socialMediaLinks)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String businessName,  String? description,  String? contactEmail,  String? contactPhone,  String? address,  String? city,  String? state,  String? pinCode,  String category,  String? website,  String approvalStatus,  bool isActive,  DateTime? approvedAt,  String? approvedBy,  DateTime? createdAt,  String? firebaseUid,  String? vendorFirstName,  String? vendorLastName,  String? vendorFullName,  List<VendorImageDto> images,  List<VendorSocialMediaDto> socialMediaLinks)  $default,) {final _that = this;
 switch (_that) {
 case _VendorResponse():
 return $default(_that.id,_that.businessName,_that.description,_that.contactEmail,_that.contactPhone,_that.address,_that.city,_that.state,_that.pinCode,_that.category,_that.website,_that.approvalStatus,_that.isActive,_that.approvedAt,_that.approvedBy,_that.createdAt,_that.firebaseUid,_that.vendorFirstName,_that.vendorLastName,_that.vendorFullName,_that.images,_that.socialMediaLinks);case _:
@@ -215,7 +215,7 @@ return $default(_that.id,_that.businessName,_that.description,_that.contactEmail
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String businessName,  String? description,  String contactEmail,  String? contactPhone,  String? address,  String? city,  String? state,  String? pinCode,  String category,  String? website,  String approvalStatus,  bool isActive,  DateTime? approvedAt,  String? approvedBy,  DateTime createdAt,  String? firebaseUid,  String? vendorFirstName,  String? vendorLastName,  String vendorFullName,  List<VendorImageDto> images,  List<VendorSocialMediaDto> socialMediaLinks)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String businessName,  String? description,  String? contactEmail,  String? contactPhone,  String? address,  String? city,  String? state,  String? pinCode,  String category,  String? website,  String approvalStatus,  bool isActive,  DateTime? approvedAt,  String? approvedBy,  DateTime? createdAt,  String? firebaseUid,  String? vendorFirstName,  String? vendorLastName,  String? vendorFullName,  List<VendorImageDto> images,  List<VendorSocialMediaDto> socialMediaLinks)?  $default,) {final _that = this;
 switch (_that) {
 case _VendorResponse() when $default != null:
 return $default(_that.id,_that.businessName,_that.description,_that.contactEmail,_that.contactPhone,_that.address,_that.city,_that.state,_that.pinCode,_that.category,_that.website,_that.approvalStatus,_that.isActive,_that.approvedAt,_that.approvedBy,_that.createdAt,_that.firebaseUid,_that.vendorFirstName,_that.vendorLastName,_that.vendorFullName,_that.images,_that.socialMediaLinks);case _:
@@ -230,13 +230,13 @@ return $default(_that.id,_that.businessName,_that.description,_that.contactEmail
 @JsonSerializable()
 
 class _VendorResponse implements VendorResponse {
-  const _VendorResponse({required this.id, required this.businessName, this.description, required this.contactEmail, this.contactPhone, this.address, this.city, this.state, this.pinCode, required this.category, this.website, required this.approvalStatus, required this.isActive, this.approvedAt, this.approvedBy, required this.createdAt, this.firebaseUid, this.vendorFirstName, this.vendorLastName, required this.vendorFullName, final  List<VendorImageDto> images = const [], final  List<VendorSocialMediaDto> socialMediaLinks = const []}): _images = images,_socialMediaLinks = socialMediaLinks;
+  const _VendorResponse({required this.id, required this.businessName, this.description, this.contactEmail, this.contactPhone, this.address, this.city, this.state, this.pinCode, required this.category, this.website, this.approvalStatus = 'Approved', required this.isActive, this.approvedAt, this.approvedBy, this.createdAt, this.firebaseUid, this.vendorFirstName, this.vendorLastName, this.vendorFullName, final  List<VendorImageDto> images = const [], final  List<VendorSocialMediaDto> socialMediaLinks = const []}): _images = images,_socialMediaLinks = socialMediaLinks;
   factory _VendorResponse.fromJson(Map<String, dynamic> json) => _$VendorResponseFromJson(json);
 
 @override final  int id;
 @override final  String businessName;
 @override final  String? description;
-@override final  String contactEmail;
+@override final  String? contactEmail;
 @override final  String? contactPhone;
 @override final  String? address;
 @override final  String? city;
@@ -244,15 +244,15 @@ class _VendorResponse implements VendorResponse {
 @override final  String? pinCode;
 @override final  String category;
 @override final  String? website;
-@override final  String approvalStatus;
+@override@JsonKey() final  String approvalStatus;
 @override final  bool isActive;
 @override final  DateTime? approvedAt;
 @override final  String? approvedBy;
-@override final  DateTime createdAt;
+@override final  DateTime? createdAt;
 @override final  String? firebaseUid;
 @override final  String? vendorFirstName;
 @override final  String? vendorLastName;
-@override final  String vendorFullName;
+@override final  String? vendorFullName;
  final  List<VendorImageDto> _images;
 @override@JsonKey() List<VendorImageDto> get images {
   if (_images is EqualUnmodifiableListView) return _images;
@@ -301,7 +301,7 @@ abstract mixin class _$VendorResponseCopyWith<$Res> implements $VendorResponseCo
   factory _$VendorResponseCopyWith(_VendorResponse value, $Res Function(_VendorResponse) _then) = __$VendorResponseCopyWithImpl;
 @override @useResult
 $Res call({
- int id, String businessName, String? description, String contactEmail, String? contactPhone, String? address, String? city, String? state, String? pinCode, String category, String? website, String approvalStatus, bool isActive, DateTime? approvedAt, String? approvedBy, DateTime createdAt, String? firebaseUid, String? vendorFirstName, String? vendorLastName, String vendorFullName, List<VendorImageDto> images, List<VendorSocialMediaDto> socialMediaLinks
+ int id, String businessName, String? description, String? contactEmail, String? contactPhone, String? address, String? city, String? state, String? pinCode, String category, String? website, String approvalStatus, bool isActive, DateTime? approvedAt, String? approvedBy, DateTime? createdAt, String? firebaseUid, String? vendorFirstName, String? vendorLastName, String? vendorFullName, List<VendorImageDto> images, List<VendorSocialMediaDto> socialMediaLinks
 });
 
 
@@ -318,13 +318,13 @@ class __$VendorResponseCopyWithImpl<$Res>
 
 /// Create a copy of VendorResponse
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? businessName = null,Object? description = freezed,Object? contactEmail = null,Object? contactPhone = freezed,Object? address = freezed,Object? city = freezed,Object? state = freezed,Object? pinCode = freezed,Object? category = null,Object? website = freezed,Object? approvalStatus = null,Object? isActive = null,Object? approvedAt = freezed,Object? approvedBy = freezed,Object? createdAt = null,Object? firebaseUid = freezed,Object? vendorFirstName = freezed,Object? vendorLastName = freezed,Object? vendorFullName = null,Object? images = null,Object? socialMediaLinks = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? businessName = null,Object? description = freezed,Object? contactEmail = freezed,Object? contactPhone = freezed,Object? address = freezed,Object? city = freezed,Object? state = freezed,Object? pinCode = freezed,Object? category = null,Object? website = freezed,Object? approvalStatus = null,Object? isActive = null,Object? approvedAt = freezed,Object? approvedBy = freezed,Object? createdAt = freezed,Object? firebaseUid = freezed,Object? vendorFirstName = freezed,Object? vendorLastName = freezed,Object? vendorFullName = freezed,Object? images = null,Object? socialMediaLinks = null,}) {
   return _then(_VendorResponse(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,businessName: null == businessName ? _self.businessName : businessName // ignore: cast_nullable_to_non_nullable
 as String,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
-as String?,contactEmail: null == contactEmail ? _self.contactEmail : contactEmail // ignore: cast_nullable_to_non_nullable
-as String,contactPhone: freezed == contactPhone ? _self.contactPhone : contactPhone // ignore: cast_nullable_to_non_nullable
+as String?,contactEmail: freezed == contactEmail ? _self.contactEmail : contactEmail // ignore: cast_nullable_to_non_nullable
+as String?,contactPhone: freezed == contactPhone ? _self.contactPhone : contactPhone // ignore: cast_nullable_to_non_nullable
 as String?,address: freezed == address ? _self.address : address // ignore: cast_nullable_to_non_nullable
 as String?,city: freezed == city ? _self.city : city // ignore: cast_nullable_to_non_nullable
 as String?,state: freezed == state ? _self.state : state // ignore: cast_nullable_to_non_nullable
@@ -335,12 +335,12 @@ as String?,approvalStatus: null == approvalStatus ? _self.approvalStatus : appro
 as String,isActive: null == isActive ? _self.isActive : isActive // ignore: cast_nullable_to_non_nullable
 as bool,approvedAt: freezed == approvedAt ? _self.approvedAt : approvedAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,approvedBy: freezed == approvedBy ? _self.approvedBy : approvedBy // ignore: cast_nullable_to_non_nullable
-as String?,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
-as DateTime,firebaseUid: freezed == firebaseUid ? _self.firebaseUid : firebaseUid // ignore: cast_nullable_to_non_nullable
+as String?,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,firebaseUid: freezed == firebaseUid ? _self.firebaseUid : firebaseUid // ignore: cast_nullable_to_non_nullable
 as String?,vendorFirstName: freezed == vendorFirstName ? _self.vendorFirstName : vendorFirstName // ignore: cast_nullable_to_non_nullable
 as String?,vendorLastName: freezed == vendorLastName ? _self.vendorLastName : vendorLastName // ignore: cast_nullable_to_non_nullable
-as String?,vendorFullName: null == vendorFullName ? _self.vendorFullName : vendorFullName // ignore: cast_nullable_to_non_nullable
-as String,images: null == images ? _self._images : images // ignore: cast_nullable_to_non_nullable
+as String?,vendorFullName: freezed == vendorFullName ? _self.vendorFullName : vendorFullName // ignore: cast_nullable_to_non_nullable
+as String?,images: null == images ? _self._images : images // ignore: cast_nullable_to_non_nullable
 as List<VendorImageDto>,socialMediaLinks: null == socialMediaLinks ? _self._socialMediaLinks : socialMediaLinks // ignore: cast_nullable_to_non_nullable
 as List<VendorSocialMediaDto>,
   ));
@@ -553,16 +553,16 @@ return $default(_that.id,_that.imageUrl,_that.altText,_that.displayOrder,_that.i
 @JsonSerializable()
 
 class _VendorImageDto implements VendorImageDto {
-  const _VendorImageDto({required this.id, required this.imageUrl, this.altText, required this.displayOrder, required this.isPrimary, required this.imageType, required this.imageTypeName});
+  const _VendorImageDto({this.id = 0, required this.imageUrl, this.altText, this.displayOrder = 0, required this.isPrimary, this.imageType = ImageType.gallery, this.imageTypeName = 'Gallery'});
   factory _VendorImageDto.fromJson(Map<String, dynamic> json) => _$VendorImageDtoFromJson(json);
 
-@override final  int id;
+@override@JsonKey() final  int id;
 @override final  String imageUrl;
 @override final  String? altText;
-@override final  int displayOrder;
+@override@JsonKey() final  int displayOrder;
 @override final  bool isPrimary;
-@override final  ImageType imageType;
-@override final  String imageTypeName;
+@override@JsonKey() final  ImageType imageType;
+@override@JsonKey() final  String imageTypeName;
 
 /// Create a copy of VendorImageDto
 /// with the given fields replaced by the non-null parameter values.
@@ -634,7 +634,7 @@ as String,
 /// @nodoc
 mixin _$VendorSocialMediaDto {
 
- int get id; SocialMediaPlatform get platform; String get platformName; String get url; bool get isActive;
+ int get id; SocialMediaPlatform? get platform; String? get platformName; String get url; bool get isActive;
 /// Create a copy of VendorSocialMediaDto
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -667,7 +667,7 @@ abstract mixin class $VendorSocialMediaDtoCopyWith<$Res>  {
   factory $VendorSocialMediaDtoCopyWith(VendorSocialMediaDto value, $Res Function(VendorSocialMediaDto) _then) = _$VendorSocialMediaDtoCopyWithImpl;
 @useResult
 $Res call({
- int id, SocialMediaPlatform platform, String platformName, String url, bool isActive
+ int id, SocialMediaPlatform? platform, String? platformName, String url, bool isActive
 });
 
 
@@ -684,12 +684,12 @@ class _$VendorSocialMediaDtoCopyWithImpl<$Res>
 
 /// Create a copy of VendorSocialMediaDto
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? platform = null,Object? platformName = null,Object? url = null,Object? isActive = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? platform = freezed,Object? platformName = freezed,Object? url = null,Object? isActive = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as int,platform: null == platform ? _self.platform : platform // ignore: cast_nullable_to_non_nullable
-as SocialMediaPlatform,platformName: null == platformName ? _self.platformName : platformName // ignore: cast_nullable_to_non_nullable
-as String,url: null == url ? _self.url : url // ignore: cast_nullable_to_non_nullable
+as int,platform: freezed == platform ? _self.platform : platform // ignore: cast_nullable_to_non_nullable
+as SocialMediaPlatform?,platformName: freezed == platformName ? _self.platformName : platformName // ignore: cast_nullable_to_non_nullable
+as String?,url: null == url ? _self.url : url // ignore: cast_nullable_to_non_nullable
 as String,isActive: null == isActive ? _self.isActive : isActive // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
@@ -776,7 +776,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  SocialMediaPlatform platform,  String platformName,  String url,  bool isActive)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  SocialMediaPlatform? platform,  String? platformName,  String url,  bool isActive)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _VendorSocialMediaDto() when $default != null:
 return $default(_that.id,_that.platform,_that.platformName,_that.url,_that.isActive);case _:
@@ -797,7 +797,7 @@ return $default(_that.id,_that.platform,_that.platformName,_that.url,_that.isAct
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  SocialMediaPlatform platform,  String platformName,  String url,  bool isActive)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  SocialMediaPlatform? platform,  String? platformName,  String url,  bool isActive)  $default,) {final _that = this;
 switch (_that) {
 case _VendorSocialMediaDto():
 return $default(_that.id,_that.platform,_that.platformName,_that.url,_that.isActive);case _:
@@ -817,7 +817,7 @@ return $default(_that.id,_that.platform,_that.platformName,_that.url,_that.isAct
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  SocialMediaPlatform platform,  String platformName,  String url,  bool isActive)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  SocialMediaPlatform? platform,  String? platformName,  String url,  bool isActive)?  $default,) {final _that = this;
 switch (_that) {
 case _VendorSocialMediaDto() when $default != null:
 return $default(_that.id,_that.platform,_that.platformName,_that.url,_that.isActive);case _:
@@ -832,14 +832,14 @@ return $default(_that.id,_that.platform,_that.platformName,_that.url,_that.isAct
 @JsonSerializable()
 
 class _VendorSocialMediaDto implements VendorSocialMediaDto {
-  const _VendorSocialMediaDto({required this.id, required this.platform, required this.platformName, required this.url, required this.isActive});
+  const _VendorSocialMediaDto({this.id = 0, this.platform, this.platformName, required this.url, this.isActive = true});
   factory _VendorSocialMediaDto.fromJson(Map<String, dynamic> json) => _$VendorSocialMediaDtoFromJson(json);
 
-@override final  int id;
-@override final  SocialMediaPlatform platform;
-@override final  String platformName;
+@override@JsonKey() final  int id;
+@override final  SocialMediaPlatform? platform;
+@override final  String? platformName;
 @override final  String url;
-@override final  bool isActive;
+@override@JsonKey() final  bool isActive;
 
 /// Create a copy of VendorSocialMediaDto
 /// with the given fields replaced by the non-null parameter values.
@@ -874,7 +874,7 @@ abstract mixin class _$VendorSocialMediaDtoCopyWith<$Res> implements $VendorSoci
   factory _$VendorSocialMediaDtoCopyWith(_VendorSocialMediaDto value, $Res Function(_VendorSocialMediaDto) _then) = __$VendorSocialMediaDtoCopyWithImpl;
 @override @useResult
 $Res call({
- int id, SocialMediaPlatform platform, String platformName, String url, bool isActive
+ int id, SocialMediaPlatform? platform, String? platformName, String url, bool isActive
 });
 
 
@@ -891,12 +891,12 @@ class __$VendorSocialMediaDtoCopyWithImpl<$Res>
 
 /// Create a copy of VendorSocialMediaDto
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? platform = null,Object? platformName = null,Object? url = null,Object? isActive = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? platform = freezed,Object? platformName = freezed,Object? url = null,Object? isActive = null,}) {
   return _then(_VendorSocialMediaDto(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as int,platform: null == platform ? _self.platform : platform // ignore: cast_nullable_to_non_nullable
-as SocialMediaPlatform,platformName: null == platformName ? _self.platformName : platformName // ignore: cast_nullable_to_non_nullable
-as String,url: null == url ? _self.url : url // ignore: cast_nullable_to_non_nullable
+as int,platform: freezed == platform ? _self.platform : platform // ignore: cast_nullable_to_non_nullable
+as SocialMediaPlatform?,platformName: freezed == platformName ? _self.platformName : platformName // ignore: cast_nullable_to_non_nullable
+as String?,url: null == url ? _self.url : url // ignore: cast_nullable_to_non_nullable
 as String,isActive: null == isActive ? _self.isActive : isActive // ignore: cast_nullable_to_non_nullable
 as bool,
   ));

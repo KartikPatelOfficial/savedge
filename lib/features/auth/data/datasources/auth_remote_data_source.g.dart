@@ -96,25 +96,25 @@ class _AuthRemoteDataSource implements AuthRemoteDataSource {
   }
 
   @override
-  Future<UserProfileResponse2> getUserProfile() async {
+  Future<UserProfileResponse3> getUserProfile() async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<UserProfileResponse2>(
+    final _options = _setStreamType<UserProfileResponse3>(
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/api/users/profile',
+            '/api/users/me',
             queryParameters: queryParameters,
             data: _data,
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    late UserProfileResponse2 _value;
+    late UserProfileResponse3 _value;
     try {
-      _value = UserProfileResponse2.fromJson(_result.data!);
+      _value = UserProfileResponse3.fromJson(_result.data!);
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;
@@ -123,27 +123,27 @@ class _AuthRemoteDataSource implements AuthRemoteDataSource {
   }
 
   @override
-  Future<UserProfileResponse2> updateUserProfile(
-    UpdateUserProfileRequest request,
+  Future<UserProfileResponse3> updateUserProfile(
+    UpdateUserProfileRequest3 request,
   ) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     final _data = request;
-    final _options = _setStreamType<UserProfileResponse2>(
+    final _options = _setStreamType<UserProfileResponse3>(
       Options(method: 'PUT', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/api/users/profile',
+            '/api/users/me',
             queryParameters: queryParameters,
             data: _data,
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    late UserProfileResponse2 _value;
+    late UserProfileResponse3 _value;
     try {
-      _value = UserProfileResponse2.fromJson(_result.data!);
+      _value = UserProfileResponse3.fromJson(_result.data!);
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;

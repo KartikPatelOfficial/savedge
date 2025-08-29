@@ -1,13 +1,12 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:savedge/core/storage/secure_storage_service.dart';
+import 'package:savedge/features/auth/data/models/user_profile_models.dart';
 import 'package:savedge/features/auth/domain/repositories/auth_repository.dart';
-import 'package:savedge/features/auth/domain/entities/extended_user_profile.dart';
-import 'package:savedge/features/user_profile/presentation/widgets/widgets.dart';
+import 'package:savedge/features/coupons/presentation/pages/gift_page.dart';
 import 'package:savedge/features/user_profile/presentation/pages/edit_profile_page.dart';
 import 'package:savedge/features/user_profile/presentation/pages/points_wallet_page.dart';
-import 'package:savedge/features/coupons/presentation/pages/gift_page.dart';
+import 'package:savedge/features/user_profile/presentation/widgets/widgets.dart';
 
 /// Profile page displaying user information and account options
 class ProfilePage extends StatefulWidget {
@@ -19,10 +18,11 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   bool _isLoading = true;
-  ExtendedUserProfile? _userProfile;
+  UserProfileResponse3? _userProfile;
   String? _error;
 
   AuthRepository get _authRepository => GetIt.I<AuthRepository>();
+
   SecureStorageService get _secureStorage => GetIt.I<SecureStorageService>();
 
   @override
@@ -41,41 +41,9 @@ class _ProfilePageState extends State<ProfilePage> {
         throw Exception('No authenticated user found');
       }
 
-      // Try to get user data from secure storage first
-      final userData = await _secureStorage.getUserData();
-      if (userData != null) {
-        // For now, create a basic profile from stored data
-        // In a full implementation, you would have a proper user profile model
-        try {
-          final userJson = jsonDecode(userData);
-          // Create a basic ExtendedUserProfile from stored data
-          // This is a simplified implementation
-          setState(() {
-            _userProfile = ExtendedUserProfile(
-              id: userJson['id']?.toString() ?? '',
-              email: userJson['email'] ?? '',
-              firstName: userJson['firstName'],
-              lastName: userJson['lastName'],
-              phoneNumber: userJson['phoneNumber'],
-              pointsBalance: userJson['pointsBalance'] ?? 0,
-              isActive: userJson['isActive'] ?? true,
-              createdAt: DateTime.parse(userJson['createdAt'] ?? DateTime.now().toIso8601String()),
-              roles: List<String>.from(userJson['roles'] ?? ['Individual']),
-              isEmployee: userJson['isEmployee'] ?? false,
-              organizationName: userJson['organizationName'],
-            );
-          });
-        } catch (e) {
-          debugPrint('Error parsing user data: $e');
-          // Fallback to API call
-          final profile = await _authRepository.getUserProfileExtended();
-          setState(() => _userProfile = profile);
-        }
-      } else {
-        // Fallback to API call if no stored data
-        final profile = await _authRepository.getUserProfileExtended();
-        setState(() => _userProfile = profile);
-      }
+      // Get user profile directly from API using new unified endpoint
+      final profile = await _authRepository.getCurrentUserProfile();
+      setState(() => _userProfile = profile);
     } catch (e) {
       setState(() => _error = e.toString());
     } finally {
@@ -222,34 +190,35 @@ class _ProfilePageState extends State<ProfilePage> {
                 // Stats Cards
                 if (_userProfile != null) ...[
                   // Show subscription status in stats if user has active subscription
-                  if (_userProfile!.hasActiveSubscription) ...[
-                    Row(
-                      children: [
-                        Expanded(
-                          child: ProfileStatsCard(
-                            title: 'Points Balance',
-                            value: '${_userProfile!.pointsBalance}',
-                            icon: Icons.stars_outlined,
-                            color: const Color(0xFFD69E2E),
-                            onTap: _onPointsBalanceTap,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: ProfileStatsCard(
-                            title: 'Subscription',
-                            value: _userProfile!.activeSubscription!.statusDisplay,
-                            icon: Icons.star,
-                            color: _userProfile!.activeSubscription!.hasExpired
-                                ? Colors.red
-                                : _userProfile!.activeSubscription!.isExpiringSoon
-                                    ? Colors.orange
-                                    : Colors.green,
-                            onTap: _onManageSubscriptionTap,
-                          ),
-                        ),
-                      ],
-                    ),
+                  // TODO: Implement subscription checking with new profile model
+                  if (false) ...[
+                    // Row(
+                    //   children: [
+                    //     Expanded(
+                    //       child: ProfileStatsCard(
+                    //         title: 'Points Balance',
+                    //         value: '${_userProfile!.pointsBalance}',
+                    //         icon: Icons.stars_outlined,
+                    //         color: const Color(0xFFD69E2E),
+                    //         onTap: _onPointsBalanceTap,
+                    //       ),
+                    //     ),
+                    //     const SizedBox(width: 12),
+                    //     Expanded(
+                    //       child: ProfileStatsCard(
+                    //         title: 'Subscription',
+                    //         value: _userProfile!.activeSubscription!.statusDisplay,
+                    //         icon: Icons.star,
+                    //         color: _userProfile!.activeSubscription!.hasExpired
+                    //             ? Colors.red
+                    //             : _userProfile!.activeSubscription!.isExpiringSoon
+                    //                 ? Colors.orange
+                    //                 : Colors.green,
+                    //         onTap: _onManageSubscriptionTap,
+                    //       ),
+                    //     ),
+                    //   ],
+                    // ),
                   ] else ...[
                     // For users without subscriptions, show original layout
                     Row(
@@ -269,7 +238,8 @@ class _ProfilePageState extends State<ProfilePage> {
                             title: _userProfile!.isEmployee
                                 ? 'Redemptions'
                                 : 'Orders',
-                            value: '12', // This would come from appropriate API
+                            value: '12',
+                            // This would come from appropriate API
                             icon: _userProfile!.isEmployee
                                 ? Icons.redeem_outlined
                                 : Icons.shopping_bag_outlined,
@@ -282,7 +252,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
                   // Employee-specific stats (only show for employees)
                   if (_userProfile!.isEmployee &&
-                      _userProfile!.organizationName != null) ...[
+                      _userProfile!.employeeInfo != null) ...[
                     const SizedBox(height: 16),
                     Container(
                       width: double.infinity,
@@ -320,28 +290,35 @@ class _ProfilePageState extends State<ProfilePage> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      _userProfile!.organizationName!,
+                                      _userProfile!
+                                          .employeeInfo!
+                                          .organizationName,
                                       style: const TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.w700,
                                         color: Color(0xFF1A202C),
                                       ),
                                     ),
-                                    if (_userProfile!.department != null)
-                                      Text(
-                                        _userProfile!.department!,
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          color: Color(0xFF718096),
-                                        ),
+                                    Text(
+                                      _userProfile!.employeeInfo!.department,
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        color: Color(0xFF718096),
                                       ),
+                                    ),
                                   ],
                                 ),
                               ),
                             ],
                           ),
-                          if (_userProfile!.employeeCode != null ||
-                              _userProfile!.position != null) ...[
+                          if (_userProfile!
+                                  .employeeInfo!
+                                  .employeeCode
+                                  .isNotEmpty ||
+                              _userProfile!
+                                  .employeeInfo!
+                                  .position
+                                  .isNotEmpty) ...[
                             const SizedBox(height: 16),
                             const Divider(
                               color: Color(0xFFE2E8F0),
@@ -351,7 +328,10 @@ class _ProfilePageState extends State<ProfilePage> {
                             const SizedBox(height: 16),
                             Row(
                               children: [
-                                if (_userProfile!.employeeCode != null) ...[
+                                if (_userProfile!
+                                    .employeeInfo!
+                                    .employeeCode
+                                    .isNotEmpty) ...[
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment:
@@ -367,7 +347,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                         ),
                                         const SizedBox(height: 4),
                                         Text(
-                                          _userProfile!.employeeCode!,
+                                          _userProfile!
+                                              .employeeInfo!
+                                              .employeeCode,
                                           style: const TextStyle(
                                             fontSize: 15,
                                             fontWeight: FontWeight.w600,
@@ -378,8 +360,14 @@ class _ProfilePageState extends State<ProfilePage> {
                                     ),
                                   ),
                                 ],
-                                if (_userProfile!.position != null) ...[
-                                  if (_userProfile!.employeeCode != null)
+                                if (_userProfile!
+                                    .employeeInfo!
+                                    .position
+                                    .isNotEmpty) ...[
+                                  if (_userProfile!
+                                      .employeeInfo!
+                                      .employeeCode
+                                      .isNotEmpty)
                                     const SizedBox(width: 16),
                                   Expanded(
                                     child: Column(
@@ -396,7 +384,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                         ),
                                         const SizedBox(height: 4),
                                         Text(
-                                          _userProfile!.position!,
+                                          _userProfile!.employeeInfo!.position,
                                           style: const TextStyle(
                                             fontSize: 15,
                                             fontWeight: FontWeight.w600,
@@ -418,16 +406,15 @@ class _ProfilePageState extends State<ProfilePage> {
 
                 const SizedBox(height: 20),
 
-
-                // Subscription Status Card (show for all users who have subscriptions)
-                if (_userProfile != null && _userProfile!.activeSubscription != null) ...[
-                  SubscriptionStatusCard(
-                    activeSubscription: _userProfile!.activeSubscription,
-                    onManageSubscriptionTap: _onManageSubscriptionTap,
-                    onUpgradeTap: _onUpgradeSubscriptionTap,
-                  ),
-                  const SizedBox(height: 20),
-                ],
+                // TODO: Subscription Status Card (implement with new profile model)
+                // if (_userProfile != null && _userProfile!.activeSubscription != null) ...[
+                //   SubscriptionStatusCard(
+                //     activeSubscription: _userProfile!.activeSubscription,
+                //     onManageSubscriptionTap: _onManageSubscriptionTap,
+                //     onUpgradeTap: _onUpgradeSubscriptionTap,
+                //   ),
+                //   const SizedBox(height: 20),
+                // ],
 
                 // Menu Items
                 if (_userProfile != null) ...[
@@ -440,18 +427,12 @@ class _ProfilePageState extends State<ProfilePage> {
                           : 'Update your personal information',
                       onTap: _onEditProfileTap,
                     ),
-                    // Show subscription menu for all users (employees and non-employees)
+                    // TODO: Show subscription menu for all users (employees and non-employees)
                     ProfileMenuItem(
                       icon: Icons.card_membership,
-                      title: _userProfile!.hasActiveSubscription
-                          ? 'Manage Subscription'
-                          : 'Get Premium',
-                      subtitle: _userProfile!.hasActiveSubscription
-                          ? 'Manage your subscription plan'
-                          : 'Unlock premium features',
-                      onTap: _userProfile!.hasActiveSubscription
-                          ? _onManageSubscriptionTap
-                          : _onUpgradeSubscriptionTap,
+                      title: 'Get Premium',
+                      subtitle: 'Unlock premium features',
+                      onTap: _onUpgradeSubscriptionTap,
                     ),
                     if (!_userProfile!.isEmployee) ...[
                       ProfileMenuItem(
@@ -544,7 +525,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 // Sign Out Button
                 _buildSignOutSection(),
 
-                const SizedBox(height: 100), // Bottom padding for nav bar
+                const SizedBox(height: 100),
+                // Bottom padding for nav bar
               ],
             ),
           ),
@@ -661,11 +643,9 @@ class _ProfilePageState extends State<ProfilePage> {
 
   void _onSendGiftsTap() {
     debugPrint('Send & Receive Gifts tapped');
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const GiftPage(),
-      ),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (context) => const GiftPage()));
   }
 
   void _onRedemptionHistoryTap() {
@@ -701,11 +681,9 @@ class _ProfilePageState extends State<ProfilePage> {
 
   void _onPointsBalanceTap() {
     debugPrint('Points Balance tapped');
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const PointsWalletPage(),
-      ),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (context) => const PointsWalletPage()));
   }
 
   void _onSignOutTap() {
@@ -744,10 +722,9 @@ class _ProfilePageState extends State<ProfilePage> {
                 await _secureStorage.clearAll();
                 // Navigate back to authentication flow
                 if (mounted) {
-                  Navigator.of(context).pushNamedAndRemoveUntil(
-                    '/',
-                    (route) => false,
-                  );
+                  Navigator.of(
+                    context,
+                  ).pushNamedAndRemoveUntil('/', (route) => false);
                 }
               } catch (e) {
                 if (mounted) {

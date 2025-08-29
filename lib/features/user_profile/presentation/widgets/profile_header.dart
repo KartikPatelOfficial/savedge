@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:savedge/features/auth/domain/entities/extended_user_profile.dart';
+import 'package:savedge/features/auth/data/models/user_profile_models.dart';
 
 /// Profile header widget displaying user avatar and basic info
 class ProfileHeader extends StatelessWidget {
   const ProfileHeader({super.key, this.userProfile, this.onEditTap});
 
-  final ExtendedUserProfile? userProfile;
+  final UserProfileResponse3? userProfile;
   final VoidCallback? onEditTap;
 
   @override
@@ -83,16 +83,15 @@ class ProfileHeader extends StatelessWidget {
                           ),
                     ),
                     const SizedBox(height: 4),
-                    if (userProfile?.email != null)
-                      Text(
-                        userProfile!.email!,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Colors.grey[600],
-                        ),
+                    Text(
+                      userProfile?.email ?? '',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Colors.grey[600],
                       ),
+                    ),
                     const SizedBox(height: 4),
                     if (userProfile?.isEmployee == true &&
-                        userProfile?.organizationName != null)
+                        userProfile?.employeeInfo != null)
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 8,
@@ -103,7 +102,7 @@ class ProfileHeader extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
-                          userProfile!.organizationName!,
+                          userProfile!.employeeInfo!.organizationName,
                           style: TextStyle(
                             color: const Color(0xFF6F3FCC),
                             fontSize: 12,
@@ -169,11 +168,7 @@ class ProfileHeader extends StatelessWidget {
 
   String _getDisplayName() {
     if (userProfile != null) {
-      final firstName = userProfile!.firstName ?? '';
-      final lastName = userProfile!.lastName ?? '';
-      if (firstName.isNotEmpty || lastName.isNotEmpty) {
-        return '$firstName $lastName'.trim();
-      }
+      return userProfile!.displayName;
     }
 
     return 'User';

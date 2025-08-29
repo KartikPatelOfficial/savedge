@@ -10,7 +10,7 @@ abstract class VendorResponse with _$VendorResponse {
     required int id,
     required String businessName,
     String? description,
-    required String contactEmail,
+    String? contactEmail,
     String? contactPhone,
     String? address,
     String? city,
@@ -18,15 +18,15 @@ abstract class VendorResponse with _$VendorResponse {
     String? pinCode,
     required String category,
     String? website,
-    required String approvalStatus,
+    @Default('Approved') String approvalStatus,
     required bool isActive,
     DateTime? approvedAt,
     String? approvedBy,
-    required DateTime createdAt,
+    DateTime? createdAt,
     String? firebaseUid,
     String? vendorFirstName,
     String? vendorLastName,
-    required String vendorFullName,
+    String? vendorFullName,
     @Default([]) List<VendorImageDto> images,
     @Default([]) List<VendorSocialMediaDto> socialMediaLinks,
   }) = _VendorResponse;
@@ -39,13 +39,13 @@ abstract class VendorResponse with _$VendorResponse {
 @freezed
 abstract class VendorImageDto with _$VendorImageDto {
   const factory VendorImageDto({
-    required int id,
+    @Default(0) int id,
     required String imageUrl,
     String? altText,
-    required int displayOrder,
+    @Default(0) int displayOrder,
     required bool isPrimary,
-    required ImageType imageType,
-    required String imageTypeName,
+    @Default(ImageType.gallery) ImageType imageType,
+    @Default('Gallery') String imageTypeName,
   }) = _VendorImageDto;
 
   factory VendorImageDto.fromJson(Map<String, dynamic> json) =>
@@ -56,11 +56,11 @@ abstract class VendorImageDto with _$VendorImageDto {
 @freezed
 abstract class VendorSocialMediaDto with _$VendorSocialMediaDto {
   const factory VendorSocialMediaDto({
-    required int id,
-    required SocialMediaPlatform platform,
-    required String platformName,
+    @Default(0) int id,
+    SocialMediaPlatform? platform,
+    String? platformName,
     required String url,
-    required bool isActive,
+    @Default(true) bool isActive,
   }) = _VendorSocialMediaDto;
 
   factory VendorSocialMediaDto.fromJson(Map<String, dynamic> json) =>
@@ -89,21 +89,21 @@ enum ImageType {
 
 /// Social media platform enum
 enum SocialMediaPlatform {
-  @JsonValue(1)
+  @JsonValue('Instagram')
   instagram,
-  @JsonValue(2)
+  @JsonValue('Facebook')
   facebook,
-  @JsonValue(3)
+  @JsonValue('Twitter')
   twitter,
-  @JsonValue(4)
+  @JsonValue('LinkedIn')
   linkedin,
-  @JsonValue(5)
+  @JsonValue('YouTube')
   youtube,
-  @JsonValue(6)
+  @JsonValue('GoogleMaps')
   googleMaps,
-  @JsonValue(7)
+  @JsonValue('WhatsApp')
   whatsApp,
-  @JsonValue(8)
+  @JsonValue('Other')
   other,
 }
 

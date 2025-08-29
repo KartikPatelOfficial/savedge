@@ -11,7 +11,7 @@ _VendorResponse _$VendorResponseFromJson(Map<String, dynamic> json) =>
       id: (json['id'] as num).toInt(),
       businessName: json['businessName'] as String,
       description: json['description'] as String?,
-      contactEmail: json['contactEmail'] as String,
+      contactEmail: json['contactEmail'] as String?,
       contactPhone: json['contactPhone'] as String?,
       address: json['address'] as String?,
       city: json['city'] as String?,
@@ -19,17 +19,19 @@ _VendorResponse _$VendorResponseFromJson(Map<String, dynamic> json) =>
       pinCode: json['pinCode'] as String?,
       category: json['category'] as String,
       website: json['website'] as String?,
-      approvalStatus: json['approvalStatus'] as String,
+      approvalStatus: json['approvalStatus'] as String? ?? 'Approved',
       isActive: json['isActive'] as bool,
       approvedAt: json['approvedAt'] == null
           ? null
           : DateTime.parse(json['approvedAt'] as String),
       approvedBy: json['approvedBy'] as String?,
-      createdAt: DateTime.parse(json['createdAt'] as String),
+      createdAt: json['createdAt'] == null
+          ? null
+          : DateTime.parse(json['createdAt'] as String),
       firebaseUid: json['firebaseUid'] as String?,
       vendorFirstName: json['vendorFirstName'] as String?,
       vendorLastName: json['vendorLastName'] as String?,
-      vendorFullName: json['vendorFullName'] as String,
+      vendorFullName: json['vendorFullName'] as String?,
       images:
           (json['images'] as List<dynamic>?)
               ?.map((e) => VendorImageDto.fromJson(e as Map<String, dynamic>))
@@ -61,7 +63,7 @@ Map<String, dynamic> _$VendorResponseToJson(_VendorResponse instance) =>
       'isActive': instance.isActive,
       'approvedAt': instance.approvedAt?.toIso8601String(),
       'approvedBy': instance.approvedBy,
-      'createdAt': instance.createdAt.toIso8601String(),
+      'createdAt': instance.createdAt?.toIso8601String(),
       'firebaseUid': instance.firebaseUid,
       'vendorFirstName': instance.vendorFirstName,
       'vendorLastName': instance.vendorLastName,
@@ -72,13 +74,15 @@ Map<String, dynamic> _$VendorResponseToJson(_VendorResponse instance) =>
 
 _VendorImageDto _$VendorImageDtoFromJson(Map<String, dynamic> json) =>
     _VendorImageDto(
-      id: (json['id'] as num).toInt(),
+      id: (json['id'] as num?)?.toInt() ?? 0,
       imageUrl: json['imageUrl'] as String,
       altText: json['altText'] as String?,
-      displayOrder: (json['displayOrder'] as num).toInt(),
+      displayOrder: (json['displayOrder'] as num?)?.toInt() ?? 0,
       isPrimary: json['isPrimary'] as bool,
-      imageType: $enumDecode(_$ImageTypeEnumMap, json['imageType']),
-      imageTypeName: json['imageTypeName'] as String,
+      imageType:
+          $enumDecodeNullable(_$ImageTypeEnumMap, json['imageType']) ??
+          ImageType.gallery,
+      imageTypeName: json['imageTypeName'] as String? ?? 'Gallery',
     );
 
 Map<String, dynamic> _$VendorImageDtoToJson(_VendorImageDto instance) =>
@@ -106,32 +110,32 @@ const _$ImageTypeEnumMap = {
 _VendorSocialMediaDto _$VendorSocialMediaDtoFromJson(
   Map<String, dynamic> json,
 ) => _VendorSocialMediaDto(
-  id: (json['id'] as num).toInt(),
-  platform: $enumDecode(_$SocialMediaPlatformEnumMap, json['platform']),
-  platformName: json['platformName'] as String,
+  id: (json['id'] as num?)?.toInt() ?? 0,
+  platform: $enumDecodeNullable(_$SocialMediaPlatformEnumMap, json['platform']),
+  platformName: json['platformName'] as String?,
   url: json['url'] as String,
-  isActive: json['isActive'] as bool,
+  isActive: json['isActive'] as bool? ?? true,
 );
 
 Map<String, dynamic> _$VendorSocialMediaDtoToJson(
   _VendorSocialMediaDto instance,
 ) => <String, dynamic>{
   'id': instance.id,
-  'platform': _$SocialMediaPlatformEnumMap[instance.platform]!,
+  'platform': _$SocialMediaPlatformEnumMap[instance.platform],
   'platformName': instance.platformName,
   'url': instance.url,
   'isActive': instance.isActive,
 };
 
 const _$SocialMediaPlatformEnumMap = {
-  SocialMediaPlatform.instagram: 1,
-  SocialMediaPlatform.facebook: 2,
-  SocialMediaPlatform.twitter: 3,
-  SocialMediaPlatform.linkedin: 4,
-  SocialMediaPlatform.youtube: 5,
-  SocialMediaPlatform.googleMaps: 6,
-  SocialMediaPlatform.whatsApp: 7,
-  SocialMediaPlatform.other: 8,
+  SocialMediaPlatform.instagram: 'Instagram',
+  SocialMediaPlatform.facebook: 'Facebook',
+  SocialMediaPlatform.twitter: 'Twitter',
+  SocialMediaPlatform.linkedin: 'LinkedIn',
+  SocialMediaPlatform.youtube: 'YouTube',
+  SocialMediaPlatform.googleMaps: 'GoogleMaps',
+  SocialMediaPlatform.whatsApp: 'WhatsApp',
+  SocialMediaPlatform.other: 'Other',
 };
 
 _PaginatedVendorsResponse _$PaginatedVendorsResponseFromJson(

@@ -1,5 +1,6 @@
 import 'package:savedge/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:savedge/features/auth/data/models/auth_models.dart';
+import 'package:savedge/features/auth/data/models/user_profile_models.dart';
 import 'package:savedge/features/auth/domain/entities/extended_user_profile.dart';
 import 'package:savedge/features/auth/domain/entities/user_profile.dart';
 import 'package:savedge/features/auth/domain/repositories/auth_repository.dart';
@@ -47,41 +48,19 @@ class AuthRepositoryImpl implements AuthRepository {
     createdAt: r.createdAt,
   );
 
-  UserProfile _map2(UserProfileResponse2 r) => _mapBase(
+  UserProfile _map3(UserProfileResponse3 r) => _mapBase(
     id: r.id,
     email: r.email,
     firstName: r.firstName,
     lastName: r.lastName,
-    firebaseUid: r.firebaseUid,
-    organizationId: r.organizationId,
-    pointsBalance: r.pointsBalance,
-    pointsExpiry: r.pointsExpiry,
+    firebaseUid: null,
+    organizationId: r.employeeInfo?.organizationId,
+    pointsBalance: r.employeeInfo?.pointsBalance ?? 0,
+    pointsExpiry: null,
     isActive: r.isActive,
     createdAt: r.createdAt,
   );
 
-  ExtendedUserProfile _mapExtended(UserProfileResponse2 r) =>
-      ExtendedUserProfile(
-        id: r.id,
-        email: r.email,
-        firstName: r.firstName,
-        lastName: r.lastName,
-        organizationId: r.organizationId,
-        organizationName: r.organizationName,
-        pointsBalance: r.pointsBalance,
-        pointsExpiry: r.pointsExpiry,
-        isActive: r.isActive,
-        createdAt: r.createdAt,
-        roles: r.roles,
-        isEmployee: r.isEmployee,
-        employeeCode: r.employeeCode,
-        department: r.department,
-        position: r.position,
-        joinDate: r.joinDate,
-        activeSubscription: r.activeSubscription != null
-            ? ActiveSubscriptionModel.fromJson(r.activeSubscription!).toDomain()
-            : null,
-      );
 
   @override
   Future<UserProfile> getProfile() async => _map(await _remote.getProfile());
@@ -108,20 +87,41 @@ class AuthRepositoryImpl implements AuthRepository {
     String? lastName,
   }) async {
     final res = await _remote.updateUserProfile(
-      UpdateUserProfileRequest(
+      UpdateUserProfileRequest3(
         email: email,
         firstName: firstName,
         lastName: lastName,
       ),
     );
-    return _map2(res);
+    return _map3(res);
   }
 
   @override
   Future<ExtendedUserProfile> getUserProfileExtended() async {
     final res = await _remote.getUserProfile();
-    return _mapExtended(res);
+    return _mapExtended3(res);
   }
+
+  ExtendedUserProfile _mapExtended3(UserProfileResponse3 r) =>
+      ExtendedUserProfile(
+        id: r.id,
+        email: r.email,
+        firstName: r.firstName,
+        lastName: r.lastName,
+        organizationId: r.employeeInfo?.organizationId,
+        organizationName: r.employeeInfo?.organizationName,
+        pointsBalance: r.employeeInfo?.pointsBalance ?? 0,
+        pointsExpiry: null,
+        isActive: r.isActive,
+        createdAt: r.createdAt,
+        roles: r.roles,
+        isEmployee: r.isEmployee,
+        employeeCode: r.employeeInfo?.employeeCode,
+        department: r.employeeInfo?.department,
+        position: r.employeeInfo?.position,
+        joinDate: null,
+        activeSubscription: null,
+      );
 
   // New unified authentication flow methods
   @override
@@ -218,5 +218,27 @@ class AuthRepositoryImpl implements AuthRepository {
       ),
     );
     return res;
+  }
+
+  @override
+  Future<UserProfileResponse3> getCurrentUserProfile() async {
+    return await _remote.getUserProfile();
+  }
+
+  @override
+  Future<UserProfileResponse3> updateCurrentUserProfile({
+    String? firstName,
+    String? lastName,
+    String? email,
+    String? profileImageUrl,
+  }) async {
+    return await _remote.updateUserProfile(
+      UpdateUserProfileRequest3(
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+        profileImageUrl: profileImageUrl,
+      ),
+    );
   }
 }

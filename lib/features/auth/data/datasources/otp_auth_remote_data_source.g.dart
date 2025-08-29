@@ -27,7 +27,7 @@ class _OtpAuthRemoteDataSource implements OtpAuthRemoteDataSource {
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/api/user-auth/send-otp',
+            '/api/auth/user-auth/send-otp',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -54,7 +54,7 @@ class _OtpAuthRemoteDataSource implements OtpAuthRemoteDataSource {
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/api/user-auth/verify-otp',
+            '/api/auth/user-auth/verify-otp',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -83,7 +83,7 @@ class _OtpAuthRemoteDataSource implements OtpAuthRemoteDataSource {
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/api/user-auth/register-individual',
+            '/api/auth/user-auth/register-individual',
             queryParameters: queryParameters,
             data: _data,
           )

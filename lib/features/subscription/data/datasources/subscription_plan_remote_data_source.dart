@@ -40,7 +40,7 @@ class SubscriptionPlanRemoteDataSourceImpl
   @override
   Future<SubscriptionPlanModel?> getSubscriptionPlan(int id) async {
     try {
-      final response = await _dio.get('/api/admin/subscriptions/$id');
+      final response = await _dio.get('/api/subscriptions/$id');
 
       if (response.statusCode == 200) {
         return SubscriptionPlanModel.fromJson(
