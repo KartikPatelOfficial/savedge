@@ -445,23 +445,52 @@ class _QRScannerPageState extends State<QRScannerPage>
         );
       }
 
-      // Navigate to redemption options page
+      // QR verification successful - directly redeem the coupon
       if (mounted) {
-        final result = await Navigator.of(context).push<bool>(
-          MaterialPageRoute(
-            builder: (context) =>
-                CouponRedemptionOptionsPage(couponData: couponCheck),
-          ),
-        );
+        try {
+          // Show loading dialog
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) => const Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
 
-        if (result == true) {
-          // Coupon was successfully claimed
-          if (mounted) {
-            Navigator.of(context).pop(true); // Return success
+          // Find the user's unused coupon for this coupon ID
+          if (couponCheck.hasUnusedCoupons && couponCheck.unusedCoupons.isNotEmpty) {
+            // Use the first unused coupon
+            final unusedCoupon = couponCheck.unusedCoupons.first;
+            await _couponService.redeemMyCoupon(unusedCoupon.userCouponId);
+          } else {
+            throw Exception('No unused coupons available for redemption');
           }
-        } else {
-          // User cancelled or failed to claim
-          _resetScanning();
+
+          // Close loading dialog
+          if (mounted) {
+            Navigator.of(context).pop();
+          }
+
+          // Show success message
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Coupon redeemed successfully!'),
+                backgroundColor: Colors.green,
+              ),
+            );
+          }
+
+          // Return success to close QR scanner
+          if (mounted) {
+            Navigator.of(context).pop(true);
+          }
+        } catch (e) {
+          // Close loading dialog if still open
+          if (mounted) {
+            Navigator.of(context).pop();
+          }
+          throw Exception('Failed to redeem coupon: $e');
         }
       }
     } catch (e) {

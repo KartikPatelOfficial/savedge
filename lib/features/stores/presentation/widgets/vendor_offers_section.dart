@@ -5,7 +5,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:savedge/core/injection/injection.dart';
 import 'package:savedge/features/vendors/domain/entities/coupon.dart';
 import 'package:savedge/features/vendors/presentation/bloc/coupons_bloc.dart';
-import 'package:savedge/features/qr_scanner/presentation/pages/qr_scanner_page.dart';
+import 'package:savedge/features/coupons/presentation/pages/coupon_redemption_options_page.dart';
+import 'package:savedge/features/coupons/data/services/coupon_service.dart';
+import 'package:get_it/get_it.dart';
 
 /// Widget for displaying vendor-specific offers/coupons
 class VendorOffersSection extends StatelessWidget {
@@ -428,34 +430,16 @@ class _VendorOfferCardState extends State<VendorOfferCard>
       // Show loading indicator with haptic feedback
       HapticFeedback.lightImpact();
       
-      // Navigate to QR scanner page with hero animation
+      // First, check the coupon to get its details
+      final couponService = GetIt.I<CouponService>();
+      final couponCheck = await couponService.checkCoupon(widget.coupon.id);
+      
+      // Navigate to coupon redemption options page
       final result = await Navigator.of(context).push<bool>(
-        PageRouteBuilder(
-          pageBuilder: (context, animation, secondaryAnimation) => QRScannerPage(
-            couponId: widget.coupon.id,
-            expectedVendorUid: widget.vendorUid,
-            expectedVendorName: widget.vendorName,
+        MaterialPageRoute(
+          builder: (context) => CouponRedemptionOptionsPage(
+            couponData: couponCheck,
           ),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            const begin = Offset(1.0, 0.0);
-            const end = Offset.zero;
-            const curve = Curves.easeInOutCubic;
-            
-            final tween = Tween(begin: begin, end: end);
-            final curvedAnimation = CurvedAnimation(
-              parent: animation,
-              curve: curve,
-            );
-            
-            return SlideTransition(
-              position: tween.animate(curvedAnimation),
-              child: FadeTransition(
-                opacity: animation,
-                child: child,
-              ),
-            );
-          },
-          transitionDuration: const Duration(milliseconds: 300),
         ),
       );
 
