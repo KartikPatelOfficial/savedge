@@ -1,5 +1,4 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:savedge/core/injection/injection.dart';
@@ -199,21 +198,6 @@ class _VendorDetailView extends StatelessWidget {
         ? galleryImages
         : vendor.images.take(3).toList(); // Show up to 3 images
 
-    // Debug: Print image information
-    if (kDebugMode) {
-      print('=== Vendor Images Debug ===');
-      print('Total images: ${vendor.images.length}');
-      print('Gallery images: ${galleryImages.length}');
-      print('Images to show: ${imagesToShow.length}');
-      for (int i = 0; i < imagesToShow.length; i++) {
-        final img = imagesToShow[i];
-        print(
-          'Image $i: ${img.imageUrl} (Type: ${img.imageType}, Primary: ${img.isPrimary})',
-        );
-      }
-      print('===========================');
-    }
-
     return SliverAppBar(
       expandedHeight: 300,
       pinned: true,
@@ -378,12 +362,6 @@ class _VendorDetailView extends StatelessWidget {
   Widget _buildVendorInfo() {
     return Container(
       margin: const EdgeInsets.all(20),
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
