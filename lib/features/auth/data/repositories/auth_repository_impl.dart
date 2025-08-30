@@ -4,7 +4,6 @@ import 'package:savedge/features/auth/data/models/user_profile_models.dart';
 import 'package:savedge/features/auth/domain/entities/extended_user_profile.dart';
 import 'package:savedge/features/auth/domain/entities/user_profile.dart';
 import 'package:savedge/features/auth/domain/repositories/auth_repository.dart';
-import 'package:savedge/features/subscription/data/models/active_subscription_model.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   const AuthRepositoryImpl(this._remote);
@@ -55,12 +54,11 @@ class AuthRepositoryImpl implements AuthRepository {
     lastName: r.lastName,
     firebaseUid: null,
     organizationId: r.employeeInfo?.organizationId,
-    pointsBalance: r.employeeInfo?.pointsBalance ?? 0,
+    pointsBalance: r.employeeInfo?.availablePoints ?? 0,
     pointsExpiry: null,
     isActive: r.isActive,
     createdAt: r.createdAt,
   );
-
 
   @override
   Future<UserProfile> getProfile() async => _map(await _remote.getProfile());
@@ -110,7 +108,7 @@ class AuthRepositoryImpl implements AuthRepository {
         lastName: r.lastName,
         organizationId: r.employeeInfo?.organizationId,
         organizationName: r.employeeInfo?.organizationName,
-        pointsBalance: r.employeeInfo?.pointsBalance ?? 0,
+        pointsBalance: r.employeeInfo?.availablePoints ?? 0,
         pointsExpiry: null,
         isActive: r.isActive,
         createdAt: r.createdAt,

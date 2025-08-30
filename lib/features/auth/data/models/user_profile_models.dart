@@ -36,7 +36,7 @@ abstract class EmployeeInfo with _$EmployeeInfo {
     required String department,
     required String position,
     required String employeeCode,
-    required int pointsBalance,
+    required int availablePoints,
   }) = _EmployeeInfo;
 
   factory EmployeeInfo.fromJson(Map<String, dynamic> json) =>
@@ -95,7 +95,7 @@ extension UserProfileResponse3Extensions on UserProfileResponse3 {
   bool get isEmployeeWithOrganization => isEmployee && employeeInfo != null;
 
   /// Get points balance (from employee info or 0 for others)
-  int get pointsBalance => employeeInfo?.pointsBalance ?? 0;
+  int get pointsBalance => employeeInfo?.availablePoints ?? 0;
 
   /// Get display name
   String get displayName {
