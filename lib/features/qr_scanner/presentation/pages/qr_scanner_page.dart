@@ -428,22 +428,8 @@ class _QRScannerPageState extends State<QRScannerPage>
       // Stop camera to free resources during processing
       await _stopCamera();
 
-      // Parse QR code format: 'savedge://vendor/$vendorId'
-      final uri = Uri.tryParse(qrCode);
-      if (uri == null || uri.scheme != 'savedge' || uri.host != 'vendor') {
-        throw Exception(
-          'Invalid QR code format. Please scan a valid vendor QR code.',
-        );
-      }
-
-      if (uri.pathSegments.isEmpty) {
-        throw Exception('Invalid vendor QR code. No vendor ID found.');
-      }
-
-      final scannedVendorId = uri.pathSegments[0];
-
       // Validate vendor matches
-      if (scannedVendorId != widget.expectedVendorUid) {
+      if (qrCode != widget.expectedVendorUid) {
         throw Exception(
           'This QR code belongs to a different vendor. Please scan the QR code from ${widget.expectedVendorName}.',
         );

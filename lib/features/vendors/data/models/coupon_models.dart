@@ -14,6 +14,7 @@ class CouponResponse {
       validTo: DateTime.parse(json['validUntil'] as String),
       isActive: json['isActive'] as bool,
       vendorId: json['vendorProfileId'] as int,
+      vendorUserId: json['vendorUserId'] as String,
       status: _mapStatusFromInt(json['status'] as int),
       termsAndConditions: json['termsAndConditions'] as String?,
       usageCount: json['currentRedemptions'] as int? ?? 0,
@@ -47,6 +48,7 @@ class CouponResponse {
     required this.validTo,
     required this.isActive,
     required this.vendorId,
+    required this.vendorUserId,
     required this.status,
     this.termsAndConditions,
     this.usageCount = 0,
@@ -75,6 +77,7 @@ class CouponResponse {
   final DateTime validTo;
   final bool isActive;
   final int vendorId;
+  final String vendorUserId;
   final String status;
   final String? termsAndConditions;
   final int usageCount;
@@ -104,6 +107,7 @@ class CouponResponse {
       'validUntil': validTo.toIso8601String(),
       'isActive': isActive,
       'vendorProfileId': vendorId,
+      'vendorUserId': vendorUserId,
       'status': status,
       'termsAndConditions': termsAndConditions,
       'currentRedemptions': usageCount,

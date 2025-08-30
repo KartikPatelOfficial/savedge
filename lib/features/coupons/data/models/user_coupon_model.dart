@@ -11,6 +11,7 @@ class UserCouponModel {
     required this.minCartValue,
     required this.maxDiscountAmount,
     required this.vendorId,
+    required this.vendorUserId,
     required this.vendorName,
     required this.expiryDate,
     required this.isUsed,
@@ -32,6 +33,7 @@ class UserCouponModel {
   final double minCartValue;
   final double maxDiscountAmount;
   final int vendorId;
+  final String vendorUserId;
   final String vendorName;
   final String expiryDate;
   final bool isUsed;
@@ -76,7 +78,8 @@ class UserCouponModel {
       ),
       minCartValue: (json['minCartValue'] as num?)?.toDouble() ?? 0.0,
       maxDiscountAmount: (json['maxDiscountAmount'] as num?)?.toDouble() ?? 0.0,
-      vendorId: json['vendorId'] as int,
+      vendorId: json['vendorProfileId'] as int,
+      vendorUserId: json['vendorUserId'] as String,
       vendorName: json['vendorName'] as String? ?? 'Vendor ${json['vendorId']}',
       expiryDate: json['expiryDate'] as String,
       isUsed: json['status'] == 'Used' || json['isUsed'] == true,
@@ -114,7 +117,8 @@ class UserCouponModel {
       'discountDisplay': discountDisplay,
       'minCartValue': minCartValue,
       'maxDiscountAmount': maxDiscountAmount,
-      'vendorId': vendorId,
+      'vendorProfileId': vendorId,
+      'vendorUserId': vendorUserId,
       'vendorName': vendorName,
       'expiryDate': expiryDate,
       'isUsed': isUsed,

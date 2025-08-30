@@ -933,7 +933,7 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
         MaterialPageRoute(
           builder: (context) => QRScannerPage(
             couponId: widget.userCoupon!.couponId,
-            expectedVendorUid: widget.userCoupon!.vendorId.toString(),
+            expectedVendorUid: widget.userCoupon!.vendorUserId,
             expectedVendorName: widget.userCoupon!.vendorName,
           ),
         ),

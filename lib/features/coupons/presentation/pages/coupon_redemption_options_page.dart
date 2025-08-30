@@ -852,6 +852,7 @@ class _CouponRedemptionOptionsPageState
             title: widget.couponData.title,
             description: widget.couponData.description,
             vendorId: widget.couponData.vendorId,
+            vendorUserId: widget.couponData.vendorUserId,
             vendorName: widget.couponData.vendorName,
             status: firstUnusedCoupon.status,
             acquiredDate: DateTime.tryParse(firstUnusedCoupon.acquiredDate) ?? DateTime.now(),

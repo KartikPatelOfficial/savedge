@@ -41,6 +41,7 @@ class CouponCheckResponse {
     required this.title,
     required this.description,
     required this.vendorId,
+    required this.vendorUserId,
     required this.vendorName,
     required this.discountType,
     required this.discountValue,
@@ -77,6 +78,7 @@ class CouponCheckResponse {
   final String title;
   final String description;
   final int vendorId;
+  final String vendorUserId;
   final String vendorName;
   final int discountType;
   final double discountValue;
@@ -113,7 +115,8 @@ class CouponCheckResponse {
       couponId: json['couponId'] as int,
       title: json['title'] as String,
       description: json['description'] as String,
-      vendorId: json['vendorId'] as int,
+      vendorId: json['vendorProfileId'] as int,
+      vendorUserId: json['vendorUserId'] as String,
       vendorName: json['vendorName'] as String,
       discountType: json['discountType'] as int,
       discountValue: (json['discountValue'] as num).toDouble(),

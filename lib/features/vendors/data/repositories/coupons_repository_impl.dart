@@ -104,6 +104,7 @@ class CouponsRepositoryImpl implements CouponsRepository {
       validTo: response.validTo,
       isActive: response.isActive,
       vendorId: response.vendorId,
+      vendorUserId: response.vendorUserId,
       status: response.status,
       termsAndConditions: response.termsAndConditions,
       usageCount: response.usageCount,

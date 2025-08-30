@@ -14,6 +14,7 @@ class Coupon extends Equatable {
     required this.validTo,
     required this.isActive,
     required this.vendorId,
+    required this.vendorUserId,
     required this.status,
     this.termsAndConditions,
     this.usageCount = 0,
@@ -31,6 +32,7 @@ class Coupon extends Equatable {
   final DateTime validTo;
   final bool isActive;
   final int vendorId;
+  final String vendorUserId;
   final String status;
   final String? termsAndConditions;
   final int usageCount;
@@ -76,6 +78,7 @@ class Coupon extends Equatable {
     validTo,
     isActive,
     vendorId,
+    vendorUserId,
     status,
     termsAndConditions,
     usageCount,

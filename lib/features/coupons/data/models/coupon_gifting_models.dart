@@ -77,6 +77,7 @@ abstract class UserCouponDetailModel with _$UserCouponDetailModel {
     required String title,
     String? description,
     required int vendorId,
+    required String vendorUserId,
     required String vendorName,
     required String status,
     required DateTime acquiredDate,
