@@ -20,7 +20,6 @@ abstract class CouponsRemoteDataSource {
     @Query('vendorId') int? vendorId,
     @Query('discountType') String? discountType,
     @Query('status') String? status,
-    @Query('isActive') bool? isActive,
     @Query('isExpired') bool? isExpired,
   });
 
@@ -30,7 +29,7 @@ abstract class CouponsRemoteDataSource {
     @Query('vendorId') int vendorId, {
     @Query('pageNumber') int pageNumber = 1,
     @Query('pageSize') int pageSize = 10,
-    @Query('isActive') bool isActive = true,
+    @Query('status') String? status = 'active',
     @Query('isExpired') bool isExpired = false,
   });
 
@@ -39,7 +38,7 @@ abstract class CouponsRemoteDataSource {
   Future<GetCouponsResponse> getFeaturedCoupons({
     @Query('pageNumber') int pageNumber = 1,
     @Query('pageSize') int pageSize = 5,
-    @Query('isActive') bool isActive = true,
+    @Query('status') String? status = 'active',
     @Query('isExpired') bool isExpired = false,
   });
 }

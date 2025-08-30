@@ -25,7 +25,6 @@ class _CouponsRemoteDataSource implements CouponsRemoteDataSource {
     int? vendorId,
     String? discountType,
     String? status,
-    bool? isActive,
     bool? isExpired,
   }) async {
     final _extra = <String, dynamic>{};
@@ -36,7 +35,6 @@ class _CouponsRemoteDataSource implements CouponsRemoteDataSource {
       r'vendorId': vendorId,
       r'discountType': discountType,
       r'status': status,
-      r'isActive': isActive,
       r'isExpired': isExpired,
     };
     queryParameters.removeWhere((k, v) => v == null);
@@ -68,7 +66,7 @@ class _CouponsRemoteDataSource implements CouponsRemoteDataSource {
     int vendorId, {
     int pageNumber = 1,
     int pageSize = 10,
-    bool isActive = true,
+    String? status = 'active',
     bool isExpired = false,
   }) async {
     final _extra = <String, dynamic>{};
@@ -76,9 +74,10 @@ class _CouponsRemoteDataSource implements CouponsRemoteDataSource {
       r'vendorId': vendorId,
       r'pageNumber': pageNumber,
       r'pageSize': pageSize,
-      r'isActive': isActive,
+      r'status': status,
       r'isExpired': isExpired,
     };
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<GetCouponsResponse>(
@@ -106,16 +105,17 @@ class _CouponsRemoteDataSource implements CouponsRemoteDataSource {
   Future<GetCouponsResponse> getFeaturedCoupons({
     int pageNumber = 1,
     int pageSize = 5,
-    bool isActive = true,
+    String? status = 'active',
     bool isExpired = false,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{
       r'pageNumber': pageNumber,
       r'pageSize': pageSize,
-      r'isActive': isActive,
+      r'status': status,
       r'isExpired': isExpired,
     };
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<GetCouponsResponse>(

@@ -10,28 +10,24 @@ class CouponResponse {
       minimumOrderAmount: (json['minCartValue'] as num?)?.toDouble() ?? 0.0,
       maximumDiscountAmount:
           (json['maxDiscountAmount'] as num?)?.toDouble() ?? 0.0,
+      cashPrice: (json['cashPrice'] as num?)?.toDouble(),
       validFrom: DateTime.parse(json['validFrom'] as String),
       validTo: DateTime.parse(json['validUntil'] as String),
-      isActive: json['isActive'] as bool,
       vendorId: json['vendorProfileId'] as int,
       vendorUserId: json['vendorUserId'] as String,
       status: _mapStatusFromInt(json['status'] as int),
-      termsAndConditions: json['termsAndConditions'] as String?,
-      usageCount: json['currentRedemptions'] as int? ?? 0,
-      maxUsageCount: json['maxRedemptions'] as int?,
+      termsAndConditions: json['terms'] as String?,
+      maxRedemptions: json['maxRedemptions'] as int?,
       createdAt: json['createdAt'] != null
           ? DateTime.parse(json['createdAt'] as String)
           : null,
-      updatedAt: json['updatedAt'] != null
-          ? DateTime.parse(json['updatedAt'] as String)
+      lastModifiedAt: json['lastModifiedAt'] != null
+          ? DateTime.parse(json['lastModifiedAt'] as String)
           : null,
       vendorName: json['vendorName'] as String?,
       discountTypeDisplay: json['discountTypeDisplay'] as String?,
       discountDisplay: json['discountDisplay'] as String?,
       statusDisplay: json['statusDisplay'] as String?,
-      imageUrl: json['imageUrl'] as String?,
-      pointsCost: json['pointsCost'] as int?,
-      isOnePerUser: json['isOnePerUser'] as bool? ?? false,
       isValid: json['isValid'] as bool? ?? true,
       isExpired: json['isExpired'] as bool? ?? false,
     );
@@ -46,22 +42,18 @@ class CouponResponse {
     required this.maximumDiscountAmount,
     required this.validFrom,
     required this.validTo,
-    required this.isActive,
     required this.vendorId,
     required this.vendorUserId,
     required this.status,
+    this.cashPrice,
     this.termsAndConditions,
-    this.usageCount = 0,
-    this.maxUsageCount,
+    this.maxRedemptions,
     this.createdAt,
-    this.updatedAt,
+    this.lastModifiedAt,
     this.vendorName,
     this.discountTypeDisplay,
     this.discountDisplay,
     this.statusDisplay,
-    this.imageUrl,
-    this.pointsCost,
-    this.isOnePerUser = false,
     this.isValid = true,
     this.isExpired = false,
   });
@@ -73,24 +65,20 @@ class CouponResponse {
   final String discountType;
   final double minimumOrderAmount;
   final double maximumDiscountAmount;
+  final double? cashPrice;
   final DateTime validFrom;
   final DateTime validTo;
-  final bool isActive;
   final int vendorId;
   final String vendorUserId;
   final String status;
   final String? termsAndConditions;
-  final int usageCount;
-  final int? maxUsageCount;
+  final int? maxRedemptions;
   final DateTime? createdAt;
-  final DateTime? updatedAt;
+  final DateTime? lastModifiedAt;
   final String? vendorName;
   final String? discountTypeDisplay;
   final String? discountDisplay;
   final String? statusDisplay;
-  final String? imageUrl;
-  final int? pointsCost;
-  final bool isOnePerUser;
   final bool isValid;
   final bool isExpired;
 
@@ -103,24 +91,20 @@ class CouponResponse {
       'discountType': discountType,
       'minCartValue': minimumOrderAmount,
       'maxDiscountAmount': maximumDiscountAmount,
+      'cashPrice': cashPrice,
       'validFrom': validFrom.toIso8601String(),
       'validUntil': validTo.toIso8601String(),
-      'isActive': isActive,
       'vendorProfileId': vendorId,
       'vendorUserId': vendorUserId,
       'status': status,
-      'termsAndConditions': termsAndConditions,
-      'currentRedemptions': usageCount,
-      'maxRedemptions': maxUsageCount,
+      'terms': termsAndConditions,
+      'maxRedemptions': maxRedemptions,
       'createdAt': createdAt?.toIso8601String(),
-      'updatedAt': updatedAt?.toIso8601String(),
+      'lastModifiedAt': lastModifiedAt?.toIso8601String(),
       'vendorName': vendorName,
       'discountTypeDisplay': discountTypeDisplay,
       'discountDisplay': discountDisplay,
       'statusDisplay': statusDisplay,
-      'imageUrl': imageUrl,
-      'pointsCost': pointsCost,
-      'isOnePerUser': isOnePerUser,
       'isValid': isValid,
       'isExpired': isExpired,
     };

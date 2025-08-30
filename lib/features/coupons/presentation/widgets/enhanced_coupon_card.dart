@@ -115,7 +115,8 @@ class EnhancedCouponCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                if (coupon.minCartValue > 0) ...[
+                if (coupon.minCartValue != null &&
+                    coupon.minCartValue! > 0) ...[
                   const SizedBox(height: 12),
                   Container(
                     padding: const EdgeInsets.symmetric(
@@ -136,7 +137,7 @@ class EnhancedCouponCard extends StatelessWidget {
                         ),
                         const SizedBox(width: 6),
                         Text(
-                          'Min order: ₹${coupon.minCartValue.toInt()}',
+                          'Min order: ₹${coupon.minCartValue!.toInt()}',
                           style: const TextStyle(
                             fontSize: 12,
                             color: Color(0xFF6F3FCC),

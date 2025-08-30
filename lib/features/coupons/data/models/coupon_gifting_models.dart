@@ -87,7 +87,7 @@ abstract class UserCouponDetailModel with _$UserCouponDetailModel {
     String? qrCode,
     required String discountType,
     required double discountValue,
-    required double minCartValue,
+    double? minCartValue,
     String? imageUrl,
     required bool isGifted,
     String? giftedFromUserId,

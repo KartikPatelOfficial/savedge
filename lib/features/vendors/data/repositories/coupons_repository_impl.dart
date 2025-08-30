@@ -22,7 +22,6 @@ class CouponsRepositoryImpl implements CouponsRepository {
     int? vendorId,
     String? discountType,
     String? status,
-    bool? isActive,
     bool? isExpired,
   }) async {
     try {
@@ -33,7 +32,6 @@ class CouponsRepositoryImpl implements CouponsRepository {
         vendorId: vendorId,
         discountType: discountType,
         status: status,
-        isActive: isActive,
         isExpired: isExpired,
       );
 
@@ -49,7 +47,7 @@ class CouponsRepositoryImpl implements CouponsRepository {
     int vendorId, {
     int pageNumber = 1,
     int pageSize = 10,
-    bool isActive = true,
+    String? status = 'active',
     bool isExpired = false,
   }) async {
     try {
@@ -57,7 +55,7 @@ class CouponsRepositoryImpl implements CouponsRepository {
         vendorId,
         pageNumber: pageNumber,
         pageSize: pageSize,
-        isActive: isActive,
+        status: status,
         isExpired: isExpired,
       );
 
@@ -72,14 +70,14 @@ class CouponsRepositoryImpl implements CouponsRepository {
   Future<Either<Failure, List<Coupon>>> getFeaturedCoupons({
     int pageNumber = 1,
     int pageSize = 5,
-    bool isActive = true,
+    String? status = 'active',
     bool isExpired = false,
   }) async {
     try {
       final response = await _remoteDataSource.getFeaturedCoupons(
         pageNumber: pageNumber,
         pageSize: pageSize,
-        isActive: isActive,
+        status: status,
         isExpired: isExpired,
       );
 
@@ -102,13 +100,12 @@ class CouponsRepositoryImpl implements CouponsRepository {
       maximumDiscountAmount: response.maximumDiscountAmount,
       validFrom: response.validFrom,
       validTo: response.validTo,
-      isActive: response.isActive,
       vendorId: response.vendorId,
       vendorUserId: response.vendorUserId,
       status: response.status,
+      cashPrice: response.cashPrice,
       termsAndConditions: response.termsAndConditions,
-      usageCount: response.usageCount,
-      maxUsageCount: response.maxUsageCount,
+      maxRedemptions: response.maxRedemptions,
     );
   }
 }

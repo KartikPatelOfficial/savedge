@@ -23,7 +23,7 @@ class GetVendorCouponsUseCase
       params.vendorId,
       pageNumber: params.pageNumber,
       pageSize: params.pageSize,
-      isActive: params.isActive,
+      status: params.status,
       isExpired: params.isExpired,
     );
   }
@@ -34,22 +34,22 @@ class GetVendorCouponsParams extends Equatable {
     required this.vendorId,
     this.pageNumber = 1,
     this.pageSize = 10,
-    this.isActive = true,
+    this.status = 'active',
     this.isExpired = false,
   });
 
   final int vendorId;
   final int pageNumber;
   final int pageSize;
-  final bool isActive;
+  final String? status;
   final bool isExpired;
 
   @override
-  List<Object> get props => [
+  List<Object?> get props => [
     vendorId,
     pageNumber,
     pageSize,
-    isActive,
+    status,
     isExpired,
   ];
 }

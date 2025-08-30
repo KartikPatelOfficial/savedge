@@ -22,7 +22,7 @@ class GetFeaturedCouponsUseCase
     return _repository.getFeaturedCoupons(
       pageNumber: params.pageNumber,
       pageSize: params.pageSize,
-      isActive: params.isActive,
+      status: params.status,
       isExpired: params.isExpired,
     );
   }
@@ -32,15 +32,15 @@ class GetFeaturedCouponsParams extends Equatable {
   const GetFeaturedCouponsParams({
     this.pageNumber = 1,
     this.pageSize = 5,
-    this.isActive = true,
+    this.status = 'active',
     this.isExpired = false,
   });
 
   final int pageNumber;
   final int pageSize;
-  final bool isActive;
+  final String? status;
   final bool isExpired;
 
   @override
-  List<Object> get props => [pageNumber, pageSize, isActive, isExpired];
+  List<Object?> get props => [pageNumber, pageSize, status, isExpired];
 }

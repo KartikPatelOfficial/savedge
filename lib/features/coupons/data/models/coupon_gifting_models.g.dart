@@ -112,7 +112,7 @@ _UserCouponDetailModel _$UserCouponDetailModelFromJson(
   qrCode: json['qrCode'] as String?,
   discountType: json['discountType'] as String,
   discountValue: (json['discountValue'] as num).toDouble(),
-  minCartValue: (json['minCartValue'] as num).toDouble(),
+  minCartValue: (json['minCartValue'] as num?)?.toDouble(),
   imageUrl: json['imageUrl'] as String?,
   isGifted: json['isGifted'] as bool,
   giftedFromUserId: json['giftedFromUserId'] as String?,

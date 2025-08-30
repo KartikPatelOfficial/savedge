@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-
-import 'package:savedge/features/coupons/data/services/coupon_service.dart';
 import 'package:savedge/features/coupons/data/models/coupon_claim_models.dart';
 import 'package:savedge/features/coupons/data/models/coupon_gifting_models.dart';
+import 'package:savedge/features/coupons/data/services/coupon_service.dart';
+
 import 'coupon_confirmation_page.dart';
 
 /// Modern coupon claiming page with beautiful UI and smooth animations
@@ -18,11 +18,12 @@ class CouponRedemptionOptionsPage extends StatefulWidget {
 }
 
 class _CouponRedemptionOptionsPageState
-    extends State<CouponRedemptionOptionsPage> with TickerProviderStateMixin {
+    extends State<CouponRedemptionOptionsPage>
+    with TickerProviderStateMixin {
   CouponService get _couponService => GetIt.I<CouponService>();
   bool isProcessing = false;
   RedemptionMethod? selectedMethod;
-  
+
   late AnimationController _slideController;
   late AnimationController _fadeController;
   late Animation<Offset> _slideAnimation;
@@ -40,21 +41,15 @@ class _CouponRedemptionOptionsPageState
       vsync: this,
     );
 
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.3),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeOutCubic,
-    ));
+    _slideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero).animate(
+          CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+        );
 
     _fadeAnimation = Tween<double>(
       begin: 0.0,
       end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _fadeController,
-      curve: Curves.easeOut,
-    ));
+    ).animate(CurvedAnimation(parent: _fadeController, curve: Curves.easeOut));
 
     // Start animations
     _slideController.forward();
@@ -107,7 +102,7 @@ class _CouponRedemptionOptionsPageState
                 // Header
                 _buildHeader(),
                 const SizedBox(height: 24),
-                
+
                 // Coupon Card
                 _buildModernCouponCard(),
                 const SizedBox(height: 32),
@@ -149,11 +144,7 @@ class _CouponRedemptionOptionsPageState
         const SizedBox(height: 8),
         Text(
           'Choose how you\'d like to get this coupon',
-          style: TextStyle(
-            fontSize: 16,
-            color: Colors.grey[600],
-            height: 1.4,
-          ),
+          style: TextStyle(fontSize: 16, color: Colors.grey[600], height: 1.4),
         ),
       ],
     );
@@ -179,10 +170,7 @@ class _CouponRedemptionOptionsPageState
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
               gradient: const LinearGradient(
-                colors: [
-                  Color(0xFF667eea),
-                  Color(0xFF764ba2),
-                ],
+                colors: [Color(0xFF667eea), Color(0xFF764ba2)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -283,7 +271,8 @@ class _CouponRedemptionOptionsPageState
                     fontWeight: FontWeight.w400,
                   ),
                 ),
-                if (widget.couponData.minCartValue > 0) ...[
+                if (widget.couponData.minCartValue != null &&
+                    widget.couponData.minCartValue! > 0) ...[
                   const SizedBox(height: 16),
                   Container(
                     padding: const EdgeInsets.symmetric(
@@ -308,7 +297,7 @@ class _CouponRedemptionOptionsPageState
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          'Minimum order: ₹${widget.couponData.minCartValue.toStringAsFixed(0)}',
+                          'Minimum order: ₹${widget.couponData.minCartValue!.toStringAsFixed(0)}',
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 13,
@@ -368,7 +357,7 @@ class _CouponRedemptionOptionsPageState
             ),
             const SizedBox(width: 12),
             Text(
-              widget.couponData.hasUnusedCoupons 
+              widget.couponData.hasUnusedCoupons
                   ? 'You Have ${widget.couponData.unusedCoupons.length} Unused Coupon${widget.couponData.unusedCoupons.length > 1 ? 's' : ''}'
                   : 'Choose Your Method',
               style: const TextStyle(
@@ -407,7 +396,7 @@ class _CouponRedemptionOptionsPageState
             isEnabled: true,
           ),
           const SizedBox(height: 16),
-          
+
           // Divider with "OR" text
           Row(
             children: [
@@ -429,40 +418,27 @@ class _CouponRedemptionOptionsPageState
           const SizedBox(height: 16),
         ],
 
-        // Points Option
-        _buildModernRedemptionOption(
-          method: RedemptionMethod.points,
-          icon: Icons.auto_awesome,
-          title: 'Use SavPoints',
-          subtitle: '${widget.couponData.pointsCost} points',
-          description: 'Redeem from your earned points',
-          color: const Color(0xFFFF6B35),
-          gradient: const LinearGradient(
-            colors: [Color(0xFFFF6B35), Color(0xFFF7931E)],
-          ),
-          isEnabled: true, // Can always use points to claim new coupons
-        ),
 
-        const SizedBox(height: 16),
-
-        // Razorpay Option
-        _buildModernRedemptionOption(
-          method: RedemptionMethod.razorpay,
-          icon: Icons.credit_card,
-          title: 'Pay & Claim',
-          subtitle: '₹${widget.couponData.pointsCost}',
-          description: 'Instant purchase with card/UPI',
-          color: const Color(0xFF00C851),
-          gradient: const LinearGradient(
-            colors: [Color(0xFF00C851), Color(0xFF00A047)],
+        // Razorpay Option (only show if cash price is set)
+        if (widget.couponData.cashPrice != null && widget.couponData.cashPrice! > 0)
+          _buildModernRedemptionOption(
+            method: RedemptionMethod.razorpay,
+            icon: Icons.credit_card,
+            title: 'Pay & Claim',
+            subtitle: '₹${widget.couponData.cashPrice}',
+            description: 'Instant purchase with card/UPI',
+            color: const Color(0xFF00C851),
+            gradient: const LinearGradient(
+              colors: [Color(0xFF00C851), Color(0xFF00A047)],
+            ),
+            isEnabled: true, // Can always use payment to claim new coupons
           ),
-          isEnabled: true, // Can always use payment to claim new coupons
-        ),
 
         const SizedBox(height: 16),
 
         // Subscription/Membership Option - Show if user has active subscription allowance
-        if (widget.couponData.userMaxRedemptions != null && widget.couponData.userMaxRedemptions! > 0)
+        if (widget.couponData.userMaxRedemptions != null &&
+            widget.couponData.userMaxRedemptions! > 0)
           _buildModernMembershipOption(),
       ],
     );
@@ -481,9 +457,7 @@ class _CouponRedemptionOptionsPageState
     final isSelected = selectedMethod == method;
 
     return GestureDetector(
-      onTap: isEnabled 
-          ? () => setState(() => selectedMethod = method) 
-          : null,
+      onTap: isEnabled ? () => setState(() => selectedMethod = method) : null,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeOutCubic,
@@ -492,15 +466,13 @@ class _CouponRedemptionOptionsPageState
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected 
-                ? color 
-                : Colors.grey[200]!,
+            color: isSelected ? color : Colors.grey[200]!,
             width: isSelected ? 2 : 1,
           ),
           boxShadow: [
             BoxShadow(
-              color: isSelected 
-                  ? color.withOpacity(0.2) 
+              color: isSelected
+                  ? color.withOpacity(0.2)
                   : Colors.black.withOpacity(0.05),
               blurRadius: isSelected ? 20 : 10,
               offset: Offset(0, isSelected ? 8 : 4),
@@ -516,13 +488,15 @@ class _CouponRedemptionOptionsPageState
                 gradient: isEnabled ? gradient : null,
                 color: !isEnabled ? Colors.grey[200] : null,
                 borderRadius: BorderRadius.circular(16),
-                boxShadow: isEnabled ? [
-                  BoxShadow(
-                    color: color.withOpacity(0.3),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ] : null,
+                boxShadow: isEnabled
+                    ? [
+                        BoxShadow(
+                          color: color.withOpacity(0.3),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ]
+                    : null,
               ),
               child: Icon(
                 icon,
@@ -555,10 +529,7 @@ class _CouponRedemptionOptionsPageState
                   const SizedBox(height: 2),
                   Text(
                     description,
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Colors.grey[600],
-                    ),
+                    style: TextStyle(fontSize: 13, color: Colors.grey[600]),
                   ),
                 ],
               ),
@@ -575,12 +546,8 @@ class _CouponRedemptionOptionsPageState
                   width: 2,
                 ),
               ),
-              child: isSelected 
-                  ? const Icon(
-                      Icons.check,
-                      color: Colors.white,
-                      size: 16,
-                    )
+              child: isSelected
+                  ? const Icon(Icons.check, color: Colors.white, size: 16)
                   : null,
             ),
           ],
@@ -618,8 +585,8 @@ class _CouponRedemptionOptionsPageState
           ),
           boxShadow: [
             BoxShadow(
-              color: isSelected 
-                  ? color.withOpacity(0.2) 
+              color: isSelected
+                  ? color.withOpacity(0.2)
                   : Colors.black.withOpacity(0.05),
               blurRadius: isSelected ? 20 : 10,
               offset: Offset(0, isSelected ? 8 : 4),
@@ -635,13 +602,15 @@ class _CouponRedemptionOptionsPageState
                 gradient: isEnabled ? gradient : null,
                 color: !isEnabled ? Colors.grey[200] : null,
                 borderRadius: BorderRadius.circular(16),
-                boxShadow: isEnabled ? [
-                  BoxShadow(
-                    color: color.withOpacity(0.3),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ] : null,
+                boxShadow: isEnabled
+                    ? [
+                        BoxShadow(
+                          color: color.withOpacity(0.3),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ]
+                    : null,
               ),
               child: Icon(
                 Icons.workspace_premium,
@@ -700,10 +669,7 @@ class _CouponRedemptionOptionsPageState
                     isEnabled
                         ? 'Use your premium membership'
                         : 'No redemptions remaining',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Colors.grey[600],
-                    ),
+                    style: TextStyle(fontSize: 13, color: Colors.grey[600]),
                   ),
                 ],
               ),
@@ -720,12 +686,8 @@ class _CouponRedemptionOptionsPageState
                   width: 2,
                 ),
               ),
-              child: isSelected 
-                  ? const Icon(
-                      Icons.check,
-                      color: Colors.white,
-                      size: 16,
-                    )
+              child: isSelected
+                  ? const Icon(Icons.check, color: Colors.white, size: 16)
                   : null,
             ),
           ],
@@ -742,19 +704,21 @@ class _CouponRedemptionOptionsPageState
       height: 64,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
-        boxShadow: isEnabled ? [
-          BoxShadow(
-            color: const Color(0xFF6F3FCC).withOpacity(0.4),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-        ] : null,
+        boxShadow: isEnabled
+            ? [
+                BoxShadow(
+                  color: const Color(0xFF6F3FCC).withOpacity(0.4),
+                  blurRadius: 20,
+                  offset: const Offset(0, 8),
+                ),
+              ]
+            : null,
       ),
       child: ElevatedButton(
         onPressed: isEnabled ? _handleClaim : null,
         style: ElevatedButton.styleFrom(
-          backgroundColor: isEnabled 
-              ? const Color(0xFF6F3FCC) 
+          backgroundColor: isEnabled
+              ? const Color(0xFF6F3FCC)
               : Colors.grey[300],
           foregroundColor: Colors.white,
           disabledForegroundColor: Colors.grey[500],
@@ -791,11 +755,9 @@ class _CouponRedemptionOptionsPageState
                   Icon(
                     selectedMethod == RedemptionMethod.existing
                         ? Icons.redeem
-                        : selectedMethod == RedemptionMethod.points 
-                            ? Icons.auto_awesome
-                            : selectedMethod == RedemptionMethod.membership
-                                ? Icons.workspace_premium
-                                : Icons.credit_card,
+                        : selectedMethod == RedemptionMethod.membership
+                        ? Icons.workspace_premium
+                        : Icons.credit_card,
                     size: 20,
                   ),
                   const SizedBox(width: 8),
@@ -818,8 +780,6 @@ class _CouponRedemptionOptionsPageState
     switch (selectedMethod!) {
       case RedemptionMethod.existing:
         return 'Use Existing Coupon';
-      case RedemptionMethod.points:
-        return 'Claim with SavPoints';
       case RedemptionMethod.razorpay:
         return 'Pay & Get Coupon';
       case RedemptionMethod.membership:
@@ -835,16 +795,16 @@ class _CouponRedemptionOptionsPageState
     try {
       // Navigate to confirmation page instead of directly claiming
       await Future.delayed(const Duration(milliseconds: 300));
-      
+
       if (!mounted) return;
-      
+
       bool result = false;
-      
+
       if (selectedMethod == RedemptionMethod.existing) {
         // For existing coupons, use the "use" confirmation type
         if (widget.couponData.unusedCoupons.isNotEmpty) {
           final firstUnusedCoupon = widget.couponData.unusedCoupons.first;
-          
+
           // Create UserCouponDetailModel from unused coupon data
           final userCoupon = UserCouponDetailModel(
             id: firstUnusedCoupon.id,
@@ -855,44 +815,55 @@ class _CouponRedemptionOptionsPageState
             vendorUserId: widget.couponData.vendorUserId,
             vendorName: widget.couponData.vendorName,
             status: firstUnusedCoupon.status,
-            acquiredDate: DateTime.tryParse(firstUnusedCoupon.acquiredDate) ?? DateTime.now(),
-            redeemedDate: null, // Unused coupons don't have redemption date
-            expiryDate: DateTime.tryParse(widget.couponData.expiryDate) ?? DateTime.now(),
+            acquiredDate:
+                DateTime.tryParse(firstUnusedCoupon.purchasedDate) ??
+                DateTime.now(),
+            redeemedDate: null,
+            // Unused coupons don't have redemption date
+            expiryDate:
+                DateTime.tryParse(widget.couponData.validUntil) ??
+                DateTime.now(),
             uniqueCode: firstUnusedCoupon.uniqueCode,
-            qrCode: null, // QR code may not be in unused coupon data
+            qrCode: null,
+            // QR code may not be in unused coupon data
             discountType: widget.couponData.discountType.toString(),
             discountValue: widget.couponData.discountValue,
             minCartValue: widget.couponData.minCartValue,
-            imageUrl: widget.couponData.imageUrl,
-            isGifted: false, // Assuming unused coupons are not gifted
+            imageUrl: null, // Image URLs are no longer supported in the new system
+            isGifted: false,
+            // Assuming unused coupons are not gifted
             giftedFromUserId: null,
             giftedToUserId: null,
             giftedDate: null,
             giftMessage: null,
           );
-          
-          result = await Navigator.of(context).push<bool>(
-            MaterialPageRoute(
-              builder: (context) => CouponConfirmationPage(
-                userCoupon: userCoupon,
-                confirmationType: CouponConfirmationType.use,
-              ),
-            ),
-          ) ?? false;
+
+          result =
+              await Navigator.of(context).push<bool>(
+                MaterialPageRoute(
+                  builder: (context) => CouponConfirmationPage(
+                    userCoupon: userCoupon,
+                    confirmationType: CouponConfirmationType.use,
+                  ),
+                ),
+              ) ??
+              false;
         } else {
           throw Exception('No unused coupons available');
         }
       } else {
         // For new claims, use the "claim" confirmation type
-        result = await Navigator.of(context).push<bool>(
-          MaterialPageRoute(
-            builder: (context) => CouponConfirmationPage(
-              claimCoupon: widget.couponData,
-              redemptionMethod: _getRedemptionMethodString(),
-              confirmationType: CouponConfirmationType.claim,
-            ),
-          ),
-        ) ?? false;
+        result =
+            await Navigator.of(context).push<bool>(
+              MaterialPageRoute(
+                builder: (context) => CouponConfirmationPage(
+                  claimCoupon: widget.couponData,
+                  redemptionMethod: _getRedemptionMethodString(),
+                  confirmationType: CouponConfirmationType.claim,
+                ),
+              ),
+            ) ??
+            false;
       }
 
       if (result && mounted) {
@@ -912,8 +883,6 @@ class _CouponRedemptionOptionsPageState
     switch (selectedMethod!) {
       case RedemptionMethod.existing:
         return 'existing';
-      case RedemptionMethod.points:
-        return 'points';
       case RedemptionMethod.razorpay:
         return 'razorpay';
       case RedemptionMethod.membership:
@@ -956,4 +925,4 @@ class _CouponRedemptionOptionsPageState
   }
 }
 
-enum RedemptionMethod { existing, points, razorpay, membership }
+enum RedemptionMethod { existing, razorpay, membership }

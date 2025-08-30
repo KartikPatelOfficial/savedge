@@ -117,42 +117,6 @@ class CouponService {
     }
   }
 
-  /// Claim a coupon using points
-  Future<ClaimCouponResponse> claimCouponWithPoints(int couponId) async {
-    try {
-      final request = ClaimCouponRequest(couponId: couponId);
-
-      final response = await _httpClient.post(
-        '/api/user/coupons/claim',
-        data: request.toJson(),
-      );
-
-      return ClaimCouponResponse.fromJson(
-        response.data as Map<String, dynamic>,
-      );
-    } catch (e) {
-      // Extract meaningful error messages from backend API
-      String errorMessage = 'Failed to claim coupon with points';
-
-      if (e.toString().contains('Bad Request')) {
-        if (e.toString().contains('insufficient points')) {
-          errorMessage = 'Insufficient points to claim this coupon';
-        } else if (e.toString().contains('Insufficient points')) {
-          errorMessage = 'Insufficient points to claim this coupon';
-        } else if (e.toString().contains('redemption limit')) {
-          errorMessage = 'This coupon has reached its usage limit';
-        } else if (e.toString().contains('not valid')) {
-          errorMessage = 'This coupon is no longer valid';
-        } else if (e.toString().contains('expired')) {
-          errorMessage = 'This coupon has expired';
-        } else {
-          errorMessage = 'Unable to claim coupon: ${e.toString()}';
-        }
-      }
-
-      throw Exception(errorMessage);
-    }
-  }
 
   /// Claim a coupon from subscription
   Future<ClaimCouponResponse> claimCouponFromSubscription(int couponId) async {

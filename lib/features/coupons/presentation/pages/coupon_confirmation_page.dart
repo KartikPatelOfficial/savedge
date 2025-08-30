@@ -646,11 +646,8 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
 
   String _getPaymentMethodText() {
     switch (widget.redemptionMethod) {
-      case 'points':
-        final points = widget.claimCoupon?.pointsCost ?? 0;
-        return 'Pay with $points points';
       case 'razorpay':
-        final amount = widget.claimCoupon?.pointsCost ?? 0;
+        final amount = widget.claimCoupon?.cashPrice ?? 0;
         return 'Pay ₹$amount with card/UPI';
       case 'membership':
         return 'Use membership benefits';
@@ -679,8 +676,6 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
 
   IconData _getPaymentIcon() {
     switch (widget.redemptionMethod) {
-      case 'points':
-        return Icons.auto_awesome;
       case 'razorpay':
         return Icons.credit_card;
       case 'membership':
@@ -692,8 +687,6 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
 
   Color _getPaymentColor() {
     switch (widget.redemptionMethod) {
-      case 'points':
-        return const Color(0xFFFF6B35);
       case 'razorpay':
         return const Color(0xFF00C851);
       case 'membership':
@@ -749,11 +742,6 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
 
     ClaimCouponResponse response;
     switch (widget.redemptionMethod) {
-      case 'points':
-        response = await _couponService.claimCouponWithPoints(
-          widget.claimCoupon!.couponId,
-        );
-        break;
       case 'membership':
         response = await _couponService.claimCouponFromSubscription(
           widget.claimCoupon!.couponId,

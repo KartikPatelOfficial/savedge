@@ -72,7 +72,7 @@ class CouponsBloc extends Bloc<CouponsEvent, CouponsState> {
         vendorId: event.vendorId,
         pageNumber: event.pageNumber,
         pageSize: event.pageSize,
-        isActive: event.isActive,
+        status: event.status,
         isExpired: event.isExpired,
       ),
     );

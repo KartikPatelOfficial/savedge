@@ -3,13 +3,13 @@ class UnusedCouponData {
   const UnusedCouponData({
     required this.userCouponId,
     required this.uniqueCode,
-    required this.acquiredDate,
+    required this.purchasedDate,
     required this.status,
   });
 
   final int userCouponId;
   final String uniqueCode;
-  final String acquiredDate;
+  final String purchasedDate;
   final String status;
 
   // Map to match expected field names
@@ -19,7 +19,7 @@ class UnusedCouponData {
     return UnusedCouponData(
       userCouponId: json['userCouponId'] as int,
       uniqueCode: json['uniqueCode'] as String,
-      acquiredDate: json['acquiredDate'] as String,
+      purchasedDate: json['purchasedDate'] as String,
       status: json['status'] as String,
     );
   }
@@ -48,17 +48,12 @@ class CouponCheckResponse {
     required this.discountDisplay,
     required this.minCartValue,
     required this.maxDiscountAmount,
-    required this.pointsCost,
+    required this.cashPrice,
     required this.validFrom,
     required this.validUntil,
-    required this.expiryDate,
     required this.maxRedemptions,
-    required this.currentRedemptions,
-    required this.isOnePerUser,
-    required this.isActive,
     required this.status,
     required this.terms,
-    required this.imageUrl,
     required this.createdAt,
     required this.lastModifiedAt,
     required this.isValid,
@@ -83,19 +78,14 @@ class CouponCheckResponse {
   final int discountType;
   final double discountValue;
   final String discountDisplay;
-  final double minCartValue;
-  final double maxDiscountAmount;
-  final int pointsCost;
+  final double? minCartValue;
+  final double? maxDiscountAmount;
+  final double? cashPrice;
   final String validFrom;
   final String validUntil;
-  final String expiryDate;
   final int? maxRedemptions;
-  final int currentRedemptions;
-  final bool isOnePerUser;
-  final bool isActive;
   final int status;
   final String? terms;
-  final String? imageUrl;
   final String createdAt;
   final String lastModifiedAt;
   final bool isValid;
@@ -114,26 +104,21 @@ class CouponCheckResponse {
     return CouponCheckResponse(
       couponId: json['couponId'] as int,
       title: json['title'] as String,
-      description: json['description'] as String,
+      description: json['description'] as String? ?? '',
       vendorId: json['vendorProfileId'] as int,
       vendorUserId: json['vendorUserId'] as String,
       vendorName: json['vendorName'] as String,
       discountType: json['discountType'] as int,
       discountValue: (json['discountValue'] as num).toDouble(),
       discountDisplay: json['discountDisplay'] as String,
-      minCartValue: (json['minCartValue'] as num).toDouble(),
-      maxDiscountAmount: (json['maxDiscountAmount'] as num).toDouble(),
-      pointsCost: json['pointsCost'] as int,
+      minCartValue: (json['minCartValue'] as num?)?.toDouble(),
+      maxDiscountAmount: (json['maxDiscountAmount'] as num?)?.toDouble(),
+      cashPrice: (json['cashPrice'] as num?)?.toDouble(),
       validFrom: json['validFrom'] as String,
       validUntil: json['validUntil'] as String,
-      expiryDate: json['expiryDate'] as String,
       maxRedemptions: json['maxRedemptions'] as int?,
-      currentRedemptions: json['currentRedemptions'] as int,
-      isOnePerUser: json['isOnePerUser'] as bool,
-      isActive: json['isActive'] as bool,
       status: json['status'] as int,
       terms: json['terms'] as String?,
-      imageUrl: json['imageUrl'] as String?,
       createdAt: json['createdAt'] as String,
       lastModifiedAt: json['lastModifiedAt'] as String,
       isValid: json['isValid'] as bool,

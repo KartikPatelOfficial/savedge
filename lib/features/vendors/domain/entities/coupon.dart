@@ -12,13 +12,12 @@ class Coupon extends Equatable {
     required this.maximumDiscountAmount,
     required this.validFrom,
     required this.validTo,
-    required this.isActive,
     required this.vendorId,
     required this.vendorUserId,
     required this.status,
+    this.cashPrice,
     this.termsAndConditions,
-    this.usageCount = 0,
-    this.maxUsageCount,
+    this.maxRedemptions,
   });
 
   final int id;
@@ -30,21 +29,19 @@ class Coupon extends Equatable {
   final double maximumDiscountAmount;
   final DateTime validFrom;
   final DateTime validTo;
-  final bool isActive;
   final int vendorId;
   final String vendorUserId;
   final String status;
+  final double? cashPrice;
   final String? termsAndConditions;
-  final int usageCount;
-  final int? maxUsageCount;
+  final int? maxRedemptions;
 
   /// Check if coupon is currently valid
   bool get isValid {
     final now = DateTime.now();
-    return isActive &&
+    return status.toLowerCase() == 'active' &&
         now.isAfter(validFrom) &&
-        now.isBefore(validTo) &&
-        (maxUsageCount == null || usageCount < maxUsageCount!);
+        now.isBefore(validTo);
   }
 
   /// Get discount display text
@@ -76,12 +73,11 @@ class Coupon extends Equatable {
     maximumDiscountAmount,
     validFrom,
     validTo,
-    isActive,
     vendorId,
     vendorUserId,
     status,
+    cashPrice,
     termsAndConditions,
-    usageCount,
-    maxUsageCount,
+    maxRedemptions,
   ];
 }

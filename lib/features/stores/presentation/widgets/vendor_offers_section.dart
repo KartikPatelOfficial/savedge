@@ -314,14 +314,44 @@ class _VendorOfferCardState extends State<VendorOfferCard>
                               overflow: TextOverflow.ellipsis,
                             ),
                             const SizedBox(height: 8),
+                            // Show cash price or subscriber info
+                            if (widget.coupon.cashPrice != null && widget.coupon.cashPrice! > 0)
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  '₹${widget.coupon.cashPrice!.toInt()} or Free for subscribers',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              )
+                            else
+                              Text(
+                                'Free for subscribers • ${widget.coupon.maxRedemptions != null ? '${widget.coupon.maxRedemptions} uses' : 'Unlimited'}',
+                                style: TextStyle(
+                                  color: Colors.white.withOpacity(0.8),
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            const SizedBox(height: 4),
                             Text(
                               widget.coupon.termsAndConditions ?? 'Limited time offer',
                               style: TextStyle(
-                                color: Colors.white.withOpacity(0.8),
-                                fontSize: 12,
+                                color: Colors.white.withOpacity(0.7),
+                                fontSize: 10,
                                 fontWeight: FontWeight.w400,
                               ),
-                              maxLines: 2,
+                              maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
                           ],
@@ -354,7 +384,7 @@ class _VendorOfferCardState extends State<VendorOfferCard>
                             ),
                             const SizedBox(width: 6),
                             Text(
-                              'Claim',
+                              widget.coupon.cashPrice != null && widget.coupon.cashPrice! > 0 ? 'Get' : 'Claim',
                               style: TextStyle(
                                 color: primaryColor,
                                 fontSize: 14,

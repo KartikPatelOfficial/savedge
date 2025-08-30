@@ -13,7 +13,6 @@ abstract class CouponsRepository {
     int? vendorId,
     String? discountType,
     String? status,
-    bool? isActive,
     bool? isExpired,
   });
 
@@ -22,7 +21,7 @@ abstract class CouponsRepository {
     int vendorId, {
     int pageNumber = 1,
     int pageSize = 10,
-    bool isActive = true,
+    String? status = 'active',
     bool isExpired = false,
   });
 
@@ -30,7 +29,7 @@ abstract class CouponsRepository {
   Future<Either<Failure, List<Coupon>>> getFeaturedCoupons({
     int pageNumber = 1,
     int pageSize = 5,
-    bool isActive = true,
+    String? status = 'active',
     bool isExpired = false,
   });
 }
