@@ -93,8 +93,7 @@ abstract class SubscriptionInfo with _$SubscriptionInfo {
 /// Extension methods for user profile
 extension UserProfileResponse3Extensions on UserProfileResponse3 {
   /// Check if user has completed their basic profile
-  bool get hasCompletedProfile =>
-      firstName.isNotEmpty && lastName.isNotEmpty;
+  bool get hasCompletedProfile => firstName.isNotEmpty && lastName.isNotEmpty;
 
   /// Check if user is an employee
   bool get isEmployee => roles.contains('Employee');
@@ -145,7 +144,7 @@ extension UserProfileResponse3Extensions on UserProfileResponse3 {
   }
 
   /// Check if user needs profile completion
-  bool get needsProfileCompletion => 
+  bool get needsProfileCompletion =>
       !hasCompletedProfile || (isEmployee && employeeInfo == null);
 
   /// Check if user has an active subscription

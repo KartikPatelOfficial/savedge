@@ -4,6 +4,8 @@ import 'package:savedge/core/storage/secure_storage_service.dart';
 import 'package:savedge/features/auth/data/models/user_profile_models.dart';
 import 'package:savedge/features/auth/domain/repositories/auth_repository.dart';
 import 'package:savedge/features/coupons/presentation/pages/gift_page.dart';
+import 'package:savedge/features/subscription/domain/entities/subscription_plan.dart';
+import 'package:savedge/features/subscription/presentation/pages/subscription_purchase_page.dart';
 import 'package:savedge/features/user_profile/presentation/pages/edit_profile_page.dart';
 import 'package:savedge/features/user_profile/presentation/pages/points_wallet_page.dart';
 import 'package:savedge/features/user_profile/presentation/widgets/widgets.dart';
@@ -66,472 +68,450 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget _buildErrorView() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 100,
-              height: 100,
-              decoration: BoxDecoration(
-                color: const Color(0xFFE53E3E).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(50),
-              ),
-              child: const Icon(
-                Icons.error_outline,
-                size: 48,
-                color: Color(0xFFE53E3E),
+    return RefreshIndicator(
+      onRefresh: _loadUserProfile,
+      color: const Color(0xFF6F3FCC),
+      backgroundColor: Colors.white,
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: SizedBox(
+          height: MediaQuery.of(context).size.height * 0.8,
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(32),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 100,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE53E3E).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                    child: const Icon(
+                      Icons.error_outline,
+                      size: 48,
+                      color: Color(0xFFE53E3E),
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                  const Text(
+                    'Failed to load profile',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF1A202C),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    _error ?? 'Unknown error occurred',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Color(0xFF4A5568),
+                      height: 1.4,
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                  ElevatedButton(
+                    onPressed: _loadUserProfile,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF6F3FCC),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 32,
+                        vertical: 16,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text(
+                      'Try Again',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 32),
-            const Text(
-              'Failed to load profile',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.w700,
-                color: Color(0xFF1A202C),
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              _error ?? 'Unknown error occurred',
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 16,
-                color: Color(0xFF4A5568),
-                height: 1.4,
-              ),
-            ),
-            const SizedBox(height: 32),
-            ElevatedButton(
-              onPressed: _loadUserProfile,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF6F3FCC),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 32,
-                  vertical: 16,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              child: const Text(
-                'Try Again',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildProfileView() {
-    return CustomScrollView(
-      slivers: [
-        // Custom App Bar
-        SliverAppBar(
-          expandedHeight: 140,
-          backgroundColor: Colors.white,
-          pinned: true,
-          elevation: 0,
-          scrolledUnderElevation: 0,
-          surfaceTintColor: Colors.transparent,
-          flexibleSpace: FlexibleSpaceBar(
-            background: Container(color: Colors.white),
-            title: const Text(
-              'Profile',
-              style: TextStyle(
-                color: Color(0xFF1A202C),
-                fontSize: 24,
-                fontWeight: FontWeight.w700,
+    return RefreshIndicator(
+      onRefresh: _loadUserProfile,
+      color: const Color(0xFF6F3FCC),
+      backgroundColor: Colors.white,
+      child: CustomScrollView(
+        slivers: [
+          // Custom App Bar
+          SliverAppBar(
+            expandedHeight: 140,
+            backgroundColor: Colors.white,
+            pinned: true,
+            elevation: 0,
+            scrolledUnderElevation: 0,
+            surfaceTintColor: Colors.transparent,
+            flexibleSpace: FlexibleSpaceBar(
+              background: Container(color: Colors.white),
+              title: const Text(
+                'Profile',
+                style: TextStyle(
+                  color: Color(0xFF1A202C),
+                  fontSize: 24,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
+              titlePadding: const EdgeInsets.only(left: 20, bottom: 16),
             ),
-            titlePadding: const EdgeInsets.only(left: 20, bottom: 16),
           ),
-          actions: [
-            Container(
-              margin: const EdgeInsets.only(right: 20),
-              decoration: BoxDecoration(
-                color: const Color(0xFF6F3FCC).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: IconButton(
-                icon: const Icon(
-                  Icons.settings_outlined,
-                  color: Color(0xFF6F3FCC),
-                ),
-                onPressed: _onSettingsTap,
-              ),
-            ),
-          ],
-        ),
 
-        // Profile Content
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              children: [
-                // Profile Header
-                ProfileHeader(
-                  userProfile: _userProfile,
-                  onEditTap: _onEditProfileTap,
-                ),
+          // Profile Content
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                children: [
+                  // Profile Header
+                  ProfileHeader(
+                    userProfile: _userProfile,
+                    onEditTap: _onEditProfileTap,
+                  ),
 
-                const SizedBox(height: 20),
+                  const SizedBox(height: 20),
 
-                // Stats Cards
-                if (_userProfile != null) ...[
-                  // Show subscription status in stats if user has active subscription
-                  // TODO: Implement subscription checking with new profile model
-                  if (false) ...[
-                    // Row(
-                    //   children: [
-                    //     Expanded(
-                    //       child: ProfileStatsCard(
-                    //         title: 'Points Balance',
-                    //         value: '${_userProfile!.pointsBalance}',
-                    //         icon: Icons.stars_outlined,
-                    //         color: const Color(0xFFD69E2E),
-                    //         onTap: _onPointsBalanceTap,
-                    //       ),
-                    //     ),
-                    //     const SizedBox(width: 12),
-                    //     Expanded(
-                    //       child: ProfileStatsCard(
-                    //         title: 'Subscription',
-                    //         value: _userProfile!.activeSubscription!.statusDisplay,
-                    //         icon: Icons.star,
-                    //         color: _userProfile!.activeSubscription!.hasExpired
-                    //             ? Colors.red
-                    //             : _userProfile!.activeSubscription!.isExpiringSoon
-                    //                 ? Colors.orange
-                    //                 : Colors.green,
-                    //         onTap: _onManageSubscriptionTap,
-                    //       ),
-                    //     ),
-                    //   ],
-                    // ),
-                  ] else ...[
-                    // For users without subscriptions, show original layout
-                    Row(
-                      children: [
-                        Expanded(
-                          child: ProfileStatsCard(
-                            title: 'Points Balance',
-                            value: '${_userProfile!.pointsBalance}',
-                            icon: Icons.stars_outlined,
-                            color: const Color(0xFFD69E2E),
-                            onTap: _onPointsBalanceTap,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: ProfileStatsCard(
-                            title: _userProfile!.isEmployee
-                                ? 'Redemptions'
-                                : 'Orders',
-                            value: '12',
-                            // This would come from appropriate API
-                            icon: _userProfile!.isEmployee
-                                ? Icons.redeem_outlined
-                                : Icons.shopping_bag_outlined,
-                            color: const Color(0xFF38A169),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-
-                  // Employee-specific stats (only show for employees)
-                  if (_userProfile!.isEmployee &&
-                      _userProfile!.employeeInfo != null) ...[
-                    const SizedBox(height: 16),
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: const Color(0xFFE2E8F0),
-                          width: 1,
-                        ),
-                      ),
-                      child: Column(
+                  // Stats Cards
+                  if (_userProfile != null) ...[
+                    if (_userProfile!.hasActiveSubscription) ...[
+                      Row(
                         children: [
-                          Row(
-                            children: [
-                              Container(
-                                width: 40,
-                                height: 40,
-                                decoration: BoxDecoration(
-                                  color: const Color(
-                                    0xFF6F3FCC,
-                                  ).withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: const Icon(
-                                  Icons.business_outlined,
-                                  color: Color(0xFF6F3FCC),
-                                  size: 22,
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      _userProfile!
-                                          .employeeInfo!
-                                          .organizationName,
-                                      style: const TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w700,
-                                        color: Color(0xFF1A202C),
-                                      ),
-                                    ),
-                                    Text(
-                                      _userProfile!.employeeInfo!.department,
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        color: Color(0xFF718096),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                          if (_userProfile!
-                                  .employeeInfo!
-                                  .employeeCode
-                                  .isNotEmpty ||
-                              _userProfile!
-                                  .employeeInfo!
-                                  .position
-                                  .isNotEmpty) ...[
-                            const SizedBox(height: 16),
-                            const Divider(
-                              color: Color(0xFFE2E8F0),
-                              height: 1,
-                              thickness: 1,
+                          Expanded(
+                            child: ProfileStatsCard(
+                              title: 'Points Balance',
+                              value: '${_userProfile!.pointsBalance}',
+                              icon: Icons.stars_outlined,
+                              color: const Color(0xFFD69E2E),
+                              onTap: _onPointsBalanceTap,
                             ),
-                            const SizedBox(height: 16),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: ProfileStatsCard(
+                              title: _userProfile!.subscriptionInfo!.planName,
+                              value: 'Subscription',
+                              icon: Icons.star,
+                              color: !_userProfile!.subscriptionInfo!.isActive
+                                  ? Colors.red
+                                  : Colors.green,
+                              onTap: _onManageSubscriptionTap,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ] else ...[
+                      // For users without subscriptions, show original layout
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ProfileStatsCard(
+                              title: 'Points Balance',
+                              value: '${_userProfile!.pointsBalance}',
+                              icon: Icons.stars_outlined,
+                              color: const Color(0xFFD69E2E),
+                              onTap: _onPointsBalanceTap,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+
+                    // Employee-specific stats (only show for employees)
+                    if (_userProfile!.isEmployee &&
+                        _userProfile!.employeeInfo != null) ...[
+                      const SizedBox(height: 16),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: const Color(0xFFE2E8F0),
+                            width: 1,
+                          ),
+                        ),
+                        child: Column(
+                          children: [
                             Row(
                               children: [
-                                if (_userProfile!
+                                Container(
+                                  width: 40,
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    color: const Color(
+                                      0xFF6F3FCC,
+                                    ).withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: const Icon(
+                                    Icons.business_outlined,
+                                    color: Color(0xFF6F3FCC),
+                                    size: 22,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        _userProfile!
+                                            .employeeInfo!
+                                            .organizationName,
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w700,
+                                          color: Color(0xFF1A202C),
+                                        ),
+                                      ),
+                                      Text(
+                                        _userProfile!.employeeInfo!.department,
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          color: Color(0xFF718096),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            if (_userProfile!
                                     .employeeInfo!
                                     .employeeCode
-                                    .isNotEmpty) ...[
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        const Text(
-                                          'Employee ID',
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: Color(0xFF718096),
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          _userProfile!
-                                              .employeeInfo!
-                                              .employeeCode,
-                                          style: const TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w600,
-                                            color: Color(0xFF2D3748),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                                if (_userProfile!
+                                    .isNotEmpty ||
+                                _userProfile!
                                     .employeeInfo!
                                     .position
                                     .isNotEmpty) ...[
+                              const SizedBox(height: 16),
+                              const Divider(
+                                color: Color(0xFFE2E8F0),
+                                height: 1,
+                                thickness: 1,
+                              ),
+                              const SizedBox(height: 16),
+                              Row(
+                                children: [
                                   if (_userProfile!
                                       .employeeInfo!
                                       .employeeCode
-                                      .isNotEmpty)
-                                    const SizedBox(width: 16),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        const Text(
-                                          'Position',
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: Color(0xFF718096),
-                                            fontWeight: FontWeight.w600,
+                                      .isNotEmpty) ...[
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          const Text(
+                                            'Employee ID',
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: Color(0xFF718096),
+                                              fontWeight: FontWeight.w600,
+                                            ),
                                           ),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          _userProfile!.employeeInfo!.position,
-                                          style: const TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w600,
-                                            color: Color(0xFF2D3748),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            _userProfile!
+                                                .employeeInfo!
+                                                .employeeCode,
+                                            style: const TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.w600,
+                                              color: Color(0xFF2D3748),
+                                            ),
                                           ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
-                                  ),
+                                  ],
+                                  if (_userProfile!
+                                      .employeeInfo!
+                                      .position
+                                      .isNotEmpty) ...[
+                                    if (_userProfile!
+                                        .employeeInfo!
+                                        .employeeCode
+                                        .isNotEmpty)
+                                      const SizedBox(width: 16),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          const Text(
+                                            'Position',
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: Color(0xFF718096),
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            _userProfile!
+                                                .employeeInfo!
+                                                .position,
+                                            style: const TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.w600,
+                                              color: Color(0xFF2D3748),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
                                 ],
-                              ],
-                            ),
+                              ),
+                            ],
                           ],
-                        ],
+                        ),
                       ),
-                    ),
+                    ],
                   ],
-                ],
 
-                const SizedBox(height: 20),
+                  const SizedBox(height: 20),
 
-                // TODO: Subscription Status Card (implement with new profile model)
-                // if (_userProfile != null && _userProfile!.activeSubscription != null) ...[
-                //   SubscriptionStatusCard(
-                //     activeSubscription: _userProfile!.activeSubscription,
-                //     onManageSubscriptionTap: _onManageSubscriptionTap,
-                //     onUpgradeTap: _onUpgradeSubscriptionTap,
-                //   ),
-                //   const SizedBox(height: 20),
-                // ],
-
-                // Menu Items
-                if (_userProfile != null) ...[
-                  _buildMenuSection('Account', [
-                    ProfileMenuItem(
-                      icon: Icons.person,
-                      title: 'View Profile',
-                      subtitle: _userProfile!.isEmployee
-                          ? 'View your profile information'
-                          : 'Update your personal information',
-                      onTap: _onEditProfileTap,
+                  if (_userProfile != null &&
+                      _userProfile!.subscriptionInfo != null) ...[
+                    SubscriptionStatusCard(
+                      activeSubscription: _userProfile!.subscriptionInfo!,
+                      onManageSubscriptionTap: _onManageSubscriptionTap,
+                      onUpgradeTap: _onUpgradeSubscriptionTap,
                     ),
-                    // TODO: Show subscription menu for all users (employees and non-employees)
-                    ProfileMenuItem(
-                      icon: Icons.card_membership,
-                      title: 'Get Premium',
-                      subtitle: 'Unlock premium features',
-                      onTap: _onUpgradeSubscriptionTap,
-                    ),
-                    if (!_userProfile!.isEmployee) ...[
+                    const SizedBox(height: 20),
+                  ],
+
+                  // Menu Items
+                  if (_userProfile != null) ...[
+                    _buildMenuSection('Account', [
                       ProfileMenuItem(
-                        icon: Icons.security,
-                        title: 'Privacy & Security',
-                        subtitle: 'Manage your account security',
-                        onTap: _onPrivacyTap,
+                        icon: Icons.person,
+                        title: 'View Profile',
+                        subtitle: _userProfile!.isEmployee
+                            ? 'View your profile information'
+                            : 'Update your personal information',
+                        onTap: _onEditProfileTap,
                       ),
-                    ],
-                    ProfileMenuItem(
-                      icon: Icons.notifications,
-                      title: 'Notifications',
-                      subtitle: 'Configure your notification preferences',
-                      onTap: _onNotificationsTap,
-                    ),
-                  ]),
+                      if (!_userProfile!.isEmployee) ...[
+                        ProfileMenuItem(
+                          icon: Icons.security,
+                          title: 'Privacy & Security',
+                          subtitle: 'Manage your account security',
+                          onTap: _onPrivacyTap,
+                        ),
+                      ],
+                      ProfileMenuItem(
+                        icon: Icons.notifications,
+                        title: 'Notifications',
+                        subtitle: 'Configure your notification preferences',
+                        onTap: _onNotificationsTap,
+                      ),
+                    ]),
+
+                    const SizedBox(height: 24),
+
+                    _buildMenuSection('Activity', [
+                      if (!_userProfile!.isEmployee) ...[
+                        ProfileMenuItem(
+                          icon: Icons.history,
+                          title: 'Order History',
+                          subtitle: 'View your past orders',
+                          onTap: _onOrderHistoryTap,
+                        ),
+                      ],
+                      ProfileMenuItem(
+                        icon: Icons.favorite,
+                        title: 'Favorites',
+                        subtitle: 'Your favorite restaurants and items',
+                        onTap: _onFavoritesTap,
+                      ),
+                      ProfileMenuItem(
+                        icon: Icons.card_giftcard,
+                        title: _userProfile!.isEmployee
+                            ? 'Coupons & Benefits'
+                            : 'Gift Cards & Coupons',
+                        subtitle: _userProfile!.isEmployee
+                            ? 'View your employee benefits and coupons'
+                            : 'Manage your rewards',
+                        onTap: _onGiftCardsTap,
+                      ),
+                      // Gift to colleagues (show for employees only)
+                      if (_userProfile!.isEmployee) ...[
+                        ProfileMenuItem(
+                          icon: Icons.card_giftcard_outlined,
+                          title: 'Send & Receive Gifts',
+                          subtitle: 'Gift coupons or points to colleagues',
+                          onTap: _onSendGiftsTap,
+                        ),
+                      ],
+                      if (_userProfile!.isEmployee) ...[
+                        ProfileMenuItem(
+                          icon: Icons.history_outlined,
+                          title: 'Redemption History',
+                          subtitle: 'View your coupon redemptions',
+                          onTap: _onRedemptionHistoryTap,
+                        ),
+                      ],
+                    ]),
+
+                    const SizedBox(height: 24),
+
+                    _buildMenuSection('Support', [
+                      ProfileMenuItem(
+                        icon: Icons.help,
+                        title: 'Help & Support',
+                        subtitle: 'Get help with your account',
+                        onTap: _onHelpTap,
+                      ),
+                      ProfileMenuItem(
+                        icon: Icons.feedback,
+                        title: 'Send Feedback',
+                        subtitle: 'Tell us how we can improve',
+                        onTap: _onFeedbackTap,
+                      ),
+                      ProfileMenuItem(
+                        icon: Icons.info,
+                        title: 'About',
+                        subtitle: 'App version and information',
+                        onTap: _onAboutTap,
+                      ),
+                    ]),
+                  ],
 
                   const SizedBox(height: 24),
 
-                  _buildMenuSection('Activity', [
-                    if (!_userProfile!.isEmployee) ...[
-                      ProfileMenuItem(
-                        icon: Icons.history,
-                        title: 'Order History',
-                        subtitle: 'View your past orders',
-                        onTap: _onOrderHistoryTap,
-                      ),
-                    ],
-                    ProfileMenuItem(
-                      icon: Icons.favorite,
-                      title: 'Favorites',
-                      subtitle: 'Your favorite restaurants and items',
-                      onTap: _onFavoritesTap,
-                    ),
-                    ProfileMenuItem(
-                      icon: Icons.card_giftcard,
-                      title: _userProfile!.isEmployee
-                          ? 'Coupons & Benefits'
-                          : 'Gift Cards & Coupons',
-                      subtitle: _userProfile!.isEmployee
-                          ? 'View your employee benefits and coupons'
-                          : 'Manage your rewards',
-                      onTap: _onGiftCardsTap,
-                    ),
-                    // Gift to colleagues (show for employees only)
-                    if (_userProfile!.isEmployee) ...[
-                      ProfileMenuItem(
-                        icon: Icons.card_giftcard_outlined,
-                        title: 'Send & Receive Gifts',
-                        subtitle: 'Gift coupons or points to colleagues',
-                        onTap: _onSendGiftsTap,
-                      ),
-                    ],
-                    if (_userProfile!.isEmployee) ...[
-                      ProfileMenuItem(
-                        icon: Icons.history_outlined,
-                        title: 'Redemption History',
-                        subtitle: 'View your coupon redemptions',
-                        onTap: _onRedemptionHistoryTap,
-                      ),
-                    ],
-                  ]),
+                  // Sign Out Button
+                  _buildSignOutSection(),
 
-                  const SizedBox(height: 24),
-
-                  _buildMenuSection('Support', [
-                    ProfileMenuItem(
-                      icon: Icons.help,
-                      title: 'Help & Support',
-                      subtitle: 'Get help with your account',
-                      onTap: _onHelpTap,
-                    ),
-                    ProfileMenuItem(
-                      icon: Icons.feedback,
-                      title: 'Send Feedback',
-                      subtitle: 'Tell us how we can improve',
-                      onTap: _onFeedbackTap,
-                    ),
-                    ProfileMenuItem(
-                      icon: Icons.info,
-                      title: 'About',
-                      subtitle: 'App version and information',
-                      onTap: _onAboutTap,
-                    ),
-                  ]),
+                  const SizedBox(height: 100),
+                  // Bottom padding for nav bar
                 ],
-
-                const SizedBox(height: 24),
-
-                // Sign Out Button
-                _buildSignOutSection(),
-
-                const SizedBox(height: 100),
-                // Bottom padding for nav bar
-              ],
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -611,11 +591,6 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  void _onSettingsTap() {
-    debugPrint('Settings tapped');
-    // TODO: Navigate to settings page
-  }
-
   void _onPrivacyTap() {
     debugPrint('Privacy & Security tapped');
     // TODO: Navigate to privacy settings
@@ -655,9 +630,35 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _onUpgradeSubscriptionTap() {
-    debugPrint('Upgrade Subscription tapped');
-    // Navigate to subscription purchase page
-    Navigator.of(context).pushNamed('/subscription-purchase');
+    if (_userProfile?.subscriptionInfo != null) {
+      // If user has a subscription, navigate to purchase page with the same plan for renewal
+      final subscriptionPlan = _convertToSubscriptionPlan(_userProfile!.subscriptionInfo!);
+      Navigator.of(context).push(
+        SubscriptionPurchasePage.route(subscriptionPlan),
+      );
+    } else {
+      // If user doesn't have a subscription, navigate to plans page
+      Navigator.of(context).pushNamed('/subscription-purchase');
+    }
+  }
+
+  /// Convert SubscriptionInfo to SubscriptionPlan for navigation
+  SubscriptionPlan _convertToSubscriptionPlan(SubscriptionInfo subscriptionInfo) {
+    // Calculate duration in months from start and end date
+    final duration = subscriptionInfo.endDate.difference(subscriptionInfo.startDate).inDays ~/ 30;
+    
+    return SubscriptionPlan(
+      id: subscriptionInfo.planId,
+      name: subscriptionInfo.planName,
+      description: 'Renew your ${subscriptionInfo.planName} subscription',
+      price: subscriptionInfo.price,
+      durationMonths: duration > 0 ? duration : 12, // Default to 12 months if calculation is off
+      bonusPoints: subscriptionInfo.bonusPoints,
+      maxCoupons: subscriptionInfo.maxCoupons,
+      features: null,
+      imageUrl: null,
+      isActive: true,
+    );
   }
 
   void _onHelpTap() {
@@ -673,6 +674,10 @@ class _ProfilePageState extends State<ProfilePage> {
   void _onAboutTap() {
     debugPrint('About tapped');
     // TODO: Show about dialog
+  }
+
+  void _onManageSubscriptionTap() {
+    Navigator.of(context).pushNamed('/subscription-management');
   }
 
   void _onPointsBalanceTap() {

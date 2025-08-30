@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:savedge/features/subscription/domain/entities/active_subscription.dart';
+import 'package:savedge/features/auth/data/models/user_profile_models.dart';
 
 /// Widget to display subscription status information
 class SubscriptionStatusCard extends StatelessWidget {
@@ -10,7 +10,7 @@ class SubscriptionStatusCard extends StatelessWidget {
     this.onUpgradeTap,
   });
 
-  final ActiveSubscription? activeSubscription;
+  final SubscriptionInfo? activeSubscription;
   final VoidCallback? onManageSubscriptionTap;
   final VoidCallback? onUpgradeTap;
 
@@ -49,61 +49,60 @@ class SubscriptionStatusCard extends StatelessWidget {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(
-                  Icons.star_outline,
+                  Icons.workspace_premium,
                   color: Colors.white,
-                  size: 24,
+                  size: 28,
                 ),
               ),
-              const SizedBox(width: 12),
-              Expanded(
+              const SizedBox(width: 16),
+              const Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'No Active Subscription',
+                    Text(
+                      'Get Premium',
                       style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
                         color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
                       ),
                     ),
                     Text(
-                      'Unlock premium features with a subscription',
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.8),
-                        fontSize: 14,
-                      ),
+                      'Unlock exclusive coupons and benefits',
+                      style: TextStyle(fontSize: 14, color: Colors.white70),
                     ),
                   ],
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: onUpgradeTap,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                foregroundColor: const Color(0xFF6F3FCC),
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: onUpgradeTap,
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    side: const BorderSide(color: Colors.white, width: 1.5),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: const Text(
+                    'View Plans',
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
                 ),
-                elevation: 0,
               ),
-              child: const Text(
-                'View Plans',
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
-            ),
+            ],
           ),
         ],
       ),
@@ -112,21 +111,34 @@ class SubscriptionStatusCard extends StatelessWidget {
 
   Widget _buildActiveSubscriptionCard(BuildContext context) {
     final subscription = activeSubscription!;
-    final isExpiring = subscription.isExpiringSoon;
-    final hasExpired = subscription.hasExpired;
+    final now = DateTime.now();
+    final daysRemaining = subscription.endDate.difference(now).inDays;
+    final isExpiring = daysRemaining <= 15 && daysRemaining > 0;
+    final hasExpired = !subscription.isActive || daysRemaining <= 0;
+
+    // Calculate subscription duration in months
+    final duration =
+        subscription.endDate.difference(subscription.startDate).inDays ~/ 30;
+    final durationText = duration >= 12
+        ? '${duration ~/ 12} Year${duration ~/ 12 > 1 ? 's' : ''}'
+        : '$duration Month${duration > 1 ? 's' : ''}';
 
     Color statusColor;
     Color backgroundColor;
+    String statusText;
 
     if (hasExpired) {
-      statusColor = Colors.red;
-      backgroundColor = Colors.red.withOpacity(0.1);
+      statusColor = const Color(0xFFE53E3E);
+      backgroundColor = const Color(0xFFE53E3E).withOpacity(0.1);
+      statusText = 'Expired';
     } else if (isExpiring) {
-      statusColor = Colors.orange;
-      backgroundColor = Colors.orange.withOpacity(0.1);
+      statusColor = const Color(0xFFD69E2E);
+      backgroundColor = const Color(0xFFD69E2E).withOpacity(0.1);
+      statusText = 'Expiring Soon';
     } else {
-      statusColor = Colors.green;
-      backgroundColor = Colors.green.withOpacity(0.1);
+      statusColor = const Color(0xFF38A169);
+      backgroundColor = const Color(0xFF38A169).withOpacity(0.1);
+      statusText = 'Active';
     }
 
     return Container(
@@ -135,39 +147,41 @@ class SubscriptionStatusCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: statusColor.withOpacity(0.3), width: 1),
+        border: Border.all(color: statusColor.withOpacity(0.3), width: 1.5),
         boxShadow: [
           BoxShadow(
             color: Colors.grey.withOpacity(0.1),
             spreadRadius: 0,
-            blurRadius: 15,
-            offset: const Offset(0, 5),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header
+          // Header with subscription info and status
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: backgroundColor,
-                  borderRadius: BorderRadius.circular(8),
+                  gradient: LinearGradient(
+                    colors: [
+                      const Color(0xFF6F3FCC),
+                      const Color(0xFF6F3FCC).withOpacity(0.8),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(
-                  hasExpired
-                      ? Icons.error_outline
-                      : isExpiring
-                      ? Icons.warning_amber
-                      : Icons.star,
-                  color: statusColor,
+                child: const Icon(
+                  Icons.workspace_premium,
+                  color: Colors.white,
                   size: 24,
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -175,17 +189,18 @@ class SubscriptionStatusCard extends StatelessWidget {
                     Text(
                       subscription.planName,
                       style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black87,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF1A202C),
                       ),
                     ),
+                    const SizedBox(height: 4),
                     Text(
-                      subscription.priceDisplay,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[600],
-                        fontWeight: FontWeight.w500,
+                      '₹${subscription.price.toStringAsFixed(0)}/$durationText',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF4A5568),
                       ),
                     ),
                   ],
@@ -198,153 +213,263 @@ class SubscriptionStatusCard extends StatelessWidget {
                 ),
                 decoration: BoxDecoration(
                   color: backgroundColor,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(20),
                 ),
-                child: Text(
-                  subscription.statusDisplay,
-                  style: TextStyle(
-                    color: statusColor,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                  ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: statusColor,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      statusText,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: statusColor,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
 
-          // Subscription details
-          if (subscription.description != null) ...[
-            Text(
-              subscription.description!,
-              style: TextStyle(color: Colors.grey[600], fontSize: 14),
-            ),
-            const SizedBox(height: 12),
-          ],
-
-          // Benefits row
+          // Benefits/Features Grid
           Row(
             children: [
               Expanded(
-                child: _buildBenefitItem(
-                  icon: Icons.stars,
-                  label: 'Bonus Points',
-                  value: '${subscription.bonusPoints}',
-                  color: Colors.orange,
+                child: _buildFeatureItem(
+                  icon: Icons.access_time_rounded,
+                  label: hasExpired ? 'Expired' : 'Expires In',
+                  value: hasExpired
+                      ? 'Renew Now'
+                      : daysRemaining == 0
+                      ? 'Today'
+                      : daysRemaining == 1
+                      ? '1 Day'
+                      : '$daysRemaining Days',
+                  color: statusColor,
                 ),
               ),
               const SizedBox(width: 16),
               Expanded(
-                child: _buildBenefitItem(
-                  icon: Icons.local_offer,
-                  label: 'Max Coupons',
-                  value: subscription.maxCoupons == -1
-                      ? 'Unlimited'
-                      : '${subscription.maxCoupons}',
-                  color: Colors.blue,
+                child: _buildFeatureItem(
+                  icon: Icons.autorenew_rounded,
+                  label: 'Auto Renew',
+                  value: subscription.autoRenew ? 'Enabled' : 'Disabled',
+                  color: subscription.autoRenew
+                      ? const Color(0xFF38A169)
+                      : const Color(0xFF718096),
                 ),
               ),
             ],
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
 
-          // Time remaining
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.grey[50],
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  hasExpired ? 'Expired' : 'Time Remaining',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey[600],
-                    fontWeight: FontWeight.w500,
-                  ),
+          Row(
+            children: [
+              Expanded(
+                child: _buildFeatureItem(
+                  icon: Icons.event_available_rounded,
+                  label: 'Valid Until',
+                  value: _formatDate(subscription.endDate),
+                  color: const Color(0xFF6F3FCC),
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  subscription.remainingTimeDisplay,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: statusColor,
-                  ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: _buildFeatureItem(
+                  icon: Icons.star_rounded,
+                  label: 'Access Level',
+                  value: 'Premium',
+                  color: const Color(0xFFD69E2E),
                 ),
-                if (!hasExpired) ...[
-                  const SizedBox(height: 4),
-                  Text(
-                    'Valid until ${subscription.endDate.day}/${subscription.endDate.month}/${subscription.endDate.year}',
-                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                  ),
-                ],
-              ],
-            ),
+              ),
+            ],
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
 
           // Action buttons
           Row(
             children: [
               if (hasExpired) ...[
                 Expanded(
-                  child: ElevatedButton(
+                  child: ElevatedButton.icon(
                     onPressed: onUpgradeTap,
+                    icon: const Icon(Icons.refresh_rounded, size: 18),
+                    label: const Text('Renew Now'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF6F3FCC),
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(10),
                       ),
+                      elevation: 2,
                     ),
-                    child: const Text('Renew Subscription'),
                   ),
                 ),
-              ]
+              ] else ...[
+                if (isExpiring) ...[
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: onUpgradeTap,
+                      icon: const Icon(Icons.refresh_rounded, size: 18),
+                      label: const Text('Renew'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFD69E2E),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        elevation: 2,
+                      ),
+                    ),
+                  ),
+                ],
+              ],
             ],
           ),
+
+          // Expiring warning
+          if (isExpiring && !hasExpired) ...[
+            const SizedBox(height: 16),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFD69E2E).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: const Color(0xFFD69E2E).withOpacity(0.3),
+                  width: 1,
+                ),
+              ),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.warning_amber_rounded,
+                    color: Color(0xFFD69E2E),
+                    size: 20,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Your subscription expires in $daysRemaining ${daysRemaining == 1 ? 'day' : 'days'}. Renew to continue enjoying premium benefits.',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Color(0xFFD69E2E),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ],
       ),
     );
   }
 
-  Widget _buildBenefitItem({
+  Widget _buildFeatureItem({
     required IconData icon,
     required String label,
     required String value,
     required Color color,
   }) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(8),
+        color: color.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withOpacity(0.2), width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: color, size: 20),
-          const SizedBox(height: 4),
-          Text(label, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+          Row(
+            children: [
+              Icon(icon, color: color, size: 18),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Color(0xFF718096),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
           Text(
             value,
             style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: Colors.black87,
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF1A202C),
             ),
           ),
         ],
       ),
     );
+  }
+
+  String _formatDate(DateTime date) {
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    return '${date.day} ${months[date.month - 1]}, ${date.year}';
+  }
+}
+
+/// Extension methods for SubscriptionInfo
+extension SubscriptionInfoExtensions on SubscriptionInfo {
+  /// Check if subscription is expiring within specified days
+  bool isExpiringWithin(int days) {
+    final now = DateTime.now();
+    final daysRemaining = endDate.difference(now).inDays;
+    return daysRemaining <= days && daysRemaining > 0;
+  }
+
+  /// Check if subscription is currently active (not expired)
+  bool get isCurrentlyActive {
+    final now = DateTime.now();
+    return isActive && endDate.isAfter(now);
+  }
+
+  /// Get formatted price display
+  String get priceDisplay => '₹${price.toStringAsFixed(0)}';
+
+  /// Get remaining days
+  int get daysRemaining {
+    final now = DateTime.now();
+    return endDate.difference(now).inDays;
   }
 }

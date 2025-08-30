@@ -64,7 +64,7 @@ class ProfileStatsCard extends StatelessWidget {
               const SizedBox(height: 12),
               Text(
                 value,
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.w700,
                   color: Colors.grey[800],
                 ),
