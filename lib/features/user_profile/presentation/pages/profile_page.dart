@@ -488,7 +488,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     ],
                     if (_userProfile!.isEmployee) ...[
                       ProfileMenuItem(
-                        icon: Icons.redeem,
+                        icon: Icons.history_outlined,
                         title: 'Redemption History',
                         subtitle: 'View your coupon redemptions',
                         onTap: _onRedemptionHistoryTap,
@@ -649,13 +649,9 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _onRedemptionHistoryTap() {
-    debugPrint('Redemption History tapped');
-    // TODO: Navigate to redemption history for employees
-  }
-
-  void _onManageSubscriptionTap() {
-    debugPrint('Manage Subscription tapped');
-    // TODO: Navigate to subscription management page
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (context) => const PointsWalletPage()));
   }
 
   void _onUpgradeSubscriptionTap() {
@@ -680,7 +676,6 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _onPointsBalanceTap() {
-    debugPrint('Points Balance tapped');
     Navigator.of(
       context,
     ).push(MaterialPageRoute(builder: (context) => const PointsWalletPage()));
