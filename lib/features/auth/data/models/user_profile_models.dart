@@ -21,6 +21,7 @@ abstract class UserProfileResponse3 with _$UserProfileResponse3 {
     EmployeeInfo? employeeInfo,
     VendorInfo? vendorInfo,
     OrganizationInfo? organizationInfo,
+    SubscriptionInfo? subscriptionInfo,
   }) = _UserProfileResponse3;
 
   factory UserProfileResponse3.fromJson(Map<String, dynamic> json) =>
@@ -68,6 +69,25 @@ abstract class OrganizationInfo with _$OrganizationInfo {
 
   factory OrganizationInfo.fromJson(Map<String, dynamic> json) =>
       _$OrganizationInfoFromJson(json);
+}
+
+/// Subscription information embedded in user profile
+@freezed
+abstract class SubscriptionInfo with _$SubscriptionInfo {
+  const factory SubscriptionInfo({
+    required int planId,
+    required String planName,
+    required DateTime startDate,
+    required DateTime endDate,
+    required bool isActive,
+    required bool autoRenew,
+    required int bonusPoints,
+    required int maxCoupons,
+    required double price,
+  }) = _SubscriptionInfo;
+
+  factory SubscriptionInfo.fromJson(Map<String, dynamic> json) =>
+      _$SubscriptionInfoFromJson(json);
 }
 
 /// Extension methods for user profile
@@ -127,6 +147,9 @@ extension UserProfileResponse3Extensions on UserProfileResponse3 {
   /// Check if user needs profile completion
   bool get needsProfileCompletion => 
       !hasCompletedProfile || (isEmployee && employeeInfo == null);
+
+  /// Check if user has an active subscription
+  bool get hasActiveSubscription => subscriptionInfo?.isActive == true;
 }
 
 /// Update user profile request

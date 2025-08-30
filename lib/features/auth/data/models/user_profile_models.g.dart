@@ -33,6 +33,11 @@ _UserProfileResponse3 _$UserProfileResponse3FromJson(
       : OrganizationInfo.fromJson(
           json['organizationInfo'] as Map<String, dynamic>,
         ),
+  subscriptionInfo: json['subscriptionInfo'] == null
+      ? null
+      : SubscriptionInfo.fromJson(
+          json['subscriptionInfo'] as Map<String, dynamic>,
+        ),
 );
 
 Map<String, dynamic> _$UserProfileResponse3ToJson(
@@ -52,6 +57,7 @@ Map<String, dynamic> _$UserProfileResponse3ToJson(
   'employeeInfo': instance.employeeInfo,
   'vendorInfo': instance.vendorInfo,
   'organizationInfo': instance.organizationInfo,
+  'subscriptionInfo': instance.subscriptionInfo,
 };
 
 _EmployeeInfo _$EmployeeInfoFromJson(Map<String, dynamic> json) =>
@@ -101,6 +107,32 @@ Map<String, dynamic> _$OrganizationInfoToJson(_OrganizationInfo instance) =>
       'organizationId': instance.organizationId,
       'organizationName': instance.organizationName,
       'position': instance.position,
+    };
+
+_SubscriptionInfo _$SubscriptionInfoFromJson(Map<String, dynamic> json) =>
+    _SubscriptionInfo(
+      planId: (json['planId'] as num).toInt(),
+      planName: json['planName'] as String,
+      startDate: DateTime.parse(json['startDate'] as String),
+      endDate: DateTime.parse(json['endDate'] as String),
+      isActive: json['isActive'] as bool,
+      autoRenew: json['autoRenew'] as bool,
+      bonusPoints: (json['bonusPoints'] as num).toInt(),
+      maxCoupons: (json['maxCoupons'] as num).toInt(),
+      price: (json['price'] as num).toDouble(),
+    );
+
+Map<String, dynamic> _$SubscriptionInfoToJson(_SubscriptionInfo instance) =>
+    <String, dynamic>{
+      'planId': instance.planId,
+      'planName': instance.planName,
+      'startDate': instance.startDate.toIso8601String(),
+      'endDate': instance.endDate.toIso8601String(),
+      'isActive': instance.isActive,
+      'autoRenew': instance.autoRenew,
+      'bonusPoints': instance.bonusPoints,
+      'maxCoupons': instance.maxCoupons,
+      'price': instance.price,
     };
 
 _UpdateUserProfileRequest3 _$UpdateUserProfileRequest3FromJson(

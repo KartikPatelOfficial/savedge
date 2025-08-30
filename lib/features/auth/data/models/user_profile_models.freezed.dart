@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$UserProfileResponse3 {
 
- String get id; String get email; String get phoneNumber; String get firstName; String get lastName; String get fullName; String? get profileImageUrl; bool get isActive; DateTime get createdAt; DateTime? get lastLoginAt; List<String> get roles; EmployeeInfo? get employeeInfo; VendorInfo? get vendorInfo; OrganizationInfo? get organizationInfo;
+ String get id; String get email; String get phoneNumber; String get firstName; String get lastName; String get fullName; String? get profileImageUrl; bool get isActive; DateTime get createdAt; DateTime? get lastLoginAt; List<String> get roles; EmployeeInfo? get employeeInfo; VendorInfo? get vendorInfo; OrganizationInfo? get organizationInfo; SubscriptionInfo? get subscriptionInfo;
 /// Create a copy of UserProfileResponse3
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $UserProfileResponse3CopyWith<UserProfileResponse3> get copyWith => _$UserProfil
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is UserProfileResponse3&&(identical(other.id, id) || other.id == id)&&(identical(other.email, email) || other.email == email)&&(identical(other.phoneNumber, phoneNumber) || other.phoneNumber == phoneNumber)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.profileImageUrl, profileImageUrl) || other.profileImageUrl == profileImageUrl)&&(identical(other.isActive, isActive) || other.isActive == isActive)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.lastLoginAt, lastLoginAt) || other.lastLoginAt == lastLoginAt)&&const DeepCollectionEquality().equals(other.roles, roles)&&(identical(other.employeeInfo, employeeInfo) || other.employeeInfo == employeeInfo)&&(identical(other.vendorInfo, vendorInfo) || other.vendorInfo == vendorInfo)&&(identical(other.organizationInfo, organizationInfo) || other.organizationInfo == organizationInfo));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is UserProfileResponse3&&(identical(other.id, id) || other.id == id)&&(identical(other.email, email) || other.email == email)&&(identical(other.phoneNumber, phoneNumber) || other.phoneNumber == phoneNumber)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.profileImageUrl, profileImageUrl) || other.profileImageUrl == profileImageUrl)&&(identical(other.isActive, isActive) || other.isActive == isActive)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.lastLoginAt, lastLoginAt) || other.lastLoginAt == lastLoginAt)&&const DeepCollectionEquality().equals(other.roles, roles)&&(identical(other.employeeInfo, employeeInfo) || other.employeeInfo == employeeInfo)&&(identical(other.vendorInfo, vendorInfo) || other.vendorInfo == vendorInfo)&&(identical(other.organizationInfo, organizationInfo) || other.organizationInfo == organizationInfo)&&(identical(other.subscriptionInfo, subscriptionInfo) || other.subscriptionInfo == subscriptionInfo));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,email,phoneNumber,firstName,lastName,fullName,profileImageUrl,isActive,createdAt,lastLoginAt,const DeepCollectionEquality().hash(roles),employeeInfo,vendorInfo,organizationInfo);
+int get hashCode => Object.hash(runtimeType,id,email,phoneNumber,firstName,lastName,fullName,profileImageUrl,isActive,createdAt,lastLoginAt,const DeepCollectionEquality().hash(roles),employeeInfo,vendorInfo,organizationInfo,subscriptionInfo);
 
 @override
 String toString() {
-  return 'UserProfileResponse3(id: $id, email: $email, phoneNumber: $phoneNumber, firstName: $firstName, lastName: $lastName, fullName: $fullName, profileImageUrl: $profileImageUrl, isActive: $isActive, createdAt: $createdAt, lastLoginAt: $lastLoginAt, roles: $roles, employeeInfo: $employeeInfo, vendorInfo: $vendorInfo, organizationInfo: $organizationInfo)';
+  return 'UserProfileResponse3(id: $id, email: $email, phoneNumber: $phoneNumber, firstName: $firstName, lastName: $lastName, fullName: $fullName, profileImageUrl: $profileImageUrl, isActive: $isActive, createdAt: $createdAt, lastLoginAt: $lastLoginAt, roles: $roles, employeeInfo: $employeeInfo, vendorInfo: $vendorInfo, organizationInfo: $organizationInfo, subscriptionInfo: $subscriptionInfo)';
 }
 
 
@@ -48,11 +48,11 @@ abstract mixin class $UserProfileResponse3CopyWith<$Res>  {
   factory $UserProfileResponse3CopyWith(UserProfileResponse3 value, $Res Function(UserProfileResponse3) _then) = _$UserProfileResponse3CopyWithImpl;
 @useResult
 $Res call({
- String id, String email, String phoneNumber, String firstName, String lastName, String fullName, String? profileImageUrl, bool isActive, DateTime createdAt, DateTime? lastLoginAt, List<String> roles, EmployeeInfo? employeeInfo, VendorInfo? vendorInfo, OrganizationInfo? organizationInfo
+ String id, String email, String phoneNumber, String firstName, String lastName, String fullName, String? profileImageUrl, bool isActive, DateTime createdAt, DateTime? lastLoginAt, List<String> roles, EmployeeInfo? employeeInfo, VendorInfo? vendorInfo, OrganizationInfo? organizationInfo, SubscriptionInfo? subscriptionInfo
 });
 
 
-$EmployeeInfoCopyWith<$Res>? get employeeInfo;$VendorInfoCopyWith<$Res>? get vendorInfo;$OrganizationInfoCopyWith<$Res>? get organizationInfo;
+$EmployeeInfoCopyWith<$Res>? get employeeInfo;$VendorInfoCopyWith<$Res>? get vendorInfo;$OrganizationInfoCopyWith<$Res>? get organizationInfo;$SubscriptionInfoCopyWith<$Res>? get subscriptionInfo;
 
 }
 /// @nodoc
@@ -65,7 +65,7 @@ class _$UserProfileResponse3CopyWithImpl<$Res>
 
 /// Create a copy of UserProfileResponse3
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? email = null,Object? phoneNumber = null,Object? firstName = null,Object? lastName = null,Object? fullName = null,Object? profileImageUrl = freezed,Object? isActive = null,Object? createdAt = null,Object? lastLoginAt = freezed,Object? roles = null,Object? employeeInfo = freezed,Object? vendorInfo = freezed,Object? organizationInfo = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? email = null,Object? phoneNumber = null,Object? firstName = null,Object? lastName = null,Object? fullName = null,Object? profileImageUrl = freezed,Object? isActive = null,Object? createdAt = null,Object? lastLoginAt = freezed,Object? roles = null,Object? employeeInfo = freezed,Object? vendorInfo = freezed,Object? organizationInfo = freezed,Object? subscriptionInfo = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
@@ -81,7 +81,8 @@ as DateTime?,roles: null == roles ? _self.roles : roles // ignore: cast_nullable
 as List<String>,employeeInfo: freezed == employeeInfo ? _self.employeeInfo : employeeInfo // ignore: cast_nullable_to_non_nullable
 as EmployeeInfo?,vendorInfo: freezed == vendorInfo ? _self.vendorInfo : vendorInfo // ignore: cast_nullable_to_non_nullable
 as VendorInfo?,organizationInfo: freezed == organizationInfo ? _self.organizationInfo : organizationInfo // ignore: cast_nullable_to_non_nullable
-as OrganizationInfo?,
+as OrganizationInfo?,subscriptionInfo: freezed == subscriptionInfo ? _self.subscriptionInfo : subscriptionInfo // ignore: cast_nullable_to_non_nullable
+as SubscriptionInfo?,
   ));
 }
 /// Create a copy of UserProfileResponse3
@@ -119,6 +120,18 @@ $OrganizationInfoCopyWith<$Res>? get organizationInfo {
 
   return $OrganizationInfoCopyWith<$Res>(_self.organizationInfo!, (value) {
     return _then(_self.copyWith(organizationInfo: value));
+  });
+}/// Create a copy of UserProfileResponse3
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$SubscriptionInfoCopyWith<$Res>? get subscriptionInfo {
+    if (_self.subscriptionInfo == null) {
+    return null;
+  }
+
+  return $SubscriptionInfoCopyWith<$Res>(_self.subscriptionInfo!, (value) {
+    return _then(_self.copyWith(subscriptionInfo: value));
   });
 }
 }
@@ -202,10 +215,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String email,  String phoneNumber,  String firstName,  String lastName,  String fullName,  String? profileImageUrl,  bool isActive,  DateTime createdAt,  DateTime? lastLoginAt,  List<String> roles,  EmployeeInfo? employeeInfo,  VendorInfo? vendorInfo,  OrganizationInfo? organizationInfo)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String email,  String phoneNumber,  String firstName,  String lastName,  String fullName,  String? profileImageUrl,  bool isActive,  DateTime createdAt,  DateTime? lastLoginAt,  List<String> roles,  EmployeeInfo? employeeInfo,  VendorInfo? vendorInfo,  OrganizationInfo? organizationInfo,  SubscriptionInfo? subscriptionInfo)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _UserProfileResponse3() when $default != null:
-return $default(_that.id,_that.email,_that.phoneNumber,_that.firstName,_that.lastName,_that.fullName,_that.profileImageUrl,_that.isActive,_that.createdAt,_that.lastLoginAt,_that.roles,_that.employeeInfo,_that.vendorInfo,_that.organizationInfo);case _:
+return $default(_that.id,_that.email,_that.phoneNumber,_that.firstName,_that.lastName,_that.fullName,_that.profileImageUrl,_that.isActive,_that.createdAt,_that.lastLoginAt,_that.roles,_that.employeeInfo,_that.vendorInfo,_that.organizationInfo,_that.subscriptionInfo);case _:
   return orElse();
 
 }
@@ -223,10 +236,10 @@ return $default(_that.id,_that.email,_that.phoneNumber,_that.firstName,_that.las
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String email,  String phoneNumber,  String firstName,  String lastName,  String fullName,  String? profileImageUrl,  bool isActive,  DateTime createdAt,  DateTime? lastLoginAt,  List<String> roles,  EmployeeInfo? employeeInfo,  VendorInfo? vendorInfo,  OrganizationInfo? organizationInfo)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String email,  String phoneNumber,  String firstName,  String lastName,  String fullName,  String? profileImageUrl,  bool isActive,  DateTime createdAt,  DateTime? lastLoginAt,  List<String> roles,  EmployeeInfo? employeeInfo,  VendorInfo? vendorInfo,  OrganizationInfo? organizationInfo,  SubscriptionInfo? subscriptionInfo)  $default,) {final _that = this;
 switch (_that) {
 case _UserProfileResponse3():
-return $default(_that.id,_that.email,_that.phoneNumber,_that.firstName,_that.lastName,_that.fullName,_that.profileImageUrl,_that.isActive,_that.createdAt,_that.lastLoginAt,_that.roles,_that.employeeInfo,_that.vendorInfo,_that.organizationInfo);case _:
+return $default(_that.id,_that.email,_that.phoneNumber,_that.firstName,_that.lastName,_that.fullName,_that.profileImageUrl,_that.isActive,_that.createdAt,_that.lastLoginAt,_that.roles,_that.employeeInfo,_that.vendorInfo,_that.organizationInfo,_that.subscriptionInfo);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -243,10 +256,10 @@ return $default(_that.id,_that.email,_that.phoneNumber,_that.firstName,_that.las
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String email,  String phoneNumber,  String firstName,  String lastName,  String fullName,  String? profileImageUrl,  bool isActive,  DateTime createdAt,  DateTime? lastLoginAt,  List<String> roles,  EmployeeInfo? employeeInfo,  VendorInfo? vendorInfo,  OrganizationInfo? organizationInfo)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String email,  String phoneNumber,  String firstName,  String lastName,  String fullName,  String? profileImageUrl,  bool isActive,  DateTime createdAt,  DateTime? lastLoginAt,  List<String> roles,  EmployeeInfo? employeeInfo,  VendorInfo? vendorInfo,  OrganizationInfo? organizationInfo,  SubscriptionInfo? subscriptionInfo)?  $default,) {final _that = this;
 switch (_that) {
 case _UserProfileResponse3() when $default != null:
-return $default(_that.id,_that.email,_that.phoneNumber,_that.firstName,_that.lastName,_that.fullName,_that.profileImageUrl,_that.isActive,_that.createdAt,_that.lastLoginAt,_that.roles,_that.employeeInfo,_that.vendorInfo,_that.organizationInfo);case _:
+return $default(_that.id,_that.email,_that.phoneNumber,_that.firstName,_that.lastName,_that.fullName,_that.profileImageUrl,_that.isActive,_that.createdAt,_that.lastLoginAt,_that.roles,_that.employeeInfo,_that.vendorInfo,_that.organizationInfo,_that.subscriptionInfo);case _:
   return null;
 
 }
@@ -258,7 +271,7 @@ return $default(_that.id,_that.email,_that.phoneNumber,_that.firstName,_that.las
 @JsonSerializable()
 
 class _UserProfileResponse3 implements UserProfileResponse3 {
-  const _UserProfileResponse3({required this.id, required this.email, required this.phoneNumber, required this.firstName, required this.lastName, required this.fullName, this.profileImageUrl, required this.isActive, required this.createdAt, this.lastLoginAt, required final  List<String> roles, this.employeeInfo, this.vendorInfo, this.organizationInfo}): _roles = roles;
+  const _UserProfileResponse3({required this.id, required this.email, required this.phoneNumber, required this.firstName, required this.lastName, required this.fullName, this.profileImageUrl, required this.isActive, required this.createdAt, this.lastLoginAt, required final  List<String> roles, this.employeeInfo, this.vendorInfo, this.organizationInfo, this.subscriptionInfo}): _roles = roles;
   factory _UserProfileResponse3.fromJson(Map<String, dynamic> json) => _$UserProfileResponse3FromJson(json);
 
 @override final  String id;
@@ -281,6 +294,7 @@ class _UserProfileResponse3 implements UserProfileResponse3 {
 @override final  EmployeeInfo? employeeInfo;
 @override final  VendorInfo? vendorInfo;
 @override final  OrganizationInfo? organizationInfo;
+@override final  SubscriptionInfo? subscriptionInfo;
 
 /// Create a copy of UserProfileResponse3
 /// with the given fields replaced by the non-null parameter values.
@@ -295,16 +309,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UserProfileResponse3&&(identical(other.id, id) || other.id == id)&&(identical(other.email, email) || other.email == email)&&(identical(other.phoneNumber, phoneNumber) || other.phoneNumber == phoneNumber)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.profileImageUrl, profileImageUrl) || other.profileImageUrl == profileImageUrl)&&(identical(other.isActive, isActive) || other.isActive == isActive)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.lastLoginAt, lastLoginAt) || other.lastLoginAt == lastLoginAt)&&const DeepCollectionEquality().equals(other._roles, _roles)&&(identical(other.employeeInfo, employeeInfo) || other.employeeInfo == employeeInfo)&&(identical(other.vendorInfo, vendorInfo) || other.vendorInfo == vendorInfo)&&(identical(other.organizationInfo, organizationInfo) || other.organizationInfo == organizationInfo));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UserProfileResponse3&&(identical(other.id, id) || other.id == id)&&(identical(other.email, email) || other.email == email)&&(identical(other.phoneNumber, phoneNumber) || other.phoneNumber == phoneNumber)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.profileImageUrl, profileImageUrl) || other.profileImageUrl == profileImageUrl)&&(identical(other.isActive, isActive) || other.isActive == isActive)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.lastLoginAt, lastLoginAt) || other.lastLoginAt == lastLoginAt)&&const DeepCollectionEquality().equals(other._roles, _roles)&&(identical(other.employeeInfo, employeeInfo) || other.employeeInfo == employeeInfo)&&(identical(other.vendorInfo, vendorInfo) || other.vendorInfo == vendorInfo)&&(identical(other.organizationInfo, organizationInfo) || other.organizationInfo == organizationInfo)&&(identical(other.subscriptionInfo, subscriptionInfo) || other.subscriptionInfo == subscriptionInfo));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,email,phoneNumber,firstName,lastName,fullName,profileImageUrl,isActive,createdAt,lastLoginAt,const DeepCollectionEquality().hash(_roles),employeeInfo,vendorInfo,organizationInfo);
+int get hashCode => Object.hash(runtimeType,id,email,phoneNumber,firstName,lastName,fullName,profileImageUrl,isActive,createdAt,lastLoginAt,const DeepCollectionEquality().hash(_roles),employeeInfo,vendorInfo,organizationInfo,subscriptionInfo);
 
 @override
 String toString() {
-  return 'UserProfileResponse3(id: $id, email: $email, phoneNumber: $phoneNumber, firstName: $firstName, lastName: $lastName, fullName: $fullName, profileImageUrl: $profileImageUrl, isActive: $isActive, createdAt: $createdAt, lastLoginAt: $lastLoginAt, roles: $roles, employeeInfo: $employeeInfo, vendorInfo: $vendorInfo, organizationInfo: $organizationInfo)';
+  return 'UserProfileResponse3(id: $id, email: $email, phoneNumber: $phoneNumber, firstName: $firstName, lastName: $lastName, fullName: $fullName, profileImageUrl: $profileImageUrl, isActive: $isActive, createdAt: $createdAt, lastLoginAt: $lastLoginAt, roles: $roles, employeeInfo: $employeeInfo, vendorInfo: $vendorInfo, organizationInfo: $organizationInfo, subscriptionInfo: $subscriptionInfo)';
 }
 
 
@@ -315,11 +329,11 @@ abstract mixin class _$UserProfileResponse3CopyWith<$Res> implements $UserProfil
   factory _$UserProfileResponse3CopyWith(_UserProfileResponse3 value, $Res Function(_UserProfileResponse3) _then) = __$UserProfileResponse3CopyWithImpl;
 @override @useResult
 $Res call({
- String id, String email, String phoneNumber, String firstName, String lastName, String fullName, String? profileImageUrl, bool isActive, DateTime createdAt, DateTime? lastLoginAt, List<String> roles, EmployeeInfo? employeeInfo, VendorInfo? vendorInfo, OrganizationInfo? organizationInfo
+ String id, String email, String phoneNumber, String firstName, String lastName, String fullName, String? profileImageUrl, bool isActive, DateTime createdAt, DateTime? lastLoginAt, List<String> roles, EmployeeInfo? employeeInfo, VendorInfo? vendorInfo, OrganizationInfo? organizationInfo, SubscriptionInfo? subscriptionInfo
 });
 
 
-@override $EmployeeInfoCopyWith<$Res>? get employeeInfo;@override $VendorInfoCopyWith<$Res>? get vendorInfo;@override $OrganizationInfoCopyWith<$Res>? get organizationInfo;
+@override $EmployeeInfoCopyWith<$Res>? get employeeInfo;@override $VendorInfoCopyWith<$Res>? get vendorInfo;@override $OrganizationInfoCopyWith<$Res>? get organizationInfo;@override $SubscriptionInfoCopyWith<$Res>? get subscriptionInfo;
 
 }
 /// @nodoc
@@ -332,7 +346,7 @@ class __$UserProfileResponse3CopyWithImpl<$Res>
 
 /// Create a copy of UserProfileResponse3
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? email = null,Object? phoneNumber = null,Object? firstName = null,Object? lastName = null,Object? fullName = null,Object? profileImageUrl = freezed,Object? isActive = null,Object? createdAt = null,Object? lastLoginAt = freezed,Object? roles = null,Object? employeeInfo = freezed,Object? vendorInfo = freezed,Object? organizationInfo = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? email = null,Object? phoneNumber = null,Object? firstName = null,Object? lastName = null,Object? fullName = null,Object? profileImageUrl = freezed,Object? isActive = null,Object? createdAt = null,Object? lastLoginAt = freezed,Object? roles = null,Object? employeeInfo = freezed,Object? vendorInfo = freezed,Object? organizationInfo = freezed,Object? subscriptionInfo = freezed,}) {
   return _then(_UserProfileResponse3(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
@@ -348,7 +362,8 @@ as DateTime?,roles: null == roles ? _self._roles : roles // ignore: cast_nullabl
 as List<String>,employeeInfo: freezed == employeeInfo ? _self.employeeInfo : employeeInfo // ignore: cast_nullable_to_non_nullable
 as EmployeeInfo?,vendorInfo: freezed == vendorInfo ? _self.vendorInfo : vendorInfo // ignore: cast_nullable_to_non_nullable
 as VendorInfo?,organizationInfo: freezed == organizationInfo ? _self.organizationInfo : organizationInfo // ignore: cast_nullable_to_non_nullable
-as OrganizationInfo?,
+as OrganizationInfo?,subscriptionInfo: freezed == subscriptionInfo ? _self.subscriptionInfo : subscriptionInfo // ignore: cast_nullable_to_non_nullable
+as SubscriptionInfo?,
   ));
 }
 
@@ -387,6 +402,18 @@ $OrganizationInfoCopyWith<$Res>? get organizationInfo {
 
   return $OrganizationInfoCopyWith<$Res>(_self.organizationInfo!, (value) {
     return _then(_self.copyWith(organizationInfo: value));
+  });
+}/// Create a copy of UserProfileResponse3
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$SubscriptionInfoCopyWith<$Res>? get subscriptionInfo {
+    if (_self.subscriptionInfo == null) {
+    return null;
+  }
+
+  return $SubscriptionInfoCopyWith<$Res>(_self.subscriptionInfo!, (value) {
+    return _then(_self.copyWith(subscriptionInfo: value));
   });
 }
 }
@@ -1204,6 +1231,293 @@ organizationId: null == organizationId ? _self.organizationId : organizationId /
 as int,organizationName: null == organizationName ? _self.organizationName : organizationName // ignore: cast_nullable_to_non_nullable
 as String,position: null == position ? _self.position : position // ignore: cast_nullable_to_non_nullable
 as String,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$SubscriptionInfo {
+
+ int get planId; String get planName; DateTime get startDate; DateTime get endDate; bool get isActive; bool get autoRenew; int get bonusPoints; int get maxCoupons; double get price;
+/// Create a copy of SubscriptionInfo
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$SubscriptionInfoCopyWith<SubscriptionInfo> get copyWith => _$SubscriptionInfoCopyWithImpl<SubscriptionInfo>(this as SubscriptionInfo, _$identity);
+
+  /// Serializes this SubscriptionInfo to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SubscriptionInfo&&(identical(other.planId, planId) || other.planId == planId)&&(identical(other.planName, planName) || other.planName == planName)&&(identical(other.startDate, startDate) || other.startDate == startDate)&&(identical(other.endDate, endDate) || other.endDate == endDate)&&(identical(other.isActive, isActive) || other.isActive == isActive)&&(identical(other.autoRenew, autoRenew) || other.autoRenew == autoRenew)&&(identical(other.bonusPoints, bonusPoints) || other.bonusPoints == bonusPoints)&&(identical(other.maxCoupons, maxCoupons) || other.maxCoupons == maxCoupons)&&(identical(other.price, price) || other.price == price));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,planId,planName,startDate,endDate,isActive,autoRenew,bonusPoints,maxCoupons,price);
+
+@override
+String toString() {
+  return 'SubscriptionInfo(planId: $planId, planName: $planName, startDate: $startDate, endDate: $endDate, isActive: $isActive, autoRenew: $autoRenew, bonusPoints: $bonusPoints, maxCoupons: $maxCoupons, price: $price)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $SubscriptionInfoCopyWith<$Res>  {
+  factory $SubscriptionInfoCopyWith(SubscriptionInfo value, $Res Function(SubscriptionInfo) _then) = _$SubscriptionInfoCopyWithImpl;
+@useResult
+$Res call({
+ int planId, String planName, DateTime startDate, DateTime endDate, bool isActive, bool autoRenew, int bonusPoints, int maxCoupons, double price
+});
+
+
+
+
+}
+/// @nodoc
+class _$SubscriptionInfoCopyWithImpl<$Res>
+    implements $SubscriptionInfoCopyWith<$Res> {
+  _$SubscriptionInfoCopyWithImpl(this._self, this._then);
+
+  final SubscriptionInfo _self;
+  final $Res Function(SubscriptionInfo) _then;
+
+/// Create a copy of SubscriptionInfo
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? planId = null,Object? planName = null,Object? startDate = null,Object? endDate = null,Object? isActive = null,Object? autoRenew = null,Object? bonusPoints = null,Object? maxCoupons = null,Object? price = null,}) {
+  return _then(_self.copyWith(
+planId: null == planId ? _self.planId : planId // ignore: cast_nullable_to_non_nullable
+as int,planName: null == planName ? _self.planName : planName // ignore: cast_nullable_to_non_nullable
+as String,startDate: null == startDate ? _self.startDate : startDate // ignore: cast_nullable_to_non_nullable
+as DateTime,endDate: null == endDate ? _self.endDate : endDate // ignore: cast_nullable_to_non_nullable
+as DateTime,isActive: null == isActive ? _self.isActive : isActive // ignore: cast_nullable_to_non_nullable
+as bool,autoRenew: null == autoRenew ? _self.autoRenew : autoRenew // ignore: cast_nullable_to_non_nullable
+as bool,bonusPoints: null == bonusPoints ? _self.bonusPoints : bonusPoints // ignore: cast_nullable_to_non_nullable
+as int,maxCoupons: null == maxCoupons ? _self.maxCoupons : maxCoupons // ignore: cast_nullable_to_non_nullable
+as int,price: null == price ? _self.price : price // ignore: cast_nullable_to_non_nullable
+as double,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [SubscriptionInfo].
+extension SubscriptionInfoPatterns on SubscriptionInfo {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _SubscriptionInfo value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _SubscriptionInfo() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _SubscriptionInfo value)  $default,){
+final _that = this;
+switch (_that) {
+case _SubscriptionInfo():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _SubscriptionInfo value)?  $default,){
+final _that = this;
+switch (_that) {
+case _SubscriptionInfo() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int planId,  String planName,  DateTime startDate,  DateTime endDate,  bool isActive,  bool autoRenew,  int bonusPoints,  int maxCoupons,  double price)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _SubscriptionInfo() when $default != null:
+return $default(_that.planId,_that.planName,_that.startDate,_that.endDate,_that.isActive,_that.autoRenew,_that.bonusPoints,_that.maxCoupons,_that.price);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int planId,  String planName,  DateTime startDate,  DateTime endDate,  bool isActive,  bool autoRenew,  int bonusPoints,  int maxCoupons,  double price)  $default,) {final _that = this;
+switch (_that) {
+case _SubscriptionInfo():
+return $default(_that.planId,_that.planName,_that.startDate,_that.endDate,_that.isActive,_that.autoRenew,_that.bonusPoints,_that.maxCoupons,_that.price);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int planId,  String planName,  DateTime startDate,  DateTime endDate,  bool isActive,  bool autoRenew,  int bonusPoints,  int maxCoupons,  double price)?  $default,) {final _that = this;
+switch (_that) {
+case _SubscriptionInfo() when $default != null:
+return $default(_that.planId,_that.planName,_that.startDate,_that.endDate,_that.isActive,_that.autoRenew,_that.bonusPoints,_that.maxCoupons,_that.price);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _SubscriptionInfo implements SubscriptionInfo {
+  const _SubscriptionInfo({required this.planId, required this.planName, required this.startDate, required this.endDate, required this.isActive, required this.autoRenew, required this.bonusPoints, required this.maxCoupons, required this.price});
+  factory _SubscriptionInfo.fromJson(Map<String, dynamic> json) => _$SubscriptionInfoFromJson(json);
+
+@override final  int planId;
+@override final  String planName;
+@override final  DateTime startDate;
+@override final  DateTime endDate;
+@override final  bool isActive;
+@override final  bool autoRenew;
+@override final  int bonusPoints;
+@override final  int maxCoupons;
+@override final  double price;
+
+/// Create a copy of SubscriptionInfo
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$SubscriptionInfoCopyWith<_SubscriptionInfo> get copyWith => __$SubscriptionInfoCopyWithImpl<_SubscriptionInfo>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$SubscriptionInfoToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SubscriptionInfo&&(identical(other.planId, planId) || other.planId == planId)&&(identical(other.planName, planName) || other.planName == planName)&&(identical(other.startDate, startDate) || other.startDate == startDate)&&(identical(other.endDate, endDate) || other.endDate == endDate)&&(identical(other.isActive, isActive) || other.isActive == isActive)&&(identical(other.autoRenew, autoRenew) || other.autoRenew == autoRenew)&&(identical(other.bonusPoints, bonusPoints) || other.bonusPoints == bonusPoints)&&(identical(other.maxCoupons, maxCoupons) || other.maxCoupons == maxCoupons)&&(identical(other.price, price) || other.price == price));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,planId,planName,startDate,endDate,isActive,autoRenew,bonusPoints,maxCoupons,price);
+
+@override
+String toString() {
+  return 'SubscriptionInfo(planId: $planId, planName: $planName, startDate: $startDate, endDate: $endDate, isActive: $isActive, autoRenew: $autoRenew, bonusPoints: $bonusPoints, maxCoupons: $maxCoupons, price: $price)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$SubscriptionInfoCopyWith<$Res> implements $SubscriptionInfoCopyWith<$Res> {
+  factory _$SubscriptionInfoCopyWith(_SubscriptionInfo value, $Res Function(_SubscriptionInfo) _then) = __$SubscriptionInfoCopyWithImpl;
+@override @useResult
+$Res call({
+ int planId, String planName, DateTime startDate, DateTime endDate, bool isActive, bool autoRenew, int bonusPoints, int maxCoupons, double price
+});
+
+
+
+
+}
+/// @nodoc
+class __$SubscriptionInfoCopyWithImpl<$Res>
+    implements _$SubscriptionInfoCopyWith<$Res> {
+  __$SubscriptionInfoCopyWithImpl(this._self, this._then);
+
+  final _SubscriptionInfo _self;
+  final $Res Function(_SubscriptionInfo) _then;
+
+/// Create a copy of SubscriptionInfo
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? planId = null,Object? planName = null,Object? startDate = null,Object? endDate = null,Object? isActive = null,Object? autoRenew = null,Object? bonusPoints = null,Object? maxCoupons = null,Object? price = null,}) {
+  return _then(_SubscriptionInfo(
+planId: null == planId ? _self.planId : planId // ignore: cast_nullable_to_non_nullable
+as int,planName: null == planName ? _self.planName : planName // ignore: cast_nullable_to_non_nullable
+as String,startDate: null == startDate ? _self.startDate : startDate // ignore: cast_nullable_to_non_nullable
+as DateTime,endDate: null == endDate ? _self.endDate : endDate // ignore: cast_nullable_to_non_nullable
+as DateTime,isActive: null == isActive ? _self.isActive : isActive // ignore: cast_nullable_to_non_nullable
+as bool,autoRenew: null == autoRenew ? _self.autoRenew : autoRenew // ignore: cast_nullable_to_non_nullable
+as bool,bonusPoints: null == bonusPoints ? _self.bonusPoints : bonusPoints // ignore: cast_nullable_to_non_nullable
+as int,maxCoupons: null == maxCoupons ? _self.maxCoupons : maxCoupons // ignore: cast_nullable_to_non_nullable
+as int,price: null == price ? _self.price : price // ignore: cast_nullable_to_non_nullable
+as double,
   ));
 }
 

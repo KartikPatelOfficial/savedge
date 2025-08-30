@@ -4,6 +4,7 @@ import 'package:savedge/features/auth/data/models/user_profile_models.dart';
 import 'package:savedge/features/auth/domain/entities/extended_user_profile.dart';
 import 'package:savedge/features/auth/domain/entities/user_profile.dart';
 import 'package:savedge/features/auth/domain/repositories/auth_repository.dart';
+import 'package:savedge/features/subscription/domain/entities/active_subscription.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   const AuthRepositoryImpl(this._remote);
@@ -100,26 +101,47 @@ class AuthRepositoryImpl implements AuthRepository {
     return _mapExtended3(res);
   }
 
-  ExtendedUserProfile _mapExtended3(UserProfileResponse3 r) =>
-      ExtendedUserProfile(
-        id: r.id,
-        email: r.email,
-        firstName: r.firstName,
-        lastName: r.lastName,
-        organizationId: r.employeeInfo?.organizationId,
-        organizationName: r.employeeInfo?.organizationName,
-        pointsBalance: r.employeeInfo?.availablePoints ?? 0,
-        pointsExpiry: null,
-        isActive: r.isActive,
-        createdAt: r.createdAt,
-        roles: r.roles,
-        isEmployee: r.isEmployee,
-        employeeCode: r.employeeInfo?.employeeCode,
-        department: r.employeeInfo?.department,
-        position: r.employeeInfo?.position,
-        joinDate: null,
-        activeSubscription: null,
+  ExtendedUserProfile _mapExtended3(UserProfileResponse3 r) {
+    ActiveSubscription? activeSubscription;
+    if (r.subscriptionInfo != null) {
+      final sub = r.subscriptionInfo!;
+      final now = DateTime.now();
+      final daysRemaining = sub.endDate.difference(now).inDays;
+      
+      activeSubscription = ActiveSubscription(
+        planId: sub.planId,
+        planName: sub.planName,
+        startDate: sub.startDate,
+        endDate: sub.endDate,
+        isActive: sub.isActive,
+        autoRenew: sub.autoRenew,
+        daysRemaining: daysRemaining,
+        bonusPoints: sub.bonusPoints,
+        maxCoupons: sub.maxCoupons,
+        price: sub.price,
       );
+    }
+
+    return ExtendedUserProfile(
+      id: r.id,
+      email: r.email,
+      firstName: r.firstName,
+      lastName: r.lastName,
+      organizationId: r.employeeInfo?.organizationId,
+      organizationName: r.employeeInfo?.organizationName,
+      pointsBalance: r.employeeInfo?.availablePoints ?? 0,
+      pointsExpiry: null,
+      isActive: r.isActive,
+      createdAt: r.createdAt,
+      roles: r.roles,
+      isEmployee: r.isEmployee,
+      employeeCode: r.employeeInfo?.employeeCode,
+      department: r.employeeInfo?.department,
+      position: r.employeeInfo?.position,
+      joinDate: null,
+      activeSubscription: activeSubscription,
+    );
+  }
 
   // New unified authentication flow methods
   @override
