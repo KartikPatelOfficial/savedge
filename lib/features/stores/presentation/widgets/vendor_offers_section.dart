@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:get_it/get_it.dart';
 import 'package:savedge/core/injection/injection.dart';
+import 'package:savedge/features/coupons/data/services/coupon_service.dart';
+import 'package:savedge/features/coupons/presentation/pages/coupon_redemption_options_page.dart';
 import 'package:savedge/features/vendors/domain/entities/coupon.dart';
 import 'package:savedge/features/vendors/presentation/bloc/coupons_bloc.dart';
-import 'package:savedge/features/coupons/presentation/pages/coupon_redemption_options_page.dart';
-import 'package:savedge/features/coupons/data/services/coupon_service.dart';
-import 'package:get_it/get_it.dart';
 
-/// Widget for displaying vendor-specific offers/coupons
+/// Beautiful vendor offers section with animations
 class VendorOffersSection extends StatelessWidget {
   const VendorOffersSection({
     super.key,
     required this.vendorId,
     required this.vendorUid,
     required this.vendorName,
-    this.title = 'Offer for you',
+    this.title = 'Special Offers',
   });
 
   final int vendorId;
@@ -53,28 +53,44 @@ class VendorOffersView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      margin: const EdgeInsets.only(top: 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
+          // Section header
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF6F3FCC).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(
+                    Icons.local_offer,
+                    color: Color(0xFF6F3FCC),
+                    size: 20,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF1A202C),
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           BlocBuilder<CouponsBloc, CouponsState>(
             builder: (context, state) {
               if (state is CouponsLoading) {
-                return const Center(
-                  child: Padding(
-                    padding: EdgeInsets.all(20.0),
-                    child: CircularProgressIndicator(),
-                  ),
-                );
+                return _buildLoadingState();
               } else if (state is CouponsError) {
                 return _buildErrorWidget(state.message);
               } else if (state is CouponsLoaded) {
@@ -88,64 +104,153 @@ class VendorOffersView extends StatelessWidget {
     );
   }
 
+  Widget _buildLoadingState() {
+    return Container(
+      height: 200,
+      margin: const EdgeInsets.symmetric(horizontal: 24),
+      child: const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(color: Color(0xFF6F3FCC), strokeWidth: 3),
+            SizedBox(height: 16),
+            Text(
+              'Loading offers...',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: Color(0xFF6B7280),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildCouponsList(List<Coupon> coupons) {
     if (coupons.isEmpty) {
       return _buildEmptyState();
     }
 
-    return Column(
-      children: coupons
-          .map(
-            (coupon) => Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: VendorOfferCard(
-                coupon: coupon,
-                vendorUid: vendorUid,
-                vendorName: vendorName,
+    return AnimationLimiter(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Column(
+          children: coupons.asMap().entries.map((entry) {
+            final index = entry.key;
+            final coupon = entry.value;
+            return AnimationConfiguration.staggeredList(
+              position: index,
+              duration: const Duration(milliseconds: 600),
+              child: SlideAnimation(
+                verticalOffset: 30.0,
+                child: FadeInAnimation(
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: VendorOfferCard(
+                      coupon: coupon,
+                      vendorUid: vendorUid,
+                      vendorName: vendorName,
+                      index: index,
+                    ),
+                  ),
+                ),
               ),
-            ),
-          )
-          .toList(),
+            );
+          }).toList(),
+        ),
+      ),
     );
   }
 
   Widget _buildErrorWidget(String message) {
-    return Center(
-      child: Column(
-        children: [
-          Icon(Icons.error_outline, size: 48, color: Colors.grey[400]),
-          const SizedBox(height: 8),
-          Text(
-            'Failed to load offers',
-            style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            message,
-            style: TextStyle(fontSize: 12, color: Colors.grey[500]),
-            textAlign: TextAlign.center,
-          ),
-        ],
+    return Container(
+      height: 200,
+      margin: const EdgeInsets.symmetric(horizontal: 24),
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: const Color(0xFFEF4444).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(40),
+                border: Border.all(
+                  color: const Color(0xFFEF4444).withOpacity(0.2),
+                  width: 2,
+                ),
+              ),
+              child: Icon(
+                Icons.error_outline,
+                size: 36,
+                color: const Color(0xFFEF4444).withOpacity(0.7),
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Failed to load offers',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF1A202C),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              message,
+              style: const TextStyle(fontSize: 14, color: Color(0xFF6B7280)),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        children: [
-          Icon(Icons.local_offer_outlined, size: 48, color: Colors.grey[400]),
-          const SizedBox(height: 8),
-          Text(
-            'No offers available',
-            style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'Check back later for new deals!',
-            style: TextStyle(fontSize: 12, color: Colors.grey[500]),
-          ),
-        ],
+    return Container(
+      height: 200,
+      margin: const EdgeInsets.symmetric(horizontal: 24),
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: const Color(0xFF6F3FCC).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(40),
+                border: Border.all(
+                  color: const Color(0xFF6F3FCC).withOpacity(0.2),
+                  width: 2,
+                ),
+              ),
+              child: Icon(
+                Icons.local_offer_outlined,
+                size: 36,
+                color: const Color(0xFF6F3FCC).withOpacity(0.7),
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'No offers available',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF1A202C),
+              ),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Check back later for amazing deals!',
+              style: TextStyle(fontSize: 14, color: Color(0xFF6B7280)),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -158,11 +263,13 @@ class VendorOfferCard extends StatefulWidget {
     required this.coupon,
     required this.vendorUid,
     required this.vendorName,
+    this.index = 0,
   });
 
   final Coupon coupon;
   final String vendorUid;
   final String vendorName;
+  final int index;
 
   @override
   State<VendorOfferCard> createState() => _VendorOfferCardState();
@@ -181,13 +288,9 @@ class _VendorOfferCardState extends State<VendorOfferCard>
       duration: const Duration(milliseconds: 150),
       vsync: this,
     );
-    _scaleAnimation = Tween<double>(
-      begin: 1.0,
-      end: 0.95,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    ));
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
   }
 
   @override
@@ -205,6 +308,7 @@ class _VendorOfferCardState extends State<VendorOfferCard>
       onTapDown: (_) {
         setState(() => _isPressed = true);
         _animationController.forward();
+        HapticFeedback.lightImpact();
       },
       onTapUp: (_) {
         setState(() => _isPressed = false);
@@ -220,144 +324,141 @@ class _VendorOfferCardState extends State<VendorOfferCard>
         builder: (context, child) => Transform.scale(
           scale: _scaleAnimation.value,
           child: Container(
-            margin: const EdgeInsets.only(bottom: 4),
             decoration: BoxDecoration(
+              gradient: gradient,
               borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: primaryColor.withOpacity(0.2),
-                  blurRadius: _isPressed ? 8 : 15,
-                  offset: Offset(0, _isPressed ? 2 : 6),
-                ),
-              ],
             ),
-            child: Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                gradient: gradient,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Stack(
-                children: [
-                  // Background decorative elements
-                  Positioned(
-                    right: -20,
-                    top: -20,
-                    child: Container(
-                      width: 80,
-                      height: 80,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.white.withOpacity(0.1),
-                      ),
+            child: Stack(
+              children: [
+                // Animated background pattern
+                Positioned.fill(
+                  child: CustomPaint(
+                    painter: CouponPatternPainter(
+                      color: Colors.white.withOpacity(0.1),
+                      index: widget.index,
                     ),
                   ),
-                  Positioned(
-                    left: -10,
-                    bottom: -10,
-                    child: Container(
-                      width: 50,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.white.withOpacity(0.05),
-                      ),
-                    ),
-                  ),
-                  // Content
-                  Row(
+                ),
+
+                // Main content
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Row(
                     children: [
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
+                            // Offer badge
                             Container(
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
+                                horizontal: 10,
                                 vertical: 4,
                               ),
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.2),
+                                color: Colors.white.withOpacity(0.25),
                                 borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: Colors.white.withOpacity(0.3),
+                                  width: 1,
+                                ),
                               ),
-                              child: Text(
-                                'SPECIAL OFFER',
-                                style: const TextStyle(
+                              child: const Text(
+                                'EXCLUSIVE OFFER',
+                                style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 10,
                                   fontWeight: FontWeight.w700,
-                                  letterSpacing: 0.5,
+                                  letterSpacing: 0.8,
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 12),
+
+                            const SizedBox(height: 8),
+
+                            // Discount display
                             Text(
                               'Save ${widget.coupon.discountDisplay}',
                               style: const TextStyle(
                                 color: Colors.white,
-                                fontSize: 20,
+                                fontSize: 22,
                                 fontWeight: FontWeight.w800,
-                                height: 1.2,
+                                height: 1.1,
+                                shadows: [
+                                  Shadow(
+                                    color: Colors.black26,
+                                    blurRadius: 4,
+                                    offset: Offset(0, 2),
+                                  ),
+                                ],
                               ),
                             ),
-                            const SizedBox(height: 6),
+
+                            const SizedBox(height: 4),
+
+                            // Title or minimum amount
                             Text(
                               widget.coupon.minimumAmountDisplay.isNotEmpty
                                   ? widget.coupon.minimumAmountDisplay
                                   : widget.coupon.title,
-                              style: const TextStyle(
-                                color: Colors.white,
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(0.9),
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
+                                height: 1.2,
                               ),
-                              maxLines: 1,
+                              maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),
+
                             const SizedBox(height: 8),
-                            // Show cash price or subscriber info
-                            if (widget.coupon.cashPrice != null && widget.coupon.cashPrice! > 0)
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 4,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.2),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Text(
-                                  '₹${widget.coupon.cashPrice!.toInt()} or Free for subscribers',
-                                  style: const TextStyle(
-                                    color: Colors.white,
+
+                            // Price info
+                            Row(
+                              children: [
+                                if (widget.coupon.cashPrice != null &&
+                                    widget.coupon.cashPrice! > 0) ...[
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 3,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withOpacity(0.2),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Text(
+                                      '₹${widget.coupon.cashPrice!.toInt()}',
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 6),
+                                ],
+                                Text(
+                                  widget.coupon.cashPrice != null &&
+                                          widget.coupon.cashPrice! > 0
+                                      ? 'or Free with subscription'
+                                      : 'Free for subscribers',
+                                  style: TextStyle(
+                                    color: Colors.white.withOpacity(0.8),
                                     fontSize: 11,
-                                    fontWeight: FontWeight.w600,
+                                    fontWeight: FontWeight.w500,
                                   ),
                                 ),
-                              )
-                            else
-                              Text(
-                                'Free for subscribers • ${widget.coupon.maxRedemptions != null ? '${widget.coupon.maxRedemptions} uses' : 'Unlimited'}',
-                                style: TextStyle(
-                                  color: Colors.white.withOpacity(0.8),
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            const SizedBox(height: 4),
-                            Text(
-                              widget.coupon.termsAndConditions ?? 'Limited time offer',
-                              style: TextStyle(
-                                color: Colors.white.withOpacity(0.7),
-                                fontSize: 10,
-                                fontWeight: FontWeight.w400,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
+                              ],
                             ),
                           ],
                         ),
                       ),
+
                       const SizedBox(width: 16),
+
+                      // Action button
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 20,
@@ -368,7 +469,7 @@ class _VendorOfferCardState extends State<VendorOfferCard>
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
+                              color: Colors.black.withOpacity(0.15),
                               blurRadius: 8,
                               offset: const Offset(0, 4),
                             ),
@@ -377,14 +478,13 @@ class _VendorOfferCardState extends State<VendorOfferCard>
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(
-                              Icons.qr_code_scanner,
-                              color: primaryColor,
-                              size: 18,
-                            ),
+                            Icon(Icons.redeem, color: primaryColor, size: 18),
                             const SizedBox(width: 6),
                             Text(
-                              widget.coupon.cashPrice != null && widget.coupon.cashPrice! > 0 ? 'Get' : 'Claim',
+                              widget.coupon.cashPrice != null &&
+                                      widget.coupon.cashPrice! > 0
+                                  ? 'Buy'
+                                  : 'Claim',
                               style: TextStyle(
                                 color: primaryColor,
                                 fontSize: 14,
@@ -396,8 +496,8 @@ class _VendorOfferCardState extends State<VendorOfferCard>
                       ),
                     ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
@@ -406,76 +506,76 @@ class _VendorOfferCardState extends State<VendorOfferCard>
   }
 
   LinearGradient _getCouponGradient() {
-    switch (widget.coupon.discountType.toLowerCase()) {
-      case 'percentage':
-        return const LinearGradient(
-          colors: [Color(0xFF667eea), Color(0xFF764ba2)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        );
-      case 'fixedamount':
-        return const LinearGradient(
-          colors: [Color(0xFF56ab2f), Color(0xFFa8e6cf)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        );
-      default:
-        final gradients = [
-          const LinearGradient(
-            colors: [Color(0xFF667eea), Color(0xFF764ba2)],
-          ),
-          const LinearGradient(
-            colors: [Color(0xFFFF6B35), Color(0xFFF7931E)],
-          ),
-          const LinearGradient(
-            colors: [Color(0xFFff6a88), Color(0xFFff99ac)],
-          ),
-          const LinearGradient(
-            colors: [Color(0xFF56ab2f), Color(0xFFa8e6cf)],
-          ),
-        ];
-        return gradients[widget.coupon.id % gradients.length];
-    }
+    // Enhanced gradient collection with more beautiful combinations
+    final gradients = [
+      const LinearGradient(
+        colors: [Color(0xFF6F3FCC), Color(0xFF9F7AEA)], // Purple
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ),
+      const LinearGradient(
+        colors: [Color(0xFF38B2AC), Color(0xFF4FD1C7)], // Teal
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ),
+      const LinearGradient(
+        colors: [Color(0xFFED8936), Color(0xFFF56500)], // Orange
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ),
+      const LinearGradient(
+        colors: [Color(0xFF3182CE), Color(0xFF63B3ED)], // Blue
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ),
+      const LinearGradient(
+        colors: [Color(0xFF38A169), Color(0xFF68D391)], // Green
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ),
+      const LinearGradient(
+        colors: [Color(0xFFE53E3E), Color(0xFFF56565)], // Red
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ),
+    ];
+
+    return gradients[(widget.coupon.id + widget.index) % gradients.length];
   }
-  
+
   Color _getPrimaryColor() {
-    switch (widget.coupon.discountType.toLowerCase()) {
-      case 'percentage':
-        return const Color(0xFF667eea);
-      case 'fixedamount':
-        return const Color(0xFF56ab2f);
-      default:
-        final colors = [
-          const Color(0xFF667eea),
-          const Color(0xFFFF6B35),
-          const Color(0xFFff6a88),
-          const Color(0xFF56ab2f),
-        ];
-        return colors[widget.coupon.id % colors.length];
-    }
+    final colors = [
+      const Color(0xFF6F3FCC), // Purple
+      const Color(0xFF38B2AC), // Teal
+      const Color(0xFFED8936), // Orange
+      const Color(0xFF3182CE), // Blue
+      const Color(0xFF38A169), // Green
+      const Color(0xFFE53E3E), // Red
+    ];
+
+    return colors[(widget.coupon.id + widget.index) % colors.length];
   }
 
   void _onCouponTap(BuildContext context) async {
     try {
       // Show loading indicator with haptic feedback
       HapticFeedback.lightImpact();
-      
+
       // First, check the coupon to get its details
       final couponService = GetIt.I<CouponService>();
       final couponCheck = await couponService.checkCoupon(widget.coupon.id);
-      
+
       // Navigate to coupon redemption options page
       final result = await Navigator.of(context).push<bool>(
         MaterialPageRoute(
-          builder: (context) => CouponRedemptionOptionsPage(
-            couponData: couponCheck,
-          ),
+          builder: (context) =>
+              CouponRedemptionOptionsPage(couponData: couponCheck),
         ),
       );
 
       // Show enhanced result feedback
       if (!mounted) return;
-      
+
       if (result == true) {
         // Success - show modern snackbar
         ScaffoldMessenger.of(context).showSnackBar(
@@ -600,4 +700,56 @@ class _VendorOfferCardState extends State<VendorOfferCard>
       );
     }
   }
+}
+
+/// Custom painter for beautiful coupon background patterns
+class CouponPatternPainter extends CustomPainter {
+  final Color color;
+  final int index;
+
+  CouponPatternPainter({required this.color, required this.index});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+
+    switch (index % 3) {
+      case 0:
+        // Circular dots pattern
+        for (double x = 0; x < size.width; x += 40) {
+          for (double y = 0; y < size.height; y += 40) {
+            canvas.drawCircle(Offset(x, y), 3, paint);
+          }
+        }
+        break;
+      case 1:
+        // Diagonal lines pattern
+        paint.style = PaintingStyle.stroke;
+        paint.strokeWidth = 1;
+        for (double i = -size.height; i < size.width; i += 20) {
+          canvas.drawLine(
+            Offset(i, 0),
+            Offset(i + size.height, size.height),
+            paint,
+          );
+        }
+        break;
+      case 2:
+        // Grid pattern
+        paint.style = PaintingStyle.stroke;
+        paint.strokeWidth = 0.5;
+        for (double x = 0; x < size.width; x += 30) {
+          canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
+        }
+        for (double y = 0; y < size.height; y += 30) {
+          canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
+        }
+        break;
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

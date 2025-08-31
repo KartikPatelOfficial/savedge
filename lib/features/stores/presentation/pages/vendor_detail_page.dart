@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:savedge/core/injection/injection.dart';
 import 'package:savedge/core/network/image_cache_manager.dart';
@@ -32,18 +33,95 @@ class VendorDetailPage extends StatelessWidget {
           if (state is VendorDetailLoading) {
             return Scaffold(
               backgroundColor: Colors.white,
-              appBar: AppBar(
-                backgroundColor: Colors.white,
-                foregroundColor: const Color(0xFF1A202C),
-                elevation: 0,
-                scrolledUnderElevation: 0,
-                title: const Text(
-                  'Loading...',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+              body: SafeArea(
+                child: Column(
+                  children: [
+                    // Minimal header
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 16,
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 44,
+                            height: 44,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF8F9FA),
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(
+                                color: const Color(0xFFE2E8F0),
+                              ),
+                            ),
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                onTap: () => Navigator.pop(context),
+                                borderRadius: BorderRadius.circular(14),
+                                child: const Icon(
+                                  Icons.arrow_back_ios_new,
+                                  color: Color(0xFF1A202C),
+                                  size: 18,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          const Text(
+                            'Loading store...',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF1A202C),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Loading content
+                    Expanded(
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              width: 80,
+                              height: 80,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF6F3FCC).withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(40),
+                              ),
+                              child: const Center(
+                                child: CircularProgressIndicator(
+                                  color: Color(0xFF6F3FCC),
+                                  strokeWidth: 3,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 32),
+                            const Text(
+                              'Loading store details...',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF1A202C),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            const Text(
+                              'Getting the best offers for you',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Color(0xFF6B7280),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-              body: const Center(
-                child: CircularProgressIndicator(color: Color(0xFF6F3FCC)),
               ),
             );
           } else if (state is VendorDetailLoaded) {
@@ -51,92 +129,178 @@ class VendorDetailPage extends StatelessWidget {
           } else if (state is VendorDetailError) {
             return Scaffold(
               backgroundColor: Colors.white,
-              appBar: AppBar(
-                backgroundColor: Colors.white,
-                foregroundColor: const Color(0xFF1A202C),
-                elevation: 0,
-                scrolledUnderElevation: 0,
-                title: const Text(
-                  'Error',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-                ),
-              ),
-              body: Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(32),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: 100,
-                        height: 100,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFE53E3E).withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(50),
-                        ),
-                        child: const Icon(
-                          Icons.error_outline,
-                          size: 48,
-                          color: Color(0xFFE53E3E),
-                        ),
+              body: SafeArea(
+                child: Column(
+                  children: [
+                    // Header with back button
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 16,
                       ),
-                      const SizedBox(height: 32),
-                      const Text(
-                        'Failed to load store',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFF1A202C),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        state.message,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          color: Color(0xFF4A5568),
-                          height: 1.4,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 32),
-                      ElevatedButton(
-                        onPressed: () {
-                          context.read<VendorDetailBloc>().add(
-                            RefreshVendorDetail(id),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF6F3FCC),
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 32,
-                            vertical: 16,
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 44,
+                            height: 44,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF8F9FA),
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(
+                                color: const Color(0xFFE2E8F0),
+                              ),
+                            ),
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                onTap: () => Navigator.pop(context),
+                                borderRadius: BorderRadius.circular(14),
+                                child: const Icon(
+                                  Icons.arrow_back_ios_new,
+                                  color: Color(0xFF1A202C),
+                                  size: 18,
+                                ),
+                              ),
+                            ),
                           ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                          const SizedBox(width: 16),
+                          const Text(
+                            'Store Error',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF1A202C),
+                            ),
                           ),
-                        ),
-                        child: const Text(
-                          'Try Again',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
+                        ],
+                      ),
+                    ),
+                    // Error content
+                    Expanded(
+                      child: Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(40),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                width: 100,
+                                height: 100,
+                                decoration: BoxDecoration(
+                                  color: const Color(
+                                    0xFFEF4444,
+                                  ).withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(50),
+                                  border: Border.all(
+                                    color: const Color(
+                                      0xFFEF4444,
+                                    ).withOpacity(0.2),
+                                    width: 2,
+                                  ),
+                                ),
+                                child: Icon(
+                                  Icons.store_mall_directory_outlined,
+                                  size: 48,
+                                  color: const Color(
+                                    0xFFEF4444,
+                                  ).withOpacity(0.7),
+                                ),
+                              ),
+                              const SizedBox(height: 24),
+                              const Text(
+                                'Store not found',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF1A202C),
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                state.message,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  color: Color(0xFF6B7280),
+                                  height: 1.4,
+                                ),
+                              ),
+                              const SizedBox(height: 32),
+                              Container(
+                                width: double.infinity,
+                                height: 52,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(16),
+                                  gradient: const LinearGradient(
+                                    colors: [
+                                      Color(0xFF6F3FCC),
+                                      Color(0xFF9F7AEA),
+                                    ],
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: const Color(
+                                        0xFF6F3FCC,
+                                      ).withOpacity(0.3),
+                                      blurRadius: 12,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
+                                ),
+                                child: Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    onTap: () {
+                                      HapticFeedback.lightImpact();
+                                      context.read<VendorDetailBloc>().add(
+                                        RefreshVendorDetail(id),
+                                      );
+                                    },
+                                    borderRadius: BorderRadius.circular(16),
+                                    child: const Center(
+                                      child: Text(
+                                        'Try Again',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             );
           }
 
-          // Initial state - should not reach here due to bloc initialization
-          return const Scaffold(
+          // Initial state
+          return Scaffold(
             backgroundColor: Colors.white,
-            body: Center(
-              child: CircularProgressIndicator(color: Color(0xFF6F3FCC)),
+            body: SafeArea(
+              child: Center(
+                child: Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF6F3FCC).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(40),
+                  ),
+                  child: const Center(
+                    child: CircularProgressIndicator(
+                      color: Color(0xFF6F3FCC),
+                      strokeWidth: 3,
+                    ),
+                  ),
+                ),
+              ),
             ),
           );
         },
@@ -170,8 +334,6 @@ class _VendorDetailView extends StatelessWidget {
           ),
           // Yearly Subscription
           SliverToBoxAdapter(child: _buildSubscriptionPlansSection()),
-          // Other Restaurants
-          SliverToBoxAdapter(child: _buildOtherRestaurants()),
           // Bottom spacing
           const SliverToBoxAdapter(child: SizedBox(height: 100)),
         ],
@@ -634,195 +796,6 @@ class _VendorDetailView extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildOtherRestaurants() {
-    // Mock data for other restaurants
-    final otherRestaurants = [
-      {
-        'name': 'Hotel Tulsi',
-        'location': 'Sardar Vegetable Market, Sanjay Nagar, Surat, Gujarat',
-        'rating': '4.9',
-      },
-      {
-        'name': 'ZERO The restaurant',
-        'location':
-            'The restaurant, ZERO, VIP Rd, beside NANDINI 3 RESIDENCY, Vesu, Surat, Gujarat',
-        'rating': '4.9',
-      },
-      {
-        'name': 'Raada Resto & Cafe',
-        'location': 'A-302, Aagam Marg, viviana, Vesu, Surat, Gujarat',
-        'rating': '4.9',
-      },
-    ];
-
-    return Container(
-      margin: const EdgeInsets.all(20),
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF6F3FCC).withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Icon(
-                  Icons.explore_outlined,
-                  color: Color(0xFF6F3FCC),
-                  size: 18,
-                ),
-              ),
-              const SizedBox(width: 12),
-              const Text(
-                'Explore Other Restaurants',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w800,
-                  color: Color(0xFF1A202C),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          ...otherRestaurants.asMap().entries.map(
-            (entry) => _buildRestaurantItem(
-              entry.value['name']!,
-              entry.value['location']!,
-              entry.value['rating']!,
-              isLast: entry.key == otherRestaurants.length - 1,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildRestaurantItem(
-    String name,
-    String location,
-    String rating, {
-    bool isLast = false,
-  }) {
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: const Color(0xFFF8FAFC),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 64,
-                height: 64,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF6F3FCC).withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: const Color(0xFF6F3FCC).withOpacity(0.2),
-                    width: 1,
-                  ),
-                ),
-                child: const Icon(
-                  Icons.restaurant_rounded,
-                  color: Color(0xFF6F3FCC),
-                  size: 28,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      name,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF1A202C),
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      location,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Color(0xFF4A5568),
-                        height: 1.3,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 16),
-              Column(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF38A169),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          rating,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        const SizedBox(width: 4),
-                        const Icon(
-                          Icons.star_rounded,
-                          color: Colors.white,
-                          size: 14,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Container(
-                    width: 32,
-                    height: 32,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF6F3FCC).withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Icon(
-                      Icons.arrow_forward_ios_rounded,
-                      color: Color(0xFF6F3FCC),
-                      size: 16,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-        if (!isLast) const SizedBox(height: 16),
-      ],
     );
   }
 }
