@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:savedge/core/injection/injection.dart';
+import 'package:savedge/core/constants/categories_constants.dart';
 import 'package:savedge/features/stores/presentation/pages/vendor_detail_page.dart';
 import 'package:savedge/features/vendors/domain/entities/coupon.dart';
 import 'package:savedge/features/vendors/presentation/bloc/coupons_bloc.dart';
@@ -542,5 +543,28 @@ class _StackedDealsCardsState extends State<StackedDealsCards>
         ),
       ),
     );
+  }
+
+  // Mock data helpers - replace with real API calls
+  String _getMockVendorName(int vendorId) {
+    final vendorNames = [
+      'Tasty Bites',
+      'Sweet Treats',
+      'Burger House',
+      'Fashion Hub',
+      'Spa Retreat',
+    ];
+    return vendorNames[vendorId % vendorNames.length];
+  }
+
+  String _getMockCategory(int vendorId) {
+    final categories = [
+      'Restaurant',
+      'Dessert',
+      'Fast food',
+      'Clothing store',
+      'Spa',
+    ];
+    return categories[vendorId % categories.length];
   }
 }

@@ -1,17 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:savedge/core/constants/categories_constants.dart';
 
 /// Model class for category items
 class CategoryItem {
-  const CategoryItem({
-    required this.title,
-    required this.icon,
-    required this.color,
-    this.onTap,
-  });
+  const CategoryItem({required this.title, required this.iconPath, this.onTap});
 
   final String title;
-  final IconData icon;
-  final Color color;
+  final String iconPath;
   final VoidCallback? onTap;
 }
 
@@ -20,53 +15,27 @@ class CategoriesSection extends StatelessWidget {
   const CategoriesSection({
     super.key,
     this.title = 'Our Categories',
-    this.categories = const [],
     this.onSeeAllTap,
+    this.onCategoryTap,
   });
 
   final String title;
-  final List<CategoryItem> categories;
   final VoidCallback? onSeeAllTap;
+  final Function(String)? onCategoryTap;
 
   @override
   Widget build(BuildContext context) {
-    final defaultCategories = categories.isEmpty
-        ? _getDefaultCategories()
-        : categories;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _SectionHeader(title: title, onSeeAllTap: onSeeAllTap),
-        const SizedBox(height: 24),
-        _CategoriesGrid(categories: defaultCategories),
-      ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _SectionHeader(title: title, onSeeAllTap: onSeeAllTap),
+          const SizedBox(height: 20),
+          _CategoriesGrid(onCategoryTap: onCategoryTap),
+        ],
+      ),
     );
-  }
-
-  List<CategoryItem> _getDefaultCategories() {
-    return [
-      const CategoryItem(
-        title: 'Restaurant',
-        icon: Icons.restaurant,
-        color: Color(0xFFFF6B7A),
-      ),
-      const CategoryItem(
-        title: 'Saloon',
-        icon: Icons.content_cut,
-        color: Color(0xFF4CAF50),
-      ),
-      const CategoryItem(
-        title: 'Theater',
-        icon: Icons.movie,
-        color: Color(0xFF2196F3),
-      ),
-      const CategoryItem(
-        title: 'Fast Food',
-        icon: Icons.fastfood,
-        color: Color(0xFFFF9800),
-      ),
-    ];
   }
 }
 
@@ -89,34 +58,43 @@ class _SectionHeader extends StatelessWidget {
             color: Color(0xFF1A202C),
           ),
         ),
-        GestureDetector(
-          onTap: onSeeAllTap,
-          child: const Text(
-            'See all',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF6F3FCC),
-            ),
-          ),
-        ),
       ],
     );
   }
 }
 
 class _CategoriesGrid extends StatelessWidget {
-  const _CategoriesGrid({required this.categories});
+  const _CategoriesGrid({this.onCategoryTap});
 
-  final List<CategoryItem> categories;
+  final Function(String)? onCategoryTap;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: categories
-          .map((category) => CategoryItemWidget(category: category))
-          .toList(),
+    return SizedBox(
+      height: 200,
+      child: GridView.builder(
+        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        scrollDirection: Axis.horizontal,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          childAspectRatio: 1.0,
+          mainAxisSpacing: 16,
+          crossAxisSpacing: 16,
+        ),
+        itemCount: CategoriesConstants.categories.length,
+        itemBuilder: (context, index) {
+          final category = CategoriesConstants.categories[index];
+          final iconPath = CategoriesConstants.getCategoryIcon(category);
+
+          return CategoryItemWidget(
+            category: CategoryItem(
+              title: category,
+              iconPath: iconPath,
+              onTap: () => onCategoryTap?.call(category),
+            ),
+          );
+        },
+      ),
     );
   }
 }
@@ -131,33 +109,54 @@ class CategoryItemWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: category.onTap,
-      child: SizedBox(
-        width: 76,
-        child: Column(
-          children: [
-            Container(
-              width: 64,
-              height: 64,
-              decoration: BoxDecoration(
-                color: category.color.withOpacity(0.12),
-                borderRadius: BorderRadius.circular(20),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Category icon from assets
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.asset(
+                category.iconPath,
+                width: 48,
+                height: 48,
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) => Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF6F3FCC).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(
+                    Icons.category_outlined,
+                    color: Color(0xFF6F3FCC),
+                    size: 24,
+                  ),
+                ),
               ),
-              child: Icon(category.icon, color: category.color, size: 32),
             ),
-            const SizedBox(height: 12),
-            Text(
+          ),
+          const SizedBox(height: 8),
+          // Category title
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: Text(
               category.title,
               style: const TextStyle(
-                fontSize: 13,
+                fontSize: 11,
                 fontWeight: FontWeight.w600,
                 color: Color(0xFF2D3748),
               ),
               textAlign: TextAlign.center,
-              maxLines: 1,
+              maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
