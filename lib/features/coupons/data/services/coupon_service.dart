@@ -155,8 +155,11 @@ class CouponService {
     }
   }
 
-  /// Purchase a coupon with payment
+  /// Purchase a coupon with payment (DEPRECATED - kept for backward compatibility)
+  @Deprecated('Use CouponPaymentService for proper Razorpay integration')
   Future<ClaimCouponResponse> purchaseCouponWithPayment(int couponId) async {
+    // This method now calls the deprecated endpoint which will return an error
+    // directing users to use the new Razorpay payment flow
     try {
       final request = {'couponId': couponId, 'paymentMethod': 'razorpay'};
 
@@ -169,7 +172,63 @@ class CouponService {
         response.data as Map<String, dynamic>,
       );
     } catch (e) {
-      throw Exception('Failed to purchase coupon: $e');
+      // Enhanced error message to guide users to new flow
+      throw Exception(
+        'Failed to purchase coupon. Please use the new Razorpay payment flow with CouponPaymentService. Error: $e'
+      );
+    }
+  }
+
+  /// Create a Razorpay payment order for coupon purchase
+  Future<Map<String, dynamic>> createCouponPaymentOrder(int couponId) async {
+    try {
+      final response = await _httpClient.post(
+        '/api/coupons/create-payment-order',
+        data: {'couponId': couponId},
+      );
+
+      return response.data as Map<String, dynamic>;
+    } catch (e) {
+      throw Exception('Failed to create payment order for coupon: $e');
+    }
+  }
+
+  /// Verify Razorpay payment for coupon purchase
+  Future<Map<String, dynamic>> verifyCouponPayment({
+    required String razorpayPaymentId,
+    required String razorpayOrderId,
+    required String razorpaySignature,
+    required int transactionId,
+  }) async {
+    try {
+      final requestData = {
+        'razorpayPaymentId': razorpayPaymentId,
+        'razorpayOrderId': razorpayOrderId,
+        'razorpaySignature': razorpaySignature,
+        'transactionId': transactionId,
+      };
+
+      final response = await _httpClient.post(
+        '/api/coupons/verify-payment',
+        data: requestData,
+      );
+
+      return response.data as Map<String, dynamic>;
+    } catch (e) {
+      throw Exception('Failed to verify coupon payment: $e');
+    }
+  }
+
+  /// Get payment status for coupon transaction
+  Future<Map<String, dynamic>> getCouponPaymentStatus(int transactionId) async {
+    try {
+      final response = await _httpClient.get(
+        '/api/coupons/payment-status/$transactionId',
+      );
+
+      return response.data as Map<String, dynamic>;
+    } catch (e) {
+      throw Exception('Failed to get coupon payment status: $e');
     }
   }
 }

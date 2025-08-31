@@ -41,6 +41,7 @@ import 'package:savedge/features/subscription/domain/repositories/subscription_p
 import 'package:savedge/features/subscription/data/services/razorpay_payment_service.dart';
 import 'package:savedge/features/subscription/presentation/bloc/subscription_plan_bloc.dart';
 import 'package:savedge/features/coupons/data/services/coupon_service.dart';
+import 'package:savedge/features/coupons/data/services/coupon_payment_service.dart';
 import 'package:savedge/features/coupons/presentation/bloc/user_coupons_bloc.dart';
 // Enhanced coupon imports
 import 'package:savedge/features/coupons/data/services/enhanced_coupon_service.dart';
@@ -330,6 +331,7 @@ Future<void> configureDependencies() async {
 
   // Coupon services
   getIt.registerLazySingleton<CouponService>(() => CouponService());
+  getIt.registerLazySingleton<CouponPaymentService>(() => CouponPaymentService());
 
   // Enhanced coupon services
   getIt.registerSingleton<EnhancedCouponService>(

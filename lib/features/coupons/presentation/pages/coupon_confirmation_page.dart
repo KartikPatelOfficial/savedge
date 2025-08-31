@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart';
 
 import '../../../coupons/data/models/coupon_claim_models.dart';
 import '../../../coupons/data/models/coupon_gifting_models.dart';
 import '../../../coupons/data/models/coupon_redemption_models.dart';
 import '../../../coupons/data/services/coupon_service.dart';
+import '../../../coupons/data/services/coupon_payment_service.dart';
 import '../../../qr_scanner/presentation/pages/qr_scanner_page.dart';
 
 /// Confirmation page for coupon usage/redemption
@@ -36,6 +38,11 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
   bool _isConfirming = false;
   int? _claimedCouponId; // Store the claimed coupon ID for direct redemption
   final CouponService _couponService = GetIt.I<CouponService>();
+  final CouponPaymentService _couponPaymentService = GetIt.I<CouponPaymentService>();
+  
+  // Razorpay payment tracking
+  Map<String, dynamic>? _currentPaymentOrder;
+  int? _currentTransactionId;
 
   @override
   void initState() {
@@ -62,12 +69,16 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
     // Start animations
     _slideController.forward();
     _fadeController.forward();
+    
+    // Initialize payment service
+    _couponPaymentService.initialize();
   }
 
   @override
   void dispose() {
     _slideController.dispose();
     _fadeController.dispose();
+    _couponPaymentService.dispose();
     super.dispose();
   }
 
@@ -718,10 +729,19 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
             'Error: Coupon data is missing. Cannot proceed with claiming.',
           );
         }
-        await _claimNewCoupon();
 
-        if (!mounted) return;
-        _showSuccessDialog();
+        // Route based on redemption method. For Razorpay, do not show success
+        // here; wait for payment verification callback.
+        if (widget.redemptionMethod == 'membership') {
+          await _claimNewCoupon();
+          if (!mounted) return;
+          _showSuccessDialog();
+        } else if (widget.redemptionMethod == 'razorpay') {
+          await _handleRazorpayPayment();
+          // Success dialog handled after verification in callback
+        } else {
+          throw Exception('Invalid redemption method');
+        }
       }
     } catch (e) {
       if (!mounted) return;
@@ -761,38 +781,119 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
     }
   }
 
-  Future<void> _redeemUserCoupon() async {
-    if (widget.userCoupon == null) {
-      throw Exception('User coupon not found');
-    }
-
-    // Actually redeem the coupon via API to update its status
-    await _couponService.redeemMyCoupon(widget.userCoupon!.id);
-  }
-
   Future<void> _claimNewCoupon() async {
     if (widget.claimCoupon == null) {
       throw Exception('Coupon data not found');
     }
 
-    ClaimCouponResponse response;
     switch (widget.redemptionMethod) {
       case 'membership':
-        response = await _couponService.claimCouponFromSubscription(
+        final response = await _couponService.claimCouponFromSubscription(
           widget.claimCoupon!.couponId,
         );
+        // Store the claimed coupon ID for potential direct redemption
+        _claimedCouponId = response.userCouponId;
         break;
       case 'razorpay':
-        response = await _couponService.purchaseCouponWithPayment(
-          widget.claimCoupon!.couponId,
-        );
+        // Handled separately in _handleConfirm to ensure proper flow
         break;
       default:
         throw Exception('Invalid redemption method');
     }
+  }
 
-    // Store the claimed coupon ID for potential direct redemption
-    _claimedCouponId = response.userCouponId;
+  Future<void> _handleRazorpayPayment() async {
+    if (widget.claimCoupon == null) {
+      throw Exception('Coupon data not found');
+    }
+
+    try {
+      // Step 1: Create payment order
+      final paymentOrder = await _couponPaymentService.createPaymentOrder(
+        couponId: widget.claimCoupon!.couponId,
+      );
+
+      _currentPaymentOrder = paymentOrder;
+      _currentTransactionId = paymentOrder['transactionId'] as int?;
+
+      // Step 2: Start Razorpay payment
+      await _couponPaymentService.startPayment(
+        paymentOrder: paymentOrder,
+        customerName: 'User', // Will be refined in service from profile
+        customerEmail: 'user@example.com',
+        customerPhone: '+91999999999',
+        onSuccess: (PaymentSuccessResponse response) async {
+          await _handlePaymentSuccess(response);
+        },
+        onError: (error) {
+          _handlePaymentError(error);
+        },
+      );
+    } catch (e) {
+      throw Exception('Failed to initialize Razorpay payment: $e');
+    }
+  }
+
+  Future<void> _handlePaymentSuccess(PaymentSuccessResponse razorpayResponse) async {
+    // Razorpay returned success; verify with backend and finalize claim
+    try {
+      if (mounted) {
+        setState(() => _isConfirming = true);
+      }
+      final txId = _currentTransactionId;
+      final orderId = razorpayResponse.orderId ?? _currentPaymentOrder?['orderId'];
+      if (txId == null || orderId == null) {
+        throw Exception('Missing transaction or order details for verification');
+      }
+
+      final verify = await _couponPaymentService.verifyPayment(
+        razorpayPaymentId: razorpayResponse.paymentId!,
+        razorpayOrderId: orderId,
+        razorpaySignature: razorpayResponse.signature!,
+        transactionId: txId,
+      );
+
+      // Expect backend to return claimed userCouponId and uniqueCode
+      final success = (verify['success'] as bool?) ?? true; // default true if not provided
+      if (!success) {
+        final msg = (verify['message'] as String?) ?? 'Payment verification failed';
+        throw Exception(msg);
+      }
+
+      int? userCouponId = verify['userCouponId'] as int? ?? verify['data']?['userCouponId'] as int?;
+      final uniqueCode = verify['uniqueCode'] as String? ?? verify['data']?['uniqueCode'] as String?;
+      if (userCouponId == null) {
+        // Fallback: check payment status endpoint in case webhook created coupon asynchronously
+        try {
+          final status = await _couponService.getCouponPaymentStatus(txId);
+          userCouponId = status['userCouponId'] as int? ?? status['data']?['userCouponId'] as int?;
+        } catch (_) {}
+      }
+      if (userCouponId != null) {
+        _claimedCouponId = userCouponId;
+      } else {
+        // Proceed without ID; wallet screen refresh should show the new coupon
+        print('Warning: Missing userCouponId even after status check');
+      }
+
+      if (mounted) {
+        setState(() => _isConfirming = false);
+        _showSuccessDialog();
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isConfirming = false);
+      }
+      _handlePaymentError(e.toString());
+    }
+  }
+
+  void _handlePaymentError(String error) {
+    print('Payment failed: $error');
+    if (mounted) {
+      _showErrorDialog('Payment failed: $error');
+      setState(() => _isConfirming = false);
+    }
   }
 
   void _showSuccessDialog() {
