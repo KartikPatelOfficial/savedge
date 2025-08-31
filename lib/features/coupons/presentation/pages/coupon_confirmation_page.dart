@@ -157,7 +157,7 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
         const SizedBox(height: 8),
         Text(
           isUse
-              ? 'Your coupon is ready to be used at the vendor'
+              ? 'Scan vendor QR code to verify and redeem your coupon'
               : 'Review and confirm your purchase',
           style: TextStyle(fontSize: 16, color: Colors.grey[600]),
         ),
@@ -446,14 +446,16 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
         );
 
         if (widget.redemptionMethod == 'membership') {
-          final remaining =
-              (widget.claimCoupon?.userMaxRedemptions ?? 1) -
-              (widget.claimCoupon?.userUsedRedemptions ?? 0);
+          // Remaining claims should be based on total subscription claims (not used count)
+          // Prefer server-computed remaining claims if available
+          final remaining = widget.claimCoupon?.remainingSubscriptionClaims ??
+              ((widget.claimCoupon?.userMaxRedemptions ?? 1) -
+                  (widget.claimCoupon?.userUsedRedemptions ?? 0));
           items.add(
             _buildModernConfirmationItem(
               icon: Icons.workspace_premium,
               title: 'Membership Status',
-              subtitle: 'You\'ll have ${remaining - 1} uses remaining',
+              subtitle: 'You\'ll have ${remaining - 1} claims remaining',
               color: const Color(0xFF6F3FCC),
             ),
           );
@@ -566,7 +568,7 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
                       const SizedBox(width: 12),
                       Text(
                         widget.confirmationType == CouponConfirmationType.use
-                            ? 'Using Coupon...'
+                            ? 'Opening Scanner...'
                             : 'Processing...',
                         style: const TextStyle(
                           fontSize: 16,
@@ -668,7 +670,7 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
   String _getConfirmButtonText() {
     switch (widget.confirmationType) {
       case CouponConfirmationType.use:
-        return 'Ready to Use';
+        return 'Verify & Use';
       case CouponConfirmationType.claim:
         return 'Claim Coupon';
     }
@@ -701,21 +703,21 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
 
     try {
       if (widget.confirmationType == CouponConfirmationType.use) {
-        // Redeem user's owned coupon
+        // For using existing coupon, open QR scanner for vendor verification first
         if (widget.userCoupon == null) {
           throw Exception('Error: Owned coupon data is missing. Cannot proceed with redemption.');
         }
-        await _redeemUserCoupon();
+        await _navigateToQRScanner();
       } else {
         // Claim new coupon
         if (widget.claimCoupon == null) {
           throw Exception('Error: Coupon data is missing. Cannot proceed with claiming.');
         }
         await _claimNewCoupon();
+        
+        if (!mounted) return;
+        _showSuccessDialog();
       }
-
-      if (!mounted) return;
-      _showSuccessDialog();
     } catch (e) {
       if (!mounted) return;
       _showErrorDialog(e.toString());
@@ -723,6 +725,34 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
       if (mounted) {
         setState(() => _isConfirming = false);
       }
+    }
+  }
+
+  Future<void> _navigateToQRScanner() async {
+    if (widget.userCoupon == null) {
+      throw Exception('User coupon not found');
+    }
+
+    // Navigate to QR scanner for vendor verification
+    final result = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => QRScannerPage(
+          couponId: widget.userCoupon!.couponId,
+          expectedVendorUid: widget.userCoupon!.vendorUserId,
+          expectedVendorName: widget.userCoupon!.vendorName,
+        ),
+      ),
+    );
+
+    // Handle the result from QR scanner
+    if (result == true) {
+      // QR verification and redemption was successful
+      if (!mounted) return;
+      _showSuccessDialog();
+    } else {
+      // QR verification failed or was cancelled
+      // Do nothing - user remains on confirmation page
     }
   }
 
@@ -914,83 +944,50 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
   }
 
   void _navigateToUseNow() async {
-    if (widget.confirmationType == CouponConfirmationType.use) {
-      // For owned coupons, navigate to QR scanner for vendor verification
-      Navigator.pushReplacement(
+    // For newly claimed coupons, navigate to QR scanner for verification before use
+    if (_claimedCouponId == null || widget.claimCoupon == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Error: Claimed coupon data not found'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    try {
+      // Navigate to QR scanner for newly claimed coupon
+      final result = await Navigator.push<bool>(
         context,
         MaterialPageRoute(
           builder: (context) => QRScannerPage(
-            couponId: widget.userCoupon!.couponId,
-            expectedVendorUid: widget.userCoupon!.vendorUserId,
-            expectedVendorName: widget.userCoupon!.vendorName,
+            couponId: widget.claimCoupon!.couponId,
+            expectedVendorUid: widget.claimCoupon!.vendorUserId,
+            expectedVendorName: widget.claimCoupon!.vendorName,
+            userCouponId: _claimedCouponId, // Use the already claimed coupon
           ),
         ),
       );
-    } else {
-      // For newly claimed coupons, directly redeem them via API
-      if (_claimedCouponId == null) {
+
+      if (result == true) {
+        // QR verification and redemption was successful
+        // Close the success dialog and return to previous screen
+        if (mounted) {
+          Navigator.of(context).pop(); // Close success dialog
+          Navigator.of(context).pop(true); // Return to previous screen with success result
+        }
+      }
+      // If result is false or null (cancelled/failed), just stay on the success dialog
+      // User can choose "Go to Wallet" if they want to leave
+    } catch (e) {
+      // Show error message
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Error: Claimed coupon ID not found'),
+          SnackBar(
+            content: Text('Error: ${e.toString()}'),
             backgroundColor: Colors.red,
           ),
         );
-        Navigator.of(context).pushReplacementNamed('/user-coupons');
-        return;
-      }
-
-      try {
-        // Show loading indicator
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (context) => const Center(
-            child: CircularProgressIndicator(),
-          ),
-        );
-
-        // Redeem the claimed coupon directly using its ID
-        await _couponService.redeemMyCoupon(_claimedCouponId!);
-
-        // Close loading dialog
-        if (mounted) {
-          Navigator.of(context).pop();
-        }
-
-        // Show success message
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Coupon redeemed successfully!'),
-              backgroundColor: Colors.green,
-            ),
-          );
-        }
-
-        // Go back to coupons list
-        if (mounted) {
-          Navigator.of(context).pushReplacementNamed('/user-coupons');
-        }
-      } catch (e) {
-        // Close loading dialog
-        if (mounted) {
-          Navigator.of(context).pop();
-        }
-
-        // Show error message
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Failed to redeem coupon: ${e.toString()}'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-
-        // Go back to coupons list anyway
-        if (mounted) {
-          Navigator.of(context).pushReplacementNamed('/user-coupons');
-        }
       }
     }
   }

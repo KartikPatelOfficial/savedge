@@ -63,6 +63,7 @@ class CouponCheckResponse {
     required this.userUsedRedemptions,
     required this.userUnusedRedemptions,
     required this.userMaxRedemptions,
+    this.remainingSubscriptionClaims,
     required this.userLastRedemptionDate,
     required this.userLastAcquisitionDate,
     required this.hasUnusedCoupons,
@@ -95,6 +96,8 @@ class CouponCheckResponse {
   final int userUsedRedemptions;
   final int userUnusedRedemptions;
   final int? userMaxRedemptions;
+  /// Server-computed remaining claims for subscription (if provided)
+  final int? remainingSubscriptionClaims;
   final String? userLastRedemptionDate;
   final String? userLastAcquisitionDate;
   final bool hasUnusedCoupons;
@@ -130,6 +133,7 @@ class CouponCheckResponse {
       userUsedRedemptions: json['userUsedRedemptions'] as int,
       userUnusedRedemptions: json['userUnusedRedemptions'] as int,
       userMaxRedemptions: json['userMaxRedemptions'] as int?,
+      remainingSubscriptionClaims: json['remainingSubscriptionClaims'] as int?,
       userLastRedemptionDate: json['userLastRedemptionDate'] as String?,
       userLastAcquisitionDate: json['userLastAcquisitionDate'] as String?,
       hasUnusedCoupons: json['hasUnusedCoupons'] as bool,

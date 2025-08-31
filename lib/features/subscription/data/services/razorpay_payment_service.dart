@@ -131,11 +131,10 @@ class RazorpayPaymentService {
       final requestData = {
         'planId': planId,
         'autoRenew': autoRenew,
-        'paymentMethod': 'points',
-      };
+              };
 
       final response = await _httpClient.post(
-        '/api/user/subscription/purchase',
+        '/api/user/subscription/purchase-with-points',
         data: requestData,
       );
 
@@ -255,3 +254,5 @@ class RazorpayPaymentService {
     }
   }
 }
+
+

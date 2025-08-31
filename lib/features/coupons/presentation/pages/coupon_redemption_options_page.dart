@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:savedge/core/storage/secure_storage_service.dart';
+import 'package:savedge/features/auth/data/models/user_profile_models.dart';
+import 'package:savedge/features/auth/domain/repositories/auth_repository.dart';
 import 'package:savedge/features/coupons/data/models/coupon_claim_models.dart';
 import 'package:savedge/features/coupons/data/models/coupon_gifting_models.dart';
-import 'package:savedge/features/coupons/data/services/coupon_service.dart';
+import 'package:savedge/features/user_profile/presentation/widgets/subscription_status_card.dart';
 
 import 'coupon_confirmation_page.dart';
 
@@ -20,14 +23,19 @@ class CouponRedemptionOptionsPage extends StatefulWidget {
 class _CouponRedemptionOptionsPageState
     extends State<CouponRedemptionOptionsPage>
     with TickerProviderStateMixin {
-  CouponService get _couponService => GetIt.I<CouponService>();
   bool isProcessing = false;
+  bool isLoadingProfile = true;
   RedemptionMethod? selectedMethod;
+  UserProfileResponse3? _userProfile;
+  String? _profileError;
 
   late AnimationController _slideController;
   late AnimationController _fadeController;
   late Animation<Offset> _slideAnimation;
   late Animation<double> _fadeAnimation;
+
+  AuthRepository get _authRepository => GetIt.I<AuthRepository>();
+  SecureStorageService get _secureStorage => GetIt.I<SecureStorageService>();
 
   @override
   void initState() {
@@ -51,9 +59,10 @@ class _CouponRedemptionOptionsPageState
       end: 1.0,
     ).animate(CurvedAnimation(parent: _fadeController, curve: Curves.easeOut));
 
-    // Start animations
+    // Start animations and load user profile
     _slideController.forward();
     _fadeController.forward();
+    _loadUserProfile();
   }
 
   @override
@@ -61,6 +70,30 @@ class _CouponRedemptionOptionsPageState
     _slideController.dispose();
     _fadeController.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadUserProfile() async {
+    try {
+      setState(() => isLoadingProfile = true);
+
+      // Check if user is authenticated
+      final isAuthenticated = await _secureStorage.isAuthenticated();
+      if (!isAuthenticated) {
+        throw Exception('No authenticated user found');
+      }
+
+      // Get user profile to check subscription status
+      final profile = await _authRepository.getCurrentUserProfile();
+      setState(() {
+        _userProfile = profile;
+        isLoadingProfile = false;
+      });
+    } catch (e) {
+      setState(() {
+        _profileError = e.toString();
+        isLoadingProfile = false;
+      });
+    }
   }
 
   @override
@@ -418,9 +451,9 @@ class _CouponRedemptionOptionsPageState
           const SizedBox(height: 16),
         ],
 
-
         // Razorpay Option (only show if cash price is set)
-        if (widget.couponData.cashPrice != null && widget.couponData.cashPrice! > 0)
+        if (widget.couponData.cashPrice != null &&
+            widget.couponData.cashPrice! > 0)
           _buildModernRedemptionOption(
             method: RedemptionMethod.razorpay,
             icon: Icons.credit_card,
@@ -436,10 +469,14 @@ class _CouponRedemptionOptionsPageState
 
         const SizedBox(height: 16),
 
-        // Subscription/Membership Option - Show if user has active subscription allowance
+        // Subscription/Membership Option - Show only if user has active subscription and redemption allowance
         if (widget.couponData.userMaxRedemptions != null &&
-            widget.couponData.userMaxRedemptions! > 0)
-          _buildModernMembershipOption(),
+            widget.couponData.userMaxRedemptions! > 0) ...[
+          if (isLoadingProfile) 
+            _buildLoadingMembershipOption()
+          else if (_hasActiveSubscription())
+            _buildModernMembershipOption(),
+        ],
       ],
     );
   }
@@ -557,11 +594,14 @@ class _CouponRedemptionOptionsPageState
   }
 
   Widget _buildModernMembershipOption() {
-    final usedRedemptions = widget.couponData.userUsedRedemptions;
-    final maxRedemptions = widget.couponData.userMaxRedemptions!;
-    final remainingRedemptions = maxRedemptions - usedRedemptions;
+    // API provides userUsedRedemptions as total subscription claims (used + unused)
+    // We intentionally base remaining claims on claimed count, not used count
+    // Prefer server-computed remaining claims if available
+    final remainingClaims = widget.couponData.remainingSubscriptionClaims ??
+        (widget.couponData.userMaxRedemptions! -
+            widget.couponData.userUsedRedemptions);
 
-    final isEnabled = remainingRedemptions > 0;
+    final isEnabled = remainingClaims > 0;
     final isSelected = selectedMethod == RedemptionMethod.membership;
     final color = const Color(0xFF6F3FCC);
     final gradient = const LinearGradient(
@@ -645,7 +685,7 @@ class _CouponRedemptionOptionsPageState
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
-                          '$remainingRedemptions left',
+                          '$remainingClaims left',
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w700,
@@ -668,7 +708,7 @@ class _CouponRedemptionOptionsPageState
                   Text(
                     isEnabled
                         ? 'Use your premium membership'
-                        : 'No redemptions remaining',
+                        : 'No claims remaining',
                     style: TextStyle(fontSize: 13, color: Colors.grey[600]),
                   ),
                 ],
@@ -787,6 +827,91 @@ class _CouponRedemptionOptionsPageState
     }
   }
 
+  /// Check if user has an active subscription
+  bool _hasActiveSubscription() {
+    if (isLoadingProfile || _userProfile == null) {
+      return false; // Don't show membership option while loading or if no profile
+    }
+    
+    final subscription = _userProfile!.subscriptionInfo;
+    if (subscription == null) {
+      return false; // No subscription
+    }
+    
+    // Use the extension method from subscription_status_card.dart
+    return subscription.isCurrentlyActive;
+  }
+
+  /// Build loading state for membership option
+  Widget _buildLoadingMembershipOption() {
+    const color = Color(0xFF6F3FCC);
+    
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.grey[200]!, width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              color: Colors.grey[200],
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: const Icon(
+              Icons.workspace_premium,
+              color: Colors.grey,
+              size: 26,
+            ),
+          ),
+          const SizedBox(width: 16),
+          const Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Checking Membership...',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.grey,
+                  ),
+                ),
+                SizedBox(height: 4),
+                Text(
+                  'Please wait',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(
+            width: 20,
+            height: 20,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              valueColor: AlwaysStoppedAnimation<Color>(color),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _handleClaim() async {
     if (selectedMethod == null) return;
 
@@ -829,7 +954,8 @@ class _CouponRedemptionOptionsPageState
             discountType: widget.couponData.discountType.toString(),
             discountValue: widget.couponData.discountValue,
             minCartValue: widget.couponData.minCartValue,
-            imageUrl: null, // Image URLs are no longer supported in the new system
+            imageUrl: null,
+            // Image URLs are no longer supported in the new system
             isGifted: false,
             // Assuming unused coupons are not gifted
             giftedFromUserId: null,

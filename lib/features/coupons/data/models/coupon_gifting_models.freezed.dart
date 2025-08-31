@@ -1378,7 +1378,7 @@ as int,
 /// @nodoc
 mixin _$UserCouponDetailModel {
 
- int get id; int get couponId; String get title; String? get description; int get vendorId; String get vendorUserId; String get vendorName; String get status; DateTime get acquiredDate; DateTime? get redeemedDate; DateTime get expiryDate; String get uniqueCode; String? get qrCode; String get discountType; double get discountValue; double? get minCartValue; String? get imageUrl; bool get isGifted; String? get giftedFromUserId; String? get giftedToUserId; DateTime? get giftedDate; String? get giftMessage;
+ int get id; int get couponId; String get title; String? get description;@JsonKey(name: 'vendorProfileId') int get vendorId; String get vendorUserId; String get vendorName; String get status;@JsonKey(name: 'purchasedDate') DateTime get acquiredDate; DateTime? get redeemedDate;@JsonKey(name: 'validUntil') DateTime get expiryDate; String get uniqueCode; String? get qrCode; String get discountType; double get discountValue; double? get minCartValue; String? get imageUrl; bool get isGifted; String? get giftedFromUserId; String? get giftedToUserId; DateTime? get giftedDate; String? get giftMessage;
 /// Create a copy of UserCouponDetailModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1411,7 +1411,7 @@ abstract mixin class $UserCouponDetailModelCopyWith<$Res>  {
   factory $UserCouponDetailModelCopyWith(UserCouponDetailModel value, $Res Function(UserCouponDetailModel) _then) = _$UserCouponDetailModelCopyWithImpl;
 @useResult
 $Res call({
- int id, int couponId, String title, String? description, int vendorId, String vendorUserId, String vendorName, String status, DateTime acquiredDate, DateTime? redeemedDate, DateTime expiryDate, String uniqueCode, String? qrCode, String discountType, double discountValue, double? minCartValue, String? imageUrl, bool isGifted, String? giftedFromUserId, String? giftedToUserId, DateTime? giftedDate, String? giftMessage
+ int id, int couponId, String title, String? description,@JsonKey(name: 'vendorProfileId') int vendorId, String vendorUserId, String vendorName, String status,@JsonKey(name: 'purchasedDate') DateTime acquiredDate, DateTime? redeemedDate,@JsonKey(name: 'validUntil') DateTime expiryDate, String uniqueCode, String? qrCode, String discountType, double discountValue, double? minCartValue, String? imageUrl, bool isGifted, String? giftedFromUserId, String? giftedToUserId, DateTime? giftedDate, String? giftMessage
 });
 
 
@@ -1537,7 +1537,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  int couponId,  String title,  String? description,  int vendorId,  String vendorUserId,  String vendorName,  String status,  DateTime acquiredDate,  DateTime? redeemedDate,  DateTime expiryDate,  String uniqueCode,  String? qrCode,  String discountType,  double discountValue,  double? minCartValue,  String? imageUrl,  bool isGifted,  String? giftedFromUserId,  String? giftedToUserId,  DateTime? giftedDate,  String? giftMessage)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  int couponId,  String title,  String? description, @JsonKey(name: 'vendorProfileId')  int vendorId,  String vendorUserId,  String vendorName,  String status, @JsonKey(name: 'purchasedDate')  DateTime acquiredDate,  DateTime? redeemedDate, @JsonKey(name: 'validUntil')  DateTime expiryDate,  String uniqueCode,  String? qrCode,  String discountType,  double discountValue,  double? minCartValue,  String? imageUrl,  bool isGifted,  String? giftedFromUserId,  String? giftedToUserId,  DateTime? giftedDate,  String? giftMessage)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _UserCouponDetailModel() when $default != null:
 return $default(_that.id,_that.couponId,_that.title,_that.description,_that.vendorId,_that.vendorUserId,_that.vendorName,_that.status,_that.acquiredDate,_that.redeemedDate,_that.expiryDate,_that.uniqueCode,_that.qrCode,_that.discountType,_that.discountValue,_that.minCartValue,_that.imageUrl,_that.isGifted,_that.giftedFromUserId,_that.giftedToUserId,_that.giftedDate,_that.giftMessage);case _:
@@ -1558,7 +1558,7 @@ return $default(_that.id,_that.couponId,_that.title,_that.description,_that.vend
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  int couponId,  String title,  String? description,  int vendorId,  String vendorUserId,  String vendorName,  String status,  DateTime acquiredDate,  DateTime? redeemedDate,  DateTime expiryDate,  String uniqueCode,  String? qrCode,  String discountType,  double discountValue,  double? minCartValue,  String? imageUrl,  bool isGifted,  String? giftedFromUserId,  String? giftedToUserId,  DateTime? giftedDate,  String? giftMessage)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  int couponId,  String title,  String? description, @JsonKey(name: 'vendorProfileId')  int vendorId,  String vendorUserId,  String vendorName,  String status, @JsonKey(name: 'purchasedDate')  DateTime acquiredDate,  DateTime? redeemedDate, @JsonKey(name: 'validUntil')  DateTime expiryDate,  String uniqueCode,  String? qrCode,  String discountType,  double discountValue,  double? minCartValue,  String? imageUrl,  bool isGifted,  String? giftedFromUserId,  String? giftedToUserId,  DateTime? giftedDate,  String? giftMessage)  $default,) {final _that = this;
 switch (_that) {
 case _UserCouponDetailModel():
 return $default(_that.id,_that.couponId,_that.title,_that.description,_that.vendorId,_that.vendorUserId,_that.vendorName,_that.status,_that.acquiredDate,_that.redeemedDate,_that.expiryDate,_that.uniqueCode,_that.qrCode,_that.discountType,_that.discountValue,_that.minCartValue,_that.imageUrl,_that.isGifted,_that.giftedFromUserId,_that.giftedToUserId,_that.giftedDate,_that.giftMessage);case _:
@@ -1578,7 +1578,7 @@ return $default(_that.id,_that.couponId,_that.title,_that.description,_that.vend
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  int couponId,  String title,  String? description,  int vendorId,  String vendorUserId,  String vendorName,  String status,  DateTime acquiredDate,  DateTime? redeemedDate,  DateTime expiryDate,  String uniqueCode,  String? qrCode,  String discountType,  double discountValue,  double? minCartValue,  String? imageUrl,  bool isGifted,  String? giftedFromUserId,  String? giftedToUserId,  DateTime? giftedDate,  String? giftMessage)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  int couponId,  String title,  String? description, @JsonKey(name: 'vendorProfileId')  int vendorId,  String vendorUserId,  String vendorName,  String status, @JsonKey(name: 'purchasedDate')  DateTime acquiredDate,  DateTime? redeemedDate, @JsonKey(name: 'validUntil')  DateTime expiryDate,  String uniqueCode,  String? qrCode,  String discountType,  double discountValue,  double? minCartValue,  String? imageUrl,  bool isGifted,  String? giftedFromUserId,  String? giftedToUserId,  DateTime? giftedDate,  String? giftMessage)?  $default,) {final _that = this;
 switch (_that) {
 case _UserCouponDetailModel() when $default != null:
 return $default(_that.id,_that.couponId,_that.title,_that.description,_that.vendorId,_that.vendorUserId,_that.vendorName,_that.status,_that.acquiredDate,_that.redeemedDate,_that.expiryDate,_that.uniqueCode,_that.qrCode,_that.discountType,_that.discountValue,_that.minCartValue,_that.imageUrl,_that.isGifted,_that.giftedFromUserId,_that.giftedToUserId,_that.giftedDate,_that.giftMessage);case _:
@@ -1593,20 +1593,20 @@ return $default(_that.id,_that.couponId,_that.title,_that.description,_that.vend
 @JsonSerializable()
 
 class _UserCouponDetailModel implements UserCouponDetailModel {
-  const _UserCouponDetailModel({required this.id, required this.couponId, required this.title, this.description, required this.vendorId, required this.vendorUserId, required this.vendorName, required this.status, required this.acquiredDate, this.redeemedDate, required this.expiryDate, required this.uniqueCode, this.qrCode, required this.discountType, required this.discountValue, this.minCartValue, this.imageUrl, required this.isGifted, this.giftedFromUserId, this.giftedToUserId, this.giftedDate, this.giftMessage});
+  const _UserCouponDetailModel({required this.id, required this.couponId, required this.title, this.description, @JsonKey(name: 'vendorProfileId') required this.vendorId, required this.vendorUserId, required this.vendorName, required this.status, @JsonKey(name: 'purchasedDate') required this.acquiredDate, this.redeemedDate, @JsonKey(name: 'validUntil') required this.expiryDate, required this.uniqueCode, this.qrCode, required this.discountType, required this.discountValue, this.minCartValue, this.imageUrl, required this.isGifted, this.giftedFromUserId, this.giftedToUserId, this.giftedDate, this.giftMessage});
   factory _UserCouponDetailModel.fromJson(Map<String, dynamic> json) => _$UserCouponDetailModelFromJson(json);
 
 @override final  int id;
 @override final  int couponId;
 @override final  String title;
 @override final  String? description;
-@override final  int vendorId;
+@override@JsonKey(name: 'vendorProfileId') final  int vendorId;
 @override final  String vendorUserId;
 @override final  String vendorName;
 @override final  String status;
-@override final  DateTime acquiredDate;
+@override@JsonKey(name: 'purchasedDate') final  DateTime acquiredDate;
 @override final  DateTime? redeemedDate;
-@override final  DateTime expiryDate;
+@override@JsonKey(name: 'validUntil') final  DateTime expiryDate;
 @override final  String uniqueCode;
 @override final  String? qrCode;
 @override final  String discountType;
@@ -1652,7 +1652,7 @@ abstract mixin class _$UserCouponDetailModelCopyWith<$Res> implements $UserCoupo
   factory _$UserCouponDetailModelCopyWith(_UserCouponDetailModel value, $Res Function(_UserCouponDetailModel) _then) = __$UserCouponDetailModelCopyWithImpl;
 @override @useResult
 $Res call({
- int id, int couponId, String title, String? description, int vendorId, String vendorUserId, String vendorName, String status, DateTime acquiredDate, DateTime? redeemedDate, DateTime expiryDate, String uniqueCode, String? qrCode, String discountType, double discountValue, double? minCartValue, String? imageUrl, bool isGifted, String? giftedFromUserId, String? giftedToUserId, DateTime? giftedDate, String? giftMessage
+ int id, int couponId, String title, String? description,@JsonKey(name: 'vendorProfileId') int vendorId, String vendorUserId, String vendorName, String status,@JsonKey(name: 'purchasedDate') DateTime acquiredDate, DateTime? redeemedDate,@JsonKey(name: 'validUntil') DateTime expiryDate, String uniqueCode, String? qrCode, String discountType, double discountValue, double? minCartValue, String? imageUrl, bool isGifted, String? giftedFromUserId, String? giftedToUserId, DateTime? giftedDate, String? giftMessage
 });
 
 

@@ -15,11 +15,17 @@ class QRScannerPage extends StatefulWidget {
     required this.couponId,
     required this.expectedVendorUid,
     required this.expectedVendorName,
+    this.claimAndUse = false,
+    this.redemptionMethod,
+    this.userCouponId,
   });
 
   final int couponId;
   final String expectedVendorUid;
   final String expectedVendorName;
+  final bool claimAndUse; // If true, claim the coupon first then immediately use it
+  final String? redemptionMethod; // Required if claimAndUse is true (membership, razorpay)
+  final int? userCouponId; // If provided, use this specific user coupon ID for redemption
 
   @override
   State<QRScannerPage> createState() => _QRScannerPageState();
@@ -34,6 +40,17 @@ class _QRScannerPageState extends State<QRScannerPage>
   Timer? _debounceTimer;
 
   CouponService get _couponService => GetIt.I<CouponService>();
+
+  Future<dynamic> _claimCoupon(String redemptionMethod) async {
+    switch (redemptionMethod) {
+      case 'membership':
+        return await _couponService.claimCouponFromSubscription(widget.couponId);
+      case 'razorpay':
+        return await _couponService.purchaseCouponWithPayment(widget.couponId);
+      default:
+        throw Exception('Invalid redemption method: $redemptionMethod');
+    }
+  }
 
   @override
   void initState() {
@@ -445,7 +462,7 @@ class _QRScannerPageState extends State<QRScannerPage>
         );
       }
 
-      // QR verification successful - directly redeem the coupon
+      // QR verification successful - handle claiming and/or redeeming
       if (mounted) {
         try {
           // Show loading dialog
@@ -457,13 +474,29 @@ class _QRScannerPageState extends State<QRScannerPage>
             ),
           );
 
-          // Find the user's unused coupon for this coupon ID
-          if (couponCheck.hasUnusedCoupons && couponCheck.unusedCoupons.isNotEmpty) {
-            // Use the first unused coupon
-            final unusedCoupon = couponCheck.unusedCoupons.first;
-            await _couponService.redeemMyCoupon(unusedCoupon.userCouponId);
+          if (widget.userCouponId != null) {
+            // Use the specific user coupon ID provided
+            await _couponService.redeemMyCoupon(widget.userCouponId!);
+          } else if (widget.claimAndUse) {
+            // First claim the coupon, then immediately redeem it
+            if (widget.redemptionMethod == null) {
+              throw Exception('Redemption method is required for claim and use');
+            }
+
+            // Claim the coupon first
+            final claimResponse = await _claimCoupon(widget.redemptionMethod!);
+            
+            // Then immediately redeem the claimed coupon
+            await _couponService.redeemMyCoupon(claimResponse.userCouponId);
           } else {
-            throw Exception('No unused coupons available for redemption');
+            // Find the user's unused coupon for this coupon ID and redeem it
+            if (couponCheck.hasUnusedCoupons && couponCheck.unusedCoupons.isNotEmpty) {
+              // Use the first unused coupon
+              final unusedCoupon = couponCheck.unusedCoupons.first;
+              await _couponService.redeemMyCoupon(unusedCoupon.userCouponId);
+            } else {
+              throw Exception('No unused coupons available for redemption');
+            }
           }
 
           // Close loading dialog
@@ -474,8 +507,8 @@ class _QRScannerPageState extends State<QRScannerPage>
           // Show success message
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Coupon redeemed successfully!'),
+              SnackBar(
+                content: Text(widget.claimAndUse ? 'Coupon claimed and redeemed successfully!' : 'Coupon redeemed successfully!'),
                 backgroundColor: Colors.green,
               ),
             );
@@ -490,7 +523,7 @@ class _QRScannerPageState extends State<QRScannerPage>
           if (mounted) {
             Navigator.of(context).pop();
           }
-          throw Exception('Failed to redeem coupon: $e');
+          throw Exception('Failed to ${widget.claimAndUse ? "claim and redeem" : "redeem"} coupon: $e');
         }
       }
     } catch (e) {
