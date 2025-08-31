@@ -8,3 +8,4 @@ export 'home_header.dart';
 export 'hot_deals_section.dart';
 export 'subscription_plans_section.dart';
 export 'subscription_plans_widget.dart';
+export 'top_offers_section.dart';

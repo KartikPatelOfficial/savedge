@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:savedge/features/home/presentation/widgets/widgets.dart';
+import 'package:savedge/features/stores/presentation/pages/vendor_detail_page.dart';
+import 'package:savedge/features/vendors/domain/entities/vendor.dart';
 
 /// Beautiful home content page with modern design and real data integration
 class HomeContentPage extends StatefulWidget {
@@ -58,6 +60,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
                   _buildHotDealsSection(),
                   _buildCategoriesSection(),
                   _buildSubscriptionPlansSection(),
+                  _buildTopOffersSection(),
                   const SizedBox(height: 40),
                 ],
               ),
@@ -208,6 +211,10 @@ class _HomeContentPageState extends State<HomeContentPage> {
     );
   }
 
+  Widget _buildTopOffersSection() {
+    return TopOffersSection(onVendorTap: _onVendorTap);
+  }
+
   // Event handlers
   void _onFavoriteTap() {
     HapticFeedback.lightImpact();
@@ -228,5 +235,22 @@ class _HomeContentPageState extends State<HomeContentPage> {
     HapticFeedback.lightImpact();
     debugPrint('Drawer menu item tapped: $menuTitle');
     // Navigation is handled in the drawer itself now
+  }
+
+  void _onVendorTap(Vendor vendor) {
+    HapticFeedback.lightImpact();
+    // Navigate to vendor detail page
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => VendorDetailPage(vendorId: vendor.id),
+      ),
+    );
+  }
+
+  void _onTopOffersSeeAllTap() {
+    HapticFeedback.lightImpact();
+    debugPrint('Top offers see all tapped');
+    // TODO: Navigate to top offers page
   }
 }
