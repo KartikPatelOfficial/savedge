@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:savedge/features/coupons/data/models/user_coupon_model.dart';
 
 import '../../../coupons/data/models/coupon_claim_models.dart';
 import '../../../coupons/data/models/coupon_gifting_models.dart';
-import '../../../coupons/data/models/coupon_redemption_models.dart';
-import '../../../coupons/data/services/coupon_service.dart';
 import '../../../coupons/data/services/coupon_payment_service.dart';
+import '../../../coupons/data/services/coupon_service.dart';
 import '../../../qr_scanner/presentation/pages/qr_scanner_page.dart';
+import 'redeemed_coupon_page.dart';
 
 /// Confirmation page for coupon usage/redemption
 class CouponConfirmationPage extends StatefulWidget {
@@ -38,8 +39,9 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
   bool _isConfirming = false;
   int? _claimedCouponId; // Store the claimed coupon ID for direct redemption
   final CouponService _couponService = GetIt.I<CouponService>();
-  final CouponPaymentService _couponPaymentService = GetIt.I<CouponPaymentService>();
-  
+  final CouponPaymentService _couponPaymentService =
+      GetIt.I<CouponPaymentService>();
+
   // Razorpay payment tracking
   Map<String, dynamic>? _currentPaymentOrder;
   int? _currentTransactionId;
@@ -69,7 +71,7 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
     // Start animations
     _slideController.forward();
     _fadeController.forward();
-    
+
     // Initialize payment service
     _couponPaymentService.initialize();
   }
@@ -819,7 +821,8 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
       // Step 2: Start Razorpay payment
       await _couponPaymentService.startPayment(
         paymentOrder: paymentOrder,
-        customerName: 'User', // Will be refined in service from profile
+        customerName: 'User',
+        // Will be refined in service from profile
         customerEmail: 'user@example.com',
         customerPhone: '+91999999999',
         onSuccess: (PaymentSuccessResponse response) async {
@@ -834,16 +837,21 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
     }
   }
 
-  Future<void> _handlePaymentSuccess(PaymentSuccessResponse razorpayResponse) async {
+  Future<void> _handlePaymentSuccess(
+    PaymentSuccessResponse razorpayResponse,
+  ) async {
     // Razorpay returned success; verify with backend and finalize claim
     try {
       if (mounted) {
         setState(() => _isConfirming = true);
       }
       final txId = _currentTransactionId;
-      final orderId = razorpayResponse.orderId ?? _currentPaymentOrder?['orderId'];
+      final orderId =
+          razorpayResponse.orderId ?? _currentPaymentOrder?['orderId'];
       if (txId == null || orderId == null) {
-        throw Exception('Missing transaction or order details for verification');
+        throw Exception(
+          'Missing transaction or order details for verification',
+        );
       }
 
       final verify = await _couponPaymentService.verifyPayment(
@@ -854,19 +862,27 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
       );
 
       // Expect backend to return claimed userCouponId and uniqueCode
-      final success = (verify['success'] as bool?) ?? true; // default true if not provided
+      final success =
+          (verify['success'] as bool?) ?? true; // default true if not provided
       if (!success) {
-        final msg = (verify['message'] as String?) ?? 'Payment verification failed';
+        final msg =
+            (verify['message'] as String?) ?? 'Payment verification failed';
         throw Exception(msg);
       }
 
-      int? userCouponId = verify['userCouponId'] as int? ?? verify['data']?['userCouponId'] as int?;
-      final uniqueCode = verify['uniqueCode'] as String? ?? verify['data']?['uniqueCode'] as String?;
+      int? userCouponId =
+          verify['userCouponId'] as int? ??
+          verify['data']?['userCouponId'] as int?;
+      final uniqueCode =
+          verify['uniqueCode'] as String? ??
+          verify['data']?['uniqueCode'] as String?;
       if (userCouponId == null) {
         // Fallback: check payment status endpoint in case webhook created coupon asynchronously
         try {
           final status = await _couponService.getCouponPaymentStatus(txId);
-          userCouponId = status['userCouponId'] as int? ?? status['data']?['userCouponId'] as int?;
+          userCouponId =
+              status['userCouponId'] as int? ??
+              status['data']?['userCouponId'] as int?;
         } catch (_) {}
       }
       if (userCouponId != null) {
@@ -953,16 +969,22 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
               const SizedBox(height: 32),
               // Show different actions based on type
               if (isUse) ...[
-                // For used coupons - just go back
+                // For used coupons - navigate to redeemed coupon page
                 SizedBox(
                   width: double.infinity,
                   height: 56,
                   child: ElevatedButton(
                     onPressed: () {
                       Navigator.of(context).pop(); // Close dialog
-                      Navigator.of(
-                        context,
-                      ).pop(true); // Return to previous screen
+                      Navigator.of(context).pop(); // Close confirmation page
+                      // Navigate to redeemed coupon page
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => RedeemedCouponPage(
+                            userCoupon: _convertToUserCouponModel(),
+                          ),
+                        ),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: successColor,
@@ -973,7 +995,7 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
                       elevation: 0,
                     ),
                     child: const Text(
-                      'Done',
+                      'View Details',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
@@ -1119,6 +1141,51 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
         ],
       ),
     );
+  }
+
+  /// Convert UserCouponDetailModel to UserCouponModel for RedeemedCouponPage
+  UserCouponModel _convertToUserCouponModel() {
+    final userCoupon = widget.userCoupon!;
+    return UserCouponModel(
+      id: userCoupon.id,
+      couponId: userCoupon.couponId,
+      title: userCoupon.title,
+      description: userCoupon.description ?? '',
+      discountValue: userCoupon.discountValue,
+      discountType: userCoupon.discountType,
+      discountDisplay: _generateDiscountDisplay(
+        userCoupon.discountType,
+        userCoupon.discountValue,
+      ),
+      minCartValue: userCoupon.minCartValue ?? 0.0,
+      maxDiscountAmount: 0.0,
+      // Not available in UserCouponDetailModel
+      vendorId: userCoupon.vendorId,
+      vendorUserId: userCoupon.vendorUserId,
+      vendorName: userCoupon.vendorName,
+      expiryDate: userCoupon.expiryDate.toIso8601String(),
+      isUsed: true,
+      // Since this is called after successful redemption
+      usedAt: DateTime.now().toIso8601String(),
+      // Current time as redemption time
+      claimedAt: userCoupon.acquiredDate.toIso8601String(),
+      isGifted: userCoupon.isGifted,
+      terms: null,
+      // Not available in UserCouponDetailModel
+      imageUrl: userCoupon.imageUrl,
+      redemptionCode: userCoupon.uniqueCode,
+    );
+  }
+
+  String _generateDiscountDisplay(String discountType, double discountValue) {
+    switch (discountType.toLowerCase()) {
+      case 'percentage':
+        return '${discountValue.toInt()}% Off';
+      case 'fixedamount':
+        return '₹${discountValue.toInt()} Off';
+      default:
+        return '${discountValue.toInt()}% Off';
+    }
   }
 }
 

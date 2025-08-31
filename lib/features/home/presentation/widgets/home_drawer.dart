@@ -4,6 +4,7 @@ import 'package:savedge/features/static_pages/presentation/pages/contact_us_page
 import 'package:savedge/features/static_pages/presentation/pages/follow_us_page.dart';
 import 'package:savedge/features/stores/presentation/pages/stores_page.dart';
 import 'package:savedge/features/brand_vouchers/presentation/pages/brand_vouchers_page.dart';
+import 'package:savedge/features/coupons/presentation/pages/redemption_history_page.dart';
 
 /// Model class for drawer menu items
 class DrawerMenuItem {
@@ -57,6 +58,11 @@ class HomeDrawer extends StatelessWidget {
         title: 'Current Offers',
       ),
       DrawerMenuItem(
+        icon: Icons.history_outlined,
+        title: 'Redemption History',
+        onTap: () => _navigateToRedemptionHistory(context),
+      ),
+      DrawerMenuItem(
         icon: Icons.store_outlined,
         title: 'Stores',
         onTap: () => _navigateToStores(context),
@@ -83,6 +89,14 @@ class HomeDrawer extends StatelessWidget {
         onTap: () => _navigateToBrandVouchers(context),
       ),
     ];
+  }
+
+  void _navigateToRedemptionHistory(BuildContext context) {
+    Navigator.pop(context); // Close drawer first
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const RedemptionHistoryPage()),
+    );
   }
 
   void _navigateToStores(BuildContext context) {

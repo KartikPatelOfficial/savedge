@@ -4,6 +4,8 @@ import 'package:savedge/core/storage/secure_storage_service.dart';
 import 'package:savedge/features/auth/data/models/user_profile_models.dart';
 import 'package:savedge/features/auth/domain/repositories/auth_repository.dart';
 import 'package:savedge/features/coupons/presentation/pages/gift_page.dart';
+import 'package:savedge/features/coupons/presentation/pages/redemption_history_page.dart';
+import 'package:savedge/features/static_pages/presentation/pages/about_us_page.dart';
 import 'package:savedge/features/subscription/domain/entities/subscription_plan.dart';
 import 'package:savedge/features/subscription/presentation/pages/subscription_purchase_page.dart';
 import 'package:savedge/features/user_profile/presentation/pages/edit_profile_page.dart';
@@ -617,25 +619,26 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _onSendGiftsTap() {
-    debugPrint('Send & Receive Gifts tapped');
     Navigator.of(
       context,
     ).push(MaterialPageRoute(builder: (context) => const GiftPage()));
   }
 
   void _onRedemptionHistoryTap() {
-    Navigator.of(
-      context,
-    ).push(MaterialPageRoute(builder: (context) => const PointsWalletPage()));
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) => const RedemptionHistoryPage()),
+    );
   }
 
   void _onUpgradeSubscriptionTap() {
     if (_userProfile?.subscriptionInfo != null) {
       // If user has a subscription, navigate to purchase page with the same plan for renewal
-      final subscriptionPlan = _convertToSubscriptionPlan(_userProfile!.subscriptionInfo!);
-      Navigator.of(context).push(
-        SubscriptionPurchasePage.route(subscriptionPlan),
+      final subscriptionPlan = _convertToSubscriptionPlan(
+        _userProfile!.subscriptionInfo!,
       );
+      Navigator.of(
+        context,
+      ).push(SubscriptionPurchasePage.route(subscriptionPlan));
     } else {
       // If user doesn't have a subscription, navigate to plans page
       Navigator.of(context).pushNamed('/subscription-purchase');
@@ -643,16 +646,23 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   /// Convert SubscriptionInfo to SubscriptionPlan for navigation
-  SubscriptionPlan _convertToSubscriptionPlan(SubscriptionInfo subscriptionInfo) {
+  SubscriptionPlan _convertToSubscriptionPlan(
+    SubscriptionInfo subscriptionInfo,
+  ) {
     // Calculate duration in months from start and end date
-    final duration = subscriptionInfo.endDate.difference(subscriptionInfo.startDate).inDays ~/ 30;
-    
+    final duration =
+        subscriptionInfo.endDate
+            .difference(subscriptionInfo.startDate)
+            .inDays ~/
+        30;
+
     return SubscriptionPlan(
       id: subscriptionInfo.planId,
       name: subscriptionInfo.planName,
       description: 'Renew your ${subscriptionInfo.planName} subscription',
       price: subscriptionInfo.price,
-      durationMonths: duration > 0 ? duration : 12, // Default to 12 months if calculation is off
+      durationMonths: duration > 0 ? duration : 12,
+      // Default to 12 months if calculation is off
       bonusPoints: subscriptionInfo.bonusPoints,
       maxCoupons: subscriptionInfo.maxCoupons,
       features: null,
@@ -672,8 +682,9 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _onAboutTap() {
-    debugPrint('About tapped');
-    // TODO: Show about dialog
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (context) => const AboutUsPage()));
   }
 
   void _onManageSubscriptionTap() {
