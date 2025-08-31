@@ -201,7 +201,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
   Widget _buildCategoriesSection() {
     return Container(
       margin: const EdgeInsets.fromLTRB(20, 30, 20, 20),
-      child: CategoriesSection(onSeeAllTap: _onCategoriesSeeAllTap),
+      child: CategoriesSection(),
     );
   }
 
@@ -228,16 +228,6 @@ class _HomeContentPageState extends State<HomeContentPage> {
   void _onNotificationTap() {
     HapticFeedback.lightImpact();
     debugPrint('Notification tap');
-  }
-
-  void _onCategoriesSeeAllTap() {
-    HapticFeedback.lightImpact();
-    debugPrint('Categories see all tap');
-  }
-
-  void _onMarketplaceSeeAllTap() {
-    HapticFeedback.lightImpact();
-    debugPrint('Marketplace see all tap');
   }
 
   void _onMenuTap() {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:savedge/core/constants/categories_constants.dart';
+import 'package:savedge/features/home/presentation/widgets/categories_bottom_sheet.dart';
 
 /// Model class for category items
 class CategoryItem {
@@ -15,12 +16,10 @@ class CategoriesSection extends StatelessWidget {
   const CategoriesSection({
     super.key,
     this.title = 'Our Categories',
-    this.onSeeAllTap,
     this.onCategoryTap,
   });
 
   final String title;
-  final VoidCallback? onSeeAllTap;
   final Function(String)? onCategoryTap;
 
   @override
@@ -30,7 +29,18 @@ class CategoriesSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _SectionHeader(title: title, onSeeAllTap: onSeeAllTap),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: _SectionHeader(
+              title: title,
+              onSeeAllTap: () {
+                CategoriesBottomSheet.show(
+                  context: context,
+                  onCategoryTap: onCategoryTap,
+                );
+              },
+            ),
+          ),
           const SizedBox(height: 20),
           _CategoriesGrid(onCategoryTap: onCategoryTap),
         ],
@@ -58,6 +68,17 @@ class _SectionHeader extends StatelessWidget {
             color: Color(0xFF1A202C),
           ),
         ),
+        GestureDetector(
+          onTap: onSeeAllTap,
+          child: const Text(
+            'See all',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF6F3FCC),
+            ),
+          ),
+        ),
       ],
     );
   }
@@ -70,27 +91,30 @@ class _CategoriesGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Show only first 6 categories
+    final displayCategories = CategoriesConstants.categories.take(6).toList();
+
     return SizedBox(
-      height: 200,
-      child: GridView.builder(
+      height: 100,
+      child: ListView.builder(
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
         scrollDirection: Axis.horizontal,
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          childAspectRatio: 1.0,
-          mainAxisSpacing: 16,
-          crossAxisSpacing: 16,
-        ),
-        itemCount: CategoriesConstants.categories.length,
+        itemCount: displayCategories.length,
         itemBuilder: (context, index) {
-          final category = CategoriesConstants.categories[index];
+          final category = displayCategories[index];
           final iconPath = CategoriesConstants.getCategoryIcon(category);
 
-          return CategoryItemWidget(
-            category: CategoryItem(
-              title: category,
-              iconPath: iconPath,
-              onTap: () => onCategoryTap?.call(category),
+          return Container(
+            width: 76,
+            margin: EdgeInsets.only(
+              right: index == displayCategories.length - 1 ? 0 : 16,
+            ),
+            child: CategoryItemWidget(
+              category: CategoryItem(
+                title: category,
+                iconPath: iconPath,
+                onTap: () => onCategoryTap?.call(category),
+              ),
             ),
           );
         },
@@ -114,47 +138,44 @@ class CategoryItemWidget extends StatelessWidget {
         children: [
           // Category icon from assets
           Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
+            width: 64,
+            height: 64,
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(20)),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(20),
               child: Image.asset(
                 category.iconPath,
-                width: 48,
-                height: 48,
+                width: 64,
+                height: 64,
                 fit: BoxFit.contain,
                 errorBuilder: (context, error, stackTrace) => Container(
-                  width: 48,
-                  height: 48,
+                  width: 64,
+                  height: 64,
                   decoration: BoxDecoration(
                     color: const Color(0xFF6F3FCC).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(20),
                   ),
                   child: const Icon(
                     Icons.category_outlined,
                     color: Color(0xFF6F3FCC),
-                    size: 24,
+                    size: 32,
                   ),
                 ),
               ),
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           // Category title
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4),
-            child: Text(
-              category.title,
-              style: const TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF2D3748),
-              ),
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
+          Text(
+            category.title,
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF2D3748),
             ),
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
