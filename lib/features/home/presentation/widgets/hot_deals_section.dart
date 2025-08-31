@@ -34,46 +34,43 @@ class HotDealsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            child: Text(
-              title,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w700,
-                color: Color(0xFF1A202C),
-              ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+          child: Text(
+            title,
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF1A202C),
             ),
           ),
-          const SizedBox(height: 20),
-          SizedBox(
-            height: 240,
-            child: BlocBuilder<CouponsBloc, CouponsState>(
-              builder: (context, state) {
-                if (state is CouponsLoading) {
-                  return const Center(
-                    child: CircularProgressIndicator(color: Color(0xFF6F3FCC)),
-                  );
-                } else if (state is CouponsError) {
-                  return _buildErrorWidget(state.message);
-                } else if (state is CouponsLoaded) {
-                  return _buildCouponsList(state.coupons);
-                }
-                return const SizedBox.shrink();
-              },
-            ),
+        ),
+        const SizedBox(height: 20),
+        SizedBox(
+          height: 280,
+          child: BlocBuilder<CouponsBloc, CouponsState>(
+            builder: (context, state) {
+              if (state is CouponsLoading) {
+                return const Center(
+                  child: CircularProgressIndicator(color: Color(0xFF6F3FCC)),
+                );
+              } else if (state is CouponsError) {
+                return _buildErrorWidget(state.message);
+              } else if (state is CouponsLoaded) {
+                return _buildCouponsList(context, state.coupons);
+              }
+              return const SizedBox.shrink();
+            },
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
-  Widget _buildCouponsList(List<Coupon> coupons) {
+  Widget _buildCouponsList(BuildContext context, List<Coupon> coupons) {
     if (coupons.isEmpty) {
       return Center(
         child: Column(
@@ -106,20 +103,9 @@ class HotDealsView extends StatelessWidget {
       );
     }
 
-    return ListView.builder(
-      scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      itemCount: coupons.length,
-      itemBuilder: (context, index) {
-        final coupon = coupons[index];
-        return Padding(
-          padding: EdgeInsets.only(right: index == coupons.length - 1 ? 0 : 16),
-          child: HotDealCard(
-            coupon: coupon,
-            onTap: () => _navigateToCouponDetail(context, coupon),
-          ),
-        );
-      },
+    return StackedDealsCards(
+      coupons: coupons,
+      onCouponTap: (coupon) => _navigateToCouponDetail(context, coupon),
     );
   }
 
@@ -183,106 +169,229 @@ class HotDeal {
   final VoidCallback? onTap;
 }
 
-/// Individual hot deal card widget using coupon data
-class HotDealCard extends StatelessWidget {
-  const HotDealCard({
-    super.key,
-    required this.coupon,
-    this.width = 280,
-    this.onTap,
-  });
+/// Stacked deals cards widget with beautiful animations
+class StackedDealsCards extends StatefulWidget {
+  const StackedDealsCards({super.key, required this.coupons, this.onCouponTap});
 
-  final Coupon coupon;
-  final double width;
-  final VoidCallback? onTap;
+  final List<Coupon> coupons;
+  final Function(Coupon)? onCouponTap;
+
+  @override
+  State<StackedDealsCards> createState() => _StackedDealsCardsState();
+}
+
+class _StackedDealsCardsState extends State<StackedDealsCards>
+    with TickerProviderStateMixin {
+  late PageController _pageController;
+  int _currentIndex = 0;
+  late List<AnimationController> _animationControllers;
+  late List<Animation<double>> _scaleAnimations;
+  late List<Animation<Offset>> _slideAnimations;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(viewportFraction: 0.85);
+
+    // Initialize animation controllers
+    _animationControllers = List.generate(
+      widget.coupons.length,
+      (index) => AnimationController(
+        duration: Duration(milliseconds: 300 + (index * 100)),
+        vsync: this,
+      ),
+    );
+
+    // Initialize scale animations
+    _scaleAnimations = _animationControllers
+        .map(
+          (controller) => Tween<double>(begin: 0.0, end: 1.0).animate(
+            CurvedAnimation(parent: controller, curve: Curves.elasticOut),
+          ),
+        )
+        .toList();
+
+    // Initialize slide animations
+    _slideAnimations = _animationControllers
+        .map(
+          (controller) =>
+              Tween<Offset>(
+                begin: const Offset(0, 1),
+                end: Offset.zero,
+              ).animate(
+                CurvedAnimation(parent: controller, curve: Curves.easeOutBack),
+              ),
+        )
+        .toList();
+
+    // Start animations
+    _startAnimations();
+  }
+
+  void _startAnimations() {
+    for (int i = 0; i < _animationControllers.length; i++) {
+      Future.delayed(Duration(milliseconds: i * 150), () {
+        if (mounted) {
+          _animationControllers[i].forward();
+        }
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    for (var controller in _animationControllers) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: width,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
+    if (widget.coupons.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Column(
+      children: [
+        // Main stacked cards
+        SizedBox(
+          height: 220,
+          child: PageView.builder(
+            controller: _pageController,
+            onPageChanged: (index) {
+              setState(() {
+                _currentIndex = index;
+              });
+            },
+            itemCount: widget.coupons.length,
+            itemBuilder: (context, index) {
+              return AnimatedBuilder(
+                animation: _animationControllers[index],
+                builder: (context, child) {
+                  return SlideTransition(
+                    position: _slideAnimations[index],
+                    child: ScaleTransition(
+                      scale: _scaleAnimations[index],
+                      child: _buildStackCard(widget.coupons[index], index),
+                    ),
+                  );
+                },
+              );
+            },
+          ),
         ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(20),
-          child: Stack(
-            children: [
-              // Background image
-              _DealBackground(coupon: coupon),
-              // Gradient overlay
-              Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [Colors.transparent, Colors.black.withOpacity(0.6)],
-                    stops: const [0.6, 1.0],
-                  ),
-                ),
-              ),
-              // Content
-              Positioned(
-                left: 20,
-                right: 20,
-                top: 20,
-                bottom: 20,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _OfferBadge(coupon: coupon),
-                    const Spacer(),
-                    _DealInfo(coupon: coupon),
-                  ],
-                ),
-              ),
-            ],
+        const SizedBox(height: 16),
+        // Page indicators
+        _buildPageIndicators(),
+      ],
+    );
+  }
+
+  Widget _buildStackCard(Coupon coupon, int index) {
+    final isCenter = index == _currentIndex;
+
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOut,
+      margin: EdgeInsets.symmetric(vertical: isCenter ? 0 : 10),
+      child: Transform.scale(
+        scale: isCenter ? 1.0 : 0.85,
+        child: GestureDetector(
+          onTap: () => widget.onCouponTap?.call(coupon),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(24),
+            child: Stack(
+              children: [
+                // Gradient background
+                _buildGradientBackground(coupon, index),
+                // Decorative elements
+                _buildDecorations(index),
+                // Content
+                _buildCardContent(coupon),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
-}
 
-class _DealBackground extends StatelessWidget {
-  const _DealBackground({required this.coupon});
+  Widget _buildGradientBackground(Coupon coupon, int index) {
+    final gradients = [
+      [const Color(0xFF6F3FCC), const Color(0xFF9F7AEA)],
+      [const Color(0xFF38B2AC), const Color(0xFF4FD1C7)],
+      [const Color(0xFFED8936), const Color(0xFFF56500)],
+      [const Color(0xFFE53E3E), const Color(0xFFF56565)],
+      [const Color(0xFF3182CE), const Color(0xFF63B3ED)],
+    ];
 
-  final Coupon coupon;
+    final colors = gradients[index % gradients.length];
 
-  @override
-  Widget build(BuildContext context) {
-    // Since Coupon entity doesn't have imageUrl, show gradient background
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            Colors.purple[300]!.withOpacity(0.8),
-            Colors.purple[600]!.withOpacity(0.8),
-          ],
-        ),
-      ),
-      child: Center(
-        child: Icon(
-          Icons.local_offer,
-          size: 60,
-          color: Colors.white.withOpacity(0.3),
+          colors: colors,
         ),
       ),
     );
   }
-}
 
-class _OfferBadge extends StatelessWidget {
-  const _OfferBadge({required this.coupon});
+  Widget _buildDecorations(int index) {
+    return Positioned.fill(
+      child: Stack(
+        children: [
+          // Circular decorations
+          Positioned(
+            top: -30,
+            right: -30,
+            child: Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withOpacity(0.1),
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: -40,
+            left: -40,
+            child: Container(
+              width: 120,
+              height: 120,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withOpacity(0.05),
+              ),
+            ),
+          ),
+          // Floating icons
+          Positioned(
+            top: 20,
+            right: 20,
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(
+                Icons.local_fire_department,
+                color: Colors.white,
+                size: 20,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
-  final Coupon coupon;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildCardContent(Coupon coupon) {
     String discountText;
     if (coupon.discountType.toLowerCase() == 'percentage') {
       discountText = '${coupon.discountValue.toInt()}% OFF';
@@ -290,93 +399,148 @@ class _OfferBadge extends StatelessWidget {
       discountText = '₹${coupon.discountValue.toInt()} OFF';
     }
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-      decoration: BoxDecoration(
-        color: const Color(0xFF6F3FCC),
-        borderRadius: BorderRadius.circular(25),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.local_offer, color: Colors.white, size: 16),
-          const SizedBox(width: 6),
+          // Discount badge
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Text(
+              discountText,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w800,
+                color: Color(0xFF1A202C),
+              ),
+            ),
+          ),
+          const Spacer(),
+          // Title
           Text(
-            discountText,
+            coupon.title,
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
+              fontSize: 22,
+              fontWeight: FontWeight.w700,
+              shadows: [
+                Shadow(
+                  color: Colors.black26,
+                  blurRadius: 2,
+                  offset: Offset(0, 1),
+                ),
+              ],
             ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 8),
+          // Description
+          if (coupon.description.isNotEmpty)
+            Text(
+              coupon.description,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+                shadows: [
+                  Shadow(
+                    color: Colors.black26,
+                    blurRadius: 1,
+                    offset: Offset(0, 1),
+                  ),
+                ],
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          const SizedBox(height: 12),
+          // Minimum amount info
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.white.withOpacity(0.3)),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.shopping_cart_outlined,
+                      color: Colors.white,
+                      size: 16,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      coupon.minimumAmountDisplay.isEmpty
+                          ? 'No minimum'
+                          : coupon.minimumAmountDisplay,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Spacer(),
+              // Arrow indicator
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.arrow_forward_ios,
+                  color: Colors.white,
+                  size: 14,
+                ),
+              ),
+            ],
           ),
         ],
       ),
     );
   }
-}
 
-class _DealInfo extends StatelessWidget {
-  const _DealInfo({required this.coupon});
-
-  final Coupon coupon;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          coupon.title,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.w700,
+  Widget _buildPageIndicators() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(
+        widget.coupons.length,
+        (index) => AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          margin: const EdgeInsets.symmetric(horizontal: 4),
+          width: index == _currentIndex ? 24 : 8,
+          height: 8,
+          decoration: BoxDecoration(
+            color: index == _currentIndex
+                ? const Color(0xFF6F3FCC)
+                : const Color(0xFF6F3FCC).withOpacity(0.3),
+            borderRadius: BorderRadius.circular(4),
           ),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
         ),
-        const SizedBox(height: 8),
-        if (coupon.description.isNotEmpty)
-          Text(
-            coupon.description,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 14,
-              fontWeight: FontWeight.w400,
-            ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.25),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.shopping_cart, color: Colors.white, size: 18),
-                  const SizedBox(width: 6),
-                  Text(
-                    coupon.minimumAmountDisplay.isEmpty 
-                        ? 'No minimum' 
-                        : coupon.minimumAmountDisplay,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ],
+      ),
     );
   }
 }

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:savedge/features/coupons/data/models/user_coupon_model.dart';
 import 'package:savedge/features/coupons/data/models/coupon_redemption_models.dart';
+import 'package:savedge/features/coupons/data/models/user_coupon_model.dart';
 
 class RedeemedCouponPage extends StatelessWidget {
   const RedeemedCouponPage({
@@ -18,12 +18,23 @@ class RedeemedCouponPage extends StatelessWidget {
   Widget build(BuildContext context) {
     // Use redemption response data if available (for immediate after redemption)
     // Otherwise use user coupon data (for history view)
-    final String title = redemptionResponse?.couponTitle ?? userCoupon?.title ?? 'Coupon Redeemed';
-    final String vendorName = redemptionResponse?.vendorName ?? userCoupon?.vendorName ?? 'Vendor';
-    final String discountDisplay = redemptionResponse?.discountDisplay ?? userCoupon?.discountDisplay ?? '';
-    final String? redemptionCode = redemptionResponse?.uniqueCode ?? userCoupon?.redemptionCode;
-    final DateTime? redeemedAt = redemptionResponse?.redeemedAt ?? 
-        (userCoupon?.usedAt != null ? DateTime.tryParse(userCoupon!.usedAt!) : null);
+    final String title =
+        redemptionResponse?.couponTitle ??
+        userCoupon?.title ??
+        'Coupon Redeemed';
+    final String vendorName =
+        redemptionResponse?.vendorName ?? userCoupon?.vendorName ?? 'Vendor';
+    final String discountDisplay =
+        redemptionResponse?.discountDisplay ??
+        userCoupon?.discountDisplay ??
+        '';
+    final String? redemptionCode =
+        redemptionResponse?.uniqueCode ?? userCoupon?.redemptionCode;
+    final DateTime? redeemedAt =
+        redemptionResponse?.redeemedAt ??
+        (userCoupon?.usedAt != null
+            ? DateTime.tryParse(userCoupon!.usedAt!)
+            : null);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
@@ -46,8 +57,6 @@ class RedeemedCouponPage extends StatelessWidget {
                       redeemedAt: redeemedAt,
                       userCoupon: userCoupon,
                     ),
-                    const SizedBox(height: 32),
-                    _ActionButtons(),
                   ],
                 ),
               ),
@@ -118,13 +127,15 @@ class _SuccessAnimationState extends State<_SuccessAnimation>
       vsync: this,
     );
 
-    _scaleAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.elasticOut),
-    );
+    _scaleAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.elasticOut));
 
-    _opacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeIn),
-    );
+    _opacityAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeIn));
 
     _controller.forward();
   }
@@ -150,10 +161,7 @@ class _SuccessAnimationState extends State<_SuccessAnimation>
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: LinearGradient(
-                  colors: [
-                    Colors.green[400]!,
-                    Colors.green[600]!,
-                  ],
+                  colors: [Colors.green[400]!, Colors.green[600]!],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -165,11 +173,7 @@ class _SuccessAnimationState extends State<_SuccessAnimation>
                   ),
                 ],
               ),
-              child: const Icon(
-                Icons.check,
-                color: Colors.white,
-                size: 60,
-              ),
+              child: const Icon(Icons.check, color: Colors.white, size: 60),
             ),
           ),
         );
@@ -197,164 +201,153 @@ class _CouponCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            blurRadius: 20,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.black87,
+                          height: 1.2,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Icon(Icons.store, size: 16, color: Colors.grey[600]),
+                          const SizedBox(width: 6),
+                          Text(
+                            vendorName,
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.grey[700],
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                if (discountDisplay.isNotEmpty)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [Colors.green[400]!, Colors.green[600]!],
+                      ),
+                      borderRadius: BorderRadius.circular(25),
+                    ),
+                    child: Text(
+                      discountDisplay,
                       style: const TextStyle(
-                        fontSize: 20,
+                        color: Colors.white,
                         fontWeight: FontWeight.w700,
-                        color: Colors.black87,
-                        height: 1.2,
+                        fontSize: 14,
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.store,
-                          size: 16,
-                          color: Colors.grey[600],
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          vendorName,
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey[700],
-                            fontWeight: FontWeight.w500,
+                  ),
+              ],
+            ),
+            const SizedBox(height: 24),
+
+            // Redemption code section
+            if (redemptionCode != null) ...[
+              _RedemptionCodeSection(code: redemptionCode!),
+              const SizedBox(height: 20),
+            ],
+
+            // Redemption date
+            if (redeemedAt != null) ...[
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.grey[50],
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.grey[200]!),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.schedule, size: 20, color: Colors.grey[600]),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Redeemed On',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey[600],
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
-                        ),
-                      ],
+                          const SizedBox(height: 2),
+                          Text(
+                            DateFormat(
+                              'EEEE, MMM dd, yyyy \'at\' hh:mm a',
+                            ).format(redeemedAt!),
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
               ),
-              if (discountDisplay.isNotEmpty)
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Colors.green[400]!,
-                        Colors.green[600]!,
-                      ],
-                    ),
-                    borderRadius: BorderRadius.circular(25),
-                  ),
-                  child: Text(
-                    discountDisplay,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 14,
-                    ),
+              const SizedBox(height: 16),
+            ],
+
+            // Terms and conditions
+            if (userCoupon?.terms != null && userCoupon!.terms!.isNotEmpty) ...[
+              ExpansionTile(
+                title: const Text(
+                  'Terms & Conditions',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87,
                   ),
                 ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          
-          // Redemption code section
-          if (redemptionCode != null) ...[
-            _RedemptionCodeSection(code: redemptionCode!),
-            const SizedBox(height: 20),
-          ],
-          
-          // Redemption date
-          if (redeemedAt != null) ...[
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.grey[50],
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.grey[200]!),
-              ),
-              child: Row(
                 children: [
-                  Icon(
-                    Icons.schedule,
-                    size: 20,
-                    color: Colors.grey[600],
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Redeemed On',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey[600],
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          DateFormat('EEEE, MMM dd, yyyy \'at\' hh:mm a').format(redeemedAt!),
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black87,
-                          ),
-                        ),
-                      ],
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      left: 16,
+                      right: 16,
+                      bottom: 16,
+                    ),
+                    child: Text(
+                      userCoupon!.terms!,
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.grey[700],
+                        height: 1.4,
+                      ),
                     ),
                   ),
                 ],
               ),
-            ),
-            const SizedBox(height: 16),
+            ],
           ],
-          
-          // Terms and conditions
-          if (userCoupon?.terms != null && userCoupon!.terms!.isNotEmpty) ...[
-            ExpansionTile(
-              title: const Text(
-                'Terms & Conditions',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black87,
-                ),
-              ),
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
-                  child: Text(
-                    userCoupon!.terms!,
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Colors.grey[700],
-                      height: 1.4,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ],
+        ),
       ),
     );
   }
@@ -371,10 +364,7 @@ class _RedemptionCodeSection extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            Colors.blue[50]!,
-            Colors.indigo[50]!,
-          ],
+          colors: [Colors.blue[50]!, Colors.indigo[50]!],
         ),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.blue[100]!),
@@ -389,11 +379,7 @@ class _RedemptionCodeSection extends StatelessWidget {
                   color: Colors.blue[100],
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(
-                  Icons.qr_code_2,
-                  color: Colors.blue[700],
-                  size: 24,
-                ),
+                child: Icon(Icons.qr_code_2, color: Colors.blue[700], size: 24),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -412,10 +398,7 @@ class _RedemptionCodeSection extends StatelessWidget {
                     const SizedBox(height: 2),
                     const Text(
                       'Show this code at the store',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: Colors.black54,
-                      ),
+                      style: TextStyle(fontSize: 11, color: Colors.black54),
                     ),
                   ],
                 ),
@@ -438,7 +421,7 @@ class _RedemptionCodeSection extends StatelessWidget {
                     code,
                     textAlign: TextAlign.center,
                     style: const TextStyle(
-                      fontSize: 24,
+                      fontSize: 18,
                       fontWeight: FontWeight.w900,
                       color: Colors.black87,
                       fontFamily: 'Courier',
@@ -477,63 +460,6 @@ class _RedemptionCodeSection extends StatelessWidget {
         backgroundColor: Colors.green[600],
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      ),
-    );
-  }
-}
-
-class _ActionButtons extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton.icon(
-            onPressed: () {
-              // Navigate back to home or coupon list
-              Navigator.of(context).popUntil((route) => route.isFirst);
-            },
-            icon: const Icon(Icons.home),
-            label: const Text('Back to Home'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Theme.of(context).primaryColor,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(height: 12),
-        SizedBox(
-          width: double.infinity,
-          child: OutlinedButton.icon(
-            onPressed: () {
-              // Share coupon details
-              _shareCoupon(context);
-            },
-            icon: const Icon(Icons.share),
-            label: const Text('Share'),
-            style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  void _shareCoupon(BuildContext context) {
-    // TODO: Implement sharing functionality
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Share functionality coming soon!'),
-        behavior: SnackBarBehavior.floating,
       ),
     );
   }

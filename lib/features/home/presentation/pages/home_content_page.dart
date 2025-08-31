@@ -59,7 +59,6 @@ class _HomeContentPageState extends State<HomeContentPage> {
                   _buildCategoriesSection(),
                   _buildHotDealsSection(),
                   _buildSubscriptionPlansSection(),
-                  _buildMarketplaceSection(),
                   const SizedBox(height: 40),
                 ],
               ),
@@ -217,42 +216,6 @@ class _HomeContentPageState extends State<HomeContentPage> {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 20),
       child: const HotDealsSection(),
-    );
-  }
-
-  Widget _buildMarketplaceSection() {
-    return Container(
-      margin: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'Marketplace',
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w700,
-                  color: Color(0xFF1A202C),
-                ),
-              ),
-              TextButton(
-                onPressed: _onMarketplaceSeeAllTap,
-                child: const Text(
-                  'View All',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF6F3FCC),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const MarketplaceSection(),
-        ],
-      ),
     );
   }
 
