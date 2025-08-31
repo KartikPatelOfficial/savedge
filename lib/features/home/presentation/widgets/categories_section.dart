@@ -24,27 +24,24 @@ class CategoriesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            child: _SectionHeader(
-              title: title,
-              onSeeAllTap: () {
-                CategoriesBottomSheet.show(
-                  context: context,
-                  onCategoryTap: onCategoryTap,
-                );
-              },
-            ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+          child: _SectionHeader(
+            title: title,
+            onSeeAllTap: () {
+              CategoriesBottomSheet.show(
+                context: context,
+                onCategoryTap: onCategoryTap,
+              );
+            },
           ),
-          const SizedBox(height: 20),
-          _CategoriesGrid(onCategoryTap: onCategoryTap),
-        ],
-      ),
+        ),
+        const SizedBox(height: 20),
+        _CategoriesGrid(onCategoryTap: onCategoryTap),
+      ],
     );
   }
 }

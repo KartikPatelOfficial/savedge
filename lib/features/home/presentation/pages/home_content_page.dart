@@ -55,9 +55,8 @@ class _HomeContentPageState extends State<HomeContentPage> {
                   child: FadeInAnimation(child: widget),
                 ),
                 children: [
-                  _buildModernSpecialOffers(),
-                  _buildCategoriesSection(),
                   _buildHotDealsSection(),
+                  _buildCategoriesSection(),
                   _buildSubscriptionPlansSection(),
                   const SizedBox(height: 40),
                 ],
@@ -191,18 +190,8 @@ class _HomeContentPageState extends State<HomeContentPage> {
     );
   }
 
-  Widget _buildModernSpecialOffers() {
-    return Container(
-      margin: const EdgeInsets.only(top: 20),
-      child: const SpecialOffersSection(),
-    );
-  }
-
   Widget _buildCategoriesSection() {
-    return Container(
-      margin: const EdgeInsets.fromLTRB(20, 30, 20, 20),
-      child: CategoriesSection(),
-    );
+    return CategoriesSection();
   }
 
   Widget _buildSubscriptionPlansSection() {

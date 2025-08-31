@@ -1,20 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:savedge/core/injection/injection.dart';
-import 'package:savedge/core/constants/categories_constants.dart';
 import 'package:savedge/features/stores/presentation/pages/vendor_detail_page.dart';
 import 'package:savedge/features/vendors/domain/entities/coupon.dart';
 import 'package:savedge/features/vendors/presentation/bloc/coupons_bloc.dart';
 
 /// Hot deals section widget with real coupon data
 class HotDealsSection extends StatelessWidget {
-  const HotDealsSection({
-    super.key,
-    this.title = 'Hot Deals',
-    this.deals = const [],
-  });
+  const HotDealsSection({super.key, this.deals = const []});
 
-  final String title;
   final List<HotDeal> deals;
 
   @override
@@ -23,35 +17,21 @@ class HotDealsSection extends StatelessWidget {
       create: (context) =>
           getIt<CouponsBloc>()..add(const LoadFeaturedCoupons(pageSize: 5)),
       // Load only 5 featured coupons
-      child: HotDealsView(title: title),
+      child: HotDealsView(),
     );
   }
 }
 
 class HotDealsView extends StatelessWidget {
-  const HotDealsView({super.key, required this.title});
-
-  final String title;
+  const HotDealsView({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0),
-          child: Text(
-            title,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-              color: Color(0xFF1A202C),
-            ),
-          ),
-        ),
-        const SizedBox(height: 20),
         SizedBox(
-          height: 280,
+          height: 260,
           child: BlocBuilder<CouponsBloc, CouponsState>(
             builder: (context, state) {
               if (state is CouponsLoading) {
