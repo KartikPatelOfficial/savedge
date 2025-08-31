@@ -30,25 +30,25 @@ abstract class SubscriptionRemoteDataSource {
     @Body() PurchaseSubscriptionWithPointsRequestModel request,
   );
 
-  /// Create payment order for Razorpay integration
-  @POST('/api/razorpay/create-order')
+  /// Create payment order for Razorpay integration (subscriptions)
+  @POST('/api/subscriptions/create-payment-order')
   Future<CreatePaymentOrderResponseModel> createPaymentOrder(
     @Body() CreatePaymentOrderRequestModel request,
   );
 
   /// Verify payment after successful Razorpay payment
-  @POST('/api/razorpay/verify-payment')
+  @POST('/api/subscriptions/verify-payment')
   Future<VerifyPaymentResponseModel> verifyPayment(
     @Body() VerifyPaymentRequestModel request,
   );
 
   /// Get payment transaction status
-  @GET('/api/razorpay/payment-status/{transactionId}')
+  @GET('/api/subscriptions/payment-status/{transactionId}')
   Future<PaymentTransactionModel> getPaymentStatus(
     @Path('transactionId') int transactionId,
   );
 
-  /// Get payment history for user
+  /// Get payment history for user (endpoint may differ server-side)
   @GET('/api/razorpay/payment-history')
   Future<List<PaymentTransactionModel>> getPaymentHistory();
 

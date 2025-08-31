@@ -8,7 +8,7 @@ import 'package:savedge/features/auth/domain/repositories/auth_repository.dart';
 /// Service class to handle Razorpay payment integration for subscriptions
 class RazorpayPaymentService {
   late Razorpay _razorpay;
-  VoidCallback? _onPaymentSuccess;
+  Function(PaymentSuccessResponse)? _onPaymentSuccess;
   Function(String)? _onPaymentError;
 
   HttpClient get _httpClient => GetIt.I<HttpClient>();
@@ -60,7 +60,7 @@ class RazorpayPaymentService {
     required String customerName,
     required String customerEmail,
     required String customerPhone,
-    required VoidCallback onSuccess,
+    required Function(PaymentSuccessResponse) onSuccess,
     required Function(String) onError,
   }) async {
     _onPaymentSuccess = onSuccess;
@@ -147,7 +147,7 @@ class RazorpayPaymentService {
   /// Handle payment success
   void _handlePaymentSuccess(PaymentSuccessResponse response) {
     print('Payment Success: ${response.paymentId}');
-    _onPaymentSuccess?.call();
+    _onPaymentSuccess?.call(response);
   }
 
   /// Handle payment error
@@ -243,9 +243,25 @@ class RazorpayPaymentService {
         customerName: userInfo['name']!,
         customerEmail: userInfo['email']!,
         customerPhone: userInfo['phone']!,
-        onSuccess: () async {
-          // This will be called by _handlePaymentSuccess
-          // Additional verification will be handled by the UI
+        onSuccess: (PaymentSuccessResponse rzp) async {
+          try {
+            final txId = paymentOrder['transactionId'] as int?;
+            final orderId = rzp.orderId ?? paymentOrder['orderId'];
+            if (txId == null || orderId == null) {
+              throw Exception('Missing transaction/order for verification');
+            }
+
+            // Verify with backend and activate subscription
+            await verifyPayment(
+              razorpayPaymentId: rzp.paymentId ?? '',
+              razorpayOrderId: orderId,
+              razorpaySignature: rzp.signature ?? '',
+              transactionId: txId,
+            );
+            onSuccess();
+          } catch (e) {
+            onError('Verification failed: $e');
+          }
         },
         onError: onError,
       );

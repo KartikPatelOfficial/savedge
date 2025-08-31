@@ -140,7 +140,7 @@ class _SubscriptionRemoteDataSource implements SubscriptionRemoteDataSource {
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/api/razorpay/create-order',
+            '/api/subscriptions/create-payment-order',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -169,7 +169,7 @@ class _SubscriptionRemoteDataSource implements SubscriptionRemoteDataSource {
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/api/razorpay/verify-payment',
+            '/api/subscriptions/verify-payment',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -196,7 +196,7 @@ class _SubscriptionRemoteDataSource implements SubscriptionRemoteDataSource {
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/api/razorpay/payment-status/${transactionId}',
+            '/api/subscriptions/payment-status/${transactionId}',
             queryParameters: queryParameters,
             data: _data,
           )
