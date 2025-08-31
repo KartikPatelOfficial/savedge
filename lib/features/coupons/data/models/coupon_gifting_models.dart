@@ -88,6 +88,10 @@ abstract class UserCouponDetailModel with _$UserCouponDetailModel {
     required String discountType,
     required double discountValue,
     double? minCartValue,
+    // Optional source of coupon: 'Purchased', 'Subscription', or 'Gift'
+    String? source,
+    // Optional amount paid for purchased coupons
+    double? amountPaid,
     String? imageUrl,
     required bool isGifted,
     String? giftedFromUserId,

@@ -1378,7 +1378,9 @@ as int,
 /// @nodoc
 mixin _$UserCouponDetailModel {
 
- int get id; int get couponId; String get title; String? get description;@JsonKey(name: 'vendorProfileId') int get vendorId; String get vendorUserId; String get vendorName; String get status;@JsonKey(name: 'purchasedDate') DateTime get acquiredDate; DateTime? get redeemedDate;@JsonKey(name: 'validUntil') DateTime get expiryDate; String get uniqueCode; String? get qrCode; String get discountType; double get discountValue; double? get minCartValue; String? get imageUrl; bool get isGifted; String? get giftedFromUserId; String? get giftedToUserId; DateTime? get giftedDate; String? get giftMessage;
+ int get id; int get couponId; String get title; String? get description;@JsonKey(name: 'vendorProfileId') int get vendorId; String get vendorUserId; String get vendorName; String get status;@JsonKey(name: 'purchasedDate') DateTime get acquiredDate; DateTime? get redeemedDate;@JsonKey(name: 'validUntil') DateTime get expiryDate; String get uniqueCode; String? get qrCode; String get discountType; double get discountValue; double? get minCartValue;// Optional source of coupon: 'Purchased', 'Subscription', or 'Gift'
+ String? get source;// Optional amount paid for purchased coupons
+ double? get amountPaid; String? get imageUrl; bool get isGifted; String? get giftedFromUserId; String? get giftedToUserId; DateTime? get giftedDate; String? get giftMessage;
 /// Create a copy of UserCouponDetailModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1391,16 +1393,16 @@ $UserCouponDetailModelCopyWith<UserCouponDetailModel> get copyWith => _$UserCoup
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is UserCouponDetailModel&&(identical(other.id, id) || other.id == id)&&(identical(other.couponId, couponId) || other.couponId == couponId)&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.vendorId, vendorId) || other.vendorId == vendorId)&&(identical(other.vendorUserId, vendorUserId) || other.vendorUserId == vendorUserId)&&(identical(other.vendorName, vendorName) || other.vendorName == vendorName)&&(identical(other.status, status) || other.status == status)&&(identical(other.acquiredDate, acquiredDate) || other.acquiredDate == acquiredDate)&&(identical(other.redeemedDate, redeemedDate) || other.redeemedDate == redeemedDate)&&(identical(other.expiryDate, expiryDate) || other.expiryDate == expiryDate)&&(identical(other.uniqueCode, uniqueCode) || other.uniqueCode == uniqueCode)&&(identical(other.qrCode, qrCode) || other.qrCode == qrCode)&&(identical(other.discountType, discountType) || other.discountType == discountType)&&(identical(other.discountValue, discountValue) || other.discountValue == discountValue)&&(identical(other.minCartValue, minCartValue) || other.minCartValue == minCartValue)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.isGifted, isGifted) || other.isGifted == isGifted)&&(identical(other.giftedFromUserId, giftedFromUserId) || other.giftedFromUserId == giftedFromUserId)&&(identical(other.giftedToUserId, giftedToUserId) || other.giftedToUserId == giftedToUserId)&&(identical(other.giftedDate, giftedDate) || other.giftedDate == giftedDate)&&(identical(other.giftMessage, giftMessage) || other.giftMessage == giftMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is UserCouponDetailModel&&(identical(other.id, id) || other.id == id)&&(identical(other.couponId, couponId) || other.couponId == couponId)&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.vendorId, vendorId) || other.vendorId == vendorId)&&(identical(other.vendorUserId, vendorUserId) || other.vendorUserId == vendorUserId)&&(identical(other.vendorName, vendorName) || other.vendorName == vendorName)&&(identical(other.status, status) || other.status == status)&&(identical(other.acquiredDate, acquiredDate) || other.acquiredDate == acquiredDate)&&(identical(other.redeemedDate, redeemedDate) || other.redeemedDate == redeemedDate)&&(identical(other.expiryDate, expiryDate) || other.expiryDate == expiryDate)&&(identical(other.uniqueCode, uniqueCode) || other.uniqueCode == uniqueCode)&&(identical(other.qrCode, qrCode) || other.qrCode == qrCode)&&(identical(other.discountType, discountType) || other.discountType == discountType)&&(identical(other.discountValue, discountValue) || other.discountValue == discountValue)&&(identical(other.minCartValue, minCartValue) || other.minCartValue == minCartValue)&&(identical(other.source, source) || other.source == source)&&(identical(other.amountPaid, amountPaid) || other.amountPaid == amountPaid)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.isGifted, isGifted) || other.isGifted == isGifted)&&(identical(other.giftedFromUserId, giftedFromUserId) || other.giftedFromUserId == giftedFromUserId)&&(identical(other.giftedToUserId, giftedToUserId) || other.giftedToUserId == giftedToUserId)&&(identical(other.giftedDate, giftedDate) || other.giftedDate == giftedDate)&&(identical(other.giftMessage, giftMessage) || other.giftMessage == giftMessage));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hashAll([runtimeType,id,couponId,title,description,vendorId,vendorUserId,vendorName,status,acquiredDate,redeemedDate,expiryDate,uniqueCode,qrCode,discountType,discountValue,minCartValue,imageUrl,isGifted,giftedFromUserId,giftedToUserId,giftedDate,giftMessage]);
+int get hashCode => Object.hashAll([runtimeType,id,couponId,title,description,vendorId,vendorUserId,vendorName,status,acquiredDate,redeemedDate,expiryDate,uniqueCode,qrCode,discountType,discountValue,minCartValue,source,amountPaid,imageUrl,isGifted,giftedFromUserId,giftedToUserId,giftedDate,giftMessage]);
 
 @override
 String toString() {
-  return 'UserCouponDetailModel(id: $id, couponId: $couponId, title: $title, description: $description, vendorId: $vendorId, vendorUserId: $vendorUserId, vendorName: $vendorName, status: $status, acquiredDate: $acquiredDate, redeemedDate: $redeemedDate, expiryDate: $expiryDate, uniqueCode: $uniqueCode, qrCode: $qrCode, discountType: $discountType, discountValue: $discountValue, minCartValue: $minCartValue, imageUrl: $imageUrl, isGifted: $isGifted, giftedFromUserId: $giftedFromUserId, giftedToUserId: $giftedToUserId, giftedDate: $giftedDate, giftMessage: $giftMessage)';
+  return 'UserCouponDetailModel(id: $id, couponId: $couponId, title: $title, description: $description, vendorId: $vendorId, vendorUserId: $vendorUserId, vendorName: $vendorName, status: $status, acquiredDate: $acquiredDate, redeemedDate: $redeemedDate, expiryDate: $expiryDate, uniqueCode: $uniqueCode, qrCode: $qrCode, discountType: $discountType, discountValue: $discountValue, minCartValue: $minCartValue, source: $source, amountPaid: $amountPaid, imageUrl: $imageUrl, isGifted: $isGifted, giftedFromUserId: $giftedFromUserId, giftedToUserId: $giftedToUserId, giftedDate: $giftedDate, giftMessage: $giftMessage)';
 }
 
 
@@ -1411,7 +1413,7 @@ abstract mixin class $UserCouponDetailModelCopyWith<$Res>  {
   factory $UserCouponDetailModelCopyWith(UserCouponDetailModel value, $Res Function(UserCouponDetailModel) _then) = _$UserCouponDetailModelCopyWithImpl;
 @useResult
 $Res call({
- int id, int couponId, String title, String? description,@JsonKey(name: 'vendorProfileId') int vendorId, String vendorUserId, String vendorName, String status,@JsonKey(name: 'purchasedDate') DateTime acquiredDate, DateTime? redeemedDate,@JsonKey(name: 'validUntil') DateTime expiryDate, String uniqueCode, String? qrCode, String discountType, double discountValue, double? minCartValue, String? imageUrl, bool isGifted, String? giftedFromUserId, String? giftedToUserId, DateTime? giftedDate, String? giftMessage
+ int id, int couponId, String title, String? description,@JsonKey(name: 'vendorProfileId') int vendorId, String vendorUserId, String vendorName, String status,@JsonKey(name: 'purchasedDate') DateTime acquiredDate, DateTime? redeemedDate,@JsonKey(name: 'validUntil') DateTime expiryDate, String uniqueCode, String? qrCode, String discountType, double discountValue, double? minCartValue, String? source, double? amountPaid, String? imageUrl, bool isGifted, String? giftedFromUserId, String? giftedToUserId, DateTime? giftedDate, String? giftMessage
 });
 
 
@@ -1428,7 +1430,7 @@ class _$UserCouponDetailModelCopyWithImpl<$Res>
 
 /// Create a copy of UserCouponDetailModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? couponId = null,Object? title = null,Object? description = freezed,Object? vendorId = null,Object? vendorUserId = null,Object? vendorName = null,Object? status = null,Object? acquiredDate = null,Object? redeemedDate = freezed,Object? expiryDate = null,Object? uniqueCode = null,Object? qrCode = freezed,Object? discountType = null,Object? discountValue = null,Object? minCartValue = freezed,Object? imageUrl = freezed,Object? isGifted = null,Object? giftedFromUserId = freezed,Object? giftedToUserId = freezed,Object? giftedDate = freezed,Object? giftMessage = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? couponId = null,Object? title = null,Object? description = freezed,Object? vendorId = null,Object? vendorUserId = null,Object? vendorName = null,Object? status = null,Object? acquiredDate = null,Object? redeemedDate = freezed,Object? expiryDate = null,Object? uniqueCode = null,Object? qrCode = freezed,Object? discountType = null,Object? discountValue = null,Object? minCartValue = freezed,Object? source = freezed,Object? amountPaid = freezed,Object? imageUrl = freezed,Object? isGifted = null,Object? giftedFromUserId = freezed,Object? giftedToUserId = freezed,Object? giftedDate = freezed,Object? giftMessage = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,couponId: null == couponId ? _self.couponId : couponId // ignore: cast_nullable_to_non_nullable
@@ -1446,6 +1448,8 @@ as String,qrCode: freezed == qrCode ? _self.qrCode : qrCode // ignore: cast_null
 as String?,discountType: null == discountType ? _self.discountType : discountType // ignore: cast_nullable_to_non_nullable
 as String,discountValue: null == discountValue ? _self.discountValue : discountValue // ignore: cast_nullable_to_non_nullable
 as double,minCartValue: freezed == minCartValue ? _self.minCartValue : minCartValue // ignore: cast_nullable_to_non_nullable
+as double?,source: freezed == source ? _self.source : source // ignore: cast_nullable_to_non_nullable
+as String?,amountPaid: freezed == amountPaid ? _self.amountPaid : amountPaid // ignore: cast_nullable_to_non_nullable
 as double?,imageUrl: freezed == imageUrl ? _self.imageUrl : imageUrl // ignore: cast_nullable_to_non_nullable
 as String?,isGifted: null == isGifted ? _self.isGifted : isGifted // ignore: cast_nullable_to_non_nullable
 as bool,giftedFromUserId: freezed == giftedFromUserId ? _self.giftedFromUserId : giftedFromUserId // ignore: cast_nullable_to_non_nullable
@@ -1537,10 +1541,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  int couponId,  String title,  String? description, @JsonKey(name: 'vendorProfileId')  int vendorId,  String vendorUserId,  String vendorName,  String status, @JsonKey(name: 'purchasedDate')  DateTime acquiredDate,  DateTime? redeemedDate, @JsonKey(name: 'validUntil')  DateTime expiryDate,  String uniqueCode,  String? qrCode,  String discountType,  double discountValue,  double? minCartValue,  String? imageUrl,  bool isGifted,  String? giftedFromUserId,  String? giftedToUserId,  DateTime? giftedDate,  String? giftMessage)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  int couponId,  String title,  String? description, @JsonKey(name: 'vendorProfileId')  int vendorId,  String vendorUserId,  String vendorName,  String status, @JsonKey(name: 'purchasedDate')  DateTime acquiredDate,  DateTime? redeemedDate, @JsonKey(name: 'validUntil')  DateTime expiryDate,  String uniqueCode,  String? qrCode,  String discountType,  double discountValue,  double? minCartValue,  String? source,  double? amountPaid,  String? imageUrl,  bool isGifted,  String? giftedFromUserId,  String? giftedToUserId,  DateTime? giftedDate,  String? giftMessage)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _UserCouponDetailModel() when $default != null:
-return $default(_that.id,_that.couponId,_that.title,_that.description,_that.vendorId,_that.vendorUserId,_that.vendorName,_that.status,_that.acquiredDate,_that.redeemedDate,_that.expiryDate,_that.uniqueCode,_that.qrCode,_that.discountType,_that.discountValue,_that.minCartValue,_that.imageUrl,_that.isGifted,_that.giftedFromUserId,_that.giftedToUserId,_that.giftedDate,_that.giftMessage);case _:
+return $default(_that.id,_that.couponId,_that.title,_that.description,_that.vendorId,_that.vendorUserId,_that.vendorName,_that.status,_that.acquiredDate,_that.redeemedDate,_that.expiryDate,_that.uniqueCode,_that.qrCode,_that.discountType,_that.discountValue,_that.minCartValue,_that.source,_that.amountPaid,_that.imageUrl,_that.isGifted,_that.giftedFromUserId,_that.giftedToUserId,_that.giftedDate,_that.giftMessage);case _:
   return orElse();
 
 }
@@ -1558,10 +1562,10 @@ return $default(_that.id,_that.couponId,_that.title,_that.description,_that.vend
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  int couponId,  String title,  String? description, @JsonKey(name: 'vendorProfileId')  int vendorId,  String vendorUserId,  String vendorName,  String status, @JsonKey(name: 'purchasedDate')  DateTime acquiredDate,  DateTime? redeemedDate, @JsonKey(name: 'validUntil')  DateTime expiryDate,  String uniqueCode,  String? qrCode,  String discountType,  double discountValue,  double? minCartValue,  String? imageUrl,  bool isGifted,  String? giftedFromUserId,  String? giftedToUserId,  DateTime? giftedDate,  String? giftMessage)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  int couponId,  String title,  String? description, @JsonKey(name: 'vendorProfileId')  int vendorId,  String vendorUserId,  String vendorName,  String status, @JsonKey(name: 'purchasedDate')  DateTime acquiredDate,  DateTime? redeemedDate, @JsonKey(name: 'validUntil')  DateTime expiryDate,  String uniqueCode,  String? qrCode,  String discountType,  double discountValue,  double? minCartValue,  String? source,  double? amountPaid,  String? imageUrl,  bool isGifted,  String? giftedFromUserId,  String? giftedToUserId,  DateTime? giftedDate,  String? giftMessage)  $default,) {final _that = this;
 switch (_that) {
 case _UserCouponDetailModel():
-return $default(_that.id,_that.couponId,_that.title,_that.description,_that.vendorId,_that.vendorUserId,_that.vendorName,_that.status,_that.acquiredDate,_that.redeemedDate,_that.expiryDate,_that.uniqueCode,_that.qrCode,_that.discountType,_that.discountValue,_that.minCartValue,_that.imageUrl,_that.isGifted,_that.giftedFromUserId,_that.giftedToUserId,_that.giftedDate,_that.giftMessage);case _:
+return $default(_that.id,_that.couponId,_that.title,_that.description,_that.vendorId,_that.vendorUserId,_that.vendorName,_that.status,_that.acquiredDate,_that.redeemedDate,_that.expiryDate,_that.uniqueCode,_that.qrCode,_that.discountType,_that.discountValue,_that.minCartValue,_that.source,_that.amountPaid,_that.imageUrl,_that.isGifted,_that.giftedFromUserId,_that.giftedToUserId,_that.giftedDate,_that.giftMessage);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -1578,10 +1582,10 @@ return $default(_that.id,_that.couponId,_that.title,_that.description,_that.vend
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  int couponId,  String title,  String? description, @JsonKey(name: 'vendorProfileId')  int vendorId,  String vendorUserId,  String vendorName,  String status, @JsonKey(name: 'purchasedDate')  DateTime acquiredDate,  DateTime? redeemedDate, @JsonKey(name: 'validUntil')  DateTime expiryDate,  String uniqueCode,  String? qrCode,  String discountType,  double discountValue,  double? minCartValue,  String? imageUrl,  bool isGifted,  String? giftedFromUserId,  String? giftedToUserId,  DateTime? giftedDate,  String? giftMessage)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  int couponId,  String title,  String? description, @JsonKey(name: 'vendorProfileId')  int vendorId,  String vendorUserId,  String vendorName,  String status, @JsonKey(name: 'purchasedDate')  DateTime acquiredDate,  DateTime? redeemedDate, @JsonKey(name: 'validUntil')  DateTime expiryDate,  String uniqueCode,  String? qrCode,  String discountType,  double discountValue,  double? minCartValue,  String? source,  double? amountPaid,  String? imageUrl,  bool isGifted,  String? giftedFromUserId,  String? giftedToUserId,  DateTime? giftedDate,  String? giftMessage)?  $default,) {final _that = this;
 switch (_that) {
 case _UserCouponDetailModel() when $default != null:
-return $default(_that.id,_that.couponId,_that.title,_that.description,_that.vendorId,_that.vendorUserId,_that.vendorName,_that.status,_that.acquiredDate,_that.redeemedDate,_that.expiryDate,_that.uniqueCode,_that.qrCode,_that.discountType,_that.discountValue,_that.minCartValue,_that.imageUrl,_that.isGifted,_that.giftedFromUserId,_that.giftedToUserId,_that.giftedDate,_that.giftMessage);case _:
+return $default(_that.id,_that.couponId,_that.title,_that.description,_that.vendorId,_that.vendorUserId,_that.vendorName,_that.status,_that.acquiredDate,_that.redeemedDate,_that.expiryDate,_that.uniqueCode,_that.qrCode,_that.discountType,_that.discountValue,_that.minCartValue,_that.source,_that.amountPaid,_that.imageUrl,_that.isGifted,_that.giftedFromUserId,_that.giftedToUserId,_that.giftedDate,_that.giftMessage);case _:
   return null;
 
 }
@@ -1593,7 +1597,7 @@ return $default(_that.id,_that.couponId,_that.title,_that.description,_that.vend
 @JsonSerializable()
 
 class _UserCouponDetailModel implements UserCouponDetailModel {
-  const _UserCouponDetailModel({required this.id, required this.couponId, required this.title, this.description, @JsonKey(name: 'vendorProfileId') required this.vendorId, required this.vendorUserId, required this.vendorName, required this.status, @JsonKey(name: 'purchasedDate') required this.acquiredDate, this.redeemedDate, @JsonKey(name: 'validUntil') required this.expiryDate, required this.uniqueCode, this.qrCode, required this.discountType, required this.discountValue, this.minCartValue, this.imageUrl, required this.isGifted, this.giftedFromUserId, this.giftedToUserId, this.giftedDate, this.giftMessage});
+  const _UserCouponDetailModel({required this.id, required this.couponId, required this.title, this.description, @JsonKey(name: 'vendorProfileId') required this.vendorId, required this.vendorUserId, required this.vendorName, required this.status, @JsonKey(name: 'purchasedDate') required this.acquiredDate, this.redeemedDate, @JsonKey(name: 'validUntil') required this.expiryDate, required this.uniqueCode, this.qrCode, required this.discountType, required this.discountValue, this.minCartValue, this.source, this.amountPaid, this.imageUrl, required this.isGifted, this.giftedFromUserId, this.giftedToUserId, this.giftedDate, this.giftMessage});
   factory _UserCouponDetailModel.fromJson(Map<String, dynamic> json) => _$UserCouponDetailModelFromJson(json);
 
 @override final  int id;
@@ -1612,6 +1616,10 @@ class _UserCouponDetailModel implements UserCouponDetailModel {
 @override final  String discountType;
 @override final  double discountValue;
 @override final  double? minCartValue;
+// Optional source of coupon: 'Purchased', 'Subscription', or 'Gift'
+@override final  String? source;
+// Optional amount paid for purchased coupons
+@override final  double? amountPaid;
 @override final  String? imageUrl;
 @override final  bool isGifted;
 @override final  String? giftedFromUserId;
@@ -1632,16 +1640,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UserCouponDetailModel&&(identical(other.id, id) || other.id == id)&&(identical(other.couponId, couponId) || other.couponId == couponId)&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.vendorId, vendorId) || other.vendorId == vendorId)&&(identical(other.vendorUserId, vendorUserId) || other.vendorUserId == vendorUserId)&&(identical(other.vendorName, vendorName) || other.vendorName == vendorName)&&(identical(other.status, status) || other.status == status)&&(identical(other.acquiredDate, acquiredDate) || other.acquiredDate == acquiredDate)&&(identical(other.redeemedDate, redeemedDate) || other.redeemedDate == redeemedDate)&&(identical(other.expiryDate, expiryDate) || other.expiryDate == expiryDate)&&(identical(other.uniqueCode, uniqueCode) || other.uniqueCode == uniqueCode)&&(identical(other.qrCode, qrCode) || other.qrCode == qrCode)&&(identical(other.discountType, discountType) || other.discountType == discountType)&&(identical(other.discountValue, discountValue) || other.discountValue == discountValue)&&(identical(other.minCartValue, minCartValue) || other.minCartValue == minCartValue)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.isGifted, isGifted) || other.isGifted == isGifted)&&(identical(other.giftedFromUserId, giftedFromUserId) || other.giftedFromUserId == giftedFromUserId)&&(identical(other.giftedToUserId, giftedToUserId) || other.giftedToUserId == giftedToUserId)&&(identical(other.giftedDate, giftedDate) || other.giftedDate == giftedDate)&&(identical(other.giftMessage, giftMessage) || other.giftMessage == giftMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UserCouponDetailModel&&(identical(other.id, id) || other.id == id)&&(identical(other.couponId, couponId) || other.couponId == couponId)&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.vendorId, vendorId) || other.vendorId == vendorId)&&(identical(other.vendorUserId, vendorUserId) || other.vendorUserId == vendorUserId)&&(identical(other.vendorName, vendorName) || other.vendorName == vendorName)&&(identical(other.status, status) || other.status == status)&&(identical(other.acquiredDate, acquiredDate) || other.acquiredDate == acquiredDate)&&(identical(other.redeemedDate, redeemedDate) || other.redeemedDate == redeemedDate)&&(identical(other.expiryDate, expiryDate) || other.expiryDate == expiryDate)&&(identical(other.uniqueCode, uniqueCode) || other.uniqueCode == uniqueCode)&&(identical(other.qrCode, qrCode) || other.qrCode == qrCode)&&(identical(other.discountType, discountType) || other.discountType == discountType)&&(identical(other.discountValue, discountValue) || other.discountValue == discountValue)&&(identical(other.minCartValue, minCartValue) || other.minCartValue == minCartValue)&&(identical(other.source, source) || other.source == source)&&(identical(other.amountPaid, amountPaid) || other.amountPaid == amountPaid)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.isGifted, isGifted) || other.isGifted == isGifted)&&(identical(other.giftedFromUserId, giftedFromUserId) || other.giftedFromUserId == giftedFromUserId)&&(identical(other.giftedToUserId, giftedToUserId) || other.giftedToUserId == giftedToUserId)&&(identical(other.giftedDate, giftedDate) || other.giftedDate == giftedDate)&&(identical(other.giftMessage, giftMessage) || other.giftMessage == giftMessage));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hashAll([runtimeType,id,couponId,title,description,vendorId,vendorUserId,vendorName,status,acquiredDate,redeemedDate,expiryDate,uniqueCode,qrCode,discountType,discountValue,minCartValue,imageUrl,isGifted,giftedFromUserId,giftedToUserId,giftedDate,giftMessage]);
+int get hashCode => Object.hashAll([runtimeType,id,couponId,title,description,vendorId,vendorUserId,vendorName,status,acquiredDate,redeemedDate,expiryDate,uniqueCode,qrCode,discountType,discountValue,minCartValue,source,amountPaid,imageUrl,isGifted,giftedFromUserId,giftedToUserId,giftedDate,giftMessage]);
 
 @override
 String toString() {
-  return 'UserCouponDetailModel(id: $id, couponId: $couponId, title: $title, description: $description, vendorId: $vendorId, vendorUserId: $vendorUserId, vendorName: $vendorName, status: $status, acquiredDate: $acquiredDate, redeemedDate: $redeemedDate, expiryDate: $expiryDate, uniqueCode: $uniqueCode, qrCode: $qrCode, discountType: $discountType, discountValue: $discountValue, minCartValue: $minCartValue, imageUrl: $imageUrl, isGifted: $isGifted, giftedFromUserId: $giftedFromUserId, giftedToUserId: $giftedToUserId, giftedDate: $giftedDate, giftMessage: $giftMessage)';
+  return 'UserCouponDetailModel(id: $id, couponId: $couponId, title: $title, description: $description, vendorId: $vendorId, vendorUserId: $vendorUserId, vendorName: $vendorName, status: $status, acquiredDate: $acquiredDate, redeemedDate: $redeemedDate, expiryDate: $expiryDate, uniqueCode: $uniqueCode, qrCode: $qrCode, discountType: $discountType, discountValue: $discountValue, minCartValue: $minCartValue, source: $source, amountPaid: $amountPaid, imageUrl: $imageUrl, isGifted: $isGifted, giftedFromUserId: $giftedFromUserId, giftedToUserId: $giftedToUserId, giftedDate: $giftedDate, giftMessage: $giftMessage)';
 }
 
 
@@ -1652,7 +1660,7 @@ abstract mixin class _$UserCouponDetailModelCopyWith<$Res> implements $UserCoupo
   factory _$UserCouponDetailModelCopyWith(_UserCouponDetailModel value, $Res Function(_UserCouponDetailModel) _then) = __$UserCouponDetailModelCopyWithImpl;
 @override @useResult
 $Res call({
- int id, int couponId, String title, String? description,@JsonKey(name: 'vendorProfileId') int vendorId, String vendorUserId, String vendorName, String status,@JsonKey(name: 'purchasedDate') DateTime acquiredDate, DateTime? redeemedDate,@JsonKey(name: 'validUntil') DateTime expiryDate, String uniqueCode, String? qrCode, String discountType, double discountValue, double? minCartValue, String? imageUrl, bool isGifted, String? giftedFromUserId, String? giftedToUserId, DateTime? giftedDate, String? giftMessage
+ int id, int couponId, String title, String? description,@JsonKey(name: 'vendorProfileId') int vendorId, String vendorUserId, String vendorName, String status,@JsonKey(name: 'purchasedDate') DateTime acquiredDate, DateTime? redeemedDate,@JsonKey(name: 'validUntil') DateTime expiryDate, String uniqueCode, String? qrCode, String discountType, double discountValue, double? minCartValue, String? source, double? amountPaid, String? imageUrl, bool isGifted, String? giftedFromUserId, String? giftedToUserId, DateTime? giftedDate, String? giftMessage
 });
 
 
@@ -1669,7 +1677,7 @@ class __$UserCouponDetailModelCopyWithImpl<$Res>
 
 /// Create a copy of UserCouponDetailModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? couponId = null,Object? title = null,Object? description = freezed,Object? vendorId = null,Object? vendorUserId = null,Object? vendorName = null,Object? status = null,Object? acquiredDate = null,Object? redeemedDate = freezed,Object? expiryDate = null,Object? uniqueCode = null,Object? qrCode = freezed,Object? discountType = null,Object? discountValue = null,Object? minCartValue = freezed,Object? imageUrl = freezed,Object? isGifted = null,Object? giftedFromUserId = freezed,Object? giftedToUserId = freezed,Object? giftedDate = freezed,Object? giftMessage = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? couponId = null,Object? title = null,Object? description = freezed,Object? vendorId = null,Object? vendorUserId = null,Object? vendorName = null,Object? status = null,Object? acquiredDate = null,Object? redeemedDate = freezed,Object? expiryDate = null,Object? uniqueCode = null,Object? qrCode = freezed,Object? discountType = null,Object? discountValue = null,Object? minCartValue = freezed,Object? source = freezed,Object? amountPaid = freezed,Object? imageUrl = freezed,Object? isGifted = null,Object? giftedFromUserId = freezed,Object? giftedToUserId = freezed,Object? giftedDate = freezed,Object? giftMessage = freezed,}) {
   return _then(_UserCouponDetailModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,couponId: null == couponId ? _self.couponId : couponId // ignore: cast_nullable_to_non_nullable
@@ -1687,6 +1695,8 @@ as String,qrCode: freezed == qrCode ? _self.qrCode : qrCode // ignore: cast_null
 as String?,discountType: null == discountType ? _self.discountType : discountType // ignore: cast_nullable_to_non_nullable
 as String,discountValue: null == discountValue ? _self.discountValue : discountValue // ignore: cast_nullable_to_non_nullable
 as double,minCartValue: freezed == minCartValue ? _self.minCartValue : minCartValue // ignore: cast_nullable_to_non_nullable
+as double?,source: freezed == source ? _self.source : source // ignore: cast_nullable_to_non_nullable
+as String?,amountPaid: freezed == amountPaid ? _self.amountPaid : amountPaid // ignore: cast_nullable_to_non_nullable
 as double?,imageUrl: freezed == imageUrl ? _self.imageUrl : imageUrl // ignore: cast_nullable_to_non_nullable
 as String?,isGifted: null == isGifted ? _self.isGifted : isGifted // ignore: cast_nullable_to_non_nullable
 as bool,giftedFromUserId: freezed == giftedFromUserId ? _self.giftedFromUserId : giftedFromUserId // ignore: cast_nullable_to_non_nullable

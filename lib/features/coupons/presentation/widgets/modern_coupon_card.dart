@@ -76,7 +76,6 @@ class _ModernCouponCardState extends State<ModernCouponCard>
                   }
                 },
                 child: Container(
-                  height: 140,
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topLeft,
@@ -131,23 +130,8 @@ class _ModernCouponCardState extends State<ModernCouponCard>
   }
 
   Widget _buildModernDiscountSection(Map<String, Color> theme, bool isActive) {
-    return Container(
-      width: 120,
-      height: 140,
+    return Padding(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: isActive
-              ? [theme['primary']!, theme['primary']!.withOpacity(0.8)]
-              : [Colors.grey[400]!, Colors.grey[500]!],
-        ),
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(20),
-          bottomLeft: Radius.circular(20),
-        ),
-      ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
@@ -158,7 +142,6 @@ class _ModernCouponCardState extends State<ModernCouponCard>
             style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w800,
-              color: Colors.white,
               letterSpacing: -0.5,
             ),
             textAlign: TextAlign.center,
@@ -169,7 +152,6 @@ class _ModernCouponCardState extends State<ModernCouponCard>
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,
-              color: Colors.white.withOpacity(0.9),
               letterSpacing: 1.2,
             ),
           ),
@@ -183,11 +165,7 @@ class _ModernCouponCardState extends State<ModernCouponCard>
             ),
             child: Text(
               _getStatusDisplay(),
-              style: const TextStyle(
-                fontSize: 9,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
-              ),
+              style: const TextStyle(fontSize: 9, fontWeight: FontWeight.w600),
             ),
           ),
         ],
@@ -209,40 +187,45 @@ class _ModernCouponCardState extends State<ModernCouponCard>
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-              Text(
-                widget.coupon.title,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                  color: isActive ? const Color(0xFF1A202C) : Colors.grey[600],
-                  letterSpacing: -0.2,
+                // Source tag (Purchased / Membership / Gifted)
+                _buildSourceTag(),
+                const SizedBox(height: 6),
+                Text(
+                  widget.coupon.title,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: isActive
+                        ? const Color(0xFF1A202C)
+                        : Colors.grey[600],
+                    letterSpacing: -0.2,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const SizedBox(height: 4),
-              Row(
-                children: [
-                  Icon(
-                    Icons.store_outlined,
-                    size: 14,
-                    color: isActive ? theme['primary'] : Colors.grey[500],
-                  ),
-                  const SizedBox(width: 4),
-                  Expanded(
-                    child: Text(
-                      widget.coupon.vendorName,
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: isActive ? theme['primary'] : Colors.grey[500],
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.store_outlined,
+                      size: 14,
+                      color: isActive ? theme['primary'] : Colors.grey[500],
                     ),
-                  ),
-                ],
-              ),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: Text(
+                        widget.coupon.vendorName,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: isActive ? theme['primary'] : Colors.grey[500],
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
@@ -274,6 +257,48 @@ class _ModernCouponCardState extends State<ModernCouponCard>
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildSourceTag() {
+    // Determine tag text and colors
+    String? text;
+    Color bg = const Color(0xFFE5E7EB); // default gray-200
+    Color fg = const Color(0xFF374151); // gray-700
+
+    if (widget.coupon.isGifted) {
+      text = 'Gifted';
+      bg = const Color(0xFFEDE9FE); // violet-100
+      fg = const Color(0xFF6D28D9); // violet-700
+    } else if (widget.coupon.source == 'Subscription') {
+      text = 'Membership';
+      bg = const Color(0xFFEFF6FF); // blue-100
+      fg = const Color(0xFF2563EB); // blue-600
+    } else if (widget.coupon.source == 'Purchased') {
+      text = 'Purchased';
+      bg = const Color(0xFFECFDF5); // emerald-50
+      fg = const Color(0xFF059669); // emerald-600
+    }
+
+    if (text == null) {
+      return const SizedBox.shrink();
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.w700,
+          color: fg,
+          letterSpacing: 0.3,
+        ),
       ),
     );
   }
@@ -349,7 +374,9 @@ class _ModernCouponCardState extends State<ModernCouponCard>
       // Show a message for inactive coupons
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('This coupon is ${widget.coupon.statusDisplay.toLowerCase()}'),
+          content: Text(
+            'This coupon is ${widget.coupon.statusDisplay.toLowerCase()}',
+          ),
           backgroundColor: Colors.orange,
         ),
       );
@@ -437,6 +464,4 @@ class _ModernCouponCardState extends State<ModernCouponCard>
       'background': const Color(0xFFF9FAFB),
     };
   }
-
-
 }

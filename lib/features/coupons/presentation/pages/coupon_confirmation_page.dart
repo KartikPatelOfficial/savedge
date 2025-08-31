@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
 import '../../../coupons/data/models/coupon_claim_models.dart';
-import '../../../coupons/data/models/coupon_redemption_models.dart';
 import '../../../coupons/data/models/coupon_gifting_models.dart';
+import '../../../coupons/data/models/coupon_redemption_models.dart';
 import '../../../coupons/data/services/coupon_service.dart';
 import '../../../qr_scanner/presentation/pages/qr_scanner_page.dart';
 
@@ -448,7 +448,8 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
         if (widget.redemptionMethod == 'membership') {
           // Remaining claims should be based on total subscription claims (not used count)
           // Prefer server-computed remaining claims if available
-          final remaining = widget.claimCoupon?.remainingSubscriptionClaims ??
+          final remaining =
+              widget.claimCoupon?.remainingSubscriptionClaims ??
               ((widget.claimCoupon?.userMaxRedemptions ?? 1) -
                   (widget.claimCoupon?.userUsedRedemptions ?? 0));
           items.add(
@@ -705,16 +706,20 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
       if (widget.confirmationType == CouponConfirmationType.use) {
         // For using existing coupon, open QR scanner for vendor verification first
         if (widget.userCoupon == null) {
-          throw Exception('Error: Owned coupon data is missing. Cannot proceed with redemption.');
+          throw Exception(
+            'Error: Owned coupon data is missing. Cannot proceed with redemption.',
+          );
         }
         await _navigateToQRScanner();
       } else {
         // Claim new coupon
         if (widget.claimCoupon == null) {
-          throw Exception('Error: Coupon data is missing. Cannot proceed with claiming.');
+          throw Exception(
+            'Error: Coupon data is missing. Cannot proceed with claiming.',
+          );
         }
         await _claimNewCoupon();
-        
+
         if (!mounted) return;
         _showSuccessDialog();
       }
@@ -785,7 +790,7 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
       default:
         throw Exception('Invalid redemption method');
     }
-    
+
     // Store the claimed coupon ID for potential direct redemption
     _claimedCouponId = response.userCouponId;
   }
@@ -973,8 +978,8 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
         // QR verification and redemption was successful
         // Close the success dialog and return to previous screen
         if (mounted) {
-          Navigator.of(context).pop(); // Close success dialog
-          Navigator.of(context).pop(true); // Return to previous screen with success result
+          Navigator.of(context).pop();
+          Navigator.of(context).pop(true);
         }
       }
       // If result is false or null (cancelled/failed), just stay on the success dialog
