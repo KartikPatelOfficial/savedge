@@ -1716,7 +1716,7 @@ $EmployeeInfoModelCopyWith<$Res>? get employee {
 /// @nodoc
 mixin _$UserInfoModel {
 
- int get id; String get userId; String get email; String get firstName; String get lastName; String get phoneNumber; String get role; bool get isEmailConfirmed; DateTime get createdAt;
+ String get id; String get userId; String get email; String get firstName; String get lastName; String get phoneNumber; String get role; bool get isEmailConfirmed; DateTime get createdAt;
 /// Create a copy of UserInfoModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1749,7 +1749,7 @@ abstract mixin class $UserInfoModelCopyWith<$Res>  {
   factory $UserInfoModelCopyWith(UserInfoModel value, $Res Function(UserInfoModel) _then) = _$UserInfoModelCopyWithImpl;
 @useResult
 $Res call({
- int id, String userId, String email, String firstName, String lastName, String phoneNumber, String role, bool isEmailConfirmed, DateTime createdAt
+ String id, String userId, String email, String firstName, String lastName, String phoneNumber, String role, bool isEmailConfirmed, DateTime createdAt
 });
 
 
@@ -1769,7 +1769,7 @@ class _$UserInfoModelCopyWithImpl<$Res>
 @pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? userId = null,Object? email = null,Object? firstName = null,Object? lastName = null,Object? phoneNumber = null,Object? role = null,Object? isEmailConfirmed = null,Object? createdAt = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as int,userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
+as String,userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
 as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
 as String,firstName: null == firstName ? _self.firstName : firstName // ignore: cast_nullable_to_non_nullable
 as String,lastName: null == lastName ? _self.lastName : lastName // ignore: cast_nullable_to_non_nullable
@@ -1862,7 +1862,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String userId,  String email,  String firstName,  String lastName,  String phoneNumber,  String role,  bool isEmailConfirmed,  DateTime createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String userId,  String email,  String firstName,  String lastName,  String phoneNumber,  String role,  bool isEmailConfirmed,  DateTime createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _UserInfoModel() when $default != null:
 return $default(_that.id,_that.userId,_that.email,_that.firstName,_that.lastName,_that.phoneNumber,_that.role,_that.isEmailConfirmed,_that.createdAt);case _:
@@ -1883,7 +1883,7 @@ return $default(_that.id,_that.userId,_that.email,_that.firstName,_that.lastName
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String userId,  String email,  String firstName,  String lastName,  String phoneNumber,  String role,  bool isEmailConfirmed,  DateTime createdAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String userId,  String email,  String firstName,  String lastName,  String phoneNumber,  String role,  bool isEmailConfirmed,  DateTime createdAt)  $default,) {final _that = this;
 switch (_that) {
 case _UserInfoModel():
 return $default(_that.id,_that.userId,_that.email,_that.firstName,_that.lastName,_that.phoneNumber,_that.role,_that.isEmailConfirmed,_that.createdAt);case _:
@@ -1903,7 +1903,7 @@ return $default(_that.id,_that.userId,_that.email,_that.firstName,_that.lastName
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String userId,  String email,  String firstName,  String lastName,  String phoneNumber,  String role,  bool isEmailConfirmed,  DateTime createdAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String userId,  String email,  String firstName,  String lastName,  String phoneNumber,  String role,  bool isEmailConfirmed,  DateTime createdAt)?  $default,) {final _that = this;
 switch (_that) {
 case _UserInfoModel() when $default != null:
 return $default(_that.id,_that.userId,_that.email,_that.firstName,_that.lastName,_that.phoneNumber,_that.role,_that.isEmailConfirmed,_that.createdAt);case _:
@@ -1921,7 +1921,7 @@ class _UserInfoModel implements UserInfoModel {
   const _UserInfoModel({required this.id, required this.userId, required this.email, required this.firstName, required this.lastName, required this.phoneNumber, required this.role, required this.isEmailConfirmed, required this.createdAt});
   factory _UserInfoModel.fromJson(Map<String, dynamic> json) => _$UserInfoModelFromJson(json);
 
-@override final  int id;
+@override final  String id;
 @override final  String userId;
 @override final  String email;
 @override final  String firstName;
@@ -1964,7 +1964,7 @@ abstract mixin class _$UserInfoModelCopyWith<$Res> implements $UserInfoModelCopy
   factory _$UserInfoModelCopyWith(_UserInfoModel value, $Res Function(_UserInfoModel) _then) = __$UserInfoModelCopyWithImpl;
 @override @useResult
 $Res call({
- int id, String userId, String email, String firstName, String lastName, String phoneNumber, String role, bool isEmailConfirmed, DateTime createdAt
+ String id, String userId, String email, String firstName, String lastName, String phoneNumber, String role, bool isEmailConfirmed, DateTime createdAt
 });
 
 
@@ -1984,7 +1984,7 @@ class __$UserInfoModelCopyWithImpl<$Res>
 @override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? userId = null,Object? email = null,Object? firstName = null,Object? lastName = null,Object? phoneNumber = null,Object? role = null,Object? isEmailConfirmed = null,Object? createdAt = null,}) {
   return _then(_UserInfoModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as int,userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
+as String,userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
 as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
 as String,firstName: null == firstName ? _self.firstName : firstName // ignore: cast_nullable_to_non_nullable
 as String,lastName: null == lastName ? _self.lastName : lastName // ignore: cast_nullable_to_non_nullable

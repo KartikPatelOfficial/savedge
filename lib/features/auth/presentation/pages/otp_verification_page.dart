@@ -63,17 +63,31 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
               (route) => false,
             );
           } else if (state is OtpAuthEmployeeAuthenticated) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => EmployeeLoginPage(
-                  employee: state.employee,
-                  accessToken: state.accessToken,
-                  refreshToken: state.refreshToken,
-                  expiresAt: state.expiresAt,
+            final hasName = (state.employee.firstName.trim().isNotEmpty) &&
+                (state.employee.lastName.trim().isNotEmpty);
+            if (hasName) {
+              // Store tokens and go straight to dashboard
+              _saveAuthTokens(
+                accessToken: state.accessToken,
+                refreshToken: state.refreshToken,
+                expiresAt: state.expiresAt,
+                user: state.employee,
+              );
+              Navigator.of(context).pushNamedAndRemoveUntil('/home', (route) => false);
+            } else {
+              // Collect missing name info first
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => EmployeeLoginPage(
+                    employee: state.employee,
+                    accessToken: state.accessToken,
+                    refreshToken: state.refreshToken,
+                    expiresAt: state.expiresAt,
+                  ),
                 ),
-              ),
-            );
+              );
+            }
           } else if (state is OtpAuthError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(

@@ -112,7 +112,7 @@ const _$UserStatusEnumMap = {
 
 _UserInfoModel _$UserInfoModelFromJson(Map<String, dynamic> json) =>
     _UserInfoModel(
-      id: (json['id'] as num).toInt(),
+      id: json['id'] as String,
       userId: json['userId'] as String,
       email: json['email'] as String,
       firstName: json['firstName'] as String,

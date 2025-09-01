@@ -88,7 +88,7 @@ enum UserStatus {
 @freezed
 abstract class UserInfoModel with _$UserInfoModel {
   const factory UserInfoModel({
-    required int id,
+    required String id,
     required String userId,
     required String email,
     required String firstName,
