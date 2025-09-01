@@ -1011,9 +1011,9 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
                       width: double.infinity,
                       height: 56,
                       child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(context).pop(); // Close dialog
-                          Navigator.of(context).pop(true); // Return
+                        onPressed: () async {
+                          // Close the dialog and open QR scanner like "Verify & Use"
+                          Navigator.of(context).pop();
                           _navigateToUseNow();
                         },
                         style: ElevatedButton.styleFrom(
@@ -1099,9 +1099,8 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
 
       if (result == true) {
         // QR verification and redemption was successful
-        // Close the success dialog and return to previous screen
+        // Return to previous screen (close confirmation page)
         if (mounted) {
-          Navigator.of(context).pop();
           Navigator.of(context).pop(true);
         }
       }

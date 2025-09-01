@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:savedge/features/coupons/data/models/user_coupon_model.dart';
 
 import '../../../../core/injection/injection.dart';
 import '../../data/models/coupon_gifting_models.dart';
 import '../bloc/coupon_manager_bloc.dart';
 import '../bloc/coupon_manager_event.dart';
 import '../bloc/coupon_manager_state.dart';
+import 'coupon_confirmation_page.dart';
+import 'redeemed_coupon_page.dart';
 
 class CleanCouponsPage extends StatelessWidget {
   const CleanCouponsPage({super.key});
@@ -82,6 +85,62 @@ class _CleanCouponsViewState extends State<CleanCouponsView>
           return const SizedBox.shrink();
         },
       ),
+    );
+  }
+
+  void _handleCouponTap(UserCouponDetailModel coupon) {
+    HapticFeedback.lightImpact();
+
+    if (coupon.isExpired) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('This coupon has expired.')));
+      return;
+    }
+
+    if (coupon.isUsed) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) =>
+              RedeemedCouponPage(userCoupon: _convertToUserCouponModel(coupon)),
+        ),
+      );
+      return;
+    }
+
+    // Active coupon → go to confirmation to use
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => CouponConfirmationPage(
+          userCoupon: coupon,
+          confirmationType: CouponConfirmationType.use,
+        ),
+      ),
+    );
+  }
+
+  UserCouponModel _convertToUserCouponModel(UserCouponDetailModel userCoupon) {
+    return UserCouponModel(
+      id: userCoupon.id,
+      couponId: userCoupon.couponId,
+      title: userCoupon.title,
+      description: userCoupon.description ?? userCoupon.title,
+      discountValue: userCoupon.discountValue,
+      discountType: userCoupon.discountType,
+      discountDisplay: userCoupon.discountDisplay,
+      minCartValue: userCoupon.minCartValue ?? 0.0,
+      maxDiscountAmount: 0.0,
+      vendorId: userCoupon.vendorId,
+      vendorUserId: userCoupon.vendorUserId,
+      vendorName: userCoupon.vendorName,
+      expiryDate: userCoupon.expiryDate.toIso8601String(),
+      isUsed: userCoupon.isUsed,
+      usedAt: userCoupon.redeemedDate?.toIso8601String(),
+      claimedAt: userCoupon.acquiredDate.toIso8601String(),
+      isGifted: userCoupon.isGifted,
+      terms: null,
+      imageUrl: userCoupon.imageUrl,
+      redemptionCode: userCoupon.uniqueCode,
     );
   }
 
@@ -566,246 +625,381 @@ class _CleanCouponsViewState extends State<CleanCouponsView>
 
     final gradientColors = gradients[index % gradients.length];
 
-    return Container(
-      decoration: BoxDecoration(
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => _handleCouponTap(coupon),
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-        ],
-        border: Border.all(color: gradientColors[0].withAlpha(58), width: 1),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: Container(
-          decoration: BoxDecoration(
-            color: gradientColors[0].withOpacity(0.05),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Stack(
-            children: [
-              // Background gradient accent
-              Positioned(
-                right: -20,
-                top: -20,
-                child: Container(
-                  width: 120,
-                  height: 120,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: LinearGradient(
-                      colors: [
-                        gradientColors[0].withOpacity(0.1),
-                        gradientColors[1].withOpacity(0.05),
-                      ],
+        child: Opacity(
+          opacity: coupon.isUsed ? 0.6 : 1.0,
+          child: ColorFiltered(
+            colorFilter: coupon.isUsed
+                ? const ColorFilter.matrix(<double>[
+                    0.2126,
+                    0.7152,
+                    0.0722,
+                    0,
+                    0,
+                    0.2126,
+                    0.7152,
+                    0.0722,
+                    0,
+                    0,
+                    0.2126,
+                    0.7152,
+                    0.0722,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    0,
+                  ])
+                : const ColorFilter.matrix(<double>[
+                    1,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    0,
+                  ]),
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(
+                      coupon.isUsed ? 0.04 : 0.08,
                     ),
+                    blurRadius: 20,
+                    offset: const Offset(0, 8),
                   ),
+                ],
+                border: Border.all(
+                  color: coupon.isUsed
+                      ? Colors.grey.withOpacity(0.3)
+                      : gradientColors[0].withAlpha(58),
+                  width: 1,
                 ),
               ),
-
-              // Content
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Header row with vendor and status
-                    Row(
-                      children: [
-                        // Vendor info
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                coupon.vendorName,
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700,
-                                  color: Color(0xFF1A202C),
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                coupon.title,
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  color: Color(0xFF6B7280),
-                                  fontWeight: FontWeight.w500,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        // Status indicator
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 6,
-                          ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: coupon.isUsed
+                        ? Colors.grey.withOpacity(0.1)
+                        : gradientColors[0].withOpacity(0.05),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Stack(
+                    children: [
+                      // Background gradient accent
+                      Positioned(
+                        right: -20,
+                        top: -20,
+                        child: Container(
+                          width: 120,
+                          height: 120,
                           decoration: BoxDecoration(
-                            color: backgroundColor,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: primaryColor.withOpacity(0.2),
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(statusIcon, size: 14, color: textColor),
-                              const SizedBox(width: 4),
-                              Text(
-                                coupon.statusDisplay,
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                  color: textColor,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // Discount value
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 10,
-                          ),
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(colors: gradientColors),
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                          child: Text(
-                            coupon.discountDisplay,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-
-                        const Spacer(),
-
-                        // Expiry info
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            const Text(
-                              'Valid until',
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: Color(0xFF6B7280),
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              _formatDate(coupon.expiryDate),
-                              style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF1A202C),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // Bottom row with coupon code and action
-                    Row(
-                      children: [
-                        // Coupon code
-                        Expanded(
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 8,
-                            ),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFF8F9FA),
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(
-                                color: const Color(0xFFE2E8F0),
-                              ),
-                            ),
-                            child: Row(
-                              children: [
-                                const Icon(
-                                  Icons.qr_code,
-                                  size: 16,
-                                  color: Color(0xFF6B7280),
-                                ),
-                                const SizedBox(width: 6),
-                                Expanded(
-                                  child: Text(
-                                    coupon.uniqueCode,
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w600,
-                                      color: Color(0xFF4A5568),
-                                      letterSpacing: 0.5,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
+                            shape: BoxShape.circle,
+                            gradient: LinearGradient(
+                              colors: [
+                                gradientColors[0].withOpacity(0.1),
+                                gradientColors[1].withOpacity(0.05),
                               ],
                             ),
                           ),
                         ),
+                      ),
 
-                        const SizedBox(width: 12),
+                      // Content
+                      Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Header row with vendor and status
+                            Row(
+                              children: [
+                                // Vendor info
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        coupon.vendorName,
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w700,
+                                          color: coupon.isUsed
+                                              ? const Color(0xFF9CA3AF)
+                                              : const Color(0xFF1A202C),
+                                          decoration: coupon.isUsed
+                                              ? TextDecoration.lineThrough
+                                              : TextDecoration.none,
+                                          decorationColor: const Color(
+                                            0xFF9CA3AF,
+                                          ),
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        coupon.title,
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          color: coupon.isUsed
+                                              ? const Color(0xFFD1D5DB)
+                                              : const Color(0xFF6B7280),
+                                          fontWeight: FontWeight.w500,
+                                          decoration: coupon.isUsed
+                                              ? TextDecoration.lineThrough
+                                              : TextDecoration.none,
+                                          decorationColor: const Color(
+                                            0xFFD1D5DB,
+                                          ),
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ],
+                                  ),
+                                ),
 
-                        // Action button
-                        Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF6F3FCC).withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              onTap: () {
-                                HapticFeedback.lightImpact();
-                                // Handle coupon tap (show QR, copy code, etc.)
-                              },
-                              borderRadius: BorderRadius.circular(12),
-                              child: const Icon(
-                                Icons.arrow_forward_ios,
-                                size: 16,
-                                color: Color(0xFF6F3FCC),
+                                // Status indicator
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 6,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: backgroundColor,
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: primaryColor.withOpacity(0.2),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        statusIcon,
+                                        size: 14,
+                                        color: textColor,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        coupon.statusDisplay,
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w600,
+                                          color: textColor,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                            const SizedBox(height: 16),
+
+                            // Discount value
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 10,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: coupon.isUsed
+                                          ? [Colors.grey, Colors.grey.shade600]
+                                          : gradientColors,
+                                    ),
+                                    borderRadius: BorderRadius.circular(14),
+                                  ),
+                                  child: Text(
+                                    coupon.discountDisplay,
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.white,
+                                      decoration: coupon.isUsed
+                                          ? TextDecoration.lineThrough
+                                          : TextDecoration.none,
+                                      decorationColor: Colors.white,
+                                      decorationThickness: 2.0,
+                                    ),
+                                  ),
+                                ),
+
+                                const Spacer(),
+
+                                // Expiry info
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    const Text(
+                                      'Valid until',
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        color: Color(0xFF6B7280),
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      _formatDate(coupon.expiryDate),
+                                      style: const TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w600,
+                                        color: Color(0xFF1A202C),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+
+                            const SizedBox(height: 16),
+
+                            // Bottom row with coupon code and action
+                            Row(
+                              children: [
+                                // Coupon code
+                                Expanded(
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 8,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFF8F9FA),
+                                      borderRadius: BorderRadius.circular(10),
+                                      border: Border.all(
+                                        color: const Color(0xFFE2E8F0),
+                                      ),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        const Icon(
+                                          Icons.qr_code,
+                                          size: 16,
+                                          color: Color(0xFF6B7280),
+                                        ),
+                                        const SizedBox(width: 6),
+                                        Expanded(
+                                          child: Text(
+                                            coupon.uniqueCode,
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w600,
+                                              color: Color(0xFF4A5568),
+                                              letterSpacing: 0.5,
+                                            ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+
+                                const SizedBox(width: 12),
+
+                                // Action button
+                                Container(
+                                  width: 40,
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    color: const Color(
+                                      0xFF6F3FCC,
+                                    ).withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Material(
+                                    color: Colors.transparent,
+                                    child: InkWell(
+                                      onTap: () => _handleCouponTap(coupon),
+                                      borderRadius: BorderRadius.circular(12),
+                                      child: const Icon(
+                                        Icons.arrow_forward_ios,
+                                        size: 16,
+                                        color: Color(0xFF6F3FCC),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      // USED Overlay for used coupons
+                      if (coupon.isUsed)
+                        Positioned.fill(
+                          child: Center(
+                            child: Transform.rotate(
+                              angle: -0.3,
+                              child: Container(
+                                width: 140,
+                                height: 60,
+                                decoration: BoxDecoration(
+                                  color: Colors.red.withOpacity(0.9),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: Colors.red.shade700,
+                                    width: 3,
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.red.withOpacity(0.3),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
+                                ),
+                                child: const Center(
+                                  child: Text(
+                                    'USED',
+                                    style: TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.w900,
+                                      color: Colors.white,
+                                      letterSpacing: 2.0,
+                                    ),
+                                  ),
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ],
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ],
+            ),
           ),
         ),
       ),
