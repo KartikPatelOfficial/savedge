@@ -6,6 +6,7 @@ import 'package:savedge/core/injection/injection.dart';
 import 'package:savedge/core/network/image_cache_manager.dart';
 import 'package:savedge/features/home/presentation/widgets/subscription_plans_section.dart';
 import 'package:savedge/features/stores/presentation/widgets/vendor_offers_section.dart';
+import 'package:savedge/features/stores/presentation/widgets/payment_options_bottom_sheet.dart';
 import 'package:savedge/features/vendors/domain/entities/vendor.dart';
 import 'package:savedge/features/vendors/presentation/bloc/vendor_detail_bloc.dart';
 import 'package:savedge/features/vendors/presentation/bloc/vendor_detail_event.dart';
@@ -318,24 +319,35 @@ class _VendorDetailView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: CustomScrollView(
-        slivers: [
-          // Image Gallery with App Bar
-          _buildSliverAppBar(context),
-          // Vendor Info
-          SliverToBoxAdapter(child: _buildVendorInfo()),
-          // Offers Section
-          SliverToBoxAdapter(
-            child: VendorOffersSection(
-              vendorId: vendor.id,
-              vendorUid: vendor.firebaseUid ?? vendor.id.toString(),
-              vendorName: vendor.businessName,
-            ),
+      body: Stack(
+        children: [
+          CustomScrollView(
+            slivers: [
+              // Image Gallery with App Bar
+              _buildSliverAppBar(context),
+              // Vendor Info
+              SliverToBoxAdapter(child: _buildVendorInfo()),
+              // Offers Section
+              SliverToBoxAdapter(
+                child: VendorOffersSection(
+                  vendorId: vendor.id,
+                  vendorUid: vendor.firebaseUid ?? vendor.id.toString(),
+                  vendorName: vendor.businessName,
+                ),
+              ),
+              // Yearly Subscription
+              SliverToBoxAdapter(child: _buildSubscriptionPlansSection()),
+              // Bottom spacing
+              const SliverToBoxAdapter(child: SizedBox(height: 140)),
+            ],
           ),
-          // Yearly Subscription
-          SliverToBoxAdapter(child: _buildSubscriptionPlansSection()),
-          // Bottom spacing
-          const SliverToBoxAdapter(child: SizedBox(height: 100)),
+          // Floating Payment Options Button
+          Positioned(
+            bottom: 24,
+            left: 20,
+            right: 20,
+            child: _buildPaymentOptionsButton(context),
+          ),
         ],
       ),
     );
@@ -795,6 +807,62 @@ class _VendorDetailView extends StatelessWidget {
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildPaymentOptionsButton(BuildContext context) {
+    return Container(
+      height: 56,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        gradient: const LinearGradient(
+          colors: [Color(0xFF6F3FCC), Color(0xFF9F7AEA)],
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF6F3FCC).withOpacity(0.3),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => _showPaymentOptions(context),
+          borderRadius: BorderRadius.circular(16),
+          child: const Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.restaurant_menu,
+                color: Colors.white,
+                size: 20,
+              ),
+              SizedBox(width: 8),
+              Text(
+                'Start Ordering',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showPaymentOptions(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => PaymentOptionsBottomSheet(
+        vendor: vendor,
       ),
     );
   }

@@ -70,6 +70,8 @@ import 'package:savedge/features/brand_vouchers/domain/usecases/create_voucher_o
 import 'package:savedge/features/brand_vouchers/domain/usecases/get_voucher_orders_usecase.dart';
 import 'package:savedge/features/brand_vouchers/presentation/bloc/brand_vouchers_bloc.dart';
 import 'package:savedge/core/storage/secure_storage_service.dart';
+// Points payment imports
+import 'package:savedge/features/points_payment/data/services/points_payment_service.dart';
 
 final GetIt getIt = GetIt.instance;
 
@@ -339,6 +341,11 @@ Future<void> configureDependencies() async {
   );
 
   getIt.registerSingleton<GiftingService>(GiftingService(getIt<Dio>()));
+  
+  // Points payment service
+  getIt.registerSingleton<PointsPaymentService>(
+    PointsPaymentService(getIt<Dio>()),
+  );
 
   // Auth cubits
   getIt.registerFactory<OtpAuthCubit>(
