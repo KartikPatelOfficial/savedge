@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
@@ -101,6 +102,12 @@ class _PointsPaymentOtpPageState extends State<PointsPaymentOtpPage>
     });
 
     try {
+      // Debug: Print request details
+      print('Initiating payment with:');
+      print('VendorProfileId: ${widget.vendor.id}');
+      print('BillAmount: ${widget.billAmount}');
+      print('PointsToUse: ${widget.pointsToUse}');
+      
       final response = await _paymentService.initiatePayment(
         InitiatePointsPaymentRequest(
           vendorProfileId: widget.vendor.id,
@@ -115,8 +122,27 @@ class _PointsPaymentOtpPageState extends State<PointsPaymentOtpPage>
         _isInitiating = false;
       });
     } catch (e) {
+      print('Error initiating payment: $e');
+      String errorMessage = 'Failed to initiate payment';
+      
+      if (e is DioException && e.response != null) {
+        // Try to extract error message from response
+        try {
+          final errorData = e.response!.data;
+          if (errorData is Map && errorData['errors'] is List) {
+            errorMessage = (errorData['errors'] as List).join(', ');
+          } else if (errorData is Map && errorData['message'] != null) {
+            errorMessage = errorData['message'];
+          }
+        } catch (_) {
+          errorMessage = e.response!.statusMessage ?? 'Server error';
+        }
+      } else {
+        errorMessage = e.toString().replaceAll('Exception: ', '');
+      }
+      
       setState(() {
-        _errorMessage = e.toString().replaceAll('Exception: ', '');
+        _errorMessage = errorMessage;
         _isInitiating = false;
       });
     }

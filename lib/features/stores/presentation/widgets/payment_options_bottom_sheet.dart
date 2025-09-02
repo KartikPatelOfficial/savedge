@@ -67,9 +67,13 @@ class _PaymentOptionsBottomSheetState extends State<PaymentOptionsBottomSheet>
       if (mounted) {
         setState(() {
           _userProfile = profile;
-          _availablePoints = profile.pointsBalance ?? 0;
+          _availablePoints = profile.pointsBalance;
           _isLoadingProfile = false;
         });
+        print('User profile loaded:');
+        print('User ID: ${profile.id}');
+        print('Available Points: $_availablePoints');
+        print('Has Employee Info: ${profile.employeeInfo != null}');
       }
     } catch (e) {
       if (mounted) {
@@ -307,6 +311,19 @@ class _PaymentOptionsBottomSheetState extends State<PaymentOptionsBottomSheet>
           builder: (context) => PointsPaymentPage(
             vendor: widget.vendor,
             availablePoints: _availablePoints,
+          ),
+        ),
+      );
+    } else if (_availablePoints == 0) {
+      // Show error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('You don\'t have any points to use'),
+          backgroundColor: const Color(0xFFEF4444),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.all(16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
           ),
         ),
       );
