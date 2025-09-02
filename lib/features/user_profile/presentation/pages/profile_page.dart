@@ -6,6 +6,7 @@ import 'package:savedge/features/auth/domain/repositories/auth_repository.dart';
 import 'package:savedge/features/coupons/presentation/pages/gift_page.dart';
 import 'package:savedge/features/coupons/presentation/pages/redemption_history_page.dart';
 import 'package:savedge/features/static_pages/presentation/pages/about_us_page.dart';
+import 'package:savedge/features/stores/presentation/pages/stores_page.dart';
 import 'package:savedge/features/subscription/domain/entities/subscription_plan.dart';
 import 'package:savedge/features/subscription/presentation/pages/subscription_purchase_page.dart';
 import 'package:savedge/features/user_profile/presentation/pages/edit_profile_page.dart';
@@ -640,8 +641,10 @@ class _ProfilePageState extends State<ProfilePage> {
         context,
       ).push(SubscriptionPurchasePage.route(subscriptionPlan));
     } else {
-      // If user doesn't have a subscription, navigate to plans page
-      Navigator.of(context).pushNamed('/subscription-purchase');
+      // If no subscription, navigate to general subscription plans page
+      Navigator.of(
+        context,
+      ).push(MaterialPageRoute(builder: (context) => const StoresPage()));
     }
   }
 
@@ -688,7 +691,9 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _onManageSubscriptionTap() {
-    Navigator.of(context).pushNamed('/subscription-management');
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (context) => const StoresPage()));
   }
 
   void _onPointsBalanceTap() {
