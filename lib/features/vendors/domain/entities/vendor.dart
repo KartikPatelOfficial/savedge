@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+
 import 'coupon.dart';
 
 /// Vendor domain entity
@@ -23,11 +24,6 @@ class Vendor extends Equatable {
     this.images = const [],
     this.socialMediaLinks = const [],
     this.coupons = const [],
-    this.rating,
-    this.averagePrice,
-    this.isOpen,
-    this.openingHours,
-    this.closingHours,
   });
 
   final int id;
@@ -50,13 +46,6 @@ class Vendor extends Equatable {
   final List<VendorSocialMedia> socialMediaLinks;
   final List<Coupon> coupons;
 
-  // Additional properties for UI (provided by API)
-  final double? rating;
-  final int? averagePrice;
-  final bool? isOpen;
-  final String? openingHours;
-  final String? closingHours;
-
   @override
   List<Object?> get props => [
     id,
@@ -78,11 +67,6 @@ class Vendor extends Equatable {
     images,
     socialMediaLinks,
     coupons,
-    rating,
-    averagePrice,
-    isOpen,
-    openingHours,
-    closingHours,
   ];
 }
 

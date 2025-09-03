@@ -345,34 +345,6 @@ class _VendorDetailView extends StatelessWidget {
         : 'Address not available';
   }
 
-  /// Get average price display
-  String get _averagePriceDisplay {
-    if (vendor.averagePrice == null) return '';
-    return '₹${vendor.averagePrice} Avg. For 2 Person';
-  }
-
-  /// Get rating display
-  String get _ratingDisplay {
-    if (vendor.rating == null) return '0.0';
-    return vendor.rating!.toStringAsFixed(1);
-  }
-
-  /// Get timing text when open
-  String _getTimingText() {
-    if (vendor.openingHours != null && vendor.closingHours != null) {
-      return '${vendor.openingHours} to ${vendor.closingHours}';
-    }
-    return 'Timing not available';
-  }
-
-  /// Get timing text when closed
-  String _getClosedTimingText() {
-    if (vendor.openingHours != null) {
-      return 'Opens at ${vendor.openingHours}';
-    }
-    return 'Opening hours not available';
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -601,36 +573,6 @@ class _VendorDetailView extends StatelessWidget {
                   ),
                 ),
               ),
-              if (vendor.rating != null)
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                  ),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF38A169),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        _ratingDisplay,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      const Icon(
-                        Icons.star_rounded,
-                        color: Colors.white,
-                        size: 18,
-                      ),
-                    ],
-                  ),
-                ),
             ],
           ),
           const SizedBox(height: 16),
@@ -666,60 +608,6 @@ class _VendorDetailView extends StatelessWidget {
             ],
           ),
 
-          const SizedBox(height: 16),
-
-          // Category and price row
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF6F3FCC).withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: const Color(0xFF6F3FCC).withOpacity(0.2),
-                    width: 1,
-                  ),
-                ),
-                child: Text(
-                  vendor.category,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Color(0xFF6F3FCC),
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-              if (vendor.averagePrice != null) ...[
-                const SizedBox(width: 12),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFD69E2E).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: const Color(0xFFD69E2E).withOpacity(0.2),
-                      width: 1,
-                    ),
-                  ),
-                  child: Text(
-                    _averagePriceDisplay,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Color(0xFFD69E2E),
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ],
-            ],
-          ),
           const SizedBox(height: 24),
 
           // Action buttons row
@@ -960,19 +848,11 @@ class _VendorDetailView extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 8,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
                   ),
                   child: Material(
                     color: Colors.transparent,
                     child: InkWell(
                       onTap: () => _openPointsPaymentDialog(context),
-                      borderRadius: BorderRadius.circular(16),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
