@@ -28,10 +28,6 @@ _VendorResponse _$VendorResponseFromJson(Map<String, dynamic> json) =>
       createdAt: json['createdAt'] == null
           ? null
           : DateTime.parse(json['createdAt'] as String),
-      firebaseUid: json['firebaseUid'] as String?,
-      vendorFirstName: json['vendorFirstName'] as String?,
-      vendorLastName: json['vendorLastName'] as String?,
-      vendorFullName: json['vendorFullName'] as String?,
       images:
           (json['images'] as List<dynamic>?)
               ?.map((e) => VendorImageDto.fromJson(e as Map<String, dynamic>))
@@ -64,10 +60,6 @@ Map<String, dynamic> _$VendorResponseToJson(_VendorResponse instance) =>
       'approvedAt': instance.approvedAt?.toIso8601String(),
       'approvedBy': instance.approvedBy,
       'createdAt': instance.createdAt?.toIso8601String(),
-      'firebaseUid': instance.firebaseUid,
-      'vendorFirstName': instance.vendorFirstName,
-      'vendorLastName': instance.vendorLastName,
-      'vendorFullName': instance.vendorFullName,
       'images': instance.images,
       'socialMediaLinks': instance.socialMediaLinks,
     };

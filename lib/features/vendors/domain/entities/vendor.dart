@@ -23,10 +23,7 @@ class Vendor extends Equatable {
     this.approvedAt,
     this.approvedBy,
     required this.createdAt,
-    this.firebaseUid,
-    this.vendorFirstName,
-    this.vendorLastName,
-    required this.vendorFullName,
+    // Removed Firebase/vendor personal fields per backend DTO update
     this.images = const [],
     this.socialMediaLinks = const [],
     // this.coupons = const [], // TODO: Uncomment when coupon entity is ready
@@ -53,10 +50,6 @@ class Vendor extends Equatable {
   final DateTime? approvedAt;
   final String? approvedBy;
   final DateTime createdAt;
-  final String? firebaseUid;
-  final String? vendorFirstName;
-  final String? vendorLastName;
-  final String vendorFullName;
   final List<VendorImage> images;
   final List<VendorSocialMedia> socialMediaLinks;
   // final List<Coupon> coupons; // TODO: Uncomment when coupon entity is ready
@@ -121,10 +114,6 @@ class Vendor extends Equatable {
     approvedAt,
     approvedBy,
     createdAt,
-    firebaseUid,
-    vendorFirstName,
-    vendorLastName,
-    vendorFullName,
     images,
     socialMediaLinks,
     rating,

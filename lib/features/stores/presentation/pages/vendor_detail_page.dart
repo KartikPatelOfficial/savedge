@@ -5,8 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:savedge/core/injection/injection.dart';
 import 'package:savedge/core/network/image_cache_manager.dart';
 import 'package:savedge/features/home/presentation/widgets/subscription_plans_section.dart';
-import 'package:savedge/features/stores/presentation/widgets/vendor_offers_section.dart';
 import 'package:savedge/features/stores/presentation/widgets/payment_options_bottom_sheet.dart';
+import 'package:savedge/features/stores/presentation/widgets/vendor_offers_section.dart';
 import 'package:savedge/features/vendors/domain/entities/vendor.dart';
 import 'package:savedge/features/vendors/presentation/bloc/vendor_detail_bloc.dart';
 import 'package:savedge/features/vendors/presentation/bloc/vendor_detail_event.dart';
@@ -331,7 +331,7 @@ class _VendorDetailView extends StatelessWidget {
               SliverToBoxAdapter(
                 child: VendorOffersSection(
                   vendorId: vendor.id,
-                  vendorUid: vendor.firebaseUid ?? vendor.id.toString(),
+                  vendorUid: vendor.id.toString(),
                   vendorName: vendor.businessName,
                 ),
               ),
@@ -835,11 +835,7 @@ class _VendorDetailView extends StatelessWidget {
           child: const Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                Icons.restaurant_menu,
-                color: Colors.white,
-                size: 20,
-              ),
+              Icon(Icons.restaurant_menu, color: Colors.white, size: 20),
               SizedBox(width: 8),
               Text(
                 'Start Ordering',
@@ -861,9 +857,7 @@ class _VendorDetailView extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => PaymentOptionsBottomSheet(
-        vendor: vendor,
-      ),
+      builder: (context) => PaymentOptionsBottomSheet(vendor: vendor),
     );
   }
 }

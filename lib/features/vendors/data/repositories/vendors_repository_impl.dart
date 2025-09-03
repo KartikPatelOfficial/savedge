@@ -114,10 +114,6 @@ class VendorsRepositoryImpl implements VendorsRepository {
       approvedAt: response.approvedAt,
       approvedBy: response.approvedBy,
       createdAt: response.createdAt ?? DateTime.now(),
-      firebaseUid: response.firebaseUid,
-      vendorFirstName: response.vendorFirstName,
-      vendorLastName: response.vendorLastName,
-      vendorFullName: response.vendorFullName ?? response.businessName,
       images: response.images.map(_mapVendorImageDtoToEntity).toList(),
       socialMediaLinks: response.socialMediaLinks
           .map(_mapVendorSocialMediaDtoToEntity)

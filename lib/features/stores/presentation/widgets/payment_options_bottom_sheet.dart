@@ -4,7 +4,7 @@ import 'package:get_it/get_it.dart';
 import 'package:savedge/core/storage/secure_storage_service.dart';
 import 'package:savedge/features/auth/data/models/user_profile_models.dart';
 import 'package:savedge/features/auth/domain/repositories/auth_repository.dart';
-import 'package:savedge/features/points_payment/presentation/pages/points_payment_page.dart';
+import 'package:savedge/features/points_payment/presentation/widgets/points_payment_dialog.dart';
 import 'package:savedge/features/vendors/domain/entities/vendor.dart';
 
 class PaymentOptionsBottomSheet extends StatefulWidget {
@@ -305,13 +305,12 @@ class _PaymentOptionsBottomSheetState extends State<PaymentOptionsBottomSheet>
     if (!_isLoadingProfile && _availablePoints > 0) {
       HapticFeedback.lightImpact();
       Navigator.pop(context); // Close bottom sheet
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => PointsPaymentPage(
-            vendor: widget.vendor,
-            availablePoints: _availablePoints,
-          ),
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => PointsPaymentDialog(
+          vendor: widget.vendor,
+          availablePoints: _availablePoints,
         ),
       );
     } else if (_availablePoints == 0) {

@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$UserProfileResponse {
 
- String get id; String get email; String? get firstName; String? get lastName; String? get firebaseUid; int? get organizationId; int get pointsBalance; DateTime? get pointsExpiry; bool? get isActive; DateTime? get createdAt;
+ String get id; String get email; String? get firstName; String? get lastName; int? get organizationId; int get pointsBalance; DateTime? get pointsExpiry; bool? get isActive; DateTime? get createdAt;
 /// Create a copy of UserProfileResponse
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $UserProfileResponseCopyWith<UserProfileResponse> get copyWith => _$UserProfileR
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is UserProfileResponse&&(identical(other.id, id) || other.id == id)&&(identical(other.email, email) || other.email == email)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.firebaseUid, firebaseUid) || other.firebaseUid == firebaseUid)&&(identical(other.organizationId, organizationId) || other.organizationId == organizationId)&&(identical(other.pointsBalance, pointsBalance) || other.pointsBalance == pointsBalance)&&(identical(other.pointsExpiry, pointsExpiry) || other.pointsExpiry == pointsExpiry)&&(identical(other.isActive, isActive) || other.isActive == isActive)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is UserProfileResponse&&(identical(other.id, id) || other.id == id)&&(identical(other.email, email) || other.email == email)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.organizationId, organizationId) || other.organizationId == organizationId)&&(identical(other.pointsBalance, pointsBalance) || other.pointsBalance == pointsBalance)&&(identical(other.pointsExpiry, pointsExpiry) || other.pointsExpiry == pointsExpiry)&&(identical(other.isActive, isActive) || other.isActive == isActive)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,email,firstName,lastName,firebaseUid,organizationId,pointsBalance,pointsExpiry,isActive,createdAt);
+int get hashCode => Object.hash(runtimeType,id,email,firstName,lastName,organizationId,pointsBalance,pointsExpiry,isActive,createdAt);
 
 @override
 String toString() {
-  return 'UserProfileResponse(id: $id, email: $email, firstName: $firstName, lastName: $lastName, firebaseUid: $firebaseUid, organizationId: $organizationId, pointsBalance: $pointsBalance, pointsExpiry: $pointsExpiry, isActive: $isActive, createdAt: $createdAt)';
+  return 'UserProfileResponse(id: $id, email: $email, firstName: $firstName, lastName: $lastName, organizationId: $organizationId, pointsBalance: $pointsBalance, pointsExpiry: $pointsExpiry, isActive: $isActive, createdAt: $createdAt)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $UserProfileResponseCopyWith<$Res>  {
   factory $UserProfileResponseCopyWith(UserProfileResponse value, $Res Function(UserProfileResponse) _then) = _$UserProfileResponseCopyWithImpl;
 @useResult
 $Res call({
- String id, String email, String? firstName, String? lastName, String? firebaseUid, int? organizationId, int pointsBalance, DateTime? pointsExpiry, bool? isActive, DateTime? createdAt
+ String id, String email, String? firstName, String? lastName, int? organizationId, int pointsBalance, DateTime? pointsExpiry, bool? isActive, DateTime? createdAt
 });
 
 
@@ -65,13 +65,12 @@ class _$UserProfileResponseCopyWithImpl<$Res>
 
 /// Create a copy of UserProfileResponse
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? email = null,Object? firstName = freezed,Object? lastName = freezed,Object? firebaseUid = freezed,Object? organizationId = freezed,Object? pointsBalance = null,Object? pointsExpiry = freezed,Object? isActive = freezed,Object? createdAt = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? email = null,Object? firstName = freezed,Object? lastName = freezed,Object? organizationId = freezed,Object? pointsBalance = null,Object? pointsExpiry = freezed,Object? isActive = freezed,Object? createdAt = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
 as String,firstName: freezed == firstName ? _self.firstName : firstName // ignore: cast_nullable_to_non_nullable
 as String?,lastName: freezed == lastName ? _self.lastName : lastName // ignore: cast_nullable_to_non_nullable
-as String?,firebaseUid: freezed == firebaseUid ? _self.firebaseUid : firebaseUid // ignore: cast_nullable_to_non_nullable
 as String?,organizationId: freezed == organizationId ? _self.organizationId : organizationId // ignore: cast_nullable_to_non_nullable
 as int?,pointsBalance: null == pointsBalance ? _self.pointsBalance : pointsBalance // ignore: cast_nullable_to_non_nullable
 as int,pointsExpiry: freezed == pointsExpiry ? _self.pointsExpiry : pointsExpiry // ignore: cast_nullable_to_non_nullable
@@ -162,10 +161,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String email,  String? firstName,  String? lastName,  String? firebaseUid,  int? organizationId,  int pointsBalance,  DateTime? pointsExpiry,  bool? isActive,  DateTime? createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String email,  String? firstName,  String? lastName,  int? organizationId,  int pointsBalance,  DateTime? pointsExpiry,  bool? isActive,  DateTime? createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _UserProfileResponse() when $default != null:
-return $default(_that.id,_that.email,_that.firstName,_that.lastName,_that.firebaseUid,_that.organizationId,_that.pointsBalance,_that.pointsExpiry,_that.isActive,_that.createdAt);case _:
+return $default(_that.id,_that.email,_that.firstName,_that.lastName,_that.organizationId,_that.pointsBalance,_that.pointsExpiry,_that.isActive,_that.createdAt);case _:
   return orElse();
 
 }
@@ -183,10 +182,10 @@ return $default(_that.id,_that.email,_that.firstName,_that.lastName,_that.fireba
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String email,  String? firstName,  String? lastName,  String? firebaseUid,  int? organizationId,  int pointsBalance,  DateTime? pointsExpiry,  bool? isActive,  DateTime? createdAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String email,  String? firstName,  String? lastName,  int? organizationId,  int pointsBalance,  DateTime? pointsExpiry,  bool? isActive,  DateTime? createdAt)  $default,) {final _that = this;
 switch (_that) {
 case _UserProfileResponse():
-return $default(_that.id,_that.email,_that.firstName,_that.lastName,_that.firebaseUid,_that.organizationId,_that.pointsBalance,_that.pointsExpiry,_that.isActive,_that.createdAt);case _:
+return $default(_that.id,_that.email,_that.firstName,_that.lastName,_that.organizationId,_that.pointsBalance,_that.pointsExpiry,_that.isActive,_that.createdAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -203,10 +202,10 @@ return $default(_that.id,_that.email,_that.firstName,_that.lastName,_that.fireba
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String email,  String? firstName,  String? lastName,  String? firebaseUid,  int? organizationId,  int pointsBalance,  DateTime? pointsExpiry,  bool? isActive,  DateTime? createdAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String email,  String? firstName,  String? lastName,  int? organizationId,  int pointsBalance,  DateTime? pointsExpiry,  bool? isActive,  DateTime? createdAt)?  $default,) {final _that = this;
 switch (_that) {
 case _UserProfileResponse() when $default != null:
-return $default(_that.id,_that.email,_that.firstName,_that.lastName,_that.firebaseUid,_that.organizationId,_that.pointsBalance,_that.pointsExpiry,_that.isActive,_that.createdAt);case _:
+return $default(_that.id,_that.email,_that.firstName,_that.lastName,_that.organizationId,_that.pointsBalance,_that.pointsExpiry,_that.isActive,_that.createdAt);case _:
   return null;
 
 }
@@ -218,14 +217,13 @@ return $default(_that.id,_that.email,_that.firstName,_that.lastName,_that.fireba
 @JsonSerializable()
 
 class _UserProfileResponse implements UserProfileResponse {
-  const _UserProfileResponse({required this.id, required this.email, this.firstName, this.lastName, this.firebaseUid, this.organizationId, required this.pointsBalance, this.pointsExpiry, this.isActive, this.createdAt});
+  const _UserProfileResponse({required this.id, required this.email, this.firstName, this.lastName, this.organizationId, required this.pointsBalance, this.pointsExpiry, this.isActive, this.createdAt});
   factory _UserProfileResponse.fromJson(Map<String, dynamic> json) => _$UserProfileResponseFromJson(json);
 
 @override final  String id;
 @override final  String email;
 @override final  String? firstName;
 @override final  String? lastName;
-@override final  String? firebaseUid;
 @override final  int? organizationId;
 @override final  int pointsBalance;
 @override final  DateTime? pointsExpiry;
@@ -245,16 +243,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UserProfileResponse&&(identical(other.id, id) || other.id == id)&&(identical(other.email, email) || other.email == email)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.firebaseUid, firebaseUid) || other.firebaseUid == firebaseUid)&&(identical(other.organizationId, organizationId) || other.organizationId == organizationId)&&(identical(other.pointsBalance, pointsBalance) || other.pointsBalance == pointsBalance)&&(identical(other.pointsExpiry, pointsExpiry) || other.pointsExpiry == pointsExpiry)&&(identical(other.isActive, isActive) || other.isActive == isActive)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UserProfileResponse&&(identical(other.id, id) || other.id == id)&&(identical(other.email, email) || other.email == email)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.organizationId, organizationId) || other.organizationId == organizationId)&&(identical(other.pointsBalance, pointsBalance) || other.pointsBalance == pointsBalance)&&(identical(other.pointsExpiry, pointsExpiry) || other.pointsExpiry == pointsExpiry)&&(identical(other.isActive, isActive) || other.isActive == isActive)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,email,firstName,lastName,firebaseUid,organizationId,pointsBalance,pointsExpiry,isActive,createdAt);
+int get hashCode => Object.hash(runtimeType,id,email,firstName,lastName,organizationId,pointsBalance,pointsExpiry,isActive,createdAt);
 
 @override
 String toString() {
-  return 'UserProfileResponse(id: $id, email: $email, firstName: $firstName, lastName: $lastName, firebaseUid: $firebaseUid, organizationId: $organizationId, pointsBalance: $pointsBalance, pointsExpiry: $pointsExpiry, isActive: $isActive, createdAt: $createdAt)';
+  return 'UserProfileResponse(id: $id, email: $email, firstName: $firstName, lastName: $lastName, organizationId: $organizationId, pointsBalance: $pointsBalance, pointsExpiry: $pointsExpiry, isActive: $isActive, createdAt: $createdAt)';
 }
 
 
@@ -265,7 +263,7 @@ abstract mixin class _$UserProfileResponseCopyWith<$Res> implements $UserProfile
   factory _$UserProfileResponseCopyWith(_UserProfileResponse value, $Res Function(_UserProfileResponse) _then) = __$UserProfileResponseCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String email, String? firstName, String? lastName, String? firebaseUid, int? organizationId, int pointsBalance, DateTime? pointsExpiry, bool? isActive, DateTime? createdAt
+ String id, String email, String? firstName, String? lastName, int? organizationId, int pointsBalance, DateTime? pointsExpiry, bool? isActive, DateTime? createdAt
 });
 
 
@@ -282,13 +280,12 @@ class __$UserProfileResponseCopyWithImpl<$Res>
 
 /// Create a copy of UserProfileResponse
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? email = null,Object? firstName = freezed,Object? lastName = freezed,Object? firebaseUid = freezed,Object? organizationId = freezed,Object? pointsBalance = null,Object? pointsExpiry = freezed,Object? isActive = freezed,Object? createdAt = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? email = null,Object? firstName = freezed,Object? lastName = freezed,Object? organizationId = freezed,Object? pointsBalance = null,Object? pointsExpiry = freezed,Object? isActive = freezed,Object? createdAt = freezed,}) {
   return _then(_UserProfileResponse(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
 as String,firstName: freezed == firstName ? _self.firstName : firstName // ignore: cast_nullable_to_non_nullable
 as String?,lastName: freezed == lastName ? _self.lastName : lastName // ignore: cast_nullable_to_non_nullable
-as String?,firebaseUid: freezed == firebaseUid ? _self.firebaseUid : firebaseUid // ignore: cast_nullable_to_non_nullable
 as String?,organizationId: freezed == organizationId ? _self.organizationId : organizationId // ignore: cast_nullable_to_non_nullable
 as int?,pointsBalance: null == pointsBalance ? _self.pointsBalance : pointsBalance // ignore: cast_nullable_to_non_nullable
 as int,pointsExpiry: freezed == pointsExpiry ? _self.pointsExpiry : pointsExpiry // ignore: cast_nullable_to_non_nullable
@@ -834,7 +831,7 @@ as String,
 /// @nodoc
 mixin _$UserProfileResponse2 {
 
- String get id; String get email; String? get firstName; String? get lastName; String? get firebaseUid; int? get organizationId; String? get organizationName; int get pointsBalance; DateTime? get pointsExpiry; bool get isActive; DateTime get createdAt; List<String> get roles; bool get isEmployee; String? get employeeCode; String? get department; String? get position; DateTime? get joinDate; Map<String, dynamic>? get activeSubscription;
+ String get id; String get email; String? get firstName; String? get lastName; int? get organizationId; String? get organizationName; int get pointsBalance; DateTime? get pointsExpiry; bool get isActive; DateTime get createdAt; List<String> get roles; bool get isEmployee; String? get employeeCode; String? get department; String? get position; DateTime? get joinDate; Map<String, dynamic>? get activeSubscription;
 /// Create a copy of UserProfileResponse2
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -847,16 +844,16 @@ $UserProfileResponse2CopyWith<UserProfileResponse2> get copyWith => _$UserProfil
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is UserProfileResponse2&&(identical(other.id, id) || other.id == id)&&(identical(other.email, email) || other.email == email)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.firebaseUid, firebaseUid) || other.firebaseUid == firebaseUid)&&(identical(other.organizationId, organizationId) || other.organizationId == organizationId)&&(identical(other.organizationName, organizationName) || other.organizationName == organizationName)&&(identical(other.pointsBalance, pointsBalance) || other.pointsBalance == pointsBalance)&&(identical(other.pointsExpiry, pointsExpiry) || other.pointsExpiry == pointsExpiry)&&(identical(other.isActive, isActive) || other.isActive == isActive)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&const DeepCollectionEquality().equals(other.roles, roles)&&(identical(other.isEmployee, isEmployee) || other.isEmployee == isEmployee)&&(identical(other.employeeCode, employeeCode) || other.employeeCode == employeeCode)&&(identical(other.department, department) || other.department == department)&&(identical(other.position, position) || other.position == position)&&(identical(other.joinDate, joinDate) || other.joinDate == joinDate)&&const DeepCollectionEquality().equals(other.activeSubscription, activeSubscription));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is UserProfileResponse2&&(identical(other.id, id) || other.id == id)&&(identical(other.email, email) || other.email == email)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.organizationId, organizationId) || other.organizationId == organizationId)&&(identical(other.organizationName, organizationName) || other.organizationName == organizationName)&&(identical(other.pointsBalance, pointsBalance) || other.pointsBalance == pointsBalance)&&(identical(other.pointsExpiry, pointsExpiry) || other.pointsExpiry == pointsExpiry)&&(identical(other.isActive, isActive) || other.isActive == isActive)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&const DeepCollectionEquality().equals(other.roles, roles)&&(identical(other.isEmployee, isEmployee) || other.isEmployee == isEmployee)&&(identical(other.employeeCode, employeeCode) || other.employeeCode == employeeCode)&&(identical(other.department, department) || other.department == department)&&(identical(other.position, position) || other.position == position)&&(identical(other.joinDate, joinDate) || other.joinDate == joinDate)&&const DeepCollectionEquality().equals(other.activeSubscription, activeSubscription));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,email,firstName,lastName,firebaseUid,organizationId,organizationName,pointsBalance,pointsExpiry,isActive,createdAt,const DeepCollectionEquality().hash(roles),isEmployee,employeeCode,department,position,joinDate,const DeepCollectionEquality().hash(activeSubscription));
+int get hashCode => Object.hash(runtimeType,id,email,firstName,lastName,organizationId,organizationName,pointsBalance,pointsExpiry,isActive,createdAt,const DeepCollectionEquality().hash(roles),isEmployee,employeeCode,department,position,joinDate,const DeepCollectionEquality().hash(activeSubscription));
 
 @override
 String toString() {
-  return 'UserProfileResponse2(id: $id, email: $email, firstName: $firstName, lastName: $lastName, firebaseUid: $firebaseUid, organizationId: $organizationId, organizationName: $organizationName, pointsBalance: $pointsBalance, pointsExpiry: $pointsExpiry, isActive: $isActive, createdAt: $createdAt, roles: $roles, isEmployee: $isEmployee, employeeCode: $employeeCode, department: $department, position: $position, joinDate: $joinDate, activeSubscription: $activeSubscription)';
+  return 'UserProfileResponse2(id: $id, email: $email, firstName: $firstName, lastName: $lastName, organizationId: $organizationId, organizationName: $organizationName, pointsBalance: $pointsBalance, pointsExpiry: $pointsExpiry, isActive: $isActive, createdAt: $createdAt, roles: $roles, isEmployee: $isEmployee, employeeCode: $employeeCode, department: $department, position: $position, joinDate: $joinDate, activeSubscription: $activeSubscription)';
 }
 
 
@@ -867,7 +864,7 @@ abstract mixin class $UserProfileResponse2CopyWith<$Res>  {
   factory $UserProfileResponse2CopyWith(UserProfileResponse2 value, $Res Function(UserProfileResponse2) _then) = _$UserProfileResponse2CopyWithImpl;
 @useResult
 $Res call({
- String id, String email, String? firstName, String? lastName, String? firebaseUid, int? organizationId, String? organizationName, int pointsBalance, DateTime? pointsExpiry, bool isActive, DateTime createdAt, List<String> roles, bool isEmployee, String? employeeCode, String? department, String? position, DateTime? joinDate, Map<String, dynamic>? activeSubscription
+ String id, String email, String? firstName, String? lastName, int? organizationId, String? organizationName, int pointsBalance, DateTime? pointsExpiry, bool isActive, DateTime createdAt, List<String> roles, bool isEmployee, String? employeeCode, String? department, String? position, DateTime? joinDate, Map<String, dynamic>? activeSubscription
 });
 
 
@@ -884,13 +881,12 @@ class _$UserProfileResponse2CopyWithImpl<$Res>
 
 /// Create a copy of UserProfileResponse2
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? email = null,Object? firstName = freezed,Object? lastName = freezed,Object? firebaseUid = freezed,Object? organizationId = freezed,Object? organizationName = freezed,Object? pointsBalance = null,Object? pointsExpiry = freezed,Object? isActive = null,Object? createdAt = null,Object? roles = null,Object? isEmployee = null,Object? employeeCode = freezed,Object? department = freezed,Object? position = freezed,Object? joinDate = freezed,Object? activeSubscription = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? email = null,Object? firstName = freezed,Object? lastName = freezed,Object? organizationId = freezed,Object? organizationName = freezed,Object? pointsBalance = null,Object? pointsExpiry = freezed,Object? isActive = null,Object? createdAt = null,Object? roles = null,Object? isEmployee = null,Object? employeeCode = freezed,Object? department = freezed,Object? position = freezed,Object? joinDate = freezed,Object? activeSubscription = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
 as String,firstName: freezed == firstName ? _self.firstName : firstName // ignore: cast_nullable_to_non_nullable
 as String?,lastName: freezed == lastName ? _self.lastName : lastName // ignore: cast_nullable_to_non_nullable
-as String?,firebaseUid: freezed == firebaseUid ? _self.firebaseUid : firebaseUid // ignore: cast_nullable_to_non_nullable
 as String?,organizationId: freezed == organizationId ? _self.organizationId : organizationId // ignore: cast_nullable_to_non_nullable
 as int?,organizationName: freezed == organizationName ? _self.organizationName : organizationName // ignore: cast_nullable_to_non_nullable
 as String?,pointsBalance: null == pointsBalance ? _self.pointsBalance : pointsBalance // ignore: cast_nullable_to_non_nullable
@@ -989,10 +985,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String email,  String? firstName,  String? lastName,  String? firebaseUid,  int? organizationId,  String? organizationName,  int pointsBalance,  DateTime? pointsExpiry,  bool isActive,  DateTime createdAt,  List<String> roles,  bool isEmployee,  String? employeeCode,  String? department,  String? position,  DateTime? joinDate,  Map<String, dynamic>? activeSubscription)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String email,  String? firstName,  String? lastName,  int? organizationId,  String? organizationName,  int pointsBalance,  DateTime? pointsExpiry,  bool isActive,  DateTime createdAt,  List<String> roles,  bool isEmployee,  String? employeeCode,  String? department,  String? position,  DateTime? joinDate,  Map<String, dynamic>? activeSubscription)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _UserProfileResponse2() when $default != null:
-return $default(_that.id,_that.email,_that.firstName,_that.lastName,_that.firebaseUid,_that.organizationId,_that.organizationName,_that.pointsBalance,_that.pointsExpiry,_that.isActive,_that.createdAt,_that.roles,_that.isEmployee,_that.employeeCode,_that.department,_that.position,_that.joinDate,_that.activeSubscription);case _:
+return $default(_that.id,_that.email,_that.firstName,_that.lastName,_that.organizationId,_that.organizationName,_that.pointsBalance,_that.pointsExpiry,_that.isActive,_that.createdAt,_that.roles,_that.isEmployee,_that.employeeCode,_that.department,_that.position,_that.joinDate,_that.activeSubscription);case _:
   return orElse();
 
 }
@@ -1010,10 +1006,10 @@ return $default(_that.id,_that.email,_that.firstName,_that.lastName,_that.fireba
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String email,  String? firstName,  String? lastName,  String? firebaseUid,  int? organizationId,  String? organizationName,  int pointsBalance,  DateTime? pointsExpiry,  bool isActive,  DateTime createdAt,  List<String> roles,  bool isEmployee,  String? employeeCode,  String? department,  String? position,  DateTime? joinDate,  Map<String, dynamic>? activeSubscription)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String email,  String? firstName,  String? lastName,  int? organizationId,  String? organizationName,  int pointsBalance,  DateTime? pointsExpiry,  bool isActive,  DateTime createdAt,  List<String> roles,  bool isEmployee,  String? employeeCode,  String? department,  String? position,  DateTime? joinDate,  Map<String, dynamic>? activeSubscription)  $default,) {final _that = this;
 switch (_that) {
 case _UserProfileResponse2():
-return $default(_that.id,_that.email,_that.firstName,_that.lastName,_that.firebaseUid,_that.organizationId,_that.organizationName,_that.pointsBalance,_that.pointsExpiry,_that.isActive,_that.createdAt,_that.roles,_that.isEmployee,_that.employeeCode,_that.department,_that.position,_that.joinDate,_that.activeSubscription);case _:
+return $default(_that.id,_that.email,_that.firstName,_that.lastName,_that.organizationId,_that.organizationName,_that.pointsBalance,_that.pointsExpiry,_that.isActive,_that.createdAt,_that.roles,_that.isEmployee,_that.employeeCode,_that.department,_that.position,_that.joinDate,_that.activeSubscription);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -1030,10 +1026,10 @@ return $default(_that.id,_that.email,_that.firstName,_that.lastName,_that.fireba
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String email,  String? firstName,  String? lastName,  String? firebaseUid,  int? organizationId,  String? organizationName,  int pointsBalance,  DateTime? pointsExpiry,  bool isActive,  DateTime createdAt,  List<String> roles,  bool isEmployee,  String? employeeCode,  String? department,  String? position,  DateTime? joinDate,  Map<String, dynamic>? activeSubscription)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String email,  String? firstName,  String? lastName,  int? organizationId,  String? organizationName,  int pointsBalance,  DateTime? pointsExpiry,  bool isActive,  DateTime createdAt,  List<String> roles,  bool isEmployee,  String? employeeCode,  String? department,  String? position,  DateTime? joinDate,  Map<String, dynamic>? activeSubscription)?  $default,) {final _that = this;
 switch (_that) {
 case _UserProfileResponse2() when $default != null:
-return $default(_that.id,_that.email,_that.firstName,_that.lastName,_that.firebaseUid,_that.organizationId,_that.organizationName,_that.pointsBalance,_that.pointsExpiry,_that.isActive,_that.createdAt,_that.roles,_that.isEmployee,_that.employeeCode,_that.department,_that.position,_that.joinDate,_that.activeSubscription);case _:
+return $default(_that.id,_that.email,_that.firstName,_that.lastName,_that.organizationId,_that.organizationName,_that.pointsBalance,_that.pointsExpiry,_that.isActive,_that.createdAt,_that.roles,_that.isEmployee,_that.employeeCode,_that.department,_that.position,_that.joinDate,_that.activeSubscription);case _:
   return null;
 
 }
@@ -1045,14 +1041,13 @@ return $default(_that.id,_that.email,_that.firstName,_that.lastName,_that.fireba
 @JsonSerializable()
 
 class _UserProfileResponse2 implements UserProfileResponse2 {
-  const _UserProfileResponse2({required this.id, required this.email, this.firstName, this.lastName, this.firebaseUid, this.organizationId, this.organizationName, required this.pointsBalance, this.pointsExpiry, required this.isActive, required this.createdAt, required final  List<String> roles, required this.isEmployee, this.employeeCode, this.department, this.position, this.joinDate, final  Map<String, dynamic>? activeSubscription}): _roles = roles,_activeSubscription = activeSubscription;
+  const _UserProfileResponse2({required this.id, required this.email, this.firstName, this.lastName, this.organizationId, this.organizationName, required this.pointsBalance, this.pointsExpiry, required this.isActive, required this.createdAt, required final  List<String> roles, required this.isEmployee, this.employeeCode, this.department, this.position, this.joinDate, final  Map<String, dynamic>? activeSubscription}): _roles = roles,_activeSubscription = activeSubscription;
   factory _UserProfileResponse2.fromJson(Map<String, dynamic> json) => _$UserProfileResponse2FromJson(json);
 
 @override final  String id;
 @override final  String email;
 @override final  String? firstName;
 @override final  String? lastName;
-@override final  String? firebaseUid;
 @override final  int? organizationId;
 @override final  String? organizationName;
 @override final  int pointsBalance;
@@ -1094,16 +1089,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UserProfileResponse2&&(identical(other.id, id) || other.id == id)&&(identical(other.email, email) || other.email == email)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.firebaseUid, firebaseUid) || other.firebaseUid == firebaseUid)&&(identical(other.organizationId, organizationId) || other.organizationId == organizationId)&&(identical(other.organizationName, organizationName) || other.organizationName == organizationName)&&(identical(other.pointsBalance, pointsBalance) || other.pointsBalance == pointsBalance)&&(identical(other.pointsExpiry, pointsExpiry) || other.pointsExpiry == pointsExpiry)&&(identical(other.isActive, isActive) || other.isActive == isActive)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&const DeepCollectionEquality().equals(other._roles, _roles)&&(identical(other.isEmployee, isEmployee) || other.isEmployee == isEmployee)&&(identical(other.employeeCode, employeeCode) || other.employeeCode == employeeCode)&&(identical(other.department, department) || other.department == department)&&(identical(other.position, position) || other.position == position)&&(identical(other.joinDate, joinDate) || other.joinDate == joinDate)&&const DeepCollectionEquality().equals(other._activeSubscription, _activeSubscription));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UserProfileResponse2&&(identical(other.id, id) || other.id == id)&&(identical(other.email, email) || other.email == email)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.organizationId, organizationId) || other.organizationId == organizationId)&&(identical(other.organizationName, organizationName) || other.organizationName == organizationName)&&(identical(other.pointsBalance, pointsBalance) || other.pointsBalance == pointsBalance)&&(identical(other.pointsExpiry, pointsExpiry) || other.pointsExpiry == pointsExpiry)&&(identical(other.isActive, isActive) || other.isActive == isActive)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&const DeepCollectionEquality().equals(other._roles, _roles)&&(identical(other.isEmployee, isEmployee) || other.isEmployee == isEmployee)&&(identical(other.employeeCode, employeeCode) || other.employeeCode == employeeCode)&&(identical(other.department, department) || other.department == department)&&(identical(other.position, position) || other.position == position)&&(identical(other.joinDate, joinDate) || other.joinDate == joinDate)&&const DeepCollectionEquality().equals(other._activeSubscription, _activeSubscription));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,email,firstName,lastName,firebaseUid,organizationId,organizationName,pointsBalance,pointsExpiry,isActive,createdAt,const DeepCollectionEquality().hash(_roles),isEmployee,employeeCode,department,position,joinDate,const DeepCollectionEquality().hash(_activeSubscription));
+int get hashCode => Object.hash(runtimeType,id,email,firstName,lastName,organizationId,organizationName,pointsBalance,pointsExpiry,isActive,createdAt,const DeepCollectionEquality().hash(_roles),isEmployee,employeeCode,department,position,joinDate,const DeepCollectionEquality().hash(_activeSubscription));
 
 @override
 String toString() {
-  return 'UserProfileResponse2(id: $id, email: $email, firstName: $firstName, lastName: $lastName, firebaseUid: $firebaseUid, organizationId: $organizationId, organizationName: $organizationName, pointsBalance: $pointsBalance, pointsExpiry: $pointsExpiry, isActive: $isActive, createdAt: $createdAt, roles: $roles, isEmployee: $isEmployee, employeeCode: $employeeCode, department: $department, position: $position, joinDate: $joinDate, activeSubscription: $activeSubscription)';
+  return 'UserProfileResponse2(id: $id, email: $email, firstName: $firstName, lastName: $lastName, organizationId: $organizationId, organizationName: $organizationName, pointsBalance: $pointsBalance, pointsExpiry: $pointsExpiry, isActive: $isActive, createdAt: $createdAt, roles: $roles, isEmployee: $isEmployee, employeeCode: $employeeCode, department: $department, position: $position, joinDate: $joinDate, activeSubscription: $activeSubscription)';
 }
 
 
@@ -1114,7 +1109,7 @@ abstract mixin class _$UserProfileResponse2CopyWith<$Res> implements $UserProfil
   factory _$UserProfileResponse2CopyWith(_UserProfileResponse2 value, $Res Function(_UserProfileResponse2) _then) = __$UserProfileResponse2CopyWithImpl;
 @override @useResult
 $Res call({
- String id, String email, String? firstName, String? lastName, String? firebaseUid, int? organizationId, String? organizationName, int pointsBalance, DateTime? pointsExpiry, bool isActive, DateTime createdAt, List<String> roles, bool isEmployee, String? employeeCode, String? department, String? position, DateTime? joinDate, Map<String, dynamic>? activeSubscription
+ String id, String email, String? firstName, String? lastName, int? organizationId, String? organizationName, int pointsBalance, DateTime? pointsExpiry, bool isActive, DateTime createdAt, List<String> roles, bool isEmployee, String? employeeCode, String? department, String? position, DateTime? joinDate, Map<String, dynamic>? activeSubscription
 });
 
 
@@ -1131,13 +1126,12 @@ class __$UserProfileResponse2CopyWithImpl<$Res>
 
 /// Create a copy of UserProfileResponse2
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? email = null,Object? firstName = freezed,Object? lastName = freezed,Object? firebaseUid = freezed,Object? organizationId = freezed,Object? organizationName = freezed,Object? pointsBalance = null,Object? pointsExpiry = freezed,Object? isActive = null,Object? createdAt = null,Object? roles = null,Object? isEmployee = null,Object? employeeCode = freezed,Object? department = freezed,Object? position = freezed,Object? joinDate = freezed,Object? activeSubscription = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? email = null,Object? firstName = freezed,Object? lastName = freezed,Object? organizationId = freezed,Object? organizationName = freezed,Object? pointsBalance = null,Object? pointsExpiry = freezed,Object? isActive = null,Object? createdAt = null,Object? roles = null,Object? isEmployee = null,Object? employeeCode = freezed,Object? department = freezed,Object? position = freezed,Object? joinDate = freezed,Object? activeSubscription = freezed,}) {
   return _then(_UserProfileResponse2(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
 as String,firstName: freezed == firstName ? _self.firstName : firstName // ignore: cast_nullable_to_non_nullable
 as String?,lastName: freezed == lastName ? _self.lastName : lastName // ignore: cast_nullable_to_non_nullable
-as String?,firebaseUid: freezed == firebaseUid ? _self.firebaseUid : firebaseUid // ignore: cast_nullable_to_non_nullable
 as String?,organizationId: freezed == organizationId ? _self.organizationId : organizationId // ignore: cast_nullable_to_non_nullable
 as int?,organizationName: freezed == organizationName ? _self.organizationName : organizationName // ignore: cast_nullable_to_non_nullable
 as String?,pointsBalance: null == pointsBalance ? _self.pointsBalance : pointsBalance // ignore: cast_nullable_to_non_nullable
@@ -3945,7 +3939,7 @@ as String,
 /// @nodoc
 mixin _$PhoneRegistrationResponse {
 
- String get id; String get email; String get firstName; String get lastName; String get firebaseUid; String get role; int? get organizationId; String? get organizationName; int get pointsBalance; DateTime? get pointsExpiry; bool get isActive; DateTime get createdAt; bool get isNewUser; bool get isEmployee; String? get employeeCode; String? get department; String? get position;
+ String get id; String get email; String get firstName; String get lastName; String get role; int? get organizationId; String? get organizationName; int get pointsBalance; DateTime? get pointsExpiry; bool get isActive; DateTime get createdAt; bool get isNewUser; bool get isEmployee; String? get employeeCode; String? get department; String? get position;
 /// Create a copy of PhoneRegistrationResponse
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -3958,16 +3952,16 @@ $PhoneRegistrationResponseCopyWith<PhoneRegistrationResponse> get copyWith => _$
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is PhoneRegistrationResponse&&(identical(other.id, id) || other.id == id)&&(identical(other.email, email) || other.email == email)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.firebaseUid, firebaseUid) || other.firebaseUid == firebaseUid)&&(identical(other.role, role) || other.role == role)&&(identical(other.organizationId, organizationId) || other.organizationId == organizationId)&&(identical(other.organizationName, organizationName) || other.organizationName == organizationName)&&(identical(other.pointsBalance, pointsBalance) || other.pointsBalance == pointsBalance)&&(identical(other.pointsExpiry, pointsExpiry) || other.pointsExpiry == pointsExpiry)&&(identical(other.isActive, isActive) || other.isActive == isActive)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.isNewUser, isNewUser) || other.isNewUser == isNewUser)&&(identical(other.isEmployee, isEmployee) || other.isEmployee == isEmployee)&&(identical(other.employeeCode, employeeCode) || other.employeeCode == employeeCode)&&(identical(other.department, department) || other.department == department)&&(identical(other.position, position) || other.position == position));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PhoneRegistrationResponse&&(identical(other.id, id) || other.id == id)&&(identical(other.email, email) || other.email == email)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.role, role) || other.role == role)&&(identical(other.organizationId, organizationId) || other.organizationId == organizationId)&&(identical(other.organizationName, organizationName) || other.organizationName == organizationName)&&(identical(other.pointsBalance, pointsBalance) || other.pointsBalance == pointsBalance)&&(identical(other.pointsExpiry, pointsExpiry) || other.pointsExpiry == pointsExpiry)&&(identical(other.isActive, isActive) || other.isActive == isActive)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.isNewUser, isNewUser) || other.isNewUser == isNewUser)&&(identical(other.isEmployee, isEmployee) || other.isEmployee == isEmployee)&&(identical(other.employeeCode, employeeCode) || other.employeeCode == employeeCode)&&(identical(other.department, department) || other.department == department)&&(identical(other.position, position) || other.position == position));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,email,firstName,lastName,firebaseUid,role,organizationId,organizationName,pointsBalance,pointsExpiry,isActive,createdAt,isNewUser,isEmployee,employeeCode,department,position);
+int get hashCode => Object.hash(runtimeType,id,email,firstName,lastName,role,organizationId,organizationName,pointsBalance,pointsExpiry,isActive,createdAt,isNewUser,isEmployee,employeeCode,department,position);
 
 @override
 String toString() {
-  return 'PhoneRegistrationResponse(id: $id, email: $email, firstName: $firstName, lastName: $lastName, firebaseUid: $firebaseUid, role: $role, organizationId: $organizationId, organizationName: $organizationName, pointsBalance: $pointsBalance, pointsExpiry: $pointsExpiry, isActive: $isActive, createdAt: $createdAt, isNewUser: $isNewUser, isEmployee: $isEmployee, employeeCode: $employeeCode, department: $department, position: $position)';
+  return 'PhoneRegistrationResponse(id: $id, email: $email, firstName: $firstName, lastName: $lastName, role: $role, organizationId: $organizationId, organizationName: $organizationName, pointsBalance: $pointsBalance, pointsExpiry: $pointsExpiry, isActive: $isActive, createdAt: $createdAt, isNewUser: $isNewUser, isEmployee: $isEmployee, employeeCode: $employeeCode, department: $department, position: $position)';
 }
 
 
@@ -3978,7 +3972,7 @@ abstract mixin class $PhoneRegistrationResponseCopyWith<$Res>  {
   factory $PhoneRegistrationResponseCopyWith(PhoneRegistrationResponse value, $Res Function(PhoneRegistrationResponse) _then) = _$PhoneRegistrationResponseCopyWithImpl;
 @useResult
 $Res call({
- String id, String email, String firstName, String lastName, String firebaseUid, String role, int? organizationId, String? organizationName, int pointsBalance, DateTime? pointsExpiry, bool isActive, DateTime createdAt, bool isNewUser, bool isEmployee, String? employeeCode, String? department, String? position
+ String id, String email, String firstName, String lastName, String role, int? organizationId, String? organizationName, int pointsBalance, DateTime? pointsExpiry, bool isActive, DateTime createdAt, bool isNewUser, bool isEmployee, String? employeeCode, String? department, String? position
 });
 
 
@@ -3995,13 +3989,12 @@ class _$PhoneRegistrationResponseCopyWithImpl<$Res>
 
 /// Create a copy of PhoneRegistrationResponse
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? email = null,Object? firstName = null,Object? lastName = null,Object? firebaseUid = null,Object? role = null,Object? organizationId = freezed,Object? organizationName = freezed,Object? pointsBalance = null,Object? pointsExpiry = freezed,Object? isActive = null,Object? createdAt = null,Object? isNewUser = null,Object? isEmployee = null,Object? employeeCode = freezed,Object? department = freezed,Object? position = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? email = null,Object? firstName = null,Object? lastName = null,Object? role = null,Object? organizationId = freezed,Object? organizationName = freezed,Object? pointsBalance = null,Object? pointsExpiry = freezed,Object? isActive = null,Object? createdAt = null,Object? isNewUser = null,Object? isEmployee = null,Object? employeeCode = freezed,Object? department = freezed,Object? position = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
 as String,firstName: null == firstName ? _self.firstName : firstName // ignore: cast_nullable_to_non_nullable
 as String,lastName: null == lastName ? _self.lastName : lastName // ignore: cast_nullable_to_non_nullable
-as String,firebaseUid: null == firebaseUid ? _self.firebaseUid : firebaseUid // ignore: cast_nullable_to_non_nullable
 as String,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
 as String,organizationId: freezed == organizationId ? _self.organizationId : organizationId // ignore: cast_nullable_to_non_nullable
 as int?,organizationName: freezed == organizationName ? _self.organizationName : organizationName // ignore: cast_nullable_to_non_nullable
@@ -4099,10 +4092,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String email,  String firstName,  String lastName,  String firebaseUid,  String role,  int? organizationId,  String? organizationName,  int pointsBalance,  DateTime? pointsExpiry,  bool isActive,  DateTime createdAt,  bool isNewUser,  bool isEmployee,  String? employeeCode,  String? department,  String? position)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String email,  String firstName,  String lastName,  String role,  int? organizationId,  String? organizationName,  int pointsBalance,  DateTime? pointsExpiry,  bool isActive,  DateTime createdAt,  bool isNewUser,  bool isEmployee,  String? employeeCode,  String? department,  String? position)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _PhoneRegistrationResponse() when $default != null:
-return $default(_that.id,_that.email,_that.firstName,_that.lastName,_that.firebaseUid,_that.role,_that.organizationId,_that.organizationName,_that.pointsBalance,_that.pointsExpiry,_that.isActive,_that.createdAt,_that.isNewUser,_that.isEmployee,_that.employeeCode,_that.department,_that.position);case _:
+return $default(_that.id,_that.email,_that.firstName,_that.lastName,_that.role,_that.organizationId,_that.organizationName,_that.pointsBalance,_that.pointsExpiry,_that.isActive,_that.createdAt,_that.isNewUser,_that.isEmployee,_that.employeeCode,_that.department,_that.position);case _:
   return orElse();
 
 }
@@ -4120,10 +4113,10 @@ return $default(_that.id,_that.email,_that.firstName,_that.lastName,_that.fireba
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String email,  String firstName,  String lastName,  String firebaseUid,  String role,  int? organizationId,  String? organizationName,  int pointsBalance,  DateTime? pointsExpiry,  bool isActive,  DateTime createdAt,  bool isNewUser,  bool isEmployee,  String? employeeCode,  String? department,  String? position)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String email,  String firstName,  String lastName,  String role,  int? organizationId,  String? organizationName,  int pointsBalance,  DateTime? pointsExpiry,  bool isActive,  DateTime createdAt,  bool isNewUser,  bool isEmployee,  String? employeeCode,  String? department,  String? position)  $default,) {final _that = this;
 switch (_that) {
 case _PhoneRegistrationResponse():
-return $default(_that.id,_that.email,_that.firstName,_that.lastName,_that.firebaseUid,_that.role,_that.organizationId,_that.organizationName,_that.pointsBalance,_that.pointsExpiry,_that.isActive,_that.createdAt,_that.isNewUser,_that.isEmployee,_that.employeeCode,_that.department,_that.position);case _:
+return $default(_that.id,_that.email,_that.firstName,_that.lastName,_that.role,_that.organizationId,_that.organizationName,_that.pointsBalance,_that.pointsExpiry,_that.isActive,_that.createdAt,_that.isNewUser,_that.isEmployee,_that.employeeCode,_that.department,_that.position);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -4140,10 +4133,10 @@ return $default(_that.id,_that.email,_that.firstName,_that.lastName,_that.fireba
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String email,  String firstName,  String lastName,  String firebaseUid,  String role,  int? organizationId,  String? organizationName,  int pointsBalance,  DateTime? pointsExpiry,  bool isActive,  DateTime createdAt,  bool isNewUser,  bool isEmployee,  String? employeeCode,  String? department,  String? position)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String email,  String firstName,  String lastName,  String role,  int? organizationId,  String? organizationName,  int pointsBalance,  DateTime? pointsExpiry,  bool isActive,  DateTime createdAt,  bool isNewUser,  bool isEmployee,  String? employeeCode,  String? department,  String? position)?  $default,) {final _that = this;
 switch (_that) {
 case _PhoneRegistrationResponse() when $default != null:
-return $default(_that.id,_that.email,_that.firstName,_that.lastName,_that.firebaseUid,_that.role,_that.organizationId,_that.organizationName,_that.pointsBalance,_that.pointsExpiry,_that.isActive,_that.createdAt,_that.isNewUser,_that.isEmployee,_that.employeeCode,_that.department,_that.position);case _:
+return $default(_that.id,_that.email,_that.firstName,_that.lastName,_that.role,_that.organizationId,_that.organizationName,_that.pointsBalance,_that.pointsExpiry,_that.isActive,_that.createdAt,_that.isNewUser,_that.isEmployee,_that.employeeCode,_that.department,_that.position);case _:
   return null;
 
 }
@@ -4155,14 +4148,13 @@ return $default(_that.id,_that.email,_that.firstName,_that.lastName,_that.fireba
 @JsonSerializable()
 
 class _PhoneRegistrationResponse implements PhoneRegistrationResponse {
-  const _PhoneRegistrationResponse({required this.id, required this.email, required this.firstName, required this.lastName, required this.firebaseUid, required this.role, this.organizationId, this.organizationName, required this.pointsBalance, this.pointsExpiry, required this.isActive, required this.createdAt, required this.isNewUser, required this.isEmployee, this.employeeCode, this.department, this.position});
+  const _PhoneRegistrationResponse({required this.id, required this.email, required this.firstName, required this.lastName, required this.role, this.organizationId, this.organizationName, required this.pointsBalance, this.pointsExpiry, required this.isActive, required this.createdAt, required this.isNewUser, required this.isEmployee, this.employeeCode, this.department, this.position});
   factory _PhoneRegistrationResponse.fromJson(Map<String, dynamic> json) => _$PhoneRegistrationResponseFromJson(json);
 
 @override final  String id;
 @override final  String email;
 @override final  String firstName;
 @override final  String lastName;
-@override final  String firebaseUid;
 @override final  String role;
 @override final  int? organizationId;
 @override final  String? organizationName;
@@ -4189,16 +4181,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PhoneRegistrationResponse&&(identical(other.id, id) || other.id == id)&&(identical(other.email, email) || other.email == email)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.firebaseUid, firebaseUid) || other.firebaseUid == firebaseUid)&&(identical(other.role, role) || other.role == role)&&(identical(other.organizationId, organizationId) || other.organizationId == organizationId)&&(identical(other.organizationName, organizationName) || other.organizationName == organizationName)&&(identical(other.pointsBalance, pointsBalance) || other.pointsBalance == pointsBalance)&&(identical(other.pointsExpiry, pointsExpiry) || other.pointsExpiry == pointsExpiry)&&(identical(other.isActive, isActive) || other.isActive == isActive)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.isNewUser, isNewUser) || other.isNewUser == isNewUser)&&(identical(other.isEmployee, isEmployee) || other.isEmployee == isEmployee)&&(identical(other.employeeCode, employeeCode) || other.employeeCode == employeeCode)&&(identical(other.department, department) || other.department == department)&&(identical(other.position, position) || other.position == position));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PhoneRegistrationResponse&&(identical(other.id, id) || other.id == id)&&(identical(other.email, email) || other.email == email)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.role, role) || other.role == role)&&(identical(other.organizationId, organizationId) || other.organizationId == organizationId)&&(identical(other.organizationName, organizationName) || other.organizationName == organizationName)&&(identical(other.pointsBalance, pointsBalance) || other.pointsBalance == pointsBalance)&&(identical(other.pointsExpiry, pointsExpiry) || other.pointsExpiry == pointsExpiry)&&(identical(other.isActive, isActive) || other.isActive == isActive)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.isNewUser, isNewUser) || other.isNewUser == isNewUser)&&(identical(other.isEmployee, isEmployee) || other.isEmployee == isEmployee)&&(identical(other.employeeCode, employeeCode) || other.employeeCode == employeeCode)&&(identical(other.department, department) || other.department == department)&&(identical(other.position, position) || other.position == position));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,email,firstName,lastName,firebaseUid,role,organizationId,organizationName,pointsBalance,pointsExpiry,isActive,createdAt,isNewUser,isEmployee,employeeCode,department,position);
+int get hashCode => Object.hash(runtimeType,id,email,firstName,lastName,role,organizationId,organizationName,pointsBalance,pointsExpiry,isActive,createdAt,isNewUser,isEmployee,employeeCode,department,position);
 
 @override
 String toString() {
-  return 'PhoneRegistrationResponse(id: $id, email: $email, firstName: $firstName, lastName: $lastName, firebaseUid: $firebaseUid, role: $role, organizationId: $organizationId, organizationName: $organizationName, pointsBalance: $pointsBalance, pointsExpiry: $pointsExpiry, isActive: $isActive, createdAt: $createdAt, isNewUser: $isNewUser, isEmployee: $isEmployee, employeeCode: $employeeCode, department: $department, position: $position)';
+  return 'PhoneRegistrationResponse(id: $id, email: $email, firstName: $firstName, lastName: $lastName, role: $role, organizationId: $organizationId, organizationName: $organizationName, pointsBalance: $pointsBalance, pointsExpiry: $pointsExpiry, isActive: $isActive, createdAt: $createdAt, isNewUser: $isNewUser, isEmployee: $isEmployee, employeeCode: $employeeCode, department: $department, position: $position)';
 }
 
 
@@ -4209,7 +4201,7 @@ abstract mixin class _$PhoneRegistrationResponseCopyWith<$Res> implements $Phone
   factory _$PhoneRegistrationResponseCopyWith(_PhoneRegistrationResponse value, $Res Function(_PhoneRegistrationResponse) _then) = __$PhoneRegistrationResponseCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String email, String firstName, String lastName, String firebaseUid, String role, int? organizationId, String? organizationName, int pointsBalance, DateTime? pointsExpiry, bool isActive, DateTime createdAt, bool isNewUser, bool isEmployee, String? employeeCode, String? department, String? position
+ String id, String email, String firstName, String lastName, String role, int? organizationId, String? organizationName, int pointsBalance, DateTime? pointsExpiry, bool isActive, DateTime createdAt, bool isNewUser, bool isEmployee, String? employeeCode, String? department, String? position
 });
 
 
@@ -4226,13 +4218,12 @@ class __$PhoneRegistrationResponseCopyWithImpl<$Res>
 
 /// Create a copy of PhoneRegistrationResponse
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? email = null,Object? firstName = null,Object? lastName = null,Object? firebaseUid = null,Object? role = null,Object? organizationId = freezed,Object? organizationName = freezed,Object? pointsBalance = null,Object? pointsExpiry = freezed,Object? isActive = null,Object? createdAt = null,Object? isNewUser = null,Object? isEmployee = null,Object? employeeCode = freezed,Object? department = freezed,Object? position = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? email = null,Object? firstName = null,Object? lastName = null,Object? role = null,Object? organizationId = freezed,Object? organizationName = freezed,Object? pointsBalance = null,Object? pointsExpiry = freezed,Object? isActive = null,Object? createdAt = null,Object? isNewUser = null,Object? isEmployee = null,Object? employeeCode = freezed,Object? department = freezed,Object? position = freezed,}) {
   return _then(_PhoneRegistrationResponse(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
 as String,firstName: null == firstName ? _self.firstName : firstName // ignore: cast_nullable_to_non_nullable
 as String,lastName: null == lastName ? _self.lastName : lastName // ignore: cast_nullable_to_non_nullable
-as String,firebaseUid: null == firebaseUid ? _self.firebaseUid : firebaseUid // ignore: cast_nullable_to_non_nullable
 as String,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
 as String,organizationId: freezed == organizationId ? _self.organizationId : organizationId // ignore: cast_nullable_to_non_nullable
 as int?,organizationName: freezed == organizationName ? _self.organizationName : organizationName // ignore: cast_nullable_to_non_nullable

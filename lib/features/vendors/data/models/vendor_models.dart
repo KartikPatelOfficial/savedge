@@ -23,10 +23,6 @@ abstract class VendorResponse with _$VendorResponse {
     DateTime? approvedAt,
     String? approvedBy,
     DateTime? createdAt,
-    String? firebaseUid,
-    String? vendorFirstName,
-    String? vendorLastName,
-    String? vendorFullName,
     @Default([]) List<VendorImageDto> images,
     @Default([]) List<VendorSocialMediaDto> socialMediaLinks,
   }) = _VendorResponse;

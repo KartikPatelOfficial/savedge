@@ -6,10 +6,6 @@
 -keep class proguard.annotation.** { *; }
 -dontwarn proguard.annotation.**
 
-# Keep Firebase classes
--keep class com.google.firebase.** { *; }
--dontwarn com.google.firebase.**
-
 # Keep Gson classes
 -keep class com.google.gson.** { *; }
 -dontwarn com.google.gson.**

@@ -6,7 +6,6 @@ class UserProfile extends Equatable {
     required this.email,
     this.firstName,
     this.lastName,
-    this.firebaseUid,
     this.organizationId,
     required this.pointsBalance,
     this.pointsExpiry,
@@ -18,7 +17,6 @@ class UserProfile extends Equatable {
   final String email;
   final String? firstName;
   final String? lastName;
-  final String? firebaseUid;
   final int? organizationId;
   final int pointsBalance;
   final DateTime? pointsExpiry;
@@ -34,7 +32,6 @@ class UserProfile extends Equatable {
     email,
     firstName,
     lastName,
-    firebaseUid,
     organizationId,
     pointsBalance,
     pointsExpiry,
