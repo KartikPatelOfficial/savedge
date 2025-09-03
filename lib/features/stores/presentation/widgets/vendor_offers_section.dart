@@ -602,20 +602,15 @@ class _VendorOfferCardState extends State<VendorOfferCard>
   }
 
   LinearGradient _getCouponGradient() {
-    // Enhanced gradient collection with more beautiful combinations
+    // Order chosen so first card is amber/orange, then alternates through others
     final gradients = [
       const LinearGradient(
+        colors: [Color(0xFFED8936), Color(0xFFF56500)], // Amber/Orange
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ),
+      const LinearGradient(
         colors: [Color(0xFF6F3FCC), Color(0xFF9F7AEA)], // Purple
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-      ),
-      const LinearGradient(
-        colors: [Color(0xFF38B2AC), Color(0xFF4FD1C7)], // Teal
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-      ),
-      const LinearGradient(
-        colors: [Color(0xFFED8936), Color(0xFFF56500)], // Orange
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
       ),
@@ -630,26 +625,33 @@ class _VendorOfferCardState extends State<VendorOfferCard>
         end: Alignment.bottomRight,
       ),
       const LinearGradient(
+        colors: [Color(0xFF38B2AC), Color(0xFF4FD1C7)], // Teal
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ),
+      const LinearGradient(
         colors: [Color(0xFFE53E3E), Color(0xFFF56565)], // Red
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
       ),
     ];
 
-    return gradients[(widget.coupon.id + widget.index) % gradients.length];
+    // Choose strictly by list position to ensure per-card variation
+    return gradients[widget.index % gradients.length];
   }
 
   Color _getPrimaryColor() {
+    // Primary accent to match gradient sequence above
     final colors = [
+      const Color(0xFFED8936), // Amber/Orange
       const Color(0xFF6F3FCC), // Purple
-      const Color(0xFF38B2AC), // Teal
-      const Color(0xFFED8936), // Orange
       const Color(0xFF3182CE), // Blue
       const Color(0xFF38A169), // Green
+      const Color(0xFF38B2AC), // Teal
       const Color(0xFFE53E3E), // Red
     ];
 
-    return colors[(widget.coupon.id + widget.index) % colors.length];
+    return colors[widget.index % colors.length];
   }
 
   void _onCouponTap(BuildContext context) async {
@@ -673,7 +675,6 @@ class _VendorOfferCardState extends State<VendorOfferCard>
       if (!mounted) return;
 
       if (result == true) {
-        // Success - show modern snackbar
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Container(

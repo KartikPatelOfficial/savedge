@@ -7,6 +7,7 @@ import 'package:savedge/core/network/image_cache_manager.dart';
 import 'package:savedge/features/home/presentation/widgets/subscription_plans_section.dart';
 import 'package:savedge/features/points_payment/presentation/widgets/points_payment_dialog.dart';
 import 'package:savedge/features/stores/presentation/widgets/vendor_offers_section.dart';
+import 'package:savedge/features/user_profile/presentation/bloc/points_bloc.dart';
 import 'package:savedge/features/vendors/domain/entities/vendor.dart';
 import 'package:savedge/features/vendors/presentation/bloc/vendor_detail_bloc.dart';
 import 'package:savedge/features/vendors/presentation/bloc/vendor_detail_event.dart';
@@ -28,8 +29,16 @@ class VendorDetailPage extends StatelessWidget {
     // Always load vendor details from API to get complete data (images, coupons, etc.)
     final int id = vendorId ?? vendor!.id;
 
-    return BlocProvider(
-      create: (context) => getIt<VendorDetailBloc>()..add(LoadVendorDetail(id)),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) =>
+              getIt<VendorDetailBloc>()..add(LoadVendorDetail(id)),
+        ),
+        BlocProvider(
+          create: (context) => getIt<PointsBloc>()..add(LoadUserPoints()),
+        ),
+      ],
       child: BlocBuilder<VendorDetailBloc, VendorDetailState>(
         builder: (context, state) {
           if (state is VendorDetailLoading) {
@@ -775,15 +784,15 @@ class _VendorDetailView extends StatelessWidget {
             ],
           ),
 
-          // Points Payment Card
-          const SizedBox(height: 24),
-          _buildPointsPaymentCard(context),
-
           // Social Media Links
           if (vendor.socialMediaLinks.isNotEmpty) ...[
             const SizedBox(height: 24),
             _buildSocialMediaSection(),
           ],
+
+          // Points Payment Card
+          const SizedBox(height: 24),
+          _buildPointsPaymentCard(context),
         ],
       ),
     );
@@ -823,24 +832,6 @@ class _VendorDetailView extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.3),
-                          width: 1,
-                        ),
-                      ),
-                      child: const Icon(
-                        Icons.payments_rounded,
-                        color: Colors.white,
-                        size: 24,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -898,15 +889,21 @@ class _VendorDetailView extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: 4),
-                            const Text(
-                              '2,500',
-                              // Mock data - should come from user state
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w800,
-                                color: Colors.white,
-                                letterSpacing: -0.5,
-                              ),
+                            BlocBuilder<PointsBloc, PointsState>(
+                              builder: (context, pointsState) {
+                                final pointsText = pointsState is PointsLoaded
+                                    ? pointsState.points.balance.toString()
+                                    : '--';
+                                return Text(
+                                  pointsText,
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w800,
+                                    color: Colors.white,
+                                    letterSpacing: -0.5,
+                                  ),
+                                );
+                              },
                             ),
                           ],
                         ),
@@ -1107,13 +1104,16 @@ class _VendorDetailView extends StatelessWidget {
   /// Open points payment dialog
   void _openPointsPaymentDialog(BuildContext context) {
     HapticFeedback.lightImpact();
+    final pointsState = context.read<PointsBloc>().state;
+    final availablePoints = pointsState is PointsLoaded
+        ? pointsState.points.balance
+        : 0;
+
     showDialog(
       context: context,
       barrierDismissible: true,
-      builder: (BuildContext context) => PointsPaymentDialog(
-        vendor: vendor,
-        availablePoints: 2500, // Mock data - should come from user state
-      ),
+      builder: (BuildContext context) =>
+          PointsPaymentDialog(vendor: vendor, availablePoints: availablePoints),
     );
   }
 }
@@ -1123,36 +1123,203 @@ class PaymentCardPatternPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white.withOpacity(0.1)
-      ..style = PaintingStyle.fill;
+      ..style = PaintingStyle.fill
+      ..isAntiAlias = true;
 
-    // Draw decorative circles pattern
-    for (double x = -20; x < size.width + 40; x += 60) {
-      for (double y = -20; y < size.height + 40; y += 60) {
-        canvas.drawCircle(Offset(x, y), 15, paint);
-      }
-    }
+    // Create flowing wave patterns similar to Gemini
+    _drawGeminiWaves(canvas, size, paint);
 
-    // Draw accent circles with different opacity
-    paint.color = Colors.white.withOpacity(0.05);
-    for (double x = 10; x < size.width + 40; x += 80) {
-      for (double y = 10; y < size.height + 40; y += 80) {
-        canvas.drawCircle(Offset(x, y), 25, paint);
-      }
-    }
+    // Add geometric accents
+    _drawGeometricAccents(canvas, size, paint);
 
-    // Draw subtle diagonal lines
+    // Add subtle mesh grid
+    _drawMeshGrid(canvas, size, paint);
+  }
+
+  void _drawGeminiWaves(Canvas canvas, Size size, Paint paint) {
+    // Create flowing wave paths with different opacities
+    final path1 = Path();
+    final path2 = Path();
+    final path3 = Path();
+
+    // Wave 1 - Top flowing wave
+    path1.moveTo(-20, size.height * 0.3);
+    path1.quadraticBezierTo(
+      size.width * 0.25,
+      size.height * 0.1,
+      size.width * 0.6,
+      size.height * 0.4,
+    );
+    path1.quadraticBezierTo(
+      size.width * 0.8,
+      size.height * 0.6,
+      size.width + 20,
+      size.height * 0.2,
+    );
+    path1.lineTo(size.width + 20, -20);
+    path1.lineTo(-20, -20);
+    path1.close();
+
+    paint.color = Colors.white.withOpacity(0.08);
+    canvas.drawPath(path1, paint);
+
+    // Wave 2 - Middle flowing wave
+    path2.moveTo(-20, size.height * 0.7);
+    path2.quadraticBezierTo(
+      size.width * 0.3,
+      size.height * 0.5,
+      size.width * 0.7,
+      size.height * 0.8,
+    );
+    path2.quadraticBezierTo(
+      size.width * 0.9,
+      size.height * 0.9,
+      size.width + 20,
+      size.height * 0.6,
+    );
+    path2.lineTo(size.width + 20, size.height + 20);
+    path2.lineTo(-20, size.height + 20);
+    path2.close();
+
+    paint.color = Colors.white.withOpacity(0.06);
+    canvas.drawPath(path2, paint);
+
+    // Wave 3 - Subtle accent wave
+    path3.moveTo(size.width * 0.2, -20);
+    path3.quadraticBezierTo(
+      size.width * 0.4,
+      size.height * 0.3,
+      size.width * 0.8,
+      size.height * 0.15,
+    );
+    path3.quadraticBezierTo(
+      size.width * 1.1,
+      size.height * 0.05,
+      size.width + 20,
+      size.height * 0.4,
+    );
+    path3.lineTo(size.width + 20, -20);
+    path3.close();
+
+    paint.color = Colors.white.withOpacity(0.04);
+    canvas.drawPath(path3, paint);
+  }
+
+  void _drawGeometricAccents(Canvas canvas, Size size, Paint paint) {
+    // Add subtle geometric shapes for Gemini-like accents
     paint
-      ..color = Colors.white.withOpacity(0.03)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 1;
+      ..strokeWidth = 1.5
+      ..color = Colors.white.withOpacity(0.1);
 
-    for (double i = -size.height; i < size.width; i += 40) {
-      canvas.drawLine(
-        Offset(i, 0),
-        Offset(i + size.height, size.height),
-        paint,
-      );
+    // Flowing lines
+    final path = Path();
+    path.moveTo(size.width * 0.1, size.height * 0.2);
+    path.quadraticBezierTo(
+      size.width * 0.3,
+      size.height * 0.1,
+      size.width * 0.5,
+      size.height * 0.25,
+    );
+    path.quadraticBezierTo(
+      size.width * 0.7,
+      size.height * 0.4,
+      size.width * 0.9,
+      size.height * 0.3,
+    );
+    canvas.drawPath(path, paint);
+
+    // Second flowing line
+    final path2 = Path();
+    path2.moveTo(size.width * 0.05, size.height * 0.7);
+    path2.quadraticBezierTo(
+      size.width * 0.25,
+      size.height * 0.85,
+      size.width * 0.45,
+      size.height * 0.75,
+    );
+    path2.quadraticBezierTo(
+      size.width * 0.65,
+      size.height * 0.65,
+      size.width * 0.85,
+      size.height * 0.8,
+    );
+    canvas.drawPath(path2, paint);
+
+    // Add subtle dots along the paths
+    paint.style = PaintingStyle.fill;
+    paint.color = Colors.white.withOpacity(0.15);
+
+    // Dots along first curve
+    _drawDotAlongCurve(canvas, size.width * 0.2, size.height * 0.18, 2, paint);
+    _drawDotAlongCurve(
+      canvas,
+      size.width * 0.6,
+      size.height * 0.35,
+      1.5,
+      paint,
+    );
+    _drawDotAlongCurve(
+      canvas,
+      size.width * 0.8,
+      size.height * 0.32,
+      2.5,
+      paint,
+    );
+
+    // Dots along second curve
+    _drawDotAlongCurve(
+      canvas,
+      size.width * 0.15,
+      size.height * 0.75,
+      1.8,
+      paint,
+    );
+    _drawDotAlongCurve(
+      canvas,
+      size.width * 0.55,
+      size.height * 0.72,
+      2.2,
+      paint,
+    );
+    _drawDotAlongCurve(
+      canvas,
+      size.width * 0.75,
+      size.height * 0.68,
+      1.6,
+      paint,
+    );
+  }
+
+  void _drawDotAlongCurve(
+    Canvas canvas,
+    double x,
+    double y,
+    double radius,
+    Paint paint,
+  ) {
+    canvas.drawCircle(Offset(x, y), radius, paint);
+  }
+
+  void _drawMeshGrid(Canvas canvas, Size size, Paint paint) {
+    // Create a very subtle mesh grid effect
+    paint
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0.5
+      ..color = Colors.white.withOpacity(0.02);
+
+    // Vertical lines
+    for (double x = size.width * 0.2; x < size.width; x += size.width * 0.15) {
+      canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
+    }
+
+    // Horizontal lines
+    for (
+      double y = size.height * 0.25;
+      y < size.height;
+      y += size.height * 0.2
+    ) {
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
     }
   }
 
