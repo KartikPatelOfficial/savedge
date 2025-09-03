@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:savedge/features/coupons/presentation/pages/clean_coupons_page.dart';
+import 'package:savedge/features/coupons/presentation/pages/coupons_page.dart';
 import 'package:savedge/features/coupons/presentation/pages/gift_page.dart';
 import 'package:savedge/features/home/presentation/widgets/widgets.dart';
 import 'package:savedge/features/user_profile/presentation/pages/profile_page.dart';
@@ -18,7 +18,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
   final List<Widget> _pages = [
     const HomeContentPage(), // Home page content without bottom nav
     const GiftPage(), // Placeholder for gift page
-    const CleanCouponsPage(), // Enhanced coupon management page
+    const CouponsPage(), // Enhanced coupon management page
     const ProfilePage(),
   ];
 

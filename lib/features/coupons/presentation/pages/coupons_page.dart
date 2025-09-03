@@ -2,18 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:savedge/core/injection/injection.dart';
+import 'package:savedge/features/coupons/data/models/coupon_gifting_models.dart';
 import 'package:savedge/features/coupons/data/models/user_coupon_model.dart';
+import 'package:savedge/features/coupons/presentation/bloc/coupon_manager_bloc.dart';
+import 'package:savedge/features/coupons/presentation/bloc/coupon_manager_event.dart';
+import 'package:savedge/features/coupons/presentation/bloc/coupon_manager_state.dart';
+import 'package:savedge/features/coupons/presentation/pages/coupon_confirmation_page.dart';
+import 'package:savedge/features/coupons/presentation/pages/redeemed_coupon_page.dart';
 
-import '../../../../core/injection/injection.dart';
-import '../../data/models/coupon_gifting_models.dart';
-import '../bloc/coupon_manager_bloc.dart';
-import '../bloc/coupon_manager_event.dart';
-import '../bloc/coupon_manager_state.dart';
-import 'coupon_confirmation_page.dart';
-import 'redeemed_coupon_page.dart';
-
-class CleanCouponsPage extends StatelessWidget {
-  const CleanCouponsPage({super.key});
+class CouponsPage extends StatelessWidget {
+  const CouponsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
