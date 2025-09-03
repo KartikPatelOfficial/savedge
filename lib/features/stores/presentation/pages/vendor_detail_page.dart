@@ -5,7 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:savedge/core/injection/injection.dart';
 import 'package:savedge/core/network/image_cache_manager.dart';
 import 'package:savedge/features/home/presentation/widgets/subscription_plans_section.dart';
-import 'package:savedge/features/stores/presentation/widgets/payment_options_bottom_sheet.dart';
+import 'package:savedge/features/points_payment/presentation/widgets/points_payment_dialog.dart';
 import 'package:savedge/features/stores/presentation/widgets/vendor_offers_section.dart';
 import 'package:savedge/features/vendors/domain/entities/vendor.dart';
 import 'package:savedge/features/vendors/presentation/bloc/vendor_detail_bloc.dart';
@@ -368,36 +368,25 @@ class _VendorDetailView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Stack(
-        children: [
-          CustomScrollView(
-            slivers: [
-              // Image Gallery with App Bar
-              _buildSliverAppBar(context),
-              // Vendor Info
-              SliverToBoxAdapter(child: _buildVendorInfo()),
-              // Offers Section
-              SliverToBoxAdapter(
-                child: VendorOffersSection(
-                  vendorId: vendor.id,
-                  vendorUid: vendor.id.toString(),
-                  vendorName: vendor.businessName,
-                  coupons: vendor.coupons,
-                ),
-              ),
-              // Yearly Subscription
-              SliverToBoxAdapter(child: _buildSubscriptionPlansSection()),
-              // Bottom spacing
-              const SliverToBoxAdapter(child: SizedBox(height: 140)),
-            ],
+      body: CustomScrollView(
+        slivers: [
+          // Image Gallery with App Bar
+          _buildSliverAppBar(context),
+          // Vendor Info
+          SliverToBoxAdapter(child: _buildVendorInfo(context)),
+          // Offers Section
+          SliverToBoxAdapter(
+            child: VendorOffersSection(
+              vendorId: vendor.id,
+              vendorUid: vendor.id.toString(),
+              vendorName: vendor.businessName,
+              coupons: vendor.coupons,
+            ),
           ),
-          // Floating Payment Options Button
-          Positioned(
-            bottom: 24,
-            left: 20,
-            right: 20,
-            child: _buildPaymentOptionsButton(context),
-          ),
+          // Yearly Subscription
+          SliverToBoxAdapter(child: _buildSubscriptionPlansSection()),
+          // Bottom spacing
+          const SliverToBoxAdapter(child: SizedBox(height: 40)),
         ],
       ),
     );
@@ -583,7 +572,7 @@ class _VendorDetailView extends StatelessWidget {
     );
   }
 
-  Widget _buildVendorInfo() {
+  Widget _buildVendorInfo(BuildContext context) {
     return Container(
       margin: const EdgeInsets.all(20),
       child: Column(
@@ -786,11 +775,232 @@ class _VendorDetailView extends StatelessWidget {
             ],
           ),
 
+          // Points Payment Card
+          const SizedBox(height: 24),
+          _buildPointsPaymentCard(context),
+
           // Social Media Links
           if (vendor.socialMediaLinks.isNotEmpty) ...[
             const SizedBox(height: 24),
             _buildSocialMediaSection(),
           ],
+        ],
+      ),
+    );
+  }
+
+  /// Build points payment card
+  Widget _buildPointsPaymentCard(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 0),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF6366F1).withOpacity(0.3),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Stack(
+        children: [
+          // Decorative pattern
+          Positioned.fill(
+            child: CustomPaint(painter: PaymentCardPatternPainter()),
+          ),
+
+          // Card content
+          Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.3),
+                          width: 1,
+                        ),
+                      ),
+                      child: const Icon(
+                        Icons.payments_rounded,
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Pay with Points',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                              height: 1.1,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Use your reward points to pay bills',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.white.withOpacity(0.9),
+                              height: 1.2,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 20),
+
+                // Points info row
+                Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withAlpha(55),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: Colors.white.withAlpha(86),
+                            width: 1,
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Available Points',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white.withOpacity(0.8),
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            const Text(
+                              '2,500',
+                              // Mock data - should come from user state
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w800,
+                                color: Colors.white,
+                                letterSpacing: -0.5,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(width: 12),
+
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.2),
+                            width: 1,
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Exchange Rate',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white.withOpacity(0.8),
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            const Text(
+                              '1 pt = ₹1',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w800,
+                                color: Colors.white,
+                                letterSpacing: -0.3,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 20),
+
+                // Action button
+                Container(
+                  width: double.infinity,
+                  height: 52,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () => _openPointsPaymentDialog(context),
+                      borderRadius: BorderRadius.circular(16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.account_balance_wallet_rounded,
+                            color: const Color(0xFF6366F1),
+                            size: 20,
+                          ),
+                          const SizedBox(width: 8),
+                          const Text(
+                            'Pay Bill with Points',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF6366F1),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -894,53 +1104,58 @@ class _VendorDetailView extends StatelessWidget {
     launchUrlString(url);
   }
 
-  Widget _buildPaymentOptionsButton(BuildContext context) {
-    return Container(
-      height: 56,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        gradient: const LinearGradient(
-          colors: [Color(0xFF6F3FCC), Color(0xFF9F7AEA)],
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF6F3FCC).withOpacity(0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () => _showPaymentOptions(context),
-          borderRadius: BorderRadius.circular(16),
-          child: const Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.restaurant_menu, color: Colors.white, size: 20),
-              SizedBox(width: 8),
-              Text(
-                'Start Ordering',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white,
-                ),
-              ),
-            ],
-          ),
-        ),
+  /// Open points payment dialog
+  void _openPointsPaymentDialog(BuildContext context) {
+    HapticFeedback.lightImpact();
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) => PointsPaymentDialog(
+        vendor: vendor,
+        availablePoints: 2500, // Mock data - should come from user state
       ),
     );
+  }
+}
+
+/// Custom painter for payment card decorative pattern
+class PaymentCardPatternPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.white.withOpacity(0.1)
+      ..style = PaintingStyle.fill;
+
+    // Draw decorative circles pattern
+    for (double x = -20; x < size.width + 40; x += 60) {
+      for (double y = -20; y < size.height + 40; y += 60) {
+        canvas.drawCircle(Offset(x, y), 15, paint);
+      }
+    }
+
+    // Draw accent circles with different opacity
+    paint.color = Colors.white.withOpacity(0.05);
+    for (double x = 10; x < size.width + 40; x += 80) {
+      for (double y = 10; y < size.height + 40; y += 80) {
+        canvas.drawCircle(Offset(x, y), 25, paint);
+      }
+    }
+
+    // Draw subtle diagonal lines
+    paint
+      ..color = Colors.white.withOpacity(0.03)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1;
+
+    for (double i = -size.height; i < size.width; i += 40) {
+      canvas.drawLine(
+        Offset(i, 0),
+        Offset(i + size.height, size.height),
+        paint,
+      );
+    }
   }
 
-  void _showPaymentOptions(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => PaymentOptionsBottomSheet(vendor: vendor),
-    );
-  }
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
