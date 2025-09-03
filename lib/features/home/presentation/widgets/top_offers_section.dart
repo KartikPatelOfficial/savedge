@@ -292,7 +292,7 @@ class TopVendorCard extends StatelessWidget {
                           const SizedBox(height: 4),
                           // Description or address
                           Text(
-                            vendor.description ?? vendor.fullAddress,
+                            vendor.description ?? vendor.address ?? '',
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 13,
@@ -330,43 +330,11 @@ class TopVendorCard extends StatelessWidget {
                                         color: Colors.white,
                                         size: 12,
                                       ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        vendor.ratingDisplay,
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
                                     ],
                                   ),
                                 ),
                                 const SizedBox(width: 8),
                               ],
-                              // Open/closed status
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 4,
-                                ),
-                                decoration: BoxDecoration(
-                                  color:
-                                      (vendor.isCurrentlyOpen
-                                              ? Colors.green
-                                              : Colors.orange)
-                                          .withOpacity(0.2),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Text(
-                                  vendor.isCurrentlyOpen ? 'Open' : 'Closed',
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
                             ],
                           ),
                         ],
@@ -431,9 +399,22 @@ class TopVendorCard extends StatelessWidget {
 
   Widget _buildBackgroundImage() {
     // Check if vendor has primary image
-    final primaryImageUrl = vendor.primaryImageUrl;
+    final image = vendor.images.firstWhere(
+      (img) => img.isPrimary,
+      orElse: () => vendor.images.isNotEmpty
+          ? vendor.images[0]
+          : VendorImage(
+              id: 0,
+              imageUrl: '',
+              displayOrder: 0,
+              isPrimary: false,
+              imageType: 'unknown',
+              imageTypeName: 'Unknown',
+            ),
+    );
+    final primaryImageUrl = image.imageUrl;
 
-    if (primaryImageUrl != null && primaryImageUrl.isNotEmpty) {
+    if (primaryImageUrl.isNotEmpty) {
       return Positioned.fill(
         child: Image.network(
           primaryImageUrl,

@@ -85,21 +85,21 @@ enum ImageType {
 
 /// Social media platform enum
 enum SocialMediaPlatform {
-  @JsonValue('Instagram')
+  @JsonValue(1)
   instagram,
-  @JsonValue('Facebook')
+  @JsonValue(2)
   facebook,
-  @JsonValue('Twitter')
+  @JsonValue(3)
   twitter,
-  @JsonValue('LinkedIn')
+  @JsonValue(4)
   linkedin,
-  @JsonValue('YouTube')
+  @JsonValue(5)
   youtube,
-  @JsonValue('GoogleMaps')
+  @JsonValue(6)
   googleMaps,
-  @JsonValue('WhatsApp')
+  @JsonValue(7)
   whatsApp,
-  @JsonValue('Other')
+  @JsonValue(8)
   other,
 }
 

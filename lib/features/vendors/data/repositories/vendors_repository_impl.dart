@@ -3,9 +3,11 @@ import 'package:dio/dio.dart';
 
 import 'package:savedge/core/error/failures.dart';
 import 'package:savedge/features/vendors/domain/entities/vendor.dart';
+import 'package:savedge/features/vendors/domain/entities/coupon.dart' as domain;
 import 'package:savedge/features/vendors/domain/repositories/vendors_repository.dart';
 import 'package:savedge/features/vendors/data/datasources/vendors_remote_data_source.dart';
 import 'package:savedge/features/vendors/data/models/vendor_models.dart';
+import 'package:savedge/features/vendors/data/models/coupon_models.dart';
 
 class VendorsRepositoryImpl implements VendorsRepository {
   const VendorsRepositoryImpl({required this.remoteDataSource});
@@ -68,9 +70,24 @@ class VendorsRepositoryImpl implements VendorsRepository {
   Future<Either<Failure, Vendor>> getVendor(int id) async {
     try {
       final response = await remoteDataSource.getVendor(id);
-      
-      final vendor = _mapVendorResponseToEntity(response.data);
-      
+      // Try to parse coupons from raw response payload if present
+      List<domain.Coupon> coupons = const [];
+      try {
+        final raw = response.response.data;
+        if (raw is Map<String, dynamic> && raw['coupons'] is List) {
+          final items = (raw['coupons'] as List)
+              .whereType<Map<String, dynamic>>()
+              .map((j) => CouponResponse.fromJson(j))
+              .map(_mapCouponResponseToEntity)
+              .toList();
+          coupons = items;
+        }
+      } catch (_) {
+        // Ignore parsing issues; fallback stays empty
+      }
+
+      final vendor = _mapVendorResponseToEntity(response.data, coupons: coupons);
+
       return Right(vendor);
     } on DioException catch (e) {
       return Left(_handleDioError(e));
@@ -96,7 +113,7 @@ class VendorsRepositoryImpl implements VendorsRepository {
     }
   }
 
-  Vendor _mapVendorResponseToEntity(VendorResponse response) {
+  Vendor _mapVendorResponseToEntity(VendorResponse response, {List<domain.Coupon> coupons = const []}) {
     return Vendor(
       id: response.id,
       businessName: response.businessName,
@@ -118,14 +135,28 @@ class VendorsRepositoryImpl implements VendorsRepository {
       socialMediaLinks: response.socialMediaLinks
           .map(_mapVendorSocialMediaDtoToEntity)
           .toList(),
-      // Add some mock data for UI
-      rating: 4.5 + (response.id % 10) * 0.05,
-      // Mock rating between 4.5-4.95
-      averagePrice: 500 + (response.id % 5) * 100,
-      // Mock price between 500-900
-      isOpen: true,
-      openingHours: '11:00 AM',
-      closingHours: '3:00 PM',
+      coupons: coupons,
+      // Use actual data from API, no fake values
+    );
+  }
+
+  domain.Coupon _mapCouponResponseToEntity(CouponResponse dto) {
+    return domain.Coupon(
+      id: dto.id,
+      title: dto.title,
+      description: dto.description,
+      discountValue: dto.discountValue,
+      discountType: dto.discountType,
+      minimumOrderAmount: dto.minimumOrderAmount,
+      maximumDiscountAmount: dto.maximumDiscountAmount,
+      validFrom: dto.validFrom,
+      validTo: dto.validTo,
+      vendorId: dto.vendorId,
+      vendorUserId: dto.vendorUserId,
+      status: dto.status,
+      cashPrice: dto.cashPrice,
+      termsAndConditions: dto.termsAndConditions,
+      maxRedemptions: dto.maxRedemptions,
     );
   }
 
@@ -142,9 +173,39 @@ class VendorsRepositoryImpl implements VendorsRepository {
   }
 
   VendorSocialMedia _mapVendorSocialMediaDtoToEntity(VendorSocialMediaDto dto) {
+    // Map platform enum to integer value
+    int platformValue;
+    switch (dto.platform) {
+      case SocialMediaPlatform.instagram:
+        platformValue = 1;
+        break;
+      case SocialMediaPlatform.facebook:
+        platformValue = 2;
+        break;
+      case SocialMediaPlatform.twitter:
+        platformValue = 3;
+        break;
+      case SocialMediaPlatform.linkedin:
+        platformValue = 4;
+        break;
+      case SocialMediaPlatform.youtube:
+        platformValue = 5;
+        break;
+      case SocialMediaPlatform.googleMaps:
+        platformValue = 6;
+        break;
+      case SocialMediaPlatform.whatsApp:
+        platformValue = 7;
+        break;
+      case SocialMediaPlatform.other:
+      default:
+        platformValue = 8;
+        break;
+    }
+
     return VendorSocialMedia(
       id: dto.id,
-      platform: dto.platformName ?? 'Other',
+      platform: platformValue,
       platformName: dto.platformName ?? 'Other',
       url: dto.url,
       isActive: dto.isActive,

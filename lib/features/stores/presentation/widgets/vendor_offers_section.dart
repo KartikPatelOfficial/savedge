@@ -9,6 +9,158 @@ import 'package:savedge/features/coupons/presentation/pages/coupon_redemption_op
 import 'package:savedge/features/vendors/domain/entities/coupon.dart';
 import 'package:savedge/features/vendors/presentation/bloc/coupons_bloc.dart';
 
+// Shared UI builders (top-level) so both views can reuse them
+Widget _buildLoadingState() {
+  return Container(
+    height: 200,
+    margin: const EdgeInsets.symmetric(horizontal: 24),
+    child: const Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircularProgressIndicator(color: Color(0xFF6F3FCC), strokeWidth: 3),
+          SizedBox(height: 16),
+          Text(
+            'Loading offers...',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: Color(0xFF6B7280),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+Widget _buildErrorWidget(String message) {
+  return Container(
+    height: 200,
+    margin: const EdgeInsets.symmetric(horizontal: 24),
+    child: Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+              color: const Color(0xFFEF4444).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(40),
+              border: Border.all(
+                color: const Color(0xFFEF4444).withOpacity(0.2),
+                width: 2,
+              ),
+            ),
+            child: Icon(
+              Icons.error_outline,
+              size: 36,
+              color: const Color(0xFFEF4444).withOpacity(0.7),
+            ),
+          ),
+          const SizedBox(height: 16),
+          const Text(
+            'Failed to load offers',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF1A202C),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            message,
+            style: const TextStyle(fontSize: 14, color: Color(0xFF6B7280)),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+Widget _buildEmptyState() {
+  return Container(
+    height: 200,
+    margin: const EdgeInsets.symmetric(horizontal: 24),
+    child: Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+              color: const Color(0xFF6F3FCC).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(40),
+              border: Border.all(
+                color: const Color(0xFF6F3FCC).withOpacity(0.2),
+                width: 2,
+              ),
+            ),
+            child: Icon(
+              Icons.local_offer_outlined,
+              size: 36,
+              color: const Color(0xFF6F3FCC).withOpacity(0.7),
+            ),
+          ),
+          const SizedBox(height: 16),
+          const Text(
+            'No offers available',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF1A202C),
+            ),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Check back later for amazing deals!',
+            style: TextStyle(fontSize: 14, color: Color(0xFF6B7280)),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+Widget _buildCouponsList(List<Coupon> coupons, String vendorUid, String vendorName) {
+  if (coupons.isEmpty) {
+    return _buildEmptyState();
+  }
+
+  return AnimationLimiter(
+    child: Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Column(
+        children: coupons.asMap().entries.map((entry) {
+          final index = entry.key;
+          final coupon = entry.value;
+          return AnimationConfiguration.staggeredList(
+            position: index,
+            duration: const Duration(milliseconds: 600),
+            child: SlideAnimation(
+              verticalOffset: 30.0,
+              child: FadeInAnimation(
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: VendorOfferCard(
+                    coupon: coupon,
+                    vendorUid: vendorUid,
+                    vendorName: vendorName,
+                    index: index,
+                  ),
+                ),
+              ),
+            ),
+          );
+        }).toList(),
+      ),
+    ),
+  );
+}
+
 /// Beautiful vendor offers section with animations
 class VendorOffersSection extends StatelessWidget {
   const VendorOffersSection({
@@ -16,20 +168,33 @@ class VendorOffersSection extends StatelessWidget {
     required this.vendorId,
     required this.vendorUid,
     required this.vendorName,
+    this.coupons,
     this.title = 'Special Offers',
   });
 
   final int vendorId;
   final String vendorUid;
   final String vendorName;
+  final List<Coupon>? coupons;
   final String title;
 
   @override
   Widget build(BuildContext context) {
+    // If coupons are provided with the vendor, render directly.
+    if (coupons != null) {
+      return VendorOffersView(
+        title: title,
+        vendorUid: vendorUid,
+        vendorName: vendorName,
+        coupons: coupons!,
+      );
+    }
+
+    // Fallback to loading via bloc
     return BlocProvider(
       create: (context) =>
           getIt<CouponsBloc>()..add(LoadVendorCoupons(vendorId: vendorId)),
-      child: VendorOffersView(
+      child: VendorOffersBlocView(
         title: title,
         vendorUid: vendorUid,
         vendorName: vendorName,
@@ -38,8 +203,8 @@ class VendorOffersSection extends StatelessWidget {
   }
 }
 
-class VendorOffersView extends StatelessWidget {
-  const VendorOffersView({
+class VendorOffersBlocView extends StatelessWidget {
+  const VendorOffersBlocView({
     super.key,
     required this.title,
     required this.vendorUid,
@@ -94,7 +259,7 @@ class VendorOffersView extends StatelessWidget {
               } else if (state is CouponsError) {
                 return _buildErrorWidget(state.message);
               } else if (state is CouponsLoaded) {
-                return _buildCouponsList(state.coupons);
+                return _buildCouponsList(state.coupons, vendorUid, vendorName);
               }
               return _buildEmptyState();
             },
@@ -103,154 +268,63 @@ class VendorOffersView extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget _buildLoadingState() {
+class VendorOffersView extends StatelessWidget {
+  const VendorOffersView({
+    super.key,
+    required this.title,
+    required this.vendorUid,
+    required this.vendorName,
+    required this.coupons,
+  });
+
+  final String title;
+  final String vendorUid;
+  final String vendorName;
+  final List<Coupon> coupons;
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
-      height: 200,
-      margin: const EdgeInsets.symmetric(horizontal: 24),
-      child: const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(color: Color(0xFF6F3FCC), strokeWidth: 3),
-            SizedBox(height: 16),
-            Text(
-              'Loading offers...',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: Color(0xFF6B7280),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCouponsList(List<Coupon> coupons) {
-    if (coupons.isEmpty) {
-      return _buildEmptyState();
-    }
-
-    return AnimationLimiter(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: Column(
-          children: coupons.asMap().entries.map((entry) {
-            final index = entry.key;
-            final coupon = entry.value;
-            return AnimationConfiguration.staggeredList(
-              position: index,
-              duration: const Duration(milliseconds: 600),
-              child: SlideAnimation(
-                verticalOffset: 30.0,
-                child: FadeInAnimation(
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 16),
-                    child: VendorOfferCard(
-                      coupon: coupon,
-                      vendorUid: vendorUid,
-                      vendorName: vendorName,
-                      index: index,
-                    ),
+      margin: const EdgeInsets.only(top: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Section header
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF6F3FCC).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(
+                    Icons.local_offer,
+                    color: Color(0xFF6F3FCC),
+                    size: 20,
                   ),
                 ),
-              ),
-            );
-          }).toList(),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildErrorWidget(String message) {
-    return Container(
-      height: 200,
-      margin: const EdgeInsets.symmetric(horizontal: 24),
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: const Color(0xFFEF4444).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(40),
-                border: Border.all(
-                  color: const Color(0xFFEF4444).withOpacity(0.2),
-                  width: 2,
+                const SizedBox(width: 12),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF1A202C),
+                  ),
                 ),
-              ),
-              child: Icon(
-                Icons.error_outline,
-                size: 36,
-                color: const Color(0xFFEF4444).withOpacity(0.7),
-              ),
+              ],
             ),
-            const SizedBox(height: 16),
-            const Text(
-              'Failed to load offers',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF1A202C),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              message,
-              style: const TextStyle(fontSize: 14, color: Color(0xFF6B7280)),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildEmptyState() {
-    return Container(
-      height: 200,
-      margin: const EdgeInsets.symmetric(horizontal: 24),
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: const Color(0xFF6F3FCC).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(40),
-                border: Border.all(
-                  color: const Color(0xFF6F3FCC).withOpacity(0.2),
-                  width: 2,
-                ),
-              ),
-              child: Icon(
-                Icons.local_offer_outlined,
-                size: 36,
-                color: const Color(0xFF6F3FCC).withOpacity(0.7),
-              ),
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'No offers available',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF1A202C),
-              ),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'Check back later for amazing deals!',
-              style: TextStyle(fontSize: 14, color: Color(0xFF6B7280)),
-            ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 20),
+          coupons.isNotEmpty
+              ? _buildCouponsList(coupons, vendorUid, vendorName)
+              : _buildEmptyState(),
+        ],
       ),
     );
   }

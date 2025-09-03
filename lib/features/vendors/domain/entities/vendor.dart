@@ -1,8 +1,5 @@
 import 'package:equatable/equatable.dart';
-
-/// Import the coupon entity
-// TODO: Uncomment when coupon entity is properly set up
-// import 'coupon.dart';
+import 'coupon.dart';
 
 /// Vendor domain entity
 class Vendor extends Equatable {
@@ -23,10 +20,9 @@ class Vendor extends Equatable {
     this.approvedAt,
     this.approvedBy,
     required this.createdAt,
-    // Removed Firebase/vendor personal fields per backend DTO update
     this.images = const [],
     this.socialMediaLinks = const [],
-    // this.coupons = const [], // TODO: Uncomment when coupon entity is ready
+    this.coupons = const [],
     this.rating,
     this.averagePrice,
     this.isOpen,
@@ -52,49 +48,14 @@ class Vendor extends Equatable {
   final DateTime createdAt;
   final List<VendorImage> images;
   final List<VendorSocialMedia> socialMediaLinks;
-  // final List<Coupon> coupons; // TODO: Uncomment when coupon entity is ready
+  final List<Coupon> coupons;
 
-  // Additional computed properties for UI
+  // Additional properties for UI (provided by API)
   final double? rating;
   final int? averagePrice;
   final bool? isOpen;
   final String? openingHours;
   final String? closingHours;
-
-  /// Get primary image URL
-  String? get primaryImageUrl {
-    final primaryImage = images.where((img) => img.isPrimary).firstOrNull;
-    return primaryImage?.imageUrl ?? images.firstOrNull?.imageUrl;
-  }
-
-  /// Get full address string
-  String get fullAddress {
-    final addressParts = <String>[];
-    if (address?.isNotEmpty == true) addressParts.add(address!);
-    if (city?.isNotEmpty == true) addressParts.add(city!);
-    if (state?.isNotEmpty == true) addressParts.add(state!);
-    if (pinCode?.isNotEmpty == true) addressParts.add(pinCode!);
-    return addressParts.join(', ');
-  }
-
-  /// Check if vendor is currently open
-  bool get isCurrentlyOpen {
-    if (isOpen != null) return isOpen!;
-    // You can add time-based logic here
-    return true; // Default to open
-  }
-
-  /// Get average price display
-  String get averagePriceDisplay {
-    if (averagePrice == null) return '';
-    return '₹$averagePrice Avg. For 2 Person';
-  }
-
-  /// Get rating display
-  String get ratingDisplay {
-    if (rating == null) return '0.0';
-    return rating!.toStringAsFixed(1);
-  }
 
   @override
   List<Object?> get props => [
@@ -116,6 +77,7 @@ class Vendor extends Equatable {
     createdAt,
     images,
     socialMediaLinks,
+    coupons,
     rating,
     averagePrice,
     isOpen,
@@ -167,7 +129,7 @@ class VendorSocialMedia extends Equatable {
   });
 
   final int id;
-  final String platform;
+  final int platform;
   final String platformName;
   final String url;
   final bool isActive;

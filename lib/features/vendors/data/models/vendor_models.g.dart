@@ -120,14 +120,14 @@ Map<String, dynamic> _$VendorSocialMediaDtoToJson(
 };
 
 const _$SocialMediaPlatformEnumMap = {
-  SocialMediaPlatform.instagram: 'Instagram',
-  SocialMediaPlatform.facebook: 'Facebook',
-  SocialMediaPlatform.twitter: 'Twitter',
-  SocialMediaPlatform.linkedin: 'LinkedIn',
-  SocialMediaPlatform.youtube: 'YouTube',
-  SocialMediaPlatform.googleMaps: 'GoogleMaps',
-  SocialMediaPlatform.whatsApp: 'WhatsApp',
-  SocialMediaPlatform.other: 'Other',
+  SocialMediaPlatform.instagram: 1,
+  SocialMediaPlatform.facebook: 2,
+  SocialMediaPlatform.twitter: 3,
+  SocialMediaPlatform.linkedin: 4,
+  SocialMediaPlatform.youtube: 5,
+  SocialMediaPlatform.googleMaps: 6,
+  SocialMediaPlatform.whatsApp: 7,
+  SocialMediaPlatform.other: 8,
 };
 
 _PaginatedVendorsResponse _$PaginatedVendorsResponseFromJson(

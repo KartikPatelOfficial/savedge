@@ -416,6 +416,10 @@ class VendorCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final imageUrl = vendor.images.isNotEmpty
+        ? vendor.images[0].imageUrl
+        : null;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
@@ -440,9 +444,9 @@ class VendorCard extends StatelessWidget {
                     color: const Color(0xFFF7FAFC),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: vendor.primaryImageUrl != null
+                  child: imageUrl != null
                       ? Image.network(
-                          vendor.primaryImageUrl!,
+                          imageUrl,
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) =>
                               _buildPlaceholderImage(),
@@ -468,7 +472,7 @@ class VendorCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      vendor.fullAddress,
+                      vendor.address ?? 'No address provided',
                       style: const TextStyle(
                         fontSize: 14,
                         color: Color(0xFF718096),
@@ -516,39 +520,11 @@ class VendorCard extends StatelessWidget {
                                   color: Colors.white,
                                   size: 14,
                                 ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  vendor.ratingDisplay,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
                               ],
                             ),
                           ),
                           const SizedBox(width: 12),
                         ],
-                        if (vendor.isCurrentlyOpen)
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 6,
-                            ),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF38A169),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: const Text(
-                              'Open Now',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
                       ],
                     ),
                   ],

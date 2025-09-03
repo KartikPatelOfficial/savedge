@@ -11,6 +11,7 @@ import 'package:savedge/features/vendors/domain/entities/vendor.dart';
 import 'package:savedge/features/vendors/presentation/bloc/vendor_detail_bloc.dart';
 import 'package:savedge/features/vendors/presentation/bloc/vendor_detail_event.dart';
 import 'package:savedge/features/vendors/presentation/bloc/vendor_detail_state.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class VendorDetailPage extends StatelessWidget {
   const VendorDetailPage({super.key, this.vendor, this.vendorId})
@@ -315,6 +316,54 @@ class _VendorDetailView extends StatelessWidget {
 
   final Vendor vendor;
 
+  /// Get primary image URL
+  String? get _primaryImageUrl {
+    final primaryImage = vendor.images
+        .where((img) => img.isPrimary)
+        .firstOrNull;
+    return primaryImage?.imageUrl ?? vendor.images.firstOrNull?.imageUrl;
+  }
+
+  /// Get full address string
+  String get _fullAddress {
+    final addressParts = <String>[];
+    if (vendor.address?.isNotEmpty == true) addressParts.add(vendor.address!);
+    if (vendor.city?.isNotEmpty == true) addressParts.add(vendor.city!);
+    if (vendor.state?.isNotEmpty == true) addressParts.add(vendor.state!);
+    if (vendor.pinCode?.isNotEmpty == true) addressParts.add(vendor.pinCode!);
+    return addressParts.isNotEmpty
+        ? addressParts.join(', ')
+        : 'Address not available';
+  }
+
+  /// Get average price display
+  String get _averagePriceDisplay {
+    if (vendor.averagePrice == null) return '';
+    return '₹${vendor.averagePrice} Avg. For 2 Person';
+  }
+
+  /// Get rating display
+  String get _ratingDisplay {
+    if (vendor.rating == null) return '0.0';
+    return vendor.rating!.toStringAsFixed(1);
+  }
+
+  /// Get timing text when open
+  String _getTimingText() {
+    if (vendor.openingHours != null && vendor.closingHours != null) {
+      return '${vendor.openingHours} to ${vendor.closingHours}';
+    }
+    return 'Timing not available';
+  }
+
+  /// Get timing text when closed
+  String _getClosedTimingText() {
+    if (vendor.openingHours != null) {
+      return 'Opens at ${vendor.openingHours}';
+    }
+    return 'Opening hours not available';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -333,6 +382,7 @@ class _VendorDetailView extends StatelessWidget {
                   vendorId: vendor.id,
                   vendorUid: vendor.id.toString(),
                   vendorName: vendor.businessName,
+                  coupons: vendor.coupons,
                 ),
               ),
               // Yearly Subscription
@@ -567,7 +617,7 @@ class _VendorDetailView extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        vendor.ratingDisplay,
+                        _ratingDisplay,
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 16,
@@ -607,7 +657,7 @@ class _VendorDetailView extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  vendor.fullAddress,
+                  _fullAddress,
                   style: const TextStyle(
                     fontSize: 16,
                     color: Color(0xFF4A5568),
@@ -661,7 +711,7 @@ class _VendorDetailView extends StatelessWidget {
                     ),
                   ),
                   child: Text(
-                    vendor.averagePriceDisplay,
+                    _averagePriceDisplay,
                     style: const TextStyle(
                       fontSize: 14,
                       color: Color(0xFFD69E2E),
@@ -671,77 +721,6 @@ class _VendorDetailView extends StatelessWidget {
                 ),
               ],
             ],
-          ),
-          const SizedBox(height: 16),
-
-          // Open status and timing in modern card
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: vendor.isCurrentlyOpen
-                  ? const Color(0xFF38A169).withOpacity(0.1)
-                  : const Color(0xFFE53E3E).withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: vendor.isCurrentlyOpen
-                    ? const Color(0xFF38A169).withOpacity(0.2)
-                    : const Color(0xFFE53E3E).withOpacity(0.2),
-                width: 1,
-              ),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 32,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    color: vendor.isCurrentlyOpen
-                        ? const Color(0xFF38A169)
-                        : const Color(0xFFE53E3E),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(
-                    vendor.isCurrentlyOpen
-                        ? Icons.access_time_rounded
-                        : Icons.schedule_rounded,
-                    color: Colors.white,
-                    size: 18,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        vendor.isCurrentlyOpen
-                            ? 'Open Now'
-                            : 'Currently Closed',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: vendor.isCurrentlyOpen
-                              ? const Color(0xFF38A169)
-                              : const Color(0xFFE53E3E),
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        vendor.isCurrentlyOpen
-                            ? '${vendor.openingHours ?? "11:00 AM"} to ${vendor.closingHours ?? "3:00 PM"}'
-                            : 'Opens at ${vendor.openingHours ?? "11:00 AM"}',
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Color(0xFF4A5568),
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
           ),
           const SizedBox(height: 24),
 
@@ -806,9 +785,113 @@ class _VendorDetailView extends StatelessWidget {
               ),
             ],
           ),
+
+          // Social Media Links
+          if (vendor.socialMediaLinks.isNotEmpty) ...[
+            const SizedBox(height: 24),
+            _buildSocialMediaSection(),
+          ],
         ],
       ),
     );
+  }
+
+  /// Build social media links section
+  Widget _buildSocialMediaSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Follow Us',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF1A202C),
+          ),
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: vendor.socialMediaLinks
+              .where((social) => social.isActive)
+              .map((social) => _buildSocialMediaIcon(social))
+              .toList(),
+        ),
+      ],
+    );
+  }
+
+  /// Build individual social media icon
+  Widget _buildSocialMediaIcon(VendorSocialMedia social) {
+    IconData iconData;
+    Color backgroundColor;
+
+    // Map platform integers to icons and colors
+    switch (social.platform) {
+      case 1: // Instagram
+        iconData = Icons.camera_alt;
+        backgroundColor = const Color(0xFFE4405F);
+        break;
+      case 2: // Facebook
+        iconData = Icons.facebook;
+        backgroundColor = const Color(0xFF1877F2);
+        break;
+      case 3: // Twitter
+        iconData = Icons.alternate_email;
+        backgroundColor = const Color(0xFF1DA1F2);
+        break;
+      case 4: // LinkedIn
+        iconData = Icons.business;
+        backgroundColor = const Color(0xFF0A66C2);
+        break;
+      case 5: // YouTube
+        iconData = Icons.play_arrow;
+        backgroundColor = const Color(0xFFFF0000);
+        break;
+      case 6: // Google Maps
+        iconData = Icons.map;
+        backgroundColor = const Color(0xFF4285F4);
+        break;
+      case 7: // WhatsApp
+        iconData = Icons.chat;
+        backgroundColor = const Color(0xFF25D366);
+        break;
+      default: // Other
+        iconData = Icons.link;
+        backgroundColor = const Color(0xFF6B7280);
+        break;
+    }
+
+    return Container(
+      margin: const EdgeInsets.only(right: 12),
+      child: Container(
+        width: 48,
+        height: 48,
+        decoration: BoxDecoration(
+          color: backgroundColor,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: backgroundColor.withOpacity(0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () => _launchSocialMediaUrl(social.url),
+            borderRadius: BorderRadius.circular(12),
+            child: Icon(iconData, color: Colors.white, size: 24),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Launch social media URL
+  void _launchSocialMediaUrl(String url) {
+    launchUrlString(url);
   }
 
   Widget _buildPaymentOptionsButton(BuildContext context) {
