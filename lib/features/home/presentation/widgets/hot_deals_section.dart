@@ -13,12 +13,19 @@ class HotDealsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) =>
-          getIt<CouponsBloc>()..add(const LoadFeaturedCoupons(pageSize: 5)),
-      // Load only 5 featured coupons
-      child: HotDealsView(),
-    );
+    // Try to use existing BLoC from parent, but don't watch for changes
+    final couponsBloc = context.read<CouponsBloc?>();
+    
+    if (couponsBloc == null) {
+      // Fallback: create a new BLoC if not provided by parent
+      return BlocProvider(
+        create: (context) =>
+            getIt<CouponsBloc>()..add(const LoadFeaturedCoupons(pageSize: 5)),
+        child: const HotDealsView(),
+      );
+    }
+    
+    return const HotDealsView();
   }
 }
 

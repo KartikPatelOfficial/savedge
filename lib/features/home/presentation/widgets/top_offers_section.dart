@@ -20,11 +20,19 @@ class TopOffersSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) =>
-          getIt<VendorsBloc>()..add(const LoadVendors(pageSize: 10)),
-      child: TopOffersView(title: title, onVendorTap: onVendorTap),
-    );
+    // Try to use existing BLoC from parent, but don't watch for changes
+    final vendorsBloc = context.read<VendorsBloc?>();
+    
+    if (vendorsBloc == null) {
+      // Fallback: create a new BLoC if not provided by parent
+      return BlocProvider(
+        create: (context) =>
+            getIt<VendorsBloc>()..add(const LoadVendors(pageSize: 10)),
+        child: TopOffersView(title: title, onVendorTap: onVendorTap),
+      );
+    }
+    
+    return TopOffersView(title: title, onVendorTap: onVendorTap);
   }
 }
 

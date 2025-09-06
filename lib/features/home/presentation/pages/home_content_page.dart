@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:savedge/core/injection/injection.dart';
 import 'package:savedge/features/home/presentation/widgets/widgets.dart';
 import 'package:savedge/features/stores/presentation/pages/stores_page.dart';
 import 'package:savedge/features/stores/presentation/pages/vendor_detail_page.dart';
+import 'package:savedge/features/subscription/presentation/bloc/subscription_plan_bloc.dart';
 import 'package:savedge/features/vendors/domain/entities/vendor.dart';
+import 'package:savedge/features/vendors/presentation/bloc/coupons_bloc.dart';
+import 'package:savedge/features/vendors/presentation/bloc/vendors_bloc.dart';
+import 'package:savedge/features/vendors/presentation/bloc/vendors_event.dart';
 
 /// Beautiful home content page with modern design and real data integration
 class HomeContentPage extends StatefulWidget {
@@ -17,58 +23,90 @@ class HomeContentPage extends StatefulWidget {
 class _HomeContentPageState extends State<HomeContentPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final ScrollController _scrollController = ScrollController();
+  late final CouponsBloc _couponsBloc;
+  late final VendorsBloc _vendorsBloc;
+  late final SubscriptionPlanBloc _subscriptionBloc;
+  final GlobalKey<SubscriptionPlansSectionState> _subscriptionKey = GlobalKey();
 
   @override
   void initState() {
     super.initState();
+    _couponsBloc = getIt<CouponsBloc>();
+    _vendorsBloc = getIt<VendorsBloc>();
+    _subscriptionBloc = getIt<SubscriptionPlanBloc>();
+    _loadInitialData();
+  }
+
+  void _loadInitialData() {
+    _couponsBloc.add(const LoadFeaturedCoupons(pageSize: 5));
+    _vendorsBloc.add(const LoadVendors(pageSize: 10));
+    _subscriptionBloc.add(const LoadSubscriptionPlans());
   }
 
   @override
   void dispose() {
     _scrollController.dispose();
+    _couponsBloc.close();
+    _vendorsBloc.close();
+    _subscriptionBloc.close();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
-      backgroundColor: Colors.white,
-      drawer: HomeDrawer(
-        userName: 'Welcome',
-        onMenuItemTap: _onDrawerMenuItemTap,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider.value(value: _couponsBloc),
+        BlocProvider.value(value: _vendorsBloc),
+        BlocProvider.value(value: _subscriptionBloc),
+      ],
+      child: Scaffold(
+        key: _scaffoldKey,
+        backgroundColor: Colors.white,
+        drawer: HomeDrawer(
+          userName: 'Welcome',
+          onMenuItemTap: _onDrawerMenuItemTap,
+        ),
+        body: _buildMainContent(),
       ),
-      body: _buildMainContent(),
     );
   }
 
   Widget _buildMainContent() {
-    return CustomScrollView(
-      controller: _scrollController,
-      physics: const BouncingScrollPhysics(),
-      slivers: [
-        _buildModernAppBar(),
-        SliverToBoxAdapter(
-          child: AnimationLimiter(
-            child: Column(
-              children: AnimationConfiguration.toStaggeredList(
-                duration: const Duration(milliseconds: 600),
-                childAnimationBuilder: (widget) => SlideAnimation(
-                  verticalOffset: 50.0,
-                  child: FadeInAnimation(child: widget),
+    return RefreshIndicator(
+      onRefresh: _handleRefresh,
+      color: const Color(0xFF1A202C),
+      backgroundColor: Colors.white,
+      displacement: 80,
+      child: CustomScrollView(
+        controller: _scrollController,
+        physics: const AlwaysScrollableScrollPhysics(
+          parent: BouncingScrollPhysics(),
+        ),
+        slivers: [
+          _buildModernAppBar(),
+          SliverToBoxAdapter(
+            child: AnimationLimiter(
+              child: Column(
+                children: AnimationConfiguration.toStaggeredList(
+                  duration: const Duration(milliseconds: 600),
+                  childAnimationBuilder: (widget) => SlideAnimation(
+                    verticalOffset: 50.0,
+                    child: FadeInAnimation(child: widget),
+                  ),
+                  children: [
+                    _buildHotDealsSection(),
+                    _buildCategoriesSection(),
+                    _buildSubscriptionPlansSection(),
+                    _buildTopOffersSection(),
+                    const SizedBox(height: 40),
+                  ],
                 ),
-                children: [
-                  _buildHotDealsSection(),
-                  _buildCategoriesSection(),
-                  _buildSubscriptionPlansSection(),
-                  _buildTopOffersSection(),
-                  const SizedBox(height: 40),
-                ],
               ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -201,7 +239,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
   Widget _buildSubscriptionPlansSection() {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),
-      child: const SubscriptionPlansSection(),
+      child: SubscriptionPlansSection(key: _subscriptionKey),
     );
   }
 
@@ -256,5 +294,21 @@ class _HomeContentPageState extends State<HomeContentPage> {
         builder: (context) => VendorDetailPage(vendorId: vendor.id),
       ),
     );
+  }
+
+  Future<void> _handleRefresh() async {
+    HapticFeedback.lightImpact();
+
+    // Reload all data from BLoCs
+    _couponsBloc.add(const LoadFeaturedCoupons(pageSize: 5));
+    // Use refresh event to avoid duplicate vendors on pull-to-refresh
+    _vendorsBloc.add(const RefreshVendors());
+    _subscriptionBloc.add(const LoadSubscriptionPlans());
+
+    // Also refresh subscription section if it has its own state
+    _subscriptionKey.currentState?.checkSubscriptionStatus();
+
+    // Wait for data to load (approximate time)
+    await Future.delayed(const Duration(milliseconds: 800));
   }
 }

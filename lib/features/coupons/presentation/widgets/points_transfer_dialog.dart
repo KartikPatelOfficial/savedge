@@ -17,13 +17,14 @@ class PointsTransferDialog extends StatefulWidget {
 
 class _PointsTransferDialogState extends State<PointsTransferDialog> {
   final _pointsController = TextEditingController();
+  final _phoneController = TextEditingController();
   final _messageController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  ColleagueModel? _selectedColleague;
 
   @override
   void dispose() {
     _pointsController.dispose();
+    _phoneController.dispose();
     _messageController.dispose();
     super.dispose();
   }
@@ -31,7 +32,7 @@ class _PointsTransferDialogState extends State<PointsTransferDialog> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => getIt<GiftingBloc>()..add(const LoadColleagues()),
+      create: (context) => getIt<GiftingBloc>(),
       child: BlocConsumer<GiftingBloc, GiftingState>(
         listener: (context, state) {
           if (state is GiftingSuccess) {
@@ -97,7 +98,7 @@ class _PointsTransferDialogState extends State<PointsTransferDialog> {
                     ),
                     const SizedBox(height: 20),
                     const Text(
-                      'Share your points with colleagues within your organization',
+                      'Enter recipient\'s phone number to transfer points',
                       style: TextStyle(
                         fontSize: 16,
                         color: Color(0xFF4A5568),
@@ -105,9 +106,9 @@ class _PointsTransferDialogState extends State<PointsTransferDialog> {
                       ),
                     ),
                     const SizedBox(height: 24),
-                    // Select Colleague
+                    // Recipient Phone Number
                     const Text(
-                      'Select Colleague',
+                      'Recipient Phone Number',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -115,52 +116,49 @@ class _PointsTransferDialogState extends State<PointsTransferDialog> {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    if (state is ColleaguesLoaded) ...[
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: const Color(0xFFE2E8F0)),
-                          borderRadius: BorderRadius.circular(12),
+                    TextFormField(
+                      controller: _phoneController,
+                      keyboardType: TextInputType.phone,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(RegExp(r'[0-9+ ]')),
+                      ],
+                      validator: (value) {
+                        final v = (value ?? '').replaceAll(' ', '');
+                        if (v.isEmpty) {
+                          return 'Please enter recipient\'s phone number';
+                        }
+                        final phoneRegex = RegExp(r'^\+?[0-9]{10,13}$');
+                        if (!phoneRegex.hasMatch(v)) {
+                          return 'Enter a valid phone number';
+                        }
+                        return null;
+                      },
+                      decoration: InputDecoration(
+                        hintText: 'e.g. +919876543210',
+                        prefixIcon: const Icon(
+                          Icons.phone_iphone,
+                          color: Color(0xFF4A5568),
                         ),
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton<ColleagueModel>(
-                            value: _selectedColleague,
-                            hint: const Text('Choose a colleague'),
-                            isExpanded: true,
-                            items: state.colleagues.map((colleague) {
-                              return DropdownMenuItem<ColleagueModel>(
-                                value: colleague,
-                                child: Text(
-                                  colleague.email.isNotEmpty
-                                      ? '${colleague.email} (${colleague.department})'
-                                      : '${colleague.employeeCode} (${colleague.department})',
-                                ),
-                              );
-                            }).toList(),
-                            onChanged: (colleague) {
-                              setState(() {
-                                _selectedColleague = colleague;
-                              });
-                            },
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: Color(0xFFE2E8F0),
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: Color(0xFF6F3FCC),
+                          ),
+                        ),
+                        errorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: Color(0xFFE53E3E),
                           ),
                         ),
                       ),
-                    ] else if (state is GiftingLoading) ...[
-                      const Center(child: CircularProgressIndicator()),
-                    ] else if (state is GiftingError) ...[
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFE53E3E).withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          'Failed to load colleagues: ${state.message}',
-                          style: const TextStyle(color: Color(0xFFE53E3E)),
-                        ),
-                      ),
-                    ],
+                    ),
                     const SizedBox(height: 20),
                     // Points Amount
                     const Text(
@@ -228,7 +226,7 @@ class _PointsTransferDialogState extends State<PointsTransferDialog> {
                       maxLines: 3,
                       maxLength: 200,
                       decoration: InputDecoration(
-                        hintText: 'Add a message for your colleague...',
+                        hintText: 'Add a message for the recipient...',
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: const BorderSide(
@@ -270,19 +268,20 @@ class _PointsTransferDialogState extends State<PointsTransferDialog> {
                         const SizedBox(width: 16),
                         Expanded(
                           child: ElevatedButton(
-                            onPressed:
-                                _selectedColleague != null &&
-                                    state is! GiftingLoading &&
+                            onPressed: state is! GiftingLoading &&
                                     _formKey.currentState?.validate() == true
                                 ? () {
                                     final points = int.parse(
                                       _pointsController.text,
                                     );
+                                    final phone =
+                                        _phoneController.text.replaceAll(' ', '');
                                     final request = TransferPointsRequest(
-                                      toUserId: _selectedColleague!.userId,
+                                      toUserId: phone,
                                       points: points,
-                                      message:
-                                          _messageController.text.trim().isEmpty
+                                      message: _messageController.text
+                                              .trim()
+                                              .isEmpty
                                           ? null
                                           : _messageController.text.trim(),
                                     );

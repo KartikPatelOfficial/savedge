@@ -169,7 +169,7 @@ class _GiftPageState extends State<GiftPage> with TickerProviderStateMixin {
                 child: _buildGiftOption(
                   icon: Icons.stars,
                   title: 'Transfer Points',
-                  subtitle: 'Send points to colleagues',
+                  subtitle: 'Send points to a phone number',
                   color: const Color(0xFFD69E2E),
                   onTap: () => _showPointsTransferDialog(),
                 ),

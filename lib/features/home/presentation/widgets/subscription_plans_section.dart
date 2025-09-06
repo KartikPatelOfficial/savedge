@@ -15,10 +15,12 @@ class SubscriptionPlansSection extends StatefulWidget {
 
   @override
   State<SubscriptionPlansSection> createState() =>
-      _SubscriptionPlansSectionState();
+      SubscriptionPlansSectionState();
 }
 
-class _SubscriptionPlansSectionState extends State<SubscriptionPlansSection> {
+class SubscriptionPlansSectionState extends State<SubscriptionPlansSection> {
+
+// Made public to allow parent to call checkSubscriptionStatus
   bool _isLoading = true;
   bool _hasActiveSubscription = false;
   String? _error;
@@ -28,10 +30,10 @@ class _SubscriptionPlansSectionState extends State<SubscriptionPlansSection> {
   @override
   void initState() {
     super.initState();
-    _checkSubscriptionStatus();
+    checkSubscriptionStatus();
   }
 
-  Future<void> _checkSubscriptionStatus() async {
+  Future<void> checkSubscriptionStatus() async {
     try {
       setState(() => _isLoading = true);
 

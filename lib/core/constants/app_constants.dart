@@ -1,9 +1,13 @@
+import 'package:flutter/foundation.dart';
+
 /// Application-wide constants
 class AppConstants {
   AppConstants._();
 
   // API Constants
-  static const String baseUrl = 'https://10.0.2.2:44447';
+  static const String baseUrl = kDebugMode
+      ? 'https://10.0.2.2:44447'
+      : 'https://web-app-20250829054601.salmonhill-0be6c935.centralindia.azurecontainerapps.io/';
   static const String apiVersion = 'v1';
   static const Duration connectionTimeout = Duration(seconds: 30);
   static const Duration receiveTimeout = Duration(seconds: 30);
@@ -41,5 +45,4 @@ class AppConstants {
 
   /// Cache keys
   static const String userCacheKey = 'CACHED_USER';
-
 }
