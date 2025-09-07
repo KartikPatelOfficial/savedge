@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:savedge/core/injection/injection.dart';
+import 'package:savedge/features/favorites/presentation/pages/favorites_page.dart';
 import 'package:savedge/features/home/presentation/widgets/widgets.dart';
 import 'package:savedge/features/stores/presentation/pages/stores_page.dart';
 import 'package:savedge/features/stores/presentation/pages/vendor_detail_page.dart';
@@ -257,7 +258,11 @@ class _HomeContentPageState extends State<HomeContentPage> {
   // Event handlers
   void _onFavoriteTap() {
     HapticFeedback.lightImpact();
-    debugPrint('Favorite tap');
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const FavoritesPage()),
+    );
   }
 
   void _onNotificationTap() {

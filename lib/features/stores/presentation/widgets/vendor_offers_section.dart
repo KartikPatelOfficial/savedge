@@ -207,7 +207,7 @@ class VendorOffersSection extends StatelessWidget {
   }
 }
 
-class VendorOffersBlocView extends StatelessWidget {
+class VendorOffersBlocView extends StatefulWidget {
   const VendorOffersBlocView({
     super.key,
     required this.title,
@@ -218,6 +218,13 @@ class VendorOffersBlocView extends StatelessWidget {
   final String title;
   final String vendorUid;
   final String vendorName;
+
+  @override
+  State<VendorOffersBlocView> createState() => _VendorOffersBlocViewState();
+}
+
+class _VendorOffersBlocViewState extends State<VendorOffersBlocView> {
+  bool membershipOnly = false;
 
   @override
   Widget build(BuildContext context) {
@@ -245,12 +252,28 @@ class VendorOffersBlocView extends StatelessWidget {
                 ),
                 const SizedBox(width: 12),
                 Text(
-                  title,
+                  widget.title,
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
                     color: Color(0xFF1A202C),
                   ),
+                ),
+                const Spacer(),
+                // Membership only toggle
+                Row(
+                  children: [
+                    const Text(
+                      'Membership only',
+                      style: TextStyle(fontSize: 12, color: Color(0xFF4B5563)),
+                    ),
+                    const SizedBox(width: 8),
+                    Switch(
+                      value: membershipOnly,
+                      activeColor: const Color(0xFF6F3FCC),
+                      onChanged: (v) => setState(() => membershipOnly = v),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -263,7 +286,20 @@ class VendorOffersBlocView extends StatelessWidget {
               } else if (state is CouponsError) {
                 return _buildErrorWidget(state.message);
               } else if (state is CouponsLoaded) {
-                return _buildCouponsList(state.coupons, vendorUid, vendorName);
+                // Only show claimable (valid & active) coupons
+                var visible = state.coupons.where((c) => c.isValid).toList();
+                if (membershipOnly) {
+                  // Include coupons that can be claimed via membership (subscription),
+                  // even if they also have a cash option. Treat maxRedemptions <= 0 or -1 as not membership-eligible.
+                  visible = visible
+                      .where((c) => (c.maxRedemptions != null && c.maxRedemptions! > 0))
+                      .toList();
+                }
+                return _buildCouponsList(
+                  visible,
+                  widget.vendorUid,
+                  widget.vendorName,
+                );
               }
               return _buildEmptyState();
             },
@@ -274,7 +310,7 @@ class VendorOffersBlocView extends StatelessWidget {
   }
 }
 
-class VendorOffersView extends StatelessWidget {
+class VendorOffersView extends StatefulWidget {
   const VendorOffersView({
     super.key,
     required this.title,
@@ -289,7 +325,24 @@ class VendorOffersView extends StatelessWidget {
   final List<Coupon> coupons;
 
   @override
+  State<VendorOffersView> createState() => _VendorOffersViewState();
+}
+
+class _VendorOffersViewState extends State<VendorOffersView> {
+  bool membershipOnly = false;
+
+  @override
   Widget build(BuildContext context) {
+    // Filter claimable coupons (valid & active)
+    var visible = widget.coupons.where((c) => c.isValid).toList();
+    if (membershipOnly) {
+      // Include coupons that can be claimed via membership (subscription),
+      // even if both membership and cash purchase are available.
+      visible = visible
+          .where((c) => (c.maxRedemptions != null && c.maxRedemptions! > 0))
+          .toList();
+    }
+
     return Container(
       margin: const EdgeInsets.only(top: 8),
       child: Column(
@@ -314,19 +367,34 @@ class VendorOffersView extends StatelessWidget {
                 ),
                 const SizedBox(width: 12),
                 Text(
-                  title,
+                  widget.title,
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
                     color: Color(0xFF1A202C),
                   ),
                 ),
+                const Spacer(),
+                Row(
+                  children: [
+                    const Text(
+                      'Membership only',
+                      style: TextStyle(fontSize: 12, color: Color(0xFF4B5563)),
+                    ),
+                    const SizedBox(width: 8),
+                    Switch(
+                      value: membershipOnly,
+                      activeColor: const Color(0xFF6F3FCC),
+                      onChanged: (v) => setState(() => membershipOnly = v),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
           const SizedBox(height: 20),
-          coupons.isNotEmpty
-              ? _buildCouponsList(coupons, vendorUid, vendorName)
+          visible.isNotEmpty
+              ? _buildCouponsList(visible, widget.vendorUid, widget.vendorName)
               : _buildEmptyState(),
         ],
       ),
@@ -511,42 +579,84 @@ class _VendorOfferCardState extends State<VendorOfferCard>
                             const SizedBox(height: 8),
 
                             // Price info
-                            Row(
-                              children: [
-                                if (widget.coupon.cashPrice != null &&
-                                    widget.coupon.cashPrice! > 0) ...[
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 3,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withOpacity(0.2),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Text(
-                                      '₹${widget.coupon.cashPrice!.toInt()}',
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
+                            Builder(
+                              builder: (context) {
+                                final hasCash =
+                                    widget.coupon.cashPrice != null &&
+                                    widget.coupon.cashPrice! > 0;
+                                final hasMembershipOption =
+                                    (widget.coupon.maxRedemptions != null && widget.coupon.maxRedemptions! > 0);
+
+                                if (hasCash && hasMembershipOption) {
+                                  return Row(
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 3,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white.withOpacity(0.2),
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          '₹${widget.coupon.cashPrice!.toInt()}',
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
                                       ),
+                                      const SizedBox(width: 6),
+                                      Text(
+                                        'or Free with subscription',
+                                        style: TextStyle(
+                                          color: Colors.white.withOpacity(0.85),
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                } else if (hasCash && !hasMembershipOption) {
+                                  return Row(
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 3,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white.withOpacity(0.2),
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          '₹${widget.coupon.cashPrice!.toInt()}',
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                } else {
+                                  return Text(
+                                    'Free with subscription',
+                                    style: TextStyle(
+                                      color: Colors.white.withOpacity(0.9),
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w600,
                                     ),
-                                  ),
-                                  const SizedBox(width: 6),
-                                ],
-                                Text(
-                                  widget.coupon.cashPrice != null &&
-                                          widget.coupon.cashPrice! > 0
-                                      ? 'or Free with subscription'
-                                      : 'Free for subscribers',
-                                  style: TextStyle(
-                                    color: Colors.white.withOpacity(0.8),
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
+                                  );
+                                }
+                              },
                             ),
                           ],
                         ),
@@ -577,10 +687,15 @@ class _VendorOfferCardState extends State<VendorOfferCard>
                             Icon(Icons.redeem, color: primaryColor, size: 18),
                             const SizedBox(width: 6),
                             Text(
-                              widget.coupon.cashPrice != null &&
-                                      widget.coupon.cashPrice! > 0
-                                  ? 'Buy'
-                                  : 'Claim',
+                              (() {
+                                final hasCash =
+                                    widget.coupon.cashPrice != null &&
+                                    widget.coupon.cashPrice! > 0;
+                                final hasMembershipOption =
+                                    (widget.coupon.maxRedemptions != null && widget.coupon.maxRedemptions! > 0);
+                                if (hasMembershipOption) return 'Claim';
+                                return hasCash ? 'Buy' : 'Claim';
+                              })(),
                               style: TextStyle(
                                 color: primaryColor,
                                 fontSize: 14,

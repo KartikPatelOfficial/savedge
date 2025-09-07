@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
+import 'package:savedge/core/injection/injection.dart';
 import 'package:savedge/core/storage/secure_storage_service.dart';
 import 'package:savedge/features/auth/data/models/user_profile_models.dart';
 import 'package:savedge/features/auth/domain/repositories/auth_repository.dart';
 import 'package:savedge/features/coupons/presentation/pages/gift_page.dart';
 import 'package:savedge/features/coupons/presentation/pages/redemption_history_page.dart';
+import 'package:savedge/features/favorites/presentation/bloc/favorites_bloc.dart';
+import 'package:savedge/features/favorites/presentation/bloc/favorites_event.dart';
+import 'package:savedge/features/favorites/presentation/pages/favorites_page.dart';
 import 'package:savedge/features/static_pages/presentation/pages/about_us_page.dart';
 import 'package:savedge/features/stores/presentation/pages/stores_page.dart';
 import 'package:savedge/features/subscription/domain/entities/subscription_plan.dart';
@@ -610,8 +615,15 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _onFavoritesTap() {
-    debugPrint('Favorites tapped');
-    // TODO: Navigate to favorites
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => BlocProvider(
+          create: (context) => getIt<FavoritesBloc>()..add(LoadFavorites()),
+          child: const FavoritesPage(),
+        ),
+      ),
+    );
   }
 
   void _onGiftCardsTap() {

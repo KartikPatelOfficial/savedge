@@ -4,78 +4,100 @@ import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:savedge/core/constants/app_constants.dart';
-import 'package:savedge/features/vendors/data/datasources/vendors_remote_data_source.dart';
-import 'package:savedge/features/vendors/data/datasources/coupons_remote_data_source.dart';
-import 'package:savedge/features/vendors/data/repositories/vendors_repository_impl.dart';
-import 'package:savedge/features/vendors/data/repositories/coupons_repository_impl.dart';
-import 'package:savedge/features/vendors/domain/repositories/vendors_repository.dart';
-import 'package:savedge/features/vendors/domain/repositories/coupons_repository.dart';
-import 'package:savedge/features/vendors/domain/usecases/get_vendor_usecase.dart';
-import 'package:savedge/features/vendors/domain/usecases/get_vendors_usecase.dart';
-import 'package:savedge/features/vendors/domain/usecases/get_featured_coupons_usecase.dart';
-import 'package:savedge/features/vendors/domain/usecases/get_vendor_coupons_usecase.dart';
-import 'package:savedge/features/vendors/presentation/bloc/vendor_detail_bloc.dart';
-import 'package:savedge/features/vendors/presentation/bloc/vendors_bloc.dart';
-import 'package:savedge/features/vendors/presentation/bloc/coupons_bloc.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:savedge/core/network/jwt_token_interceptor.dart';
+import 'package:savedge/core/network/network_client.dart';
+import 'package:savedge/core/storage/secure_storage_service.dart';
 // Auth imports
 import 'package:savedge/features/auth/data/datasources/auth_remote_data_source.dart';
-import 'package:savedge/features/auth/data/repositories/auth_repository_impl.dart';
-import 'package:savedge/features/auth/domain/repositories/auth_repository.dart';
-import 'package:savedge/features/auth/domain/usecases/get_profile_usecase.dart';
-import 'package:savedge/features/auth/domain/usecases/sync_user_usecase.dart';
 // New OTP Auth imports
 import 'package:savedge/features/auth/data/datasources/otp_auth_remote_data_source.dart';
+import 'package:savedge/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:savedge/features/auth/data/repositories/otp_auth_repository_impl.dart';
+import 'package:savedge/features/auth/domain/repositories/auth_repository.dart';
 import 'package:savedge/features/auth/domain/repositories/otp_auth_repository.dart';
-import 'package:savedge/features/auth/domain/usecases/send_otp_usecase.dart';
-import 'package:savedge/features/auth/domain/usecases/verify_otp_usecase.dart';
+import 'package:savedge/features/auth/domain/usecases/get_profile_usecase.dart';
 import 'package:savedge/features/auth/domain/usecases/register_individual_usecase.dart';
+import 'package:savedge/features/auth/domain/usecases/send_otp_usecase.dart';
+import 'package:savedge/features/auth/domain/usecases/sync_user_usecase.dart';
+import 'package:savedge/features/auth/domain/usecases/verify_otp_usecase.dart';
 import 'package:savedge/features/auth/presentation/bloc/otp_auth_cubit.dart';
-import 'package:savedge/core/network/jwt_token_interceptor.dart';
-// Subscription imports
-import 'package:savedge/features/subscription/data/datasources/subscription_plan_remote_data_source.dart';
-import 'package:savedge/features/subscription/data/repositories/subscription_plan_repository_impl.dart';
-import 'package:savedge/features/subscription/domain/repositories/subscription_plan_repository.dart';
-import 'package:savedge/features/subscription/data/services/razorpay_payment_service.dart';
-import 'package:savedge/features/subscription/presentation/bloc/subscription_plan_bloc.dart';
-import 'package:savedge/features/coupons/data/services/coupon_service.dart';
+import 'package:savedge/features/brand_vouchers/data/repositories/brand_voucher_repository_impl.dart';
+// Brand voucher imports
+import 'package:savedge/features/brand_vouchers/data/services/brand_voucher_service.dart';
+import 'package:savedge/features/brand_vouchers/domain/repositories/brand_voucher_repository.dart';
+import 'package:savedge/features/brand_vouchers/domain/usecases/create_voucher_order_usecase.dart';
+import 'package:savedge/features/brand_vouchers/domain/usecases/get_brand_vouchers_usecase.dart';
+import 'package:savedge/features/brand_vouchers/domain/usecases/get_voucher_orders_usecase.dart';
+import 'package:savedge/features/brand_vouchers/presentation/bloc/brand_vouchers_bloc.dart';
 import 'package:savedge/features/coupons/data/services/coupon_payment_service.dart';
-import 'package:savedge/features/coupons/presentation/bloc/user_coupons_bloc.dart';
+import 'package:savedge/features/coupons/data/services/coupon_service.dart';
 // Enhanced coupon imports
 import 'package:savedge/features/coupons/data/services/enhanced_coupon_service.dart';
 import 'package:savedge/features/coupons/data/services/gifting_service.dart';
 import 'package:savedge/features/coupons/presentation/bloc/coupon_manager_bloc.dart';
 import 'package:savedge/features/coupons/presentation/bloc/gifting_bloc.dart';
-import 'package:savedge/core/network/network_client.dart';
+import 'package:savedge/features/coupons/presentation/bloc/user_coupons_bloc.dart';
+// Favorites imports
+import 'package:savedge/features/favorites/data/datasources/favorites_local_datasource.dart';
+import 'package:savedge/features/favorites/data/models/favorite_vendor_adapter.dart';
+import 'package:savedge/features/favorites/data/repositories/favorites_repository_impl.dart';
+import 'package:savedge/features/favorites/domain/repositories/favorites_repository.dart';
+import 'package:savedge/features/favorites/domain/usecases/add_favorite_usecase.dart';
+import 'package:savedge/features/favorites/domain/usecases/check_favorite_usecase.dart';
+import 'package:savedge/features/favorites/domain/usecases/get_favorites_usecase.dart';
+import 'package:savedge/features/favorites/domain/usecases/remove_favorite_usecase.dart';
+import 'package:savedge/features/favorites/presentation/bloc/favorites_bloc.dart';
+// Points payment imports
+import 'package:savedge/features/points_payment/data/services/points_payment_service.dart';
+// Subscription imports
+import 'package:savedge/features/subscription/data/datasources/subscription_plan_remote_data_source.dart';
+import 'package:savedge/features/subscription/data/datasources/subscription_remote_data_source.dart';
+import 'package:savedge/features/subscription/data/repositories/subscription_plan_repository_impl.dart';
+import 'package:savedge/features/subscription/data/repositories/subscription_repository_impl.dart';
+import 'package:savedge/features/subscription/data/services/razorpay_payment_service.dart';
+import 'package:savedge/features/subscription/data/services/razorpay_service.dart';
+import 'package:savedge/features/subscription/domain/repositories/subscription_plan_repository.dart';
+import 'package:savedge/features/subscription/domain/repositories/subscription_repository.dart';
+import 'package:savedge/features/subscription/domain/usecases/subscription_usecases.dart';
+import 'package:savedge/features/subscription/presentation/bloc/subscription_bloc.dart';
+import 'package:savedge/features/subscription/presentation/bloc/subscription_plan_bloc.dart';
 // Points and Subscription imports
 import 'package:savedge/features/user_profile/data/datasources/points_remote_data_source.dart';
 import 'package:savedge/features/user_profile/data/repositories/points_repository_impl.dart';
 import 'package:savedge/features/user_profile/domain/repositories/points_repository.dart';
 import 'package:savedge/features/user_profile/domain/usecases/get_user_points_usecase.dart';
 import 'package:savedge/features/user_profile/presentation/bloc/points_bloc.dart';
-import 'package:savedge/features/subscription/data/datasources/subscription_remote_data_source.dart';
-import 'package:savedge/features/subscription/data/repositories/subscription_repository_impl.dart';
-import 'package:savedge/features/subscription/domain/repositories/subscription_repository.dart';
-import 'package:savedge/features/subscription/domain/usecases/subscription_usecases.dart';
-import 'package:savedge/features/subscription/presentation/bloc/subscription_bloc.dart';
-import 'package:savedge/features/subscription/data/services/razorpay_service.dart';
-// Brand voucher imports
-import 'package:savedge/features/brand_vouchers/data/services/brand_voucher_service.dart';
-import 'package:savedge/features/brand_vouchers/data/repositories/brand_voucher_repository_impl.dart';
-import 'package:savedge/features/brand_vouchers/domain/repositories/brand_voucher_repository.dart';
-import 'package:savedge/features/brand_vouchers/domain/usecases/get_brand_vouchers_usecase.dart';
-import 'package:savedge/features/brand_vouchers/domain/usecases/create_voucher_order_usecase.dart';
-import 'package:savedge/features/brand_vouchers/domain/usecases/get_voucher_orders_usecase.dart';
-import 'package:savedge/features/brand_vouchers/presentation/bloc/brand_vouchers_bloc.dart';
-import 'package:savedge/core/storage/secure_storage_service.dart';
-// Points payment imports
-import 'package:savedge/features/points_payment/data/services/points_payment_service.dart';
+import 'package:savedge/features/vendors/data/datasources/coupons_remote_data_source.dart';
+import 'package:savedge/features/vendors/data/datasources/vendors_remote_data_source.dart';
+import 'package:savedge/features/vendors/data/repositories/coupons_repository_impl.dart';
+import 'package:savedge/features/vendors/data/repositories/vendors_repository_impl.dart';
+import 'package:savedge/features/vendors/domain/repositories/coupons_repository.dart';
+import 'package:savedge/features/vendors/domain/repositories/vendors_repository.dart';
+import 'package:savedge/features/vendors/domain/usecases/get_featured_coupons_usecase.dart';
+import 'package:savedge/features/vendors/domain/usecases/get_vendor_coupons_usecase.dart';
+import 'package:savedge/features/vendors/domain/usecases/get_vendor_usecase.dart';
+import 'package:savedge/features/vendors/domain/usecases/get_vendors_usecase.dart';
+import 'package:savedge/features/vendors/presentation/bloc/coupons_bloc.dart';
+import 'package:savedge/features/vendors/presentation/bloc/vendor_detail_bloc.dart';
+import 'package:savedge/features/vendors/presentation/bloc/vendors_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final GetIt getIt = GetIt.instance;
 
 Future<void> configureDependencies() async {
+  // Initialize Hive for Flutter
+  await Hive.initFlutter();
+  
+  // Register Hive adapters (only register if not already registered)
+  if (!Hive.isAdapterRegistered(10)) {
+    Hive.registerAdapter(FavoriteVendorModelAdapter());
+  }
+  
+  // Initialize favorites box
+  await FavoritesLocalDataSourceImpl.initializeBox();
+  
   // External dependencies
   final sharedPreferences = await SharedPreferences.getInstance();
   getIt.registerSingleton<SharedPreferences>(sharedPreferences);
@@ -172,6 +194,32 @@ Future<void> configureDependencies() async {
 
   getIt.registerSingleton<BrandVoucherRepository>(
     BrandVoucherRepositoryImpl(getIt<BrandVoucherService>()),
+  );
+
+  // Favorites layer
+  getIt.registerSingleton<FavoritesLocalDataSource>(
+    FavoritesLocalDataSourceImpl(),
+  );
+
+  getIt.registerSingleton<FavoritesRepository>(
+    FavoritesRepositoryImpl(localDataSource: getIt<FavoritesLocalDataSource>()),
+  );
+
+  // Favorites Use Cases
+  getIt.registerSingleton<GetFavoritesUseCase>(
+    GetFavoritesUseCase(getIt<FavoritesRepository>()),
+  );
+
+  getIt.registerSingleton<AddFavoriteUseCase>(
+    AddFavoriteUseCase(getIt<FavoritesRepository>()),
+  );
+
+  getIt.registerSingleton<RemoveFavoriteUseCase>(
+    RemoveFavoriteUseCase(getIt<FavoritesRepository>()),
+  );
+
+  getIt.registerSingleton<CheckFavoriteUseCase>(
+    CheckFavoriteUseCase(getIt<FavoritesRepository>()),
   );
 
   getIt.registerSingleton<GetVendorsUseCase>(
@@ -324,6 +372,16 @@ Future<void> configureDependencies() async {
     ),
   );
 
+  // Favorites BLoC
+  getIt.registerFactory<FavoritesBloc>(
+    () => FavoritesBloc(
+      getFavoritesUseCase: getIt<GetFavoritesUseCase>(),
+      addFavoriteUseCase: getIt<AddFavoriteUseCase>(),
+      removeFavoriteUseCase: getIt<RemoveFavoriteUseCase>(),
+      checkFavoriteUseCase: getIt<CheckFavoriteUseCase>(),
+    ),
+  );
+
   // Payment services
   getIt.registerLazySingleton<RazorpayPaymentService>(
     () => RazorpayPaymentService(),
@@ -333,7 +391,9 @@ Future<void> configureDependencies() async {
 
   // Coupon services
   getIt.registerLazySingleton<CouponService>(() => CouponService());
-  getIt.registerLazySingleton<CouponPaymentService>(() => CouponPaymentService());
+  getIt.registerLazySingleton<CouponPaymentService>(
+    () => CouponPaymentService(),
+  );
 
   // Enhanced coupon services
   getIt.registerSingleton<EnhancedCouponService>(
@@ -341,7 +401,7 @@ Future<void> configureDependencies() async {
   );
 
   getIt.registerSingleton<GiftingService>(GiftingService(getIt<Dio>()));
-  
+
   // Points payment service
   getIt.registerSingleton<PointsPaymentService>(
     PointsPaymentService(getIt<Dio>()),

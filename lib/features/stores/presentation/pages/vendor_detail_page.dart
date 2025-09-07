@@ -4,6 +4,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:savedge/core/injection/injection.dart';
 import 'package:savedge/core/network/image_cache_manager.dart';
+import 'package:savedge/features/favorites/presentation/bloc/favorites_bloc.dart';
+import 'package:savedge/features/favorites/presentation/bloc/favorites_event.dart';
+import 'package:savedge/features/favorites/presentation/bloc/favorites_state.dart';
 import 'package:savedge/features/home/presentation/widgets/subscription_plans_section.dart';
 import 'package:savedge/features/points_payment/presentation/widgets/points_payment_dialog.dart';
 import 'package:savedge/features/stores/presentation/widgets/vendor_offers_section.dart';
@@ -37,6 +40,9 @@ class VendorDetailPage extends StatelessWidget {
         ),
         BlocProvider(
           create: (context) => getIt<PointsBloc>()..add(LoadUserPoints()),
+        ),
+        BlocProvider(
+          create: (context) => getIt<FavoritesBloc>()..add(LoadFavorites()),
         ),
       ],
       child: BlocBuilder<VendorDetailBloc, VendorDetailState>(
@@ -614,61 +620,112 @@ class _VendorDetailView extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: Container(
-                  height: 56,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF6F3FCC),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.favorite_border_rounded,
-                        color: Colors.white,
-                        size: 20,
+                child: BlocBuilder<FavoritesBloc, FavoritesState>(
+                  builder: (context, favState) {
+                    final isFavorite = favState is FavoritesLoaded &&
+                        favState.isFavorite(vendor.id);
+                    
+                    return Container(
+                      height: 56,
+                      decoration: BoxDecoration(
+                        color: isFavorite
+                            ? const Color(0xFFEF4444)
+                            : const Color(0xFF6F3FCC),
+                        borderRadius: BorderRadius.circular(16),
                       ),
-                      SizedBox(width: 8),
-                      Text(
-                        'Add to Favorites',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: () {
+                            HapticFeedback.lightImpact();
+                            context.read<FavoritesBloc>().add(
+                              ToggleFavorite(vendor),
+                            );
+                          },
+                          borderRadius: BorderRadius.circular(16),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                isFavorite
+                                    ? Icons.favorite_rounded
+                                    : Icons.favorite_border_rounded,
+                                color: Colors.white,
+                                size: 20,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                isFavorite
+                                    ? 'Remove from Favorites'
+                                    : 'Add to Favorites',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ],
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(width: 12),
+              if (vendor.contactPhone != null && vendor.contactPhone!.trim().isNotEmpty)
+                Container(
+                  height: 56,
+                  width: 56,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF38A169),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(16),
+                      onTap: () {
+                        HapticFeedback.lightImpact();
+                        final raw = vendor.contactPhone!.trim();
+                        final phone = raw.replaceAll(RegExp(r'[^0-9+]'), '');
+                        if (phone.isNotEmpty) {
+                          launchUrlString('tel:$phone');
+                        }
+                      },
+                      child: const Icon(
+                        Icons.call_rounded,
+                        color: Colors.white,
+                        size: 22,
+                      ),
+                    ),
                   ),
                 ),
-              ),
               const SizedBox(width: 12),
-              Container(
-                height: 56,
-                width: 56,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF38A169),
-                  borderRadius: BorderRadius.circular(16),
+              if (_googleMapsUrl != null)
+                Container(
+                  height: 56,
+                  width: 56,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFD69E2E),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(16),
+                      onTap: () {
+                        HapticFeedback.lightImpact();
+                        launchUrlString(_googleMapsUrl!);
+                      },
+                      child: const Icon(
+                        Icons.directions_rounded,
+                        color: Colors.white,
+                        size: 22,
+                      ),
+                    ),
+                  ),
                 ),
-                child: const Icon(
-                  Icons.call_rounded,
-                  color: Colors.white,
-                  size: 22,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Container(
-                height: 56,
-                width: 56,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFD69E2E),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: const Icon(
-                  Icons.directions_rounded,
-                  color: Colors.white,
-                  size: 22,
-                ),
-              ),
             ],
           ),
 
@@ -905,6 +962,24 @@ class _VendorDetailView extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  /// Find a Google Maps URL from vendor social links, if available
+  String? get _googleMapsUrl {
+    if (vendor.socialMediaLinks.isEmpty) return null;
+    for (final s in vendor.socialMediaLinks) {
+      if (!s.isActive) continue;
+      final url = s.url;
+      if (s.platform == 6) return url; // Platform 6 designated for Google Maps
+      final lu = url.toLowerCase();
+      if (lu.contains('google.com/maps') ||
+          lu.contains('goo.gl/maps') ||
+          lu.contains('maps.app.goo.gl') ||
+          lu.contains('maps.google')) {
+        return url;
+      }
+    }
+    return null;
   }
 
   /// Build individual social media icon
