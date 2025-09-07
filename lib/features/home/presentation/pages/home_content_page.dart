@@ -239,7 +239,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
 
   Widget _buildSubscriptionPlansSection() {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20),
+      margin: const EdgeInsets.all(20),
       child: SubscriptionPlansSection(key: _subscriptionKey),
     );
   }

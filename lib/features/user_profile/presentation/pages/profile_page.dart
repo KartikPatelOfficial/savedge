@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:savedge/core/injection/injection.dart';
 import 'package:savedge/core/storage/secure_storage_service.dart';
 import 'package:savedge/features/auth/data/models/user_profile_models.dart';
 import 'package:savedge/features/auth/domain/repositories/auth_repository.dart';
 import 'package:savedge/features/coupons/presentation/pages/gift_page.dart';
 import 'package:savedge/features/coupons/presentation/pages/redemption_history_page.dart';
+import 'package:savedge/features/favorites/data/models/favorite_vendor_model.dart';
 import 'package:savedge/features/favorites/presentation/bloc/favorites_bloc.dart';
 import 'package:savedge/features/favorites/presentation/bloc/favorites_event.dart';
 import 'package:savedge/features/favorites/presentation/pages/favorites_page.dart';
@@ -747,7 +749,15 @@ class _ProfilePageState extends State<ProfilePage> {
             onPressed: () async {
               Navigator.of(context).pop();
               try {
+                // Clear favorites from local storage
+                if (Hive.isBoxOpen('favorites')) {
+                  final favoritesBox = Hive.box<FavoriteVendorModel>('favorites');
+                  await favoritesBox.clear();
+                }
+                
+                // Clear secure storage (auth tokens, etc.)
                 await _secureStorage.clearAll();
+                
                 // Navigate back to authentication flow
                 if (mounted) {
                   Navigator.of(
