@@ -34,10 +34,29 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
     emit(PointsLoading());
 
     final result = await getUserPointsUseCase(NoParams());
-    result.fold(
-      (failure) =>
-          emit(PointsError(message: failure.message ?? 'Unknown error')),
-      (points) => emit(PointsLoaded(points: points)),
+    
+    await result.fold(
+      (failure) async {
+        emit(PointsError(message: failure.message ?? 'Unknown error'));
+      },
+      (points) async {
+        // Also load transactions on initial load for better UX
+        final ledgerResult = await getPointsLedgerUseCase(NoParams());
+        
+        List<PointTransaction>? transactions;
+        String? ledgerError;
+        
+        ledgerResult.fold(
+          (failure) => ledgerError = failure.message,
+          (trans) => transactions = trans,
+        );
+        
+        emit(PointsLoaded(
+          points: points,
+          transactions: transactions,
+          ledgerError: ledgerError,
+        ));
+      },
     );
   }
 
@@ -128,12 +147,42 @@ class PointsBloc extends Bloc<PointsEvent, PointsState> {
     RefreshPoints event,
     Emitter<PointsState> emit,
   ) async {
-    // Refresh all data
-    add(LoadUserPoints());
-    if (state is PointsLoaded) {
-      add(LoadPointsLedger());
-      add(LoadPointsExpiring(days: 7)); // Default to 7 days
-      add(LoadExpiredPointsCount());
+    // Store current state if it's loaded
+    final currentState = state is PointsLoaded ? state as PointsLoaded : null;
+    
+    // If we have a current state, show loading while preserving data
+    if (currentState != null) {
+      emit(currentState.copyWith(isRefreshing: true));
+    } else {
+      emit(PointsLoading());
     }
+
+    // Refresh user points
+    final pointsResult = await getUserPointsUseCase(NoParams());
+    
+    await pointsResult.fold(
+      (failure) async {
+        emit(PointsError(message: failure.message ?? 'Unknown error'));
+      },
+      (points) async {
+        // Load transactions
+        final ledgerResult = await getPointsLedgerUseCase(NoParams());
+        
+        List<PointTransaction>? transactions;
+        String? ledgerError;
+        
+        ledgerResult.fold(
+          (failure) => ledgerError = failure.message,
+          (trans) => transactions = trans,
+        );
+        
+        emit(PointsLoaded(
+          points: points,
+          transactions: transactions,
+          ledgerError: ledgerError,
+          isRefreshing: false,
+        ));
+      },
+    );
   }
 }

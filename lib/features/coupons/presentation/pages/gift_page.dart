@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:savedge/core/injection/injection.dart';
+import 'package:savedge/features/coupons/data/models/coupon_gifting_models.dart';
 import 'package:savedge/features/coupons/presentation/bloc/gifting_bloc.dart';
 import 'package:savedge/features/coupons/presentation/bloc/gifting_event.dart';
 import 'package:savedge/features/coupons/presentation/bloc/gifting_state.dart';
 import 'package:savedge/features/coupons/presentation/bloc/user_coupons_bloc.dart';
 import 'package:savedge/features/coupons/presentation/bloc/user_coupons_event.dart';
 import 'package:savedge/features/coupons/presentation/bloc/user_coupons_state.dart';
-import 'package:savedge/features/coupons/presentation/widgets/gift_coupon_dialog.dart';
 import 'package:savedge/features/coupons/presentation/widgets/points_transfer_dialog.dart';
 
 /// Comprehensive gift page for sending gifts and viewing gift history
@@ -161,7 +161,7 @@ class _GiftPageState extends State<GiftPage> with TickerProviderStateMixin {
                   title: 'Gift Coupons',
                   subtitle: 'Share your available coupons',
                   color: const Color(0xFF6F3FCC),
-                  onTap: () => _showAvailableCoupons(),
+                  onTap: () => _showGiftToPhoneDialog(),
                 ),
               ),
               const SizedBox(width: 16),
@@ -943,7 +943,7 @@ class _GiftPageState extends State<GiftPage> with TickerProviderStateMixin {
           ),
           const SizedBox(height: 8),
           const Text(
-            'You don\'t have any available coupons to gift right now.',
+            'You do not have any active coupons. Redeem the coupon if you are a member or buy a new coupon first to gift.',
             style: TextStyle(fontSize: 14, color: Color(0xFF718096)),
             textAlign: TextAlign.center,
           ),
@@ -1084,9 +1084,11 @@ class _GiftPageState extends State<GiftPage> with TickerProviderStateMixin {
     );
   }
 
-  void _showAvailableCoupons() {
-    // Switch to the first tab which shows available coupons
-    _tabController.animateTo(0);
+  void _showGiftToPhoneDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => const _GiftToPhoneDialog(),
+    );
   }
 
   void _showPointsTransferDialog() {
@@ -1097,9 +1099,494 @@ class _GiftPageState extends State<GiftPage> with TickerProviderStateMixin {
   }
 
   void _showGiftCouponDialog(dynamic coupon) {
+    // Open the gift-to-phone dialog with preselected coupon
     showDialog(
       context: context,
-      builder: (context) => GiftCouponDialog(coupon: coupon),
+      builder: (context) => _GiftToPhoneDialog(preselectedCoupon: coupon),
+    );
+  }
+}
+
+// Multi-step dialog: select coupon -> enter phone -> verify OTP -> send
+class _GiftToPhoneDialog extends StatefulWidget {
+  const _GiftToPhoneDialog({this.preselectedCoupon});
+
+  final dynamic preselectedCoupon; // expects UserCouponModel-like
+
+  @override
+  State<_GiftToPhoneDialog> createState() => _GiftToPhoneDialogState();
+}
+
+class _GiftToPhoneDialogState extends State<_GiftToPhoneDialog> {
+  int _step = 0; // 0: select coupon, 1: phone, 2: otp, 3: confirm
+  dynamic _selectedCoupon;
+  final _phoneController = TextEditingController();
+  final _otpController = TextEditingController();
+  final _messageController = TextEditingController();
+  String? _generatedOtp; // simple local OTP gate
+  bool _otpSent = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedCoupon = widget.preselectedCoupon;
+    if (_selectedCoupon != null) {
+      _step = 1; // skip selection if preselected
+    }
+  }
+
+  @override
+  void dispose() {
+    _phoneController.dispose();
+    _otpController.dispose();
+    _messageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 480),
+          child: BlocProvider(
+            create: (_) => getIt<GiftingBloc>(),
+            child: BlocConsumer<GiftingBloc, GiftingState>(
+              listener: (context, state) {
+                if (state is GiftingSuccess) {
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(state.message),
+                      backgroundColor: const Color(0xFF38A169),
+                    ),
+                  );
+                } else if (state is GiftingError) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(state.message),
+                      backgroundColor: const Color(0xFFE53E3E),
+                    ),
+                  );
+                }
+              },
+              builder: (context, state) {
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.card_giftcard,
+                          color: Color(0xFF6F3FCC),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            _step == 0
+                                ? 'Select a Coupon'
+                                : _step == 1
+                                ? 'Enter Recipient\'s Phone'
+                                : _step == 2
+                                ? 'Verify OTP'
+                                : 'Confirm & Send',
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF1A202C),
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          icon: const Icon(Icons.close),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    if (_step == 0) _buildCouponSelection(),
+                    if (_step == 1) _buildPhoneEntry(),
+                    if (_step == 2) _buildOtpVerification(),
+                    if (_step == 3) _buildConfirmSend(state is GiftingLoading),
+                  ],
+                );
+              },
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCouponSelection() {
+    return BlocProvider(
+      create: (_) =>
+          getIt<UserCouponsBloc>()
+            ..add(const LoadUserCoupons(status: 'active')),
+      child: BlocBuilder<UserCouponsBloc, UserCouponsState>(
+        builder: (context, state) {
+          if (state is UserCouponsLoading) {
+            return const Center(
+              child: Padding(
+                padding: EdgeInsets.all(24),
+                child: CircularProgressIndicator(color: Color(0xFF6F3FCC)),
+              ),
+            );
+          } else if (state is UserCouponsLoaded) {
+            final active = state.coupons.where((c) => c.isValid).toList();
+            if (active.isEmpty) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: const [
+                  Icon(
+                    Icons.local_offer_outlined,
+                    size: 40,
+                    color: Color(0xFF6F3FCC),
+                  ),
+                  SizedBox(height: 12),
+                  Text(
+                    'You do not have any active coupons. Redeem the coupon if you are a member or buy a new coupon first to gift.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Color(0xFF4A5568)),
+                  ),
+                ],
+              );
+            }
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Choose one of your active coupons to gift',
+                  style: TextStyle(color: Color(0xFF4A5568)),
+                ),
+                const SizedBox(height: 12),
+                Flexible(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxHeight: 320),
+                    child: ListView.separated(
+                      shrinkWrap: true,
+                      itemCount: active.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 8),
+                      itemBuilder: (context, index) {
+                        final c = active[index];
+                        return ListTile(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            side: const BorderSide(color: Color(0xFFE2E8F0)),
+                          ),
+                          title: Text(
+                            c.title,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          subtitle: Text(c.discountDisplay),
+                          trailing: ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                _selectedCoupon = c;
+                                _step = 1;
+                              });
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF6F3FCC),
+                            ),
+                            child: const Text('Select'),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            );
+          } else if (state is UserCouponsError) {
+            return Text(
+              state.message,
+              style: const TextStyle(color: Color(0xFFE53E3E)),
+            );
+          }
+          return const SizedBox.shrink();
+        },
+      ),
+    );
+  }
+
+  Widget _buildPhoneEntry() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSelectedCouponPreview(),
+        const SizedBox(height: 16),
+        const Text(
+          'Recipient Phone Number',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: 8),
+        TextField(
+          controller: _phoneController,
+          keyboardType: TextInputType.phone,
+          decoration: InputDecoration(
+            hintText: 'e.g. +919876543210',
+            prefixIcon: const Icon(Icons.phone_iphone),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+            focusedBorder: const OutlineInputBorder(
+              borderSide: BorderSide(color: Color(0xFF6F3FCC)),
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
+        const Text(
+          'Gift Message (Optional)',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: 8),
+        TextField(
+          controller: _messageController,
+          maxLines: 3,
+          maxLength: 200,
+          decoration: InputDecoration(
+            hintText: 'Add a personal message...',
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+            focusedBorder: const OutlineInputBorder(
+              borderSide: BorderSide(color: Color(0xFF6F3FCC)),
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        Row(
+          children: [
+            Expanded(
+              child: OutlinedButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('Cancel'),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: ElevatedButton(
+                onPressed: () {
+                  final v = _phoneController.text.replaceAll(' ', '');
+
+                  final phoneRegex = RegExp(r'^\+?[1-9]\d{1,14}$');
+
+                  if (!phoneRegex.hasMatch(v)) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Enter a valid phone number'),
+                        backgroundColor: Color(0xFFE53E3E),
+                      ),
+                    );
+                    return;
+                  }
+
+                  // Simulate sending OTP
+                  setState(() {
+                    _generatedOtp = '123456';
+                    _otpSent = true;
+                    _step = 2;
+                  });
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('OTP sent to the entered phone number'),
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF6F3FCC),
+                ),
+                child: const Text('Send OTP'),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildOtpVerification() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSelectedCouponPreview(),
+        const SizedBox(height: 16),
+        const Text(
+          'Enter OTP',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: 8),
+        TextField(
+          controller: _otpController,
+          keyboardType: TextInputType.number,
+          decoration: InputDecoration(
+            hintText: '6-digit code',
+            prefixIcon: const Icon(Icons.lock_outline),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+            focusedBorder: const OutlineInputBorder(
+              borderSide: BorderSide(color: Color(0xFF6F3FCC)),
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        Row(
+          children: [
+            Expanded(
+              child: OutlinedButton(
+                onPressed: () => setState(() => _step = 1),
+                child: const Text('Back'),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: ElevatedButton(
+                onPressed: !_otpSent
+                    ? null
+                    : () {
+                        if (_otpController.text.trim() == _generatedOtp) {
+                          setState(() => _step = 3);
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Invalid OTP. Please try again.'),
+                              backgroundColor: Color(0xFFE53E3E),
+                            ),
+                          );
+                        }
+                      },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF6F3FCC),
+                ),
+                child: const Text('Verify OTP'),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildConfirmSend(bool isLoading) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSelectedCouponPreview(),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            const Icon(Icons.phone_iphone, color: Color(0xFF4A5568)),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                _phoneController.text,
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
+            ),
+          ],
+        ),
+        if (_messageController.text.trim().isNotEmpty) ...[
+          const SizedBox(height: 8),
+          Text(
+            '“${_messageController.text.trim()}”',
+            style: const TextStyle(color: Color(0xFF4A5568)),
+          ),
+        ],
+        const SizedBox(height: 16),
+        Row(
+          children: [
+            Expanded(
+              child: OutlinedButton(
+                onPressed: () => setState(() => _step = 2),
+                child: const Text('Back'),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: ElevatedButton(
+                onPressed: isLoading
+                    ? null
+                    : () {
+                        final request = GiftCouponRequest(
+                          userCouponId: _selectedCoupon.id,
+                          // Overload toUserId with phone, similar to points transfer dialog
+                          toUserId: _phoneController.text.replaceAll(' ', ''),
+                          message: _messageController.text.trim().isEmpty
+                              ? null
+                              : _messageController.text.trim(),
+                        );
+                        context.read<GiftingBloc>().add(GiftCoupon(request));
+                      },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF6F3FCC),
+                ),
+                child: isLoading
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : const Text('Send Gift'),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSelectedCouponPreview() {
+    final c = _selectedCoupon;
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFF6F3FCC).withOpacity(0.06),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: const Color(0xFF6F3FCC),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              c.discountDisplay ?? c.discountDisplay,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  c.title ?? c.title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
+                Text(
+                  c.vendorName ?? c.vendorName,
+                  style: const TextStyle(color: Color(0xFF4A5568)),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

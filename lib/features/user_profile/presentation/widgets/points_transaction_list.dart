@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../shared/domain/entities/points.dart';
+import 'package:savedge/shared/domain/entities/points.dart';
 
 /// List widget for displaying point transactions
 class PointsTransactionList extends StatelessWidget {

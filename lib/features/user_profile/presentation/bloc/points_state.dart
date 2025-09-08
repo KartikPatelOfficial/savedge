@@ -27,6 +27,7 @@ class PointsLoaded extends PointsState {
   final bool isLoadingLedger;
   final bool isLoadingExpiring;
   final bool isLoadingExpiredCount;
+  final bool isRefreshing;
   final String? ledgerError;
   final String? expiringError;
   final String? expiredCountError;
@@ -39,6 +40,7 @@ class PointsLoaded extends PointsState {
     this.isLoadingLedger = false,
     this.isLoadingExpiring = false,
     this.isLoadingExpiredCount = false,
+    this.isRefreshing = false,
     this.ledgerError,
     this.expiringError,
     this.expiredCountError,
@@ -77,6 +79,7 @@ class PointsLoaded extends PointsState {
     bool? isLoadingLedger,
     bool? isLoadingExpiring,
     bool? isLoadingExpiredCount,
+    bool? isRefreshing,
     String? ledgerError,
     String? expiringError,
     String? expiredCountError,
@@ -90,6 +93,7 @@ class PointsLoaded extends PointsState {
       isLoadingExpiring: isLoadingExpiring ?? this.isLoadingExpiring,
       isLoadingExpiredCount:
           isLoadingExpiredCount ?? this.isLoadingExpiredCount,
+      isRefreshing: isRefreshing ?? this.isRefreshing,
       ledgerError: ledgerError,
       expiringError: expiringError,
       expiredCountError: expiredCountError,
@@ -105,6 +109,7 @@ class PointsLoaded extends PointsState {
     isLoadingLedger,
     isLoadingExpiring,
     isLoadingExpiredCount,
+    isRefreshing,
     ledgerError,
     expiringError,
     expiredCountError,

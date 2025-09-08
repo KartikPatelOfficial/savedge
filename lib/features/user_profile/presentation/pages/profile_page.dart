@@ -19,6 +19,7 @@ import 'package:savedge/features/subscription/presentation/pages/subscription_pu
 import 'package:savedge/features/user_profile/presentation/pages/edit_profile_page.dart';
 import 'package:savedge/features/user_profile/presentation/pages/points_wallet_page.dart';
 import 'package:savedge/features/user_profile/presentation/widgets/widgets.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 /// Profile page displaying user information and account options
 class ProfilePage extends StatefulWidget {
@@ -198,8 +199,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
                   const SizedBox(height: 20),
 
-                  // Stats Cards
-                  if (_userProfile != null) ...[
+                  // Stats Cards (Only for employees)
+                  if (_userProfile != null && _userProfile!.isEmployee) ...[
                     if (_userProfile!.hasActiveSubscription) ...[
                       Row(
                         children: [
@@ -227,7 +228,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         ],
                       ),
                     ] else ...[
-                      // For users without subscriptions, show original layout
+                      // For employees without subscriptions, show points balance only
                       Row(
                         children: [
                           Expanded(
@@ -242,162 +243,178 @@ class _ProfilePageState extends State<ProfilePage> {
                         ],
                       ),
                     ],
-
-                    // Employee-specific stats (only show for employees)
-                    if (_userProfile!.isEmployee &&
-                        _userProfile!.employeeInfo != null) ...[
-                      const SizedBox(height: 16),
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: const Color(0xFFE2E8F0),
-                            width: 1,
+                  ] else if (_userProfile != null &&
+                      !_userProfile!.isEmployee &&
+                      _userProfile!.hasActiveSubscription) ...[
+                    // For individual users with subscription, only show subscription card
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ProfileStatsCard(
+                            title: _userProfile!.subscriptionInfo!.planName,
+                            value: 'Subscription',
+                            icon: Icons.star,
+                            color: !_userProfile!.subscriptionInfo!.isActive
+                                ? Colors.red
+                                : Colors.green,
+                            onTap: _onManageSubscriptionTap,
                           ),
                         ),
-                        child: Column(
-                          children: [
+                      ],
+                    ),
+                  ],
+
+                  // Employee-specific stats (only show for employees)
+                  if (_userProfile!.isEmployee &&
+                      _userProfile!.employeeInfo != null) ...[
+                    const SizedBox(height: 16),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: const Color(0xFFE2E8F0),
+                          width: 1,
+                        ),
+                      ),
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                width: 40,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color: const Color(
+                                    0xFF6F3FCC,
+                                  ).withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: const Icon(
+                                  Icons.business_outlined,
+                                  color: Color(0xFF6F3FCC),
+                                  size: 22,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      _userProfile!
+                                          .employeeInfo!
+                                          .organizationName,
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w700,
+                                        color: Color(0xFF1A202C),
+                                      ),
+                                    ),
+                                    Text(
+                                      _userProfile!.employeeInfo!.department,
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        color: Color(0xFF718096),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          if (_userProfile!
+                                  .employeeInfo!
+                                  .employeeCode
+                                  .isNotEmpty ||
+                              _userProfile!
+                                  .employeeInfo!
+                                  .position
+                                  .isNotEmpty) ...[
+                            const SizedBox(height: 16),
+                            const Divider(
+                              color: Color(0xFFE2E8F0),
+                              height: 1,
+                              thickness: 1,
+                            ),
+                            const SizedBox(height: 16),
                             Row(
                               children: [
-                                Container(
-                                  width: 40,
-                                  height: 40,
-                                  decoration: BoxDecoration(
-                                    color: const Color(
-                                      0xFF6F3FCC,
-                                    ).withOpacity(0.1),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: const Icon(
-                                    Icons.business_outlined,
-                                    color: Color(0xFF6F3FCC),
-                                    size: 22,
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        _userProfile!
-                                            .employeeInfo!
-                                            .organizationName,
-                                        style: const TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w700,
-                                          color: Color(0xFF1A202C),
-                                        ),
-                                      ),
-                                      Text(
-                                        _userProfile!.employeeInfo!.department,
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          color: Color(0xFF718096),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                            if (_userProfile!
+                                if (_userProfile!
                                     .employeeInfo!
                                     .employeeCode
-                                    .isNotEmpty ||
-                                _userProfile!
+                                    .isNotEmpty) ...[
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const Text(
+                                          'Employee ID',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: Color(0xFF718096),
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          _userProfile!
+                                              .employeeInfo!
+                                              .employeeCode,
+                                          style: const TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w600,
+                                            color: Color(0xFF2D3748),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                                if (_userProfile!
                                     .employeeInfo!
                                     .position
                                     .isNotEmpty) ...[
-                              const SizedBox(height: 16),
-                              const Divider(
-                                color: Color(0xFFE2E8F0),
-                                height: 1,
-                                thickness: 1,
-                              ),
-                              const SizedBox(height: 16),
-                              Row(
-                                children: [
                                   if (_userProfile!
                                       .employeeInfo!
                                       .employeeCode
-                                      .isNotEmpty) ...[
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          const Text(
-                                            'Employee ID',
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              color: Color(0xFF718096),
-                                              fontWeight: FontWeight.w600,
-                                            ),
+                                      .isNotEmpty)
+                                    const SizedBox(width: 16),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const Text(
+                                          'Position',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: Color(0xFF718096),
+                                            fontWeight: FontWeight.w600,
                                           ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            _userProfile!
-                                                .employeeInfo!
-                                                .employeeCode,
-                                            style: const TextStyle(
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.w600,
-                                              color: Color(0xFF2D3748),
-                                            ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          _userProfile!.employeeInfo!.position,
+                                          style: const TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w600,
+                                            color: Color(0xFF2D3748),
                                           ),
-                                        ],
-                                      ),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                  if (_userProfile!
-                                      .employeeInfo!
-                                      .position
-                                      .isNotEmpty) ...[
-                                    if (_userProfile!
-                                        .employeeInfo!
-                                        .employeeCode
-                                        .isNotEmpty)
-                                      const SizedBox(width: 16),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          const Text(
-                                            'Position',
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              color: Color(0xFF718096),
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            _userProfile!
-                                                .employeeInfo!
-                                                .position,
-                                            style: const TextStyle(
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.w600,
-                                              color: Color(0xFF2D3748),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
+                                  ),
                                 ],
-                              ),
-                            ],
+                              ],
+                            ),
                           ],
-                        ),
+                        ],
                       ),
-                    ],
+                    ),
                   ],
 
                   const SizedBox(height: 20),
@@ -602,8 +619,10 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _onPrivacyTap() {
-    debugPrint('Privacy & Security tapped');
-    // TODO: Navigate to privacy settings
+    launchUrlString(
+      'https://savedge.in/privacy-policy.html',
+      mode: LaunchMode.externalApplication,
+    );
   }
 
   void _onNotificationsTap() {
@@ -751,13 +770,15 @@ class _ProfilePageState extends State<ProfilePage> {
               try {
                 // Clear favorites from local storage
                 if (Hive.isBoxOpen('favorites')) {
-                  final favoritesBox = Hive.box<FavoriteVendorModel>('favorites');
+                  final favoritesBox = Hive.box<FavoriteVendorModel>(
+                    'favorites',
+                  );
                   await favoritesBox.clear();
                 }
-                
+
                 // Clear secure storage (auth tokens, etc.)
                 await _secureStorage.clearAll();
-                
+
                 // Navigate back to authentication flow
                 if (mounted) {
                   Navigator.of(
