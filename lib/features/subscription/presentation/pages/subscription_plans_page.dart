@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../../../core/injection/injection.dart';
-import '../../../../shared/widgets/common_widgets.dart';
 import '../../../../shared/domain/entities/subscription.dart';
+import '../../../../shared/widgets/common_widgets.dart';
 import '../bloc/subscription_bloc.dart';
-import '../widgets/subscription_plan_card.dart';
 import '../widgets/current_subscription_card.dart';
 import '../widgets/purchase_confirmation_dialog.dart';
+import '../widgets/subscription_plan_card.dart';
 
 /// Page for displaying subscription plans and managing user subscriptions
 class SubscriptionPlansPage extends StatelessWidget {
@@ -226,11 +227,6 @@ class _BenefitsSection extends StatelessWidget {
               icon: Icons.discount,
               title: 'Exclusive Coupons',
               description: 'Access to subscriber-only deals and offers',
-            ),
-            _buildBenefitItem(
-              icon: Icons.account_balance_wallet,
-              title: 'Bonus Points',
-              description: 'Earn extra points with every subscription',
             ),
             _buildBenefitItem(
               icon: Icons.priority_high,

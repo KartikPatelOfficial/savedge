@@ -10,8 +10,6 @@ class ActiveSubscription {
     required this.isActive,
     required this.autoRenew,
     required this.daysRemaining,
-    required this.bonusPoints,
-    required this.maxCoupons,
   });
 
   final int planId;
@@ -23,8 +21,6 @@ class ActiveSubscription {
   final bool isActive;
   final bool autoRenew;
   final int daysRemaining;
-  final int bonusPoints;
-  final int maxCoupons;
 
   /// Get formatted price display
   String get priceDisplay => '\$${price.toStringAsFixed(2)}';

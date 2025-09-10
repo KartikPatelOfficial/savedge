@@ -81,8 +81,6 @@ abstract class SubscriptionInfo with _$SubscriptionInfo {
     required DateTime endDate,
     required bool isActive,
     required bool autoRenew,
-    required int bonusPoints,
-    required int maxCoupons,
     required double price,
   }) = _SubscriptionInfo;
 

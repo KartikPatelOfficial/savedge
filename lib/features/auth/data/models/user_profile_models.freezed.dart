@@ -1241,7 +1241,7 @@ as String,
 /// @nodoc
 mixin _$SubscriptionInfo {
 
- int get planId; String get planName; DateTime get startDate; DateTime get endDate; bool get isActive; bool get autoRenew; int get bonusPoints; int get maxCoupons; double get price;
+ int get planId; String get planName; DateTime get startDate; DateTime get endDate; bool get isActive; bool get autoRenew; double get price;
 /// Create a copy of SubscriptionInfo
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1254,16 +1254,16 @@ $SubscriptionInfoCopyWith<SubscriptionInfo> get copyWith => _$SubscriptionInfoCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SubscriptionInfo&&(identical(other.planId, planId) || other.planId == planId)&&(identical(other.planName, planName) || other.planName == planName)&&(identical(other.startDate, startDate) || other.startDate == startDate)&&(identical(other.endDate, endDate) || other.endDate == endDate)&&(identical(other.isActive, isActive) || other.isActive == isActive)&&(identical(other.autoRenew, autoRenew) || other.autoRenew == autoRenew)&&(identical(other.bonusPoints, bonusPoints) || other.bonusPoints == bonusPoints)&&(identical(other.maxCoupons, maxCoupons) || other.maxCoupons == maxCoupons)&&(identical(other.price, price) || other.price == price));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SubscriptionInfo&&(identical(other.planId, planId) || other.planId == planId)&&(identical(other.planName, planName) || other.planName == planName)&&(identical(other.startDate, startDate) || other.startDate == startDate)&&(identical(other.endDate, endDate) || other.endDate == endDate)&&(identical(other.isActive, isActive) || other.isActive == isActive)&&(identical(other.autoRenew, autoRenew) || other.autoRenew == autoRenew)&&(identical(other.price, price) || other.price == price));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,planId,planName,startDate,endDate,isActive,autoRenew,bonusPoints,maxCoupons,price);
+int get hashCode => Object.hash(runtimeType,planId,planName,startDate,endDate,isActive,autoRenew,price);
 
 @override
 String toString() {
-  return 'SubscriptionInfo(planId: $planId, planName: $planName, startDate: $startDate, endDate: $endDate, isActive: $isActive, autoRenew: $autoRenew, bonusPoints: $bonusPoints, maxCoupons: $maxCoupons, price: $price)';
+  return 'SubscriptionInfo(planId: $planId, planName: $planName, startDate: $startDate, endDate: $endDate, isActive: $isActive, autoRenew: $autoRenew, price: $price)';
 }
 
 
@@ -1274,7 +1274,7 @@ abstract mixin class $SubscriptionInfoCopyWith<$Res>  {
   factory $SubscriptionInfoCopyWith(SubscriptionInfo value, $Res Function(SubscriptionInfo) _then) = _$SubscriptionInfoCopyWithImpl;
 @useResult
 $Res call({
- int planId, String planName, DateTime startDate, DateTime endDate, bool isActive, bool autoRenew, int bonusPoints, int maxCoupons, double price
+ int planId, String planName, DateTime startDate, DateTime endDate, bool isActive, bool autoRenew, double price
 });
 
 
@@ -1291,7 +1291,7 @@ class _$SubscriptionInfoCopyWithImpl<$Res>
 
 /// Create a copy of SubscriptionInfo
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? planId = null,Object? planName = null,Object? startDate = null,Object? endDate = null,Object? isActive = null,Object? autoRenew = null,Object? bonusPoints = null,Object? maxCoupons = null,Object? price = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? planId = null,Object? planName = null,Object? startDate = null,Object? endDate = null,Object? isActive = null,Object? autoRenew = null,Object? price = null,}) {
   return _then(_self.copyWith(
 planId: null == planId ? _self.planId : planId // ignore: cast_nullable_to_non_nullable
 as int,planName: null == planName ? _self.planName : planName // ignore: cast_nullable_to_non_nullable
@@ -1299,9 +1299,7 @@ as String,startDate: null == startDate ? _self.startDate : startDate // ignore: 
 as DateTime,endDate: null == endDate ? _self.endDate : endDate // ignore: cast_nullable_to_non_nullable
 as DateTime,isActive: null == isActive ? _self.isActive : isActive // ignore: cast_nullable_to_non_nullable
 as bool,autoRenew: null == autoRenew ? _self.autoRenew : autoRenew // ignore: cast_nullable_to_non_nullable
-as bool,bonusPoints: null == bonusPoints ? _self.bonusPoints : bonusPoints // ignore: cast_nullable_to_non_nullable
-as int,maxCoupons: null == maxCoupons ? _self.maxCoupons : maxCoupons // ignore: cast_nullable_to_non_nullable
-as int,price: null == price ? _self.price : price // ignore: cast_nullable_to_non_nullable
+as bool,price: null == price ? _self.price : price // ignore: cast_nullable_to_non_nullable
 as double,
   ));
 }
@@ -1387,10 +1385,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int planId,  String planName,  DateTime startDate,  DateTime endDate,  bool isActive,  bool autoRenew,  int bonusPoints,  int maxCoupons,  double price)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int planId,  String planName,  DateTime startDate,  DateTime endDate,  bool isActive,  bool autoRenew,  double price)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _SubscriptionInfo() when $default != null:
-return $default(_that.planId,_that.planName,_that.startDate,_that.endDate,_that.isActive,_that.autoRenew,_that.bonusPoints,_that.maxCoupons,_that.price);case _:
+return $default(_that.planId,_that.planName,_that.startDate,_that.endDate,_that.isActive,_that.autoRenew,_that.price);case _:
   return orElse();
 
 }
@@ -1408,10 +1406,10 @@ return $default(_that.planId,_that.planName,_that.startDate,_that.endDate,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int planId,  String planName,  DateTime startDate,  DateTime endDate,  bool isActive,  bool autoRenew,  int bonusPoints,  int maxCoupons,  double price)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int planId,  String planName,  DateTime startDate,  DateTime endDate,  bool isActive,  bool autoRenew,  double price)  $default,) {final _that = this;
 switch (_that) {
 case _SubscriptionInfo():
-return $default(_that.planId,_that.planName,_that.startDate,_that.endDate,_that.isActive,_that.autoRenew,_that.bonusPoints,_that.maxCoupons,_that.price);case _:
+return $default(_that.planId,_that.planName,_that.startDate,_that.endDate,_that.isActive,_that.autoRenew,_that.price);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -1428,10 +1426,10 @@ return $default(_that.planId,_that.planName,_that.startDate,_that.endDate,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int planId,  String planName,  DateTime startDate,  DateTime endDate,  bool isActive,  bool autoRenew,  int bonusPoints,  int maxCoupons,  double price)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int planId,  String planName,  DateTime startDate,  DateTime endDate,  bool isActive,  bool autoRenew,  double price)?  $default,) {final _that = this;
 switch (_that) {
 case _SubscriptionInfo() when $default != null:
-return $default(_that.planId,_that.planName,_that.startDate,_that.endDate,_that.isActive,_that.autoRenew,_that.bonusPoints,_that.maxCoupons,_that.price);case _:
+return $default(_that.planId,_that.planName,_that.startDate,_that.endDate,_that.isActive,_that.autoRenew,_that.price);case _:
   return null;
 
 }
@@ -1443,7 +1441,7 @@ return $default(_that.planId,_that.planName,_that.startDate,_that.endDate,_that.
 @JsonSerializable()
 
 class _SubscriptionInfo implements SubscriptionInfo {
-  const _SubscriptionInfo({required this.planId, required this.planName, required this.startDate, required this.endDate, required this.isActive, required this.autoRenew, required this.bonusPoints, required this.maxCoupons, required this.price});
+  const _SubscriptionInfo({required this.planId, required this.planName, required this.startDate, required this.endDate, required this.isActive, required this.autoRenew, required this.price});
   factory _SubscriptionInfo.fromJson(Map<String, dynamic> json) => _$SubscriptionInfoFromJson(json);
 
 @override final  int planId;
@@ -1452,8 +1450,6 @@ class _SubscriptionInfo implements SubscriptionInfo {
 @override final  DateTime endDate;
 @override final  bool isActive;
 @override final  bool autoRenew;
-@override final  int bonusPoints;
-@override final  int maxCoupons;
 @override final  double price;
 
 /// Create a copy of SubscriptionInfo
@@ -1469,16 +1465,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SubscriptionInfo&&(identical(other.planId, planId) || other.planId == planId)&&(identical(other.planName, planName) || other.planName == planName)&&(identical(other.startDate, startDate) || other.startDate == startDate)&&(identical(other.endDate, endDate) || other.endDate == endDate)&&(identical(other.isActive, isActive) || other.isActive == isActive)&&(identical(other.autoRenew, autoRenew) || other.autoRenew == autoRenew)&&(identical(other.bonusPoints, bonusPoints) || other.bonusPoints == bonusPoints)&&(identical(other.maxCoupons, maxCoupons) || other.maxCoupons == maxCoupons)&&(identical(other.price, price) || other.price == price));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SubscriptionInfo&&(identical(other.planId, planId) || other.planId == planId)&&(identical(other.planName, planName) || other.planName == planName)&&(identical(other.startDate, startDate) || other.startDate == startDate)&&(identical(other.endDate, endDate) || other.endDate == endDate)&&(identical(other.isActive, isActive) || other.isActive == isActive)&&(identical(other.autoRenew, autoRenew) || other.autoRenew == autoRenew)&&(identical(other.price, price) || other.price == price));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,planId,planName,startDate,endDate,isActive,autoRenew,bonusPoints,maxCoupons,price);
+int get hashCode => Object.hash(runtimeType,planId,planName,startDate,endDate,isActive,autoRenew,price);
 
 @override
 String toString() {
-  return 'SubscriptionInfo(planId: $planId, planName: $planName, startDate: $startDate, endDate: $endDate, isActive: $isActive, autoRenew: $autoRenew, bonusPoints: $bonusPoints, maxCoupons: $maxCoupons, price: $price)';
+  return 'SubscriptionInfo(planId: $planId, planName: $planName, startDate: $startDate, endDate: $endDate, isActive: $isActive, autoRenew: $autoRenew, price: $price)';
 }
 
 
@@ -1489,7 +1485,7 @@ abstract mixin class _$SubscriptionInfoCopyWith<$Res> implements $SubscriptionIn
   factory _$SubscriptionInfoCopyWith(_SubscriptionInfo value, $Res Function(_SubscriptionInfo) _then) = __$SubscriptionInfoCopyWithImpl;
 @override @useResult
 $Res call({
- int planId, String planName, DateTime startDate, DateTime endDate, bool isActive, bool autoRenew, int bonusPoints, int maxCoupons, double price
+ int planId, String planName, DateTime startDate, DateTime endDate, bool isActive, bool autoRenew, double price
 });
 
 
@@ -1506,7 +1502,7 @@ class __$SubscriptionInfoCopyWithImpl<$Res>
 
 /// Create a copy of SubscriptionInfo
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? planId = null,Object? planName = null,Object? startDate = null,Object? endDate = null,Object? isActive = null,Object? autoRenew = null,Object? bonusPoints = null,Object? maxCoupons = null,Object? price = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? planId = null,Object? planName = null,Object? startDate = null,Object? endDate = null,Object? isActive = null,Object? autoRenew = null,Object? price = null,}) {
   return _then(_SubscriptionInfo(
 planId: null == planId ? _self.planId : planId // ignore: cast_nullable_to_non_nullable
 as int,planName: null == planName ? _self.planName : planName // ignore: cast_nullable_to_non_nullable
@@ -1514,9 +1510,7 @@ as String,startDate: null == startDate ? _self.startDate : startDate // ignore: 
 as DateTime,endDate: null == endDate ? _self.endDate : endDate // ignore: cast_nullable_to_non_nullable
 as DateTime,isActive: null == isActive ? _self.isActive : isActive // ignore: cast_nullable_to_non_nullable
 as bool,autoRenew: null == autoRenew ? _self.autoRenew : autoRenew // ignore: cast_nullable_to_non_nullable
-as bool,bonusPoints: null == bonusPoints ? _self.bonusPoints : bonusPoints // ignore: cast_nullable_to_non_nullable
-as int,maxCoupons: null == maxCoupons ? _self.maxCoupons : maxCoupons // ignore: cast_nullable_to_non_nullable
-as int,price: null == price ? _self.price : price // ignore: cast_nullable_to_non_nullable
+as bool,price: null == price ? _self.price : price // ignore: cast_nullable_to_non_nullable
 as double,
   ));
 }

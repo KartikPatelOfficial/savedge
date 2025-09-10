@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
-import '../../../../core/error/failures.dart';
+
 import '../../../../core/error/exceptions.dart';
+import '../../../../core/error/failures.dart';
 import '../../../../shared/domain/entities/subscription.dart';
 import '../../domain/repositories/subscription_repository.dart';
 import '../datasources/subscription_remote_data_source.dart';
@@ -87,7 +88,6 @@ class SubscriptionRepositoryImpl implements SubscriptionRepository {
       return Right({
         'message': result.message,
         'pointsSpent': result.pointsSpent,
-        'bonusPoints': result.bonusPoints,
         'newBalance': result.newBalance,
         'subscriptionId': result.subscriptionId,
       });
@@ -164,7 +164,6 @@ class SubscriptionRepositoryImpl implements SubscriptionRepository {
         'message': result.message,
         'subscriptionId': result.subscriptionId,
         'subscription': result.subscription.toDomain(),
-        'bonusPointsAwarded': result.bonusPointsAwarded,
       });
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message));

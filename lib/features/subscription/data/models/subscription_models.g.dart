@@ -14,8 +14,6 @@ _SubscriptionPlanModel _$SubscriptionPlanModelFromJson(
   description: json['description'] as String?,
   price: (json['price'] as num).toDouble(),
   durationMonths: (json['durationMonths'] as num).toInt(),
-  bonusPoints: (json['bonusPoints'] as num).toInt(),
-  maxCoupons: (json['maxCoupons'] as num).toInt(),
   features: json['features'] as String?,
   imageUrl: json['imageUrl'] as String?,
   isActive: json['isActive'] as bool? ?? true,
@@ -29,8 +27,6 @@ Map<String, dynamic> _$SubscriptionPlanModelToJson(
   'description': instance.description,
   'price': instance.price,
   'durationMonths': instance.durationMonths,
-  'bonusPoints': instance.bonusPoints,
-  'maxCoupons': instance.maxCoupons,
   'features': instance.features,
   'imageUrl': instance.imageUrl,
   'isActive': instance.isActive,
@@ -92,7 +88,6 @@ _PurchaseWithPointsResponseModel _$PurchaseWithPointsResponseModelFromJson(
 ) => _PurchaseWithPointsResponseModel(
   message: json['message'] as String,
   pointsSpent: (json['pointsSpent'] as num).toInt(),
-  bonusPoints: (json['bonusPoints'] as num).toInt(),
   newBalance: (json['newBalance'] as num).toInt(),
   subscriptionId: (json['subscriptionId'] as num).toInt(),
 );
@@ -102,7 +97,6 @@ Map<String, dynamic> _$PurchaseWithPointsResponseModelToJson(
 ) => <String, dynamic>{
   'message': instance.message,
   'pointsSpent': instance.pointsSpent,
-  'bonusPoints': instance.bonusPoints,
   'newBalance': instance.newBalance,
   'subscriptionId': instance.subscriptionId,
 };
@@ -174,7 +168,6 @@ _VerifyPaymentResponseModel _$VerifyPaymentResponseModelFromJson(
   subscription: UserSubscriptionModel.fromJson(
     json['subscription'] as Map<String, dynamic>,
   ),
-  bonusPointsAwarded: (json['bonusPointsAwarded'] as num).toInt(),
 );
 
 Map<String, dynamic> _$VerifyPaymentResponseModelToJson(
@@ -184,7 +177,6 @@ Map<String, dynamic> _$VerifyPaymentResponseModelToJson(
   'message': instance.message,
   'subscriptionId': instance.subscriptionId,
   'subscription': instance.subscription,
-  'bonusPointsAwarded': instance.bonusPointsAwarded,
 };
 
 _PaymentTransactionModel _$PaymentTransactionModelFromJson(

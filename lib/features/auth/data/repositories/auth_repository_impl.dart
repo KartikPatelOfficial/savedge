@@ -103,7 +103,7 @@ class AuthRepositoryImpl implements AuthRepository {
       final sub = r.subscriptionInfo!;
       final now = DateTime.now();
       final daysRemaining = sub.endDate.difference(now).inDays;
-      
+
       activeSubscription = ActiveSubscription(
         planId: sub.planId,
         planName: sub.planName,
@@ -112,8 +112,6 @@ class AuthRepositoryImpl implements AuthRepository {
         isActive: sub.isActive,
         autoRenew: sub.autoRenew,
         daysRemaining: daysRemaining,
-        bonusPoints: sub.bonusPoints,
-        maxCoupons: sub.maxCoupons,
         price: sub.price,
       );
     }

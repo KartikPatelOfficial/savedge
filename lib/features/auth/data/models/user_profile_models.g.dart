@@ -117,8 +117,6 @@ _SubscriptionInfo _$SubscriptionInfoFromJson(Map<String, dynamic> json) =>
       endDate: DateTime.parse(json['endDate'] as String),
       isActive: json['isActive'] as bool,
       autoRenew: json['autoRenew'] as bool,
-      bonusPoints: (json['bonusPoints'] as num).toInt(),
-      maxCoupons: (json['maxCoupons'] as num).toInt(),
       price: (json['price'] as num).toDouble(),
     );
 
@@ -130,8 +128,6 @@ Map<String, dynamic> _$SubscriptionInfoToJson(_SubscriptionInfo instance) =>
       'endDate': instance.endDate.toIso8601String(),
       'isActive': instance.isActive,
       'autoRenew': instance.autoRenew,
-      'bonusPoints': instance.bonusPoints,
-      'maxCoupons': instance.maxCoupons,
       'price': instance.price,
     };
 

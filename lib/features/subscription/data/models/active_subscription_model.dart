@@ -12,8 +12,6 @@ class ActiveSubscriptionModel extends ActiveSubscription {
     required super.isActive,
     required super.autoRenew,
     required super.daysRemaining,
-    required super.bonusPoints,
-    required super.maxCoupons,
   });
 
   factory ActiveSubscriptionModel.fromJson(Map<String, dynamic> json) {
@@ -30,8 +28,6 @@ class ActiveSubscriptionModel extends ActiveSubscription {
       isActive: json['isActive'] as bool? ?? true,
       autoRenew: json['autoRenew'] as bool? ?? false,
       daysRemaining: (json['daysRemaining'] as num?)?.toInt() ?? 0,
-      bonusPoints: (json['bonusPoints'] as num?)?.toInt() ?? 0,
-      maxCoupons: (json['maxCoupons'] as num?)?.toInt() ?? 0,
     );
   }
 
@@ -45,8 +41,6 @@ class ActiveSubscriptionModel extends ActiveSubscription {
     'isActive': isActive,
     'autoRenew': autoRenew,
     'daysRemaining': daysRemaining,
-    'bonusPoints': bonusPoints,
-    'maxCoupons': maxCoupons,
   };
 
   ActiveSubscription toDomain() => this;

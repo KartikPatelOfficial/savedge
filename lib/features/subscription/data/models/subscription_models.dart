@@ -14,8 +14,6 @@ abstract class SubscriptionPlanModel with _$SubscriptionPlanModel {
     String? description,
     required double price,
     @JsonKey(name: 'durationMonths') required int durationMonths,
-    @JsonKey(name: 'bonusPoints') required int bonusPoints,
-    @JsonKey(name: 'maxCoupons') required int maxCoupons,
     String? features,
     @JsonKey(name: 'imageUrl') String? imageUrl,
     @Default(true) bool isActive,
@@ -106,7 +104,6 @@ abstract class PurchaseWithPointsResponseModel
   const factory PurchaseWithPointsResponseModel({
     required String message,
     @JsonKey(name: 'pointsSpent') required int pointsSpent,
-    @JsonKey(name: 'bonusPoints') required int bonusPoints,
     @JsonKey(name: 'newBalance') required int newBalance,
     @JsonKey(name: 'subscriptionId') required int subscriptionId,
   }) = _PurchaseWithPointsResponseModel;
@@ -168,7 +165,6 @@ abstract class VerifyPaymentResponseModel with _$VerifyPaymentResponseModel {
     required String message,
     @JsonKey(name: 'subscriptionId') required int subscriptionId,
     required UserSubscriptionModel subscription,
-    @JsonKey(name: 'bonusPointsAwarded') required int bonusPointsAwarded,
   }) = _VerifyPaymentResponseModel;
 
   factory VerifyPaymentResponseModel.fromJson(Map<String, dynamic> json) =>
