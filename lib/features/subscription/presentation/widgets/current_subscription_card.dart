@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../../shared/domain/entities/subscription.dart';
 
 /// Card widget displaying current active subscription details
@@ -133,29 +134,6 @@ class CurrentSubscriptionCard extends StatelessWidget {
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
-              ),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 12,
-                runSpacing: 8,
-                children: [
-                  _buildBenefitChip(
-                    '${plan!.bonusPoints} Bonus Points',
-                    Icons.account_balance_wallet,
-                  ),
-                  _buildBenefitChip(
-                    plan!.hasUnlimitedCoupons
-                        ? 'Unlimited Coupons'
-                        : '${plan!.maxCoupons} Coupons',
-                    Icons.confirmation_number,
-                  ),
-                  if (plan!.featuresList.isNotEmpty)
-                    ...plan!.featuresList
-                        .take(2)
-                        .map(
-                          (feature) => _buildBenefitChip(feature, Icons.star),
-                        ),
-                ],
               ),
             ],
 

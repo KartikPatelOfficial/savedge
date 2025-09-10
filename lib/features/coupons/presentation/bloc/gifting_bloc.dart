@@ -105,16 +105,18 @@ class GiftingBloc extends Bloc<GiftingEvent, GiftingState> {
 
     try {
       // Load both gifted coupons and transferred points history
-      final giftedCoupons = await _giftingService.getGiftedCouponsHistory();
-      final transferredPoints = await _giftingService
-          .getPointsTransferHistory();
+      final history = await _giftingService.getGiftedCouponsHistory();
+      final transfers = await _giftingService.getPointsTransferHistory();
 
-      emit(
-        GiftingHistoryLoaded(
-          giftedCoupons: [],
-          transferredPoints: transferredPoints,
-        ),
-      );
+      // Show sent coupons and sent points in "Sent History" tab
+      final sentPoints = transfers
+          .where((p) => (p.direction).toLowerCase() == 'sent')
+          .toList();
+
+      emit(GiftingHistoryLoaded(
+        giftedCoupons: history.sentCoupons,
+        transferredPoints: sentPoints,
+      ));
     } catch (e) {
       emit(GiftingError('Failed to load gifting history: ${e.toString()}'));
     }
@@ -127,9 +129,18 @@ class GiftingBloc extends Bloc<GiftingEvent, GiftingState> {
     emit(const GiftingLoading());
 
     try {
-      // For now, return empty lists as the backend might not have these endpoints yet
-      // These can be implemented when the backend APIs are ready
-      emit(const ReceivedGiftsLoaded(receivedCoupons: [], receivedPoints: []));
+      final history = await _giftingService.getGiftedCouponsHistory();
+      final transfers = await _giftingService.getPointsTransferHistory();
+
+      // Received gifts/points for current user
+      final receivedPoints = transfers
+          .where((p) => (p.direction).toLowerCase() == 'received')
+          .toList();
+
+      emit(ReceivedGiftsLoaded(
+        receivedCoupons: history.receivedCoupons,
+        receivedPoints: receivedPoints,
+      ));
     } catch (e) {
       emit(GiftingError('Failed to load received gifts: ${e.toString()}'));
     }

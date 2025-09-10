@@ -6,8 +6,6 @@ class SubscriptionPlan {
     this.description,
     required this.price,
     required this.durationMonths,
-    required this.bonusPoints,
-    required this.maxCoupons,
     this.features,
     this.imageUrl,
     required this.isActive,
@@ -18,8 +16,6 @@ class SubscriptionPlan {
   final String? description;
   final double price;
   final int durationMonths;
-  final int bonusPoints;
-  final int maxCoupons;
   final String? features;
   final String? imageUrl;
   final bool isActive;

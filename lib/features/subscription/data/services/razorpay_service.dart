@@ -1,5 +1,6 @@
-import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart';
+
 import '../../../../shared/domain/entities/subscription.dart';
 
 /// Service for handling Razorpay payment integration
@@ -59,7 +60,6 @@ class RazorpayService {
         'plan_id': plan.id.toString(),
         'plan_name': plan.name,
         'duration': plan.durationText,
-        'bonus_points': plan.bonusPoints.toString(),
       },
     };
 

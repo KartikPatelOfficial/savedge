@@ -1,5 +1,6 @@
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../domain/entities/subscription_plan.dart';
 import '../../domain/repositories/subscription_plan_repository.dart';
 
@@ -96,8 +97,6 @@ class SubscriptionPlanBloc
         description: 'Get exclusive access to all premium features',
         price: 499.0,
         durationMonths: 12,
-        bonusPoints: 5000,
-        maxCoupons: 50,
         imageUrl:
             'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
         isActive: true,
@@ -108,8 +107,6 @@ class SubscriptionPlanBloc
         description: 'Essential features for regular users',
         price: 199.0,
         durationMonths: 6,
-        bonusPoints: 2000,
-        maxCoupons: 20,
         imageUrl:
             'https://images.unsplash.com/photo-1563013544-824ae1b704d3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
         isActive: true,

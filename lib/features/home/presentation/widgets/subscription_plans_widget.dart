@@ -186,24 +186,6 @@ class _SubscriptionPlanCard extends StatelessWidget {
                 fontSize: 14,
               ),
             ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Icon(
-                  Icons.monetization_on,
-                  color: Colors.yellow[600],
-                  size: 16,
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  '${plan.bonusPoints} bonus points',
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.9),
-                    fontSize: 12,
-                  ),
-                ),
-              ],
-            ),
           ],
         ),
       ),

@@ -19,8 +19,7 @@ class SubscriptionPlansSection extends StatefulWidget {
 }
 
 class SubscriptionPlansSectionState extends State<SubscriptionPlansSection> {
-
-// Made public to allow parent to call checkSubscriptionStatus
+  // Made public to allow parent to call checkSubscriptionStatus
   bool _isLoading = true;
   bool _hasActiveSubscription = false;
   String? _error;
@@ -331,28 +330,6 @@ class _SubscriptionPlanCard extends StatelessWidget {
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 6),
-            Row(
-              children: [
-                Icon(
-                  Icons.monetization_on,
-                  color: Colors.yellow[600],
-                  size: 14,
-                ),
-                const SizedBox(width: 4),
-                Expanded(
-                  child: Text(
-                    '${plan.bonusPoints} bonus points',
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.9),
-                      fontSize: 11,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
             ),
           ],
         ),

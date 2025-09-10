@@ -7,8 +7,6 @@ class SubscriptionPlanModel {
     this.description,
     required this.price,
     required this.durationMonths,
-    required this.bonusPoints,
-    required this.maxCoupons,
     this.features,
     this.imageUrl,
     this.isActive =
@@ -20,8 +18,6 @@ class SubscriptionPlanModel {
   final String? description;
   final double price;
   final int durationMonths;
-  final int bonusPoints;
-  final int maxCoupons;
   final String? features;
   final String? imageUrl;
   final bool isActive;
@@ -33,8 +29,6 @@ class SubscriptionPlanModel {
       description: json['description'] as String?,
       price: (json['price'] as num).toDouble(),
       durationMonths: json['durationMonths'] as int,
-      bonusPoints: json['bonusPoints'] as int,
-      maxCoupons: json['maxCoupons'] as int,
       features: (json['features'] as String?)?.isEmpty == true
           ? null
           : json['features'] as String?,
@@ -52,8 +46,6 @@ class SubscriptionPlanModel {
       'description': description,
       'price': price,
       'durationMonths': durationMonths,
-      'bonusPoints': bonusPoints,
-      'maxCoupons': maxCoupons,
       'features': features,
       'imageUrl': imageUrl,
       'isActive': isActive,
@@ -66,8 +58,6 @@ class SubscriptionPlanModel {
     description: description,
     price: price,
     durationMonths: durationMonths,
-    bonusPoints: bonusPoints,
-    maxCoupons: maxCoupons,
     features: features,
     imageUrl: imageUrl,
     isActive: isActive,

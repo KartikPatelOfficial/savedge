@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../../shared/domain/entities/subscription.dart';
 
 /// Card widget displaying a subscription plan with purchase option
@@ -132,16 +133,6 @@ class SubscriptionPlanCard extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildFeatureRow(
-                      Icons.account_balance_wallet,
-                      '${plan.bonusPoints} bonus points',
-                    ),
-                    _buildFeatureRow(
-                      Icons.confirmation_number,
-                      plan.hasUnlimitedCoupons
-                          ? 'Unlimited coupons'
-                          : '${plan.maxCoupons} coupons',
-                    ),
                     if (plan.featuresList.isNotEmpty)
                       ...plan.featuresList.map(
                         (feature) =>

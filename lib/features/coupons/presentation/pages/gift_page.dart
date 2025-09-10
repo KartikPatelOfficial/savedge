@@ -1,6 +1,10 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:savedge/core/injection/injection.dart';
+import 'package:savedge/features/auth/data/datasources/auth_remote_data_source.dart';
+import 'package:savedge/features/auth/data/datasources/otp_auth_remote_data_source.dart';
+import 'package:savedge/features/auth/data/models/otp_auth_models.dart';
 import 'package:savedge/features/coupons/data/models/coupon_gifting_models.dart';
 import 'package:savedge/features/coupons/presentation/bloc/gifting_bloc.dart';
 import 'package:savedge/features/coupons/presentation/bloc/gifting_event.dart';
@@ -157,16 +161,6 @@ class _GiftPageState extends State<GiftPage> with TickerProviderStateMixin {
             children: [
               Expanded(
                 child: _buildGiftOption(
-                  icon: Icons.local_offer,
-                  title: 'Gift Coupons',
-                  subtitle: 'Share your available coupons',
-                  color: const Color(0xFF6F3FCC),
-                  onTap: () => _showGiftToPhoneDialog(),
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildGiftOption(
                   icon: Icons.stars,
                   title: 'Transfer Points',
                   subtitle: 'Send points to a phone number',
@@ -196,7 +190,7 @@ class _GiftPageState extends State<GiftPage> with TickerProviderStateMixin {
                 return _buildLoadingCoupons();
               } else if (state is UserCouponsLoaded) {
                 final availableCoupons = state.coupons
-                    .where((coupon) => coupon.statusText == 'Available')
+                    .where((coupon) => coupon.statusText == 'Active')
                     .toList();
 
                 if (availableCoupons.isEmpty) {
@@ -488,6 +482,17 @@ class _GiftPageState extends State<GiftPage> with TickerProviderStateMixin {
   }
 
   Widget _buildReceivedCouponCard(dynamic coupon) {
+    // Support history model as well as ad-hoc maps
+    final String title = coupon is GiftedCouponHistoryModel
+        ? (coupon.couponTitle ?? 'Coupon')
+        : (coupon.title ?? coupon.couponTitle ?? 'Coupon');
+    final String vendor = coupon is GiftedCouponHistoryModel
+        ? 'Vendor'
+        : (coupon.vendorName ?? 'Vendor');
+    final String when = coupon is GiftedCouponHistoryModel
+        ? (coupon.giftedDate?.toLocal().toString() ?? 'Recently')
+        : (coupon.receivedAt ?? 'Recently');
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -525,7 +530,7 @@ class _GiftPageState extends State<GiftPage> with TickerProviderStateMixin {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Gift from ${coupon.senderName ?? 'Colleague'}',
+                      'Gift from Colleague',
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
@@ -533,7 +538,7 @@ class _GiftPageState extends State<GiftPage> with TickerProviderStateMixin {
                       ),
                     ),
                     Text(
-                      coupon.receivedAt ?? 'Recently',
+                      when,
                       style: const TextStyle(
                         fontSize: 12,
                         color: Color(0xFF718096),
@@ -556,8 +561,8 @@ class _GiftPageState extends State<GiftPage> with TickerProviderStateMixin {
                   color: const Color(0xFF6F3FCC),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Text(
-                  coupon.discountDisplay ?? '${coupon.discountValue}%',
+                child: const Text(
+                  'GIFT',
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 14,
@@ -571,7 +576,7 @@ class _GiftPageState extends State<GiftPage> with TickerProviderStateMixin {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      coupon.title ?? coupon.couponTitle ?? 'Coupon',
+                      title,
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -581,7 +586,7 @@ class _GiftPageState extends State<GiftPage> with TickerProviderStateMixin {
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
-                      coupon.vendorName ?? 'Vendor',
+                      vendor,
                       style: const TextStyle(
                         fontSize: 14,
                         color: Color(0xFF4A5568),
@@ -617,6 +622,13 @@ class _GiftPageState extends State<GiftPage> with TickerProviderStateMixin {
   }
 
   Widget _buildReceivedPointsCard(dynamic points) {
+    final int amount = points is PointsTransferHistoryModel
+        ? points.points
+        : (points.amount ?? 0);
+    final String when = points is PointsTransferHistoryModel
+        ? points.transferDate.toLocal().toString()
+        : (points.receivedAt ?? 'Recently');
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -662,7 +674,7 @@ class _GiftPageState extends State<GiftPage> with TickerProviderStateMixin {
                       ),
                     ),
                     Text(
-                      points.receivedAt ?? 'Recently',
+                      when,
                       style: const TextStyle(
                         fontSize: 12,
                         color: Color(0xFF718096),
@@ -681,7 +693,7 @@ class _GiftPageState extends State<GiftPage> with TickerProviderStateMixin {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  '+${points.amount ?? 0} pts',
+                  '+$amount pts',
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
@@ -716,6 +728,16 @@ class _GiftPageState extends State<GiftPage> with TickerProviderStateMixin {
   }
 
   Widget _buildSentCouponCard(dynamic coupon) {
+    final String title = coupon is GiftedCouponHistoryModel
+        ? (coupon.couponTitle ?? 'Coupon')
+        : (coupon.title ?? coupon.couponTitle ?? 'Coupon');
+    final String vendor = coupon is GiftedCouponHistoryModel
+        ? 'Vendor'
+        : (coupon.vendorName ?? 'Vendor');
+    final String when = coupon is GiftedCouponHistoryModel
+        ? (coupon.giftedDate?.toLocal().toString() ?? 'Recently')
+        : (coupon.sentAt ?? 'Recently');
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -753,7 +775,7 @@ class _GiftPageState extends State<GiftPage> with TickerProviderStateMixin {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Sent to ${coupon.recipientName ?? 'Colleague'}',
+                      'Sent to Colleague',
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
@@ -761,7 +783,7 @@ class _GiftPageState extends State<GiftPage> with TickerProviderStateMixin {
                       ),
                     ),
                     Text(
-                      coupon.sentAt ?? 'Recently',
+                      when,
                       style: const TextStyle(
                         fontSize: 12,
                         color: Color(0xFF718096),
@@ -784,8 +806,8 @@ class _GiftPageState extends State<GiftPage> with TickerProviderStateMixin {
                   color: const Color(0xFF6F3FCC),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Text(
-                  coupon.discountDisplay ?? '${coupon.discountValue}%',
+                child: const Text(
+                  'GIFT',
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 14,
@@ -799,7 +821,7 @@ class _GiftPageState extends State<GiftPage> with TickerProviderStateMixin {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      coupon.title ?? coupon.couponTitle ?? 'Coupon',
+                      title,
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -809,7 +831,7 @@ class _GiftPageState extends State<GiftPage> with TickerProviderStateMixin {
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
-                      coupon.vendorName ?? 'Vendor',
+                      vendor,
                       style: const TextStyle(
                         fontSize: 14,
                         color: Color(0xFF4A5568),
@@ -826,6 +848,13 @@ class _GiftPageState extends State<GiftPage> with TickerProviderStateMixin {
   }
 
   Widget _buildSentPointsCard(dynamic points) {
+    final int amount = points is PointsTransferHistoryModel
+        ? points.points
+        : (points.amount ?? 0);
+    final String when = points is PointsTransferHistoryModel
+        ? points.transferDate.toLocal().toString()
+        : (points.sentAt ?? 'Recently');
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -864,7 +893,7 @@ class _GiftPageState extends State<GiftPage> with TickerProviderStateMixin {
                   ),
                 ),
                 Text(
-                  points.sentAt ?? 'Recently',
+                  when,
                   style: const TextStyle(
                     fontSize: 12,
                     color: Color(0xFF718096),
@@ -880,7 +909,7 @@ class _GiftPageState extends State<GiftPage> with TickerProviderStateMixin {
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
-              '-${points.amount ?? 0} pts',
+              '-$amount pts',
               style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
@@ -1123,8 +1152,14 @@ class _GiftToPhoneDialogState extends State<_GiftToPhoneDialog> {
   final _phoneController = TextEditingController();
   final _otpController = TextEditingController();
   final _messageController = TextEditingController();
-  String? _generatedOtp; // simple local OTP gate
+  String? _generatedOtp; // kept for UI state; not used for real verify
   bool _otpSent = false;
+  bool _sendingOtp = false;
+  bool _verifyingOtp = false;
+  String? _recipientUserId;
+  String? _recipientName;
+  String? _senderPhone;
+  bool _submitting = false;
 
   @override
   void initState() {
@@ -1173,6 +1208,7 @@ class _GiftToPhoneDialogState extends State<_GiftToPhoneDialog> {
                 }
               },
               builder: (context, state) {
+                final blocContext = context;
                 return Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -1210,7 +1246,8 @@ class _GiftToPhoneDialogState extends State<_GiftToPhoneDialog> {
                     if (_step == 0) _buildCouponSelection(),
                     if (_step == 1) _buildPhoneEntry(),
                     if (_step == 2) _buildOtpVerification(),
-                    if (_step == 3) _buildConfirmSend(state is GiftingLoading),
+                    if (_step == 3)
+                      _buildConfirmSend(blocContext, state is GiftingLoading),
                   ],
                 );
               },
@@ -1369,37 +1406,70 @@ class _GiftToPhoneDialogState extends State<_GiftToPhoneDialog> {
             const SizedBox(width: 12),
             Expanded(
               child: ElevatedButton(
-                onPressed: () {
-                  final v = _phoneController.text.replaceAll(' ', '');
-
-                  final phoneRegex = RegExp(r'^\+?[1-9]\d{1,14}$');
-
-                  if (!phoneRegex.hasMatch(v)) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Enter a valid phone number'),
-                        backgroundColor: Color(0xFFE53E3E),
-                      ),
-                    );
-                    return;
-                  }
-
-                  // Simulate sending OTP
-                  setState(() {
-                    _generatedOtp = '123456';
-                    _otpSent = true;
-                    _step = 2;
-                  });
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('OTP sent to the entered phone number'),
-                    ),
-                  );
-                },
+                onPressed: _sendingOtp
+                    ? null
+                    : () async {
+                        setState(() => _sendingOtp = true);
+                        try {
+                          final auth = getIt<AuthRemoteDataSource>();
+                          final me = await auth.getUserProfile();
+                          final phone = me.phoneNumber;
+                          if (phone.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Your phone number is not set'),
+                                backgroundColor: Color(0xFFE53E3E),
+                              ),
+                            );
+                            return;
+                          }
+                          final ds = getIt<OtpAuthRemoteDataSource>();
+                          final resp = await ds.sendOtp(
+                            SendOtpRequest(phoneNumber: phone),
+                          );
+                          if (resp.succeeded) {
+                            setState(() {
+                              _senderPhone = phone;
+                              _otpSent = true;
+                              _step = 2;
+                            });
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('OTP sent to your phone number'),
+                              ),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Failed to send OTP'),
+                                backgroundColor: Color(0xFFE53E3E),
+                              ),
+                            );
+                          }
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Failed to send OTP: $e'),
+                              backgroundColor: const Color(0xFFE53E3E),
+                            ),
+                          );
+                        } finally {
+                          if (mounted) setState(() => _sendingOtp = false);
+                        }
+                      },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF6F3FCC),
                 ),
-                child: const Text('Send OTP'),
+                child: _sendingOtp
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : const Text('Next'),
               ),
             ),
           ],
@@ -1444,24 +1514,65 @@ class _GiftToPhoneDialogState extends State<_GiftToPhoneDialog> {
             const SizedBox(width: 12),
             Expanded(
               child: ElevatedButton(
-                onPressed: !_otpSent
+                onPressed: !_otpSent || _verifyingOtp
                     ? null
-                    : () {
-                        if (_otpController.text.trim() == _generatedOtp) {
-                          setState(() => _step = 3);
-                        } else {
+                    : () async {
+                        final phone = (_senderPhone ?? '').replaceAll(' ', '');
+                        final otp = _otpController.text.trim();
+                        if (otp.isEmpty) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text('Invalid OTP. Please try again.'),
+                              content: Text('Enter the OTP'),
                               backgroundColor: Color(0xFFE53E3E),
                             ),
                           );
+                          return;
+                        }
+                        setState(() => _verifyingOtp = true);
+                        try {
+                          final ds = getIt<OtpAuthRemoteDataSource>();
+                          final resp = await ds.verifyOtp(
+                            VerifyOtpRequest(phoneNumber: phone, otp: otp),
+                          );
+                          if (resp.succeeded) {
+                            setState(() {
+                              _step = 3;
+                            });
+                          } else {
+                            final errors = resp.errors.isNotEmpty
+                                ? resp.errors.join(', ')
+                                : 'OTP verification failed';
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(errors),
+                                backgroundColor: const Color(0xFFE53E3E),
+                              ),
+                            );
+                          }
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Failed to verify OTP: $e'),
+                              backgroundColor: const Color(0xFFE53E3E),
+                            ),
+                          );
+                        } finally {
+                          if (mounted) setState(() => _verifyingOtp = false);
                         }
                       },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF6F3FCC),
                 ),
-                child: const Text('Verify OTP'),
+                child: _verifyingOtp
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : const Text('Verify OTP'),
               ),
             ),
           ],
@@ -1470,7 +1581,7 @@ class _GiftToPhoneDialogState extends State<_GiftToPhoneDialog> {
     );
   }
 
-  Widget _buildConfirmSend(bool isLoading) {
+  Widget _buildConfirmSend(BuildContext blocContext, bool isLoading) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1489,6 +1600,21 @@ class _GiftToPhoneDialogState extends State<_GiftToPhoneDialog> {
             ),
           ],
         ),
+        if (_recipientName != null && _recipientName!.isNotEmpty) ...[
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              const Icon(Icons.person_outline, color: Color(0xFF4A5568)),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  _recipientName!,
+                  style: const TextStyle(color: Color(0xFF4A5568)),
+                ),
+              ),
+            ],
+          ),
+        ],
         if (_messageController.text.trim().isNotEmpty) ...[
           const SizedBox(height: 8),
           Text(
@@ -1508,23 +1634,73 @@ class _GiftToPhoneDialogState extends State<_GiftToPhoneDialog> {
             const SizedBox(width: 12),
             Expanded(
               child: ElevatedButton(
-                onPressed: isLoading
+                onPressed: isLoading || _submitting
                     ? null
-                    : () {
-                        final request = GiftCouponRequest(
-                          userCouponId: _selectedCoupon.id,
-                          // Overload toUserId with phone, similar to points transfer dialog
-                          toUserId: _phoneController.text.replaceAll(' ', ''),
-                          message: _messageController.text.trim().isEmpty
-                              ? null
-                              : _messageController.text.trim(),
+                    : () async {
+                        final recipientPhone = _phoneController.text.replaceAll(
+                          ' ',
+                          '',
                         );
-                        context.read<GiftingBloc>().add(GiftCoupon(request));
+                        final phoneRegex = RegExp(r'^\+?[1-9]\d{9,14}$');
+                        if (!phoneRegex.hasMatch(recipientPhone)) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                'Enter a valid recipient phone number',
+                              ),
+                              backgroundColor: Color(0xFFE53E3E),
+                            ),
+                          );
+                          return;
+                        }
+                        setState(() => _submitting = true);
+                        try {
+                          final dio = getIt<Dio>();
+                          final resp = await dio.post(
+                            '/api/gifting/coupon/by-phone',
+                            data: {
+                              'userCouponId': _selectedCoupon.id,
+                              'recipientPhone': recipientPhone,
+                              'message': _messageController.text.trim().isEmpty
+                                  ? null
+                                  : _messageController.text.trim(),
+                            },
+                          );
+                          if (resp.statusCode == 200 &&
+                              (resp.data['success'] == true ||
+                                  resp.data['Success'] == true)) {
+                            if (mounted) Navigator.of(context).pop();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Coupon gifted successfully'),
+                                backgroundColor: Color(0xFF38A169),
+                              ),
+                            );
+                          } else {
+                            final msg =
+                                resp.data['message'] ?? 'Failed to gift coupon';
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(msg.toString()),
+                                backgroundColor: const Color(0xFFE53E3E),
+                              ),
+                            );
+                          }
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Failed to gift coupon: $e'),
+                              backgroundColor: const Color(0xFFE53E3E),
+                            ),
+                          );
+                        } finally {
+                          if (mounted) setState(() => _submitting = false);
+                        }
                       },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF6F3FCC),
                 ),
-                child: isLoading
+                child: (isLoading || _submitting)
                     ? const SizedBox(
                         height: 20,
                         width: 20,

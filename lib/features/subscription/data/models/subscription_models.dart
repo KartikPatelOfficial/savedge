@@ -34,8 +34,6 @@ extension SubscriptionPlanModelX on SubscriptionPlanModel {
       description: description,
       price: price,
       durationMonths: durationMonths,
-      bonusPoints: bonusPoints,
-      maxCoupons: maxCoupons,
       features: features,
       imageUrl: imageUrl,
       isActive: isActive,

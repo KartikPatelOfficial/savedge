@@ -698,9 +698,6 @@ class _ProfilePageState extends State<ProfilePage> {
       description: 'Renew your ${subscriptionInfo.planName} subscription',
       price: subscriptionInfo.price,
       durationMonths: duration > 0 ? duration : 12,
-      // Default to 12 months if calculation is off
-      bonusPoints: subscriptionInfo.bonusPoints,
-      maxCoupons: subscriptionInfo.maxCoupons,
       features: null,
       imageUrl: null,
       isActive: true,

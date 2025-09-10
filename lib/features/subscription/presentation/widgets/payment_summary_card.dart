@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../../shared/domain/entities/subscription.dart';
 
 /// Card widget displaying payment summary for subscription purchase
@@ -76,21 +77,6 @@ class PaymentSummaryCard extends StatelessWidget {
                     ),
                   ],
                   const SizedBox(height: 12),
-
-                  // Plan Benefits
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 4,
-                    children: [
-                      _buildBenefitChip('${plan.bonusPoints} Bonus Points'),
-                      _buildBenefitChip(
-                        plan.hasUnlimitedCoupons
-                            ? 'Unlimited Coupons'
-                            : '${plan.maxCoupons} Coupons',
-                      ),
-                      if (autoRenew) _buildBenefitChip('Auto-Renewal'),
-                    ],
-                  ),
                 ],
               ),
             ),
@@ -140,17 +126,6 @@ class PaymentSummaryCard extends StatelessWidget {
                             fontSize: 14,
                           ),
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          '• ${plan.bonusPoints} bonus points credited instantly\n'
-                          '• Access to ${plan.hasUnlimitedCoupons ? "unlimited" : "${plan.maxCoupons}"} exclusive coupons\n'
-                          '• Premium customer support',
-                          style: TextStyle(
-                            color: Colors.blue[800],
-                            fontSize: 12,
-                            height: 1.3,
-                          ),
-                        ),
                       ],
                     ),
                   ),
@@ -158,25 +133,6 @@ class PaymentSummaryCard extends StatelessWidget {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBenefitChip(String text) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: Colors.green[100],
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.green[300]!),
-      ),
-      child: Text(
-        text,
-        style: TextStyle(
-          color: Colors.green[800],
-          fontSize: 12,
-          fontWeight: FontWeight.w500,
         ),
       ),
     );

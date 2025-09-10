@@ -7,8 +7,6 @@ class SubscriptionPlan extends Equatable {
     required this.name,
     required this.price,
     required this.durationMonths,
-    required this.bonusPoints,
-    required this.maxCoupons,
     this.description,
     this.features,
     this.imageUrl,
@@ -20,14 +18,9 @@ class SubscriptionPlan extends Equatable {
   final String? description;
   final double price;
   final int durationMonths;
-  final int bonusPoints;
-  final int maxCoupons;
   final String? features;
   final String? imageUrl;
   final bool isActive;
-
-  /// Check if this plan has unlimited coupons
-  bool get hasUnlimitedCoupons => maxCoupons == -1;
 
   /// Get features as a list
   List<String> get featuresList {
@@ -53,8 +46,6 @@ class SubscriptionPlan extends Equatable {
     description,
     price,
     durationMonths,
-    bonusPoints,
-    maxCoupons,
     features,
     imageUrl,
     isActive,

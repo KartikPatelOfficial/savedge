@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../../../shared/domain/entities/subscription.dart';
 import '../bloc/subscription_bloc.dart';
 import '../pages/payment_flow_page.dart';
@@ -81,11 +82,6 @@ class PurchaseConfirmationDialog extends StatelessWidget {
                       ),
                     ),
                   ],
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  '${plan.durationText} • ${plan.bonusPoints} bonus points',
-                  style: TextStyle(color: Colors.grey[600], fontSize: 14),
                 ),
               ],
             ),
