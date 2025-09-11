@@ -1,12 +1,11 @@
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 import 'package:retrofit/retrofit.dart';
-import 'package:savedge/core/constants/app_constants.dart';
 import 'package:savedge/features/points_payment/data/models/points_payment_models.dart';
 
 part 'points_payment_service.g.dart';
 
-@RestApi(baseUrl: AppConstants.baseUrl)
+@RestApi()
 @injectable
 abstract class PointsPaymentService {
   @factoryMethod

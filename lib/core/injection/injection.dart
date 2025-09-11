@@ -89,15 +89,15 @@ final GetIt getIt = GetIt.instance;
 Future<void> configureDependencies() async {
   // Initialize Hive for Flutter
   await Hive.initFlutter();
-  
+
   // Register Hive adapters (only register if not already registered)
   if (!Hive.isAdapterRegistered(10)) {
     Hive.registerAdapter(FavoriteVendorModelAdapter());
   }
-  
+
   // Initialize favorites box
   await FavoritesLocalDataSourceImpl.initializeBox();
-  
+
   // External dependencies
   final sharedPreferences = await SharedPreferences.getInstance();
   getIt.registerSingleton<SharedPreferences>(sharedPreferences);
