@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$VendorResponse {
 
- int get id; String get businessName; String? get description; String? get contactEmail; String? get contactPhone; String? get address; String? get city; String? get state; String? get pinCode; String get category; String? get website; String get approvalStatus; bool get isActive; DateTime? get approvedAt; String? get approvedBy; DateTime? get createdAt; List<VendorImageDto> get images; List<VendorSocialMediaDto> get socialMediaLinks;
+ int get id; String? get vendorUserId; String get businessName; String? get description; String? get contactEmail; String? get contactPhone; String? get address; String? get city; String? get state; String? get pinCode; String get category; String? get website; String get approvalStatus; bool get isActive; DateTime? get approvedAt; String? get approvedBy; DateTime? get createdAt; List<VendorImageDto> get images; List<VendorSocialMediaDto> get socialMediaLinks;
 /// Create a copy of VendorResponse
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $VendorResponseCopyWith<VendorResponse> get copyWith => _$VendorResponseCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is VendorResponse&&(identical(other.id, id) || other.id == id)&&(identical(other.businessName, businessName) || other.businessName == businessName)&&(identical(other.description, description) || other.description == description)&&(identical(other.contactEmail, contactEmail) || other.contactEmail == contactEmail)&&(identical(other.contactPhone, contactPhone) || other.contactPhone == contactPhone)&&(identical(other.address, address) || other.address == address)&&(identical(other.city, city) || other.city == city)&&(identical(other.state, state) || other.state == state)&&(identical(other.pinCode, pinCode) || other.pinCode == pinCode)&&(identical(other.category, category) || other.category == category)&&(identical(other.website, website) || other.website == website)&&(identical(other.approvalStatus, approvalStatus) || other.approvalStatus == approvalStatus)&&(identical(other.isActive, isActive) || other.isActive == isActive)&&(identical(other.approvedAt, approvedAt) || other.approvedAt == approvedAt)&&(identical(other.approvedBy, approvedBy) || other.approvedBy == approvedBy)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&const DeepCollectionEquality().equals(other.images, images)&&const DeepCollectionEquality().equals(other.socialMediaLinks, socialMediaLinks));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is VendorResponse&&(identical(other.id, id) || other.id == id)&&(identical(other.vendorUserId, vendorUserId) || other.vendorUserId == vendorUserId)&&(identical(other.businessName, businessName) || other.businessName == businessName)&&(identical(other.description, description) || other.description == description)&&(identical(other.contactEmail, contactEmail) || other.contactEmail == contactEmail)&&(identical(other.contactPhone, contactPhone) || other.contactPhone == contactPhone)&&(identical(other.address, address) || other.address == address)&&(identical(other.city, city) || other.city == city)&&(identical(other.state, state) || other.state == state)&&(identical(other.pinCode, pinCode) || other.pinCode == pinCode)&&(identical(other.category, category) || other.category == category)&&(identical(other.website, website) || other.website == website)&&(identical(other.approvalStatus, approvalStatus) || other.approvalStatus == approvalStatus)&&(identical(other.isActive, isActive) || other.isActive == isActive)&&(identical(other.approvedAt, approvedAt) || other.approvedAt == approvedAt)&&(identical(other.approvedBy, approvedBy) || other.approvedBy == approvedBy)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&const DeepCollectionEquality().equals(other.images, images)&&const DeepCollectionEquality().equals(other.socialMediaLinks, socialMediaLinks));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,businessName,description,contactEmail,contactPhone,address,city,state,pinCode,category,website,approvalStatus,isActive,approvedAt,approvedBy,createdAt,const DeepCollectionEquality().hash(images),const DeepCollectionEquality().hash(socialMediaLinks));
+int get hashCode => Object.hashAll([runtimeType,id,vendorUserId,businessName,description,contactEmail,contactPhone,address,city,state,pinCode,category,website,approvalStatus,isActive,approvedAt,approvedBy,createdAt,const DeepCollectionEquality().hash(images),const DeepCollectionEquality().hash(socialMediaLinks)]);
 
 @override
 String toString() {
-  return 'VendorResponse(id: $id, businessName: $businessName, description: $description, contactEmail: $contactEmail, contactPhone: $contactPhone, address: $address, city: $city, state: $state, pinCode: $pinCode, category: $category, website: $website, approvalStatus: $approvalStatus, isActive: $isActive, approvedAt: $approvedAt, approvedBy: $approvedBy, createdAt: $createdAt, images: $images, socialMediaLinks: $socialMediaLinks)';
+  return 'VendorResponse(id: $id, vendorUserId: $vendorUserId, businessName: $businessName, description: $description, contactEmail: $contactEmail, contactPhone: $contactPhone, address: $address, city: $city, state: $state, pinCode: $pinCode, category: $category, website: $website, approvalStatus: $approvalStatus, isActive: $isActive, approvedAt: $approvedAt, approvedBy: $approvedBy, createdAt: $createdAt, images: $images, socialMediaLinks: $socialMediaLinks)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $VendorResponseCopyWith<$Res>  {
   factory $VendorResponseCopyWith(VendorResponse value, $Res Function(VendorResponse) _then) = _$VendorResponseCopyWithImpl;
 @useResult
 $Res call({
- int id, String businessName, String? description, String? contactEmail, String? contactPhone, String? address, String? city, String? state, String? pinCode, String category, String? website, String approvalStatus, bool isActive, DateTime? approvedAt, String? approvedBy, DateTime? createdAt, List<VendorImageDto> images, List<VendorSocialMediaDto> socialMediaLinks
+ int id, String? vendorUserId, String businessName, String? description, String? contactEmail, String? contactPhone, String? address, String? city, String? state, String? pinCode, String category, String? website, String approvalStatus, bool isActive, DateTime? approvedAt, String? approvedBy, DateTime? createdAt, List<VendorImageDto> images, List<VendorSocialMediaDto> socialMediaLinks
 });
 
 
@@ -65,10 +65,11 @@ class _$VendorResponseCopyWithImpl<$Res>
 
 /// Create a copy of VendorResponse
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? businessName = null,Object? description = freezed,Object? contactEmail = freezed,Object? contactPhone = freezed,Object? address = freezed,Object? city = freezed,Object? state = freezed,Object? pinCode = freezed,Object? category = null,Object? website = freezed,Object? approvalStatus = null,Object? isActive = null,Object? approvedAt = freezed,Object? approvedBy = freezed,Object? createdAt = freezed,Object? images = null,Object? socialMediaLinks = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? vendorUserId = freezed,Object? businessName = null,Object? description = freezed,Object? contactEmail = freezed,Object? contactPhone = freezed,Object? address = freezed,Object? city = freezed,Object? state = freezed,Object? pinCode = freezed,Object? category = null,Object? website = freezed,Object? approvalStatus = null,Object? isActive = null,Object? approvedAt = freezed,Object? approvedBy = freezed,Object? createdAt = freezed,Object? images = null,Object? socialMediaLinks = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as int,businessName: null == businessName ? _self.businessName : businessName // ignore: cast_nullable_to_non_nullable
+as int,vendorUserId: freezed == vendorUserId ? _self.vendorUserId : vendorUserId // ignore: cast_nullable_to_non_nullable
+as String?,businessName: null == businessName ? _self.businessName : businessName // ignore: cast_nullable_to_non_nullable
 as String,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String?,contactEmail: freezed == contactEmail ? _self.contactEmail : contactEmail // ignore: cast_nullable_to_non_nullable
 as String?,contactPhone: freezed == contactPhone ? _self.contactPhone : contactPhone // ignore: cast_nullable_to_non_nullable
@@ -170,10 +171,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String businessName,  String? description,  String? contactEmail,  String? contactPhone,  String? address,  String? city,  String? state,  String? pinCode,  String category,  String? website,  String approvalStatus,  bool isActive,  DateTime? approvedAt,  String? approvedBy,  DateTime? createdAt,  List<VendorImageDto> images,  List<VendorSocialMediaDto> socialMediaLinks)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String? vendorUserId,  String businessName,  String? description,  String? contactEmail,  String? contactPhone,  String? address,  String? city,  String? state,  String? pinCode,  String category,  String? website,  String approvalStatus,  bool isActive,  DateTime? approvedAt,  String? approvedBy,  DateTime? createdAt,  List<VendorImageDto> images,  List<VendorSocialMediaDto> socialMediaLinks)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _VendorResponse() when $default != null:
-return $default(_that.id,_that.businessName,_that.description,_that.contactEmail,_that.contactPhone,_that.address,_that.city,_that.state,_that.pinCode,_that.category,_that.website,_that.approvalStatus,_that.isActive,_that.approvedAt,_that.approvedBy,_that.createdAt,_that.images,_that.socialMediaLinks);case _:
+return $default(_that.id,_that.vendorUserId,_that.businessName,_that.description,_that.contactEmail,_that.contactPhone,_that.address,_that.city,_that.state,_that.pinCode,_that.category,_that.website,_that.approvalStatus,_that.isActive,_that.approvedAt,_that.approvedBy,_that.createdAt,_that.images,_that.socialMediaLinks);case _:
   return orElse();
 
 }
@@ -191,10 +192,10 @@ return $default(_that.id,_that.businessName,_that.description,_that.contactEmail
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String businessName,  String? description,  String? contactEmail,  String? contactPhone,  String? address,  String? city,  String? state,  String? pinCode,  String category,  String? website,  String approvalStatus,  bool isActive,  DateTime? approvedAt,  String? approvedBy,  DateTime? createdAt,  List<VendorImageDto> images,  List<VendorSocialMediaDto> socialMediaLinks)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String? vendorUserId,  String businessName,  String? description,  String? contactEmail,  String? contactPhone,  String? address,  String? city,  String? state,  String? pinCode,  String category,  String? website,  String approvalStatus,  bool isActive,  DateTime? approvedAt,  String? approvedBy,  DateTime? createdAt,  List<VendorImageDto> images,  List<VendorSocialMediaDto> socialMediaLinks)  $default,) {final _that = this;
 switch (_that) {
 case _VendorResponse():
-return $default(_that.id,_that.businessName,_that.description,_that.contactEmail,_that.contactPhone,_that.address,_that.city,_that.state,_that.pinCode,_that.category,_that.website,_that.approvalStatus,_that.isActive,_that.approvedAt,_that.approvedBy,_that.createdAt,_that.images,_that.socialMediaLinks);case _:
+return $default(_that.id,_that.vendorUserId,_that.businessName,_that.description,_that.contactEmail,_that.contactPhone,_that.address,_that.city,_that.state,_that.pinCode,_that.category,_that.website,_that.approvalStatus,_that.isActive,_that.approvedAt,_that.approvedBy,_that.createdAt,_that.images,_that.socialMediaLinks);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -211,10 +212,10 @@ return $default(_that.id,_that.businessName,_that.description,_that.contactEmail
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String businessName,  String? description,  String? contactEmail,  String? contactPhone,  String? address,  String? city,  String? state,  String? pinCode,  String category,  String? website,  String approvalStatus,  bool isActive,  DateTime? approvedAt,  String? approvedBy,  DateTime? createdAt,  List<VendorImageDto> images,  List<VendorSocialMediaDto> socialMediaLinks)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String? vendorUserId,  String businessName,  String? description,  String? contactEmail,  String? contactPhone,  String? address,  String? city,  String? state,  String? pinCode,  String category,  String? website,  String approvalStatus,  bool isActive,  DateTime? approvedAt,  String? approvedBy,  DateTime? createdAt,  List<VendorImageDto> images,  List<VendorSocialMediaDto> socialMediaLinks)?  $default,) {final _that = this;
 switch (_that) {
 case _VendorResponse() when $default != null:
-return $default(_that.id,_that.businessName,_that.description,_that.contactEmail,_that.contactPhone,_that.address,_that.city,_that.state,_that.pinCode,_that.category,_that.website,_that.approvalStatus,_that.isActive,_that.approvedAt,_that.approvedBy,_that.createdAt,_that.images,_that.socialMediaLinks);case _:
+return $default(_that.id,_that.vendorUserId,_that.businessName,_that.description,_that.contactEmail,_that.contactPhone,_that.address,_that.city,_that.state,_that.pinCode,_that.category,_that.website,_that.approvalStatus,_that.isActive,_that.approvedAt,_that.approvedBy,_that.createdAt,_that.images,_that.socialMediaLinks);case _:
   return null;
 
 }
@@ -226,10 +227,11 @@ return $default(_that.id,_that.businessName,_that.description,_that.contactEmail
 @JsonSerializable()
 
 class _VendorResponse implements VendorResponse {
-  const _VendorResponse({required this.id, required this.businessName, this.description, this.contactEmail, this.contactPhone, this.address, this.city, this.state, this.pinCode, required this.category, this.website, this.approvalStatus = 'Approved', required this.isActive, this.approvedAt, this.approvedBy, this.createdAt, final  List<VendorImageDto> images = const [], final  List<VendorSocialMediaDto> socialMediaLinks = const []}): _images = images,_socialMediaLinks = socialMediaLinks;
+  const _VendorResponse({required this.id, this.vendorUserId, required this.businessName, this.description, this.contactEmail, this.contactPhone, this.address, this.city, this.state, this.pinCode, required this.category, this.website, this.approvalStatus = 'Approved', required this.isActive, this.approvedAt, this.approvedBy, this.createdAt, final  List<VendorImageDto> images = const [], final  List<VendorSocialMediaDto> socialMediaLinks = const []}): _images = images,_socialMediaLinks = socialMediaLinks;
   factory _VendorResponse.fromJson(Map<String, dynamic> json) => _$VendorResponseFromJson(json);
 
 @override final  int id;
+@override final  String? vendorUserId;
 @override final  String businessName;
 @override final  String? description;
 @override final  String? contactEmail;
@@ -273,16 +275,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _VendorResponse&&(identical(other.id, id) || other.id == id)&&(identical(other.businessName, businessName) || other.businessName == businessName)&&(identical(other.description, description) || other.description == description)&&(identical(other.contactEmail, contactEmail) || other.contactEmail == contactEmail)&&(identical(other.contactPhone, contactPhone) || other.contactPhone == contactPhone)&&(identical(other.address, address) || other.address == address)&&(identical(other.city, city) || other.city == city)&&(identical(other.state, state) || other.state == state)&&(identical(other.pinCode, pinCode) || other.pinCode == pinCode)&&(identical(other.category, category) || other.category == category)&&(identical(other.website, website) || other.website == website)&&(identical(other.approvalStatus, approvalStatus) || other.approvalStatus == approvalStatus)&&(identical(other.isActive, isActive) || other.isActive == isActive)&&(identical(other.approvedAt, approvedAt) || other.approvedAt == approvedAt)&&(identical(other.approvedBy, approvedBy) || other.approvedBy == approvedBy)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&const DeepCollectionEquality().equals(other._images, _images)&&const DeepCollectionEquality().equals(other._socialMediaLinks, _socialMediaLinks));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _VendorResponse&&(identical(other.id, id) || other.id == id)&&(identical(other.vendorUserId, vendorUserId) || other.vendorUserId == vendorUserId)&&(identical(other.businessName, businessName) || other.businessName == businessName)&&(identical(other.description, description) || other.description == description)&&(identical(other.contactEmail, contactEmail) || other.contactEmail == contactEmail)&&(identical(other.contactPhone, contactPhone) || other.contactPhone == contactPhone)&&(identical(other.address, address) || other.address == address)&&(identical(other.city, city) || other.city == city)&&(identical(other.state, state) || other.state == state)&&(identical(other.pinCode, pinCode) || other.pinCode == pinCode)&&(identical(other.category, category) || other.category == category)&&(identical(other.website, website) || other.website == website)&&(identical(other.approvalStatus, approvalStatus) || other.approvalStatus == approvalStatus)&&(identical(other.isActive, isActive) || other.isActive == isActive)&&(identical(other.approvedAt, approvedAt) || other.approvedAt == approvedAt)&&(identical(other.approvedBy, approvedBy) || other.approvedBy == approvedBy)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&const DeepCollectionEquality().equals(other._images, _images)&&const DeepCollectionEquality().equals(other._socialMediaLinks, _socialMediaLinks));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,businessName,description,contactEmail,contactPhone,address,city,state,pinCode,category,website,approvalStatus,isActive,approvedAt,approvedBy,createdAt,const DeepCollectionEquality().hash(_images),const DeepCollectionEquality().hash(_socialMediaLinks));
+int get hashCode => Object.hashAll([runtimeType,id,vendorUserId,businessName,description,contactEmail,contactPhone,address,city,state,pinCode,category,website,approvalStatus,isActive,approvedAt,approvedBy,createdAt,const DeepCollectionEquality().hash(_images),const DeepCollectionEquality().hash(_socialMediaLinks)]);
 
 @override
 String toString() {
-  return 'VendorResponse(id: $id, businessName: $businessName, description: $description, contactEmail: $contactEmail, contactPhone: $contactPhone, address: $address, city: $city, state: $state, pinCode: $pinCode, category: $category, website: $website, approvalStatus: $approvalStatus, isActive: $isActive, approvedAt: $approvedAt, approvedBy: $approvedBy, createdAt: $createdAt, images: $images, socialMediaLinks: $socialMediaLinks)';
+  return 'VendorResponse(id: $id, vendorUserId: $vendorUserId, businessName: $businessName, description: $description, contactEmail: $contactEmail, contactPhone: $contactPhone, address: $address, city: $city, state: $state, pinCode: $pinCode, category: $category, website: $website, approvalStatus: $approvalStatus, isActive: $isActive, approvedAt: $approvedAt, approvedBy: $approvedBy, createdAt: $createdAt, images: $images, socialMediaLinks: $socialMediaLinks)';
 }
 
 
@@ -293,7 +295,7 @@ abstract mixin class _$VendorResponseCopyWith<$Res> implements $VendorResponseCo
   factory _$VendorResponseCopyWith(_VendorResponse value, $Res Function(_VendorResponse) _then) = __$VendorResponseCopyWithImpl;
 @override @useResult
 $Res call({
- int id, String businessName, String? description, String? contactEmail, String? contactPhone, String? address, String? city, String? state, String? pinCode, String category, String? website, String approvalStatus, bool isActive, DateTime? approvedAt, String? approvedBy, DateTime? createdAt, List<VendorImageDto> images, List<VendorSocialMediaDto> socialMediaLinks
+ int id, String? vendorUserId, String businessName, String? description, String? contactEmail, String? contactPhone, String? address, String? city, String? state, String? pinCode, String category, String? website, String approvalStatus, bool isActive, DateTime? approvedAt, String? approvedBy, DateTime? createdAt, List<VendorImageDto> images, List<VendorSocialMediaDto> socialMediaLinks
 });
 
 
@@ -310,10 +312,11 @@ class __$VendorResponseCopyWithImpl<$Res>
 
 /// Create a copy of VendorResponse
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? businessName = null,Object? description = freezed,Object? contactEmail = freezed,Object? contactPhone = freezed,Object? address = freezed,Object? city = freezed,Object? state = freezed,Object? pinCode = freezed,Object? category = null,Object? website = freezed,Object? approvalStatus = null,Object? isActive = null,Object? approvedAt = freezed,Object? approvedBy = freezed,Object? createdAt = freezed,Object? images = null,Object? socialMediaLinks = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? vendorUserId = freezed,Object? businessName = null,Object? description = freezed,Object? contactEmail = freezed,Object? contactPhone = freezed,Object? address = freezed,Object? city = freezed,Object? state = freezed,Object? pinCode = freezed,Object? category = null,Object? website = freezed,Object? approvalStatus = null,Object? isActive = null,Object? approvedAt = freezed,Object? approvedBy = freezed,Object? createdAt = freezed,Object? images = null,Object? socialMediaLinks = null,}) {
   return _then(_VendorResponse(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
-as int,businessName: null == businessName ? _self.businessName : businessName // ignore: cast_nullable_to_non_nullable
+as int,vendorUserId: freezed == vendorUserId ? _self.vendorUserId : vendorUserId // ignore: cast_nullable_to_non_nullable
+as String?,businessName: null == businessName ? _self.businessName : businessName // ignore: cast_nullable_to_non_nullable
 as String,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String?,contactEmail: freezed == contactEmail ? _self.contactEmail : contactEmail // ignore: cast_nullable_to_non_nullable
 as String?,contactPhone: freezed == contactPhone ? _self.contactPhone : contactPhone // ignore: cast_nullable_to_non_nullable

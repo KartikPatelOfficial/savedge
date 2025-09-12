@@ -6,6 +6,7 @@ import 'coupon.dart';
 class Vendor extends Equatable {
   const Vendor({
     required this.id,
+    required this.vendorUserId,
     required this.businessName,
     this.description,
     required this.contactEmail,
@@ -27,6 +28,7 @@ class Vendor extends Equatable {
   });
 
   final int id;
+  final String vendorUserId;
   final String businessName;
   final String? description;
   final String contactEmail;
@@ -49,6 +51,7 @@ class Vendor extends Equatable {
   @override
   List<Object?> get props => [
     id,
+    vendorUserId,
     businessName,
     description,
     contactEmail,

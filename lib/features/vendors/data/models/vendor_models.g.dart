@@ -9,6 +9,7 @@ part of 'vendor_models.dart';
 _VendorResponse _$VendorResponseFromJson(Map<String, dynamic> json) =>
     _VendorResponse(
       id: (json['id'] as num).toInt(),
+      vendorUserId: json['vendorUserId'] as String?,
       businessName: json['businessName'] as String,
       description: json['description'] as String?,
       contactEmail: json['contactEmail'] as String?,
@@ -45,6 +46,7 @@ _VendorResponse _$VendorResponseFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$VendorResponseToJson(_VendorResponse instance) =>
     <String, dynamic>{
       'id': instance.id,
+      'vendorUserId': instance.vendorUserId,
       'businessName': instance.businessName,
       'description': instance.description,
       'contactEmail': instance.contactEmail,

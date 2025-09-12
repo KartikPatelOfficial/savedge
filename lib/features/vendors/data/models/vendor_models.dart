@@ -8,6 +8,7 @@ part 'vendor_models.g.dart';
 abstract class VendorResponse with _$VendorResponse {
   const factory VendorResponse({
     required int id,
+    String? vendorUserId,
     required String businessName,
     String? description,
     String? contactEmail,

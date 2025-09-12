@@ -9,6 +9,7 @@ import 'package:savedge/features/favorites/presentation/bloc/favorites_event.dar
 import 'package:savedge/features/favorites/presentation/bloc/favorites_state.dart';
 import 'package:savedge/features/home/presentation/widgets/subscription_plans_section.dart';
 import 'package:savedge/features/points_payment/presentation/widgets/points_payment_dialog.dart';
+import 'package:savedge/features/qr_scanner/presentation/pages/qr_scanner_page.dart';
 import 'package:savedge/features/stores/presentation/widgets/vendor_offers_section.dart';
 import 'package:savedge/features/user_profile/presentation/bloc/points_bloc.dart';
 import 'package:savedge/features/vendors/domain/entities/vendor.dart';
@@ -331,12 +332,15 @@ class _VendorDetailView extends StatelessWidget {
 
   final Vendor vendor;
 
-  /// Get primary image URL
-  String? get _primaryImageUrl {
-    final primaryImage = vendor.images
-        .where((img) => img.isPrimary)
-        .firstOrNull;
-    return primaryImage?.imageUrl ?? vendor.images.firstOrNull?.imageUrl;
+  /// Resolve vendor UID for QR and coupon flows.
+  String get _resolvedVendorUid {
+    final uid = vendor.vendorUserId.trim();
+    if (uid.isNotEmpty) return uid;
+    for (final c in vendor.coupons) {
+      final u = c.vendorUserId.trim();
+      if (u.isNotEmpty) return u;
+    }
+    return vendor.id.toString();
   }
 
   /// Get full address string
@@ -365,7 +369,7 @@ class _VendorDetailView extends StatelessWidget {
           SliverToBoxAdapter(
             child: VendorOffersSection(
               vendorId: vendor.id,
-              vendorUid: vendor.id.toString(),
+              vendorUid: _resolvedVendorUid,
               vendorName: vendor.businessName,
               coupons: vendor.coupons,
             ),
@@ -622,9 +626,10 @@ class _VendorDetailView extends StatelessWidget {
               Expanded(
                 child: BlocBuilder<FavoritesBloc, FavoritesState>(
                   builder: (context, favState) {
-                    final isFavorite = favState is FavoritesLoaded &&
+                    final isFavorite =
+                        favState is FavoritesLoaded &&
                         favState.isFavorite(vendor.id);
-                    
+
                     return Container(
                       height: 56,
                       decoration: BoxDecoration(
@@ -673,7 +678,8 @@ class _VendorDetailView extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
-              if (vendor.contactPhone != null && vendor.contactPhone!.trim().isNotEmpty)
+              if (vendor.contactPhone != null &&
+                  vendor.contactPhone!.trim().isNotEmpty)
                 Container(
                   height: 56,
                   width: 56,
@@ -1056,9 +1062,27 @@ class _VendorDetailView extends StatelessWidget {
     launchUrlString(url);
   }
 
-  /// Open points payment dialog
-  void _openPointsPaymentDialog(BuildContext context) {
+  /// Start pay-with-points flow: verify vendor via QR, then open payment dialog
+  Future<void> _openPointsPaymentDialog(BuildContext context) async {
     HapticFeedback.lightImpact();
+
+    // 1) Verify vendor via QR scanner
+    final verified = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => QRScannerPage(
+          expectedVendorUid: _resolvedVendorUid,
+          expectedVendorName: vendor.businessName,
+          verifyOnly: true,
+        ),
+      ),
+    );
+
+    if (verified != true) {
+      return; // Cancelled or failed verification
+    }
+
+    // 2) On success, open payment dialog
     final pointsState = context.read<PointsBloc>().state;
     final availablePoints = pointsState is PointsLoaded
         ? pointsState.points.balance

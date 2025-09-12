@@ -12,20 +12,26 @@ import 'package:savedge/features/coupons/presentation/pages/coupon_redemption_op
 class QRScannerPage extends StatefulWidget {
   const QRScannerPage({
     super.key,
-    required this.couponId,
+    this.couponId,
     required this.expectedVendorUid,
     required this.expectedVendorName,
     this.claimAndUse = false,
     this.redemptionMethod,
     this.userCouponId,
-  });
+    this.verifyOnly = false,
+  }) : assert(
+          // In verify-only mode, couponId is not required. Otherwise it is.
+          verifyOnly || couponId != null,
+          'couponId is required unless verifyOnly is true',
+        );
 
-  final int couponId;
+  final int? couponId;
   final String expectedVendorUid;
   final String expectedVendorName;
   final bool claimAndUse; // If true, claim the coupon first then immediately use it
   final String? redemptionMethod; // Required if claimAndUse is true (membership, razorpay)
   final int? userCouponId; // If provided, use this specific user coupon ID for redemption
+  final bool verifyOnly; // If true, only verify the vendor QR and return success
 
   @override
   State<QRScannerPage> createState() => _QRScannerPageState();
@@ -44,9 +50,9 @@ class _QRScannerPageState extends State<QRScannerPage>
   Future<dynamic> _claimCoupon(String redemptionMethod) async {
     switch (redemptionMethod) {
       case 'membership':
-        return await _couponService.claimCouponFromSubscription(widget.couponId);
+        return await _couponService.claimCouponFromSubscription(widget.couponId!);
       case 'razorpay':
-        return await _couponService.purchaseCouponWithPayment(widget.couponId);
+        return await _couponService.purchaseCouponWithPayment(widget.couponId!);
       default:
         throw Exception('Invalid redemption method: $redemptionMethod');
     }
@@ -228,16 +234,16 @@ class _QRScannerPageState extends State<QRScannerPage>
                     ),
                   ),
                   const SizedBox(width: 16),
-                  const Expanded(
-                    child: Text(
-                      'Scan QR Code',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
+          const Expanded(
+            child: Text(
+              'Scan QR Code',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 24,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
                 ],
               ),
             ),
@@ -288,7 +294,9 @@ class _QRScannerPageState extends State<QRScannerPage>
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Position the QR code at ${widget.expectedVendorName} within the camera frame to validate and redeem your coupon.',
+                      widget.verifyOnly
+                          ? 'Position the QR code at ${widget.expectedVendorName} within the camera frame to validate the vendor.'
+                          : 'Position the QR code at ${widget.expectedVendorName} within the camera frame to validate and redeem your coupon.',
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 16,
@@ -446,14 +454,24 @@ class _QRScannerPageState extends State<QRScannerPage>
       await _stopCamera();
 
       // Validate vendor matches
-      if (qrCode != widget.expectedVendorUid) {
+      final scanned = qrCode.trim();
+      final expected = widget.expectedVendorUid.trim();
+      if (scanned != expected) {
         throw Exception(
           'This QR code belongs to a different vendor. Please scan the QR code from ${widget.expectedVendorName}.',
         );
       }
 
+      // If verify-only mode, we are done here
+      if (widget.verifyOnly) {
+        if (mounted) {
+          Navigator.of(context).pop(true);
+        }
+        return;
+      }
+
       // Check if coupon can be redeemed
-      final couponCheck = await _couponService.checkCoupon(widget.couponId);
+      final couponCheck = await _couponService.checkCoupon(widget.couponId!);
 
       // Allow to proceed if user has unused coupons or can still claim more
       if (!couponCheck.canUserRedeem && !couponCheck.hasUnusedCoupons) {

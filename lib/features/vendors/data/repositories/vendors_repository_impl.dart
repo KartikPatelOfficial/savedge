@@ -1,13 +1,12 @@
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
-
 import 'package:savedge/core/error/failures.dart';
-import 'package:savedge/features/vendors/domain/entities/vendor.dart';
-import 'package:savedge/features/vendors/domain/entities/coupon.dart' as domain;
-import 'package:savedge/features/vendors/domain/repositories/vendors_repository.dart';
 import 'package:savedge/features/vendors/data/datasources/vendors_remote_data_source.dart';
-import 'package:savedge/features/vendors/data/models/vendor_models.dart';
 import 'package:savedge/features/vendors/data/models/coupon_models.dart';
+import 'package:savedge/features/vendors/data/models/vendor_models.dart';
+import 'package:savedge/features/vendors/domain/entities/coupon.dart' as domain;
+import 'package:savedge/features/vendors/domain/entities/vendor.dart';
+import 'package:savedge/features/vendors/domain/repositories/vendors_repository.dart';
 
 class VendorsRepositoryImpl implements VendorsRepository {
   const VendorsRepositoryImpl({required this.remoteDataSource});
@@ -86,7 +85,10 @@ class VendorsRepositoryImpl implements VendorsRepository {
         // Ignore parsing issues; fallback stays empty
       }
 
-      final vendor = _mapVendorResponseToEntity(response.data, coupons: coupons);
+      final vendor = _mapVendorResponseToEntity(
+        response.data,
+        coupons: coupons,
+      );
 
       return Right(vendor);
     } on DioException catch (e) {
@@ -113,9 +115,25 @@ class VendorsRepositoryImpl implements VendorsRepository {
     }
   }
 
-  Vendor _mapVendorResponseToEntity(VendorResponse response, {List<domain.Coupon> coupons = const []}) {
+  Vendor _mapVendorResponseToEntity(
+    VendorResponse response, {
+    List<domain.Coupon> coupons = const [],
+  }) {
+    // Resolve vendor UID: prefer response.vendorUserId; else derive from coupons
+    String resolvedVendorUid = (response.vendorUserId ?? '').trim();
+    if (resolvedVendorUid.isEmpty) {
+      for (final c in coupons) {
+        final uid = c.vendorUserId.trim();
+        if (uid.isNotEmpty) {
+          resolvedVendorUid = uid;
+          break;
+        }
+      }
+    }
+
     return Vendor(
       id: response.id,
+      vendorUserId: resolvedVendorUid,
       businessName: response.businessName,
       description: response.description,
       contactEmail: response.contactEmail ?? '',
@@ -211,7 +229,6 @@ class VendorsRepositoryImpl implements VendorsRepository {
       isActive: dto.isActive,
     );
   }
-
 
   Failure _handleDioError(DioException error) {
     switch (error.type) {
