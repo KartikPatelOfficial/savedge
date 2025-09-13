@@ -76,6 +76,7 @@ import 'package:savedge/features/vendors/data/repositories/vendors_repository_im
 import 'package:savedge/features/vendors/domain/repositories/coupons_repository.dart';
 import 'package:savedge/features/vendors/domain/repositories/vendors_repository.dart';
 import 'package:savedge/features/vendors/domain/usecases/get_featured_coupons_usecase.dart';
+import 'package:savedge/features/vendors/domain/usecases/get_special_offer_coupons_usecase.dart';
 import 'package:savedge/features/vendors/domain/usecases/get_vendor_coupons_usecase.dart';
 import 'package:savedge/features/vendors/domain/usecases/get_vendor_usecase.dart';
 import 'package:savedge/features/vendors/domain/usecases/get_vendors_usecase.dart';
@@ -238,6 +239,10 @@ Future<void> configureDependencies() async {
     GetVendorCouponsUseCase(getIt<CouponsRepository>()),
   );
 
+  getIt.registerSingleton<GetSpecialOfferCouponsUseCase>(
+    GetSpecialOfferCouponsUseCase(getIt<CouponsRepository>()),
+  );
+
   // Points Use Cases
   getIt.registerSingleton<GetUserPointsUseCase>(
     GetUserPointsUseCase(getIt<PointsRepository>()),
@@ -317,6 +322,7 @@ Future<void> configureDependencies() async {
     () => CouponsBloc(
       getFeaturedCouponsUseCase: getIt<GetFeaturedCouponsUseCase>(),
       getVendorCouponsUseCase: getIt<GetVendorCouponsUseCase>(),
+      getSpecialOfferCouponsUseCase: getIt<GetSpecialOfferCouponsUseCase>(),
     ),
   );
 

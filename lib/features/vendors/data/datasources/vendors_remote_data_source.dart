@@ -28,4 +28,7 @@ abstract class VendorsRemoteDataSource {
   Future<HttpResponse<List<VendorImageDto>>> getVendorImages(
     @Path('vendorId') int vendorId,
   );
+
+  @GET('/api/Vendors/top-offers')
+  Future<HttpResponse<dynamic>> getTopOfferVendors();
 }

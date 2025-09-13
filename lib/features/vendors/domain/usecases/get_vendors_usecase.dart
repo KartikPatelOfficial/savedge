@@ -17,6 +17,9 @@ class GetVendorsUseCase implements UseCase<List<Vendor>, GetVendorsParams> {
 
   @override
   Future<Either<Failure, List<Vendor>>> call(GetVendorsParams params) async {
+    if (params.isTopOffers) {
+      return repository.getTopOfferVendors();
+    }
     return repository.getVendors(
       pageNumber: params.pageNumber,
       pageSize: params.pageSize,
@@ -39,6 +42,7 @@ class GetVendorsParams extends Equatable {
     this.businessType,
     this.isApproved = true,
     this.isActive = true,
+    this.isTopOffers = false,
   });
 
   final int pageNumber;
@@ -48,6 +52,7 @@ class GetVendorsParams extends Equatable {
   final String? businessType;
   final bool? isApproved;
   final bool? isActive;
+  final bool isTopOffers;
 
   @override
   List<Object?> get props => [
@@ -58,5 +63,6 @@ class GetVendorsParams extends Equatable {
     businessType,
     isApproved,
     isActive,
+    isTopOffers,
   ];
 }

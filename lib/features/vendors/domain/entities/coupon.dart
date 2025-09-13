@@ -18,6 +18,11 @@ class Coupon extends Equatable {
     this.cashPrice,
     this.termsAndConditions,
     this.maxRedemptions,
+    this.isSpecialOffer = false,
+    this.specialOfferStartDate,
+    this.specialOfferEndDate,
+    this.specialOfferPriority = 0,
+    this.specialOfferImageUrl,
   });
 
   final int id;
@@ -35,6 +40,11 @@ class Coupon extends Equatable {
   final double? cashPrice;
   final String? termsAndConditions;
   final int? maxRedemptions;
+  final bool isSpecialOffer;
+  final DateTime? specialOfferStartDate;
+  final DateTime? specialOfferEndDate;
+  final int specialOfferPriority;
+  final String? specialOfferImageUrl;
 
   /// Check if coupon is currently valid
   bool get isValid {
@@ -62,6 +72,14 @@ class Coupon extends Equatable {
     return 'on orders above ₹${minimumOrderAmount.toInt()}';
   }
 
+  /// Check if special offer is currently active
+  bool get isSpecialOfferActive {
+    if (!isSpecialOffer) return false;
+    if (specialOfferStartDate == null || specialOfferEndDate == null) return false;
+    final now = DateTime.now();
+    return now.isAfter(specialOfferStartDate!) && now.isBefore(specialOfferEndDate!);
+  }
+
   @override
   List<Object?> get props => [
     id,
@@ -79,5 +97,10 @@ class Coupon extends Equatable {
     cashPrice,
     termsAndConditions,
     maxRedemptions,
+    isSpecialOffer,
+    specialOfferStartDate,
+    specialOfferEndDate,
+    specialOfferPriority,
+    specialOfferImageUrl,
   ];
 }

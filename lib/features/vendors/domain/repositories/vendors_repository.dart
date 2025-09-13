@@ -17,4 +17,6 @@ abstract class VendorsRepository {
   Future<Either<Failure, Vendor>> getVendor(int id);
 
   Future<Either<Failure, List<VendorImage>>> getVendorImages(int vendorId);
+  
+  Future<Either<Failure, List<Vendor>>> getTopOfferVendors();
 }

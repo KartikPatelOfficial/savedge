@@ -2,8 +2,10 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 
+import 'package:savedge/core/usecases/usecase.dart';
 import 'package:savedge/features/vendors/domain/entities/coupon.dart';
 import 'package:savedge/features/vendors/domain/usecases/get_featured_coupons_usecase.dart';
+import 'package:savedge/features/vendors/domain/usecases/get_special_offer_coupons_usecase.dart';
 import 'package:savedge/features/vendors/domain/usecases/get_vendor_coupons_usecase.dart';
 
 part 'coupons_event.dart';
@@ -15,15 +17,19 @@ class CouponsBloc extends Bloc<CouponsEvent, CouponsState> {
   CouponsBloc({
     required this.getFeaturedCouponsUseCase,
     required this.getVendorCouponsUseCase,
+    required this.getSpecialOfferCouponsUseCase,
   }) : super(CouponsInitial()) {
     on<LoadFeaturedCoupons>(_onLoadFeaturedCoupons);
     on<RefreshFeaturedCoupons>(_onRefreshFeaturedCoupons);
     on<LoadVendorCoupons>(_onLoadVendorCoupons);
     on<RefreshVendorCoupons>(_onRefreshVendorCoupons);
+    on<LoadSpecialOfferCoupons>(_onLoadSpecialOfferCoupons);
+    on<RefreshSpecialOfferCoupons>(_onRefreshSpecialOfferCoupons);
   }
 
   final GetFeaturedCouponsUseCase getFeaturedCouponsUseCase;
   final GetVendorCouponsUseCase getVendorCouponsUseCase;
+  final GetSpecialOfferCouponsUseCase getSpecialOfferCouponsUseCase;
 
   Future<void> _onLoadFeaturedCoupons(
     LoadFeaturedCoupons event,
@@ -97,6 +103,37 @@ class CouponsBloc extends Bloc<CouponsEvent, CouponsState> {
     result.fold(
       (failure) => emit(
         CouponsError(failure.message ?? 'Failed to refresh vendor coupons'),
+      ),
+      (coupons) => emit(CouponsLoaded(coupons)),
+    );
+  }
+
+  Future<void> _onLoadSpecialOfferCoupons(
+    LoadSpecialOfferCoupons event,
+    Emitter<CouponsState> emit,
+  ) async {
+    emit(CouponsLoading());
+
+    final result = await getSpecialOfferCouponsUseCase(NoParams());
+
+    result.fold(
+      (failure) => emit(
+        CouponsError(failure.message ?? 'Failed to load special offers'),
+      ),
+      (coupons) => emit(CouponsLoaded(coupons)),
+    );
+  }
+
+  Future<void> _onRefreshSpecialOfferCoupons(
+    RefreshSpecialOfferCoupons event,
+    Emitter<CouponsState> emit,
+  ) async {
+    // Don't emit loading state for refresh to avoid UI flickering
+    final result = await getSpecialOfferCouponsUseCase(NoParams());
+
+    result.fold(
+      (failure) => emit(
+        CouponsError(failure.message ?? 'Failed to refresh special offers'),
       ),
       (coupons) => emit(CouponsLoaded(coupons)),
     );

@@ -57,3 +57,7 @@ class LoadMoreVendors extends VendorsEvent {
 class RefreshVendors extends VendorsEvent {
   const RefreshVendors();
 }
+
+class LoadTopOfferVendors extends VendorsEvent {
+  const LoadTopOfferVendors();
+}

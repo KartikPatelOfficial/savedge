@@ -32,4 +32,7 @@ abstract class CouponsRepository {
     String? status = 'active',
     bool isExpired = false,
   });
+
+  /// Gets special offer coupons for hot deals section
+  Future<Either<Failure, List<Coupon>>> getSpecialOfferCoupons();
 }

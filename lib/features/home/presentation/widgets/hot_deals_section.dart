@@ -6,25 +6,40 @@ import 'package:savedge/features/vendors/domain/entities/coupon.dart';
 import 'package:savedge/features/vendors/presentation/bloc/coupons_bloc.dart';
 
 /// Hot deals section widget with real coupon data
-class HotDealsSection extends StatelessWidget {
+class HotDealsSection extends StatefulWidget {
   const HotDealsSection({super.key, this.deals = const []});
 
   final List<HotDeal> deals;
 
   @override
+  State<HotDealsSection> createState() => _HotDealsSectionState();
+}
+
+class _HotDealsSectionState extends State<HotDealsSection> {
+  bool _dispatched = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // If a CouponsBloc is already provided up the tree, trigger special offers load once
+    final existingBloc = context.read<CouponsBloc?>();
+    if (existingBloc != null && !_dispatched) {
+      existingBloc.add(const LoadSpecialOfferCoupons());
+      _dispatched = true;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // Try to use existing BLoC from parent, but don't watch for changes
+    // Use existing BLoC if available; otherwise create one and load specials
     final couponsBloc = context.read<CouponsBloc?>();
-    
     if (couponsBloc == null) {
-      // Fallback: create a new BLoC if not provided by parent
       return BlocProvider(
         create: (context) =>
-            getIt<CouponsBloc>()..add(const LoadFeaturedCoupons(pageSize: 5)),
+            getIt<CouponsBloc>()..add(const LoadSpecialOfferCoupons()),
         child: const HotDealsView(),
       );
     }
-    
     return const HotDealsView();
   }
 }
@@ -216,6 +231,50 @@ class _StackedDealsCardsState extends State<StackedDealsCards>
     _startAnimations();
   }
 
+  @override
+  void didUpdateWidget(covariant StackedDealsCards oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Reinitialize animations if coupons length changes (e.g., after load)
+    if (oldWidget.coupons.length != widget.coupons.length) {
+      for (final controller in _animationControllers) {
+        controller.dispose();
+      }
+
+      _animationControllers = List.generate(
+        widget.coupons.length,
+        (index) => AnimationController(
+          duration: Duration(milliseconds: 300 + (index * 100)),
+          vsync: this,
+        ),
+      );
+
+      _scaleAnimations = _animationControllers
+          .map(
+            (controller) => Tween<double>(begin: 0.0, end: 1.0).animate(
+              CurvedAnimation(parent: controller, curve: Curves.elasticOut),
+            ),
+          )
+          .toList();
+
+      _slideAnimations = _animationControllers
+          .map(
+            (controller) =>
+                Tween<Offset>(
+                  begin: const Offset(0, 1),
+                  end: Offset.zero,
+                ).animate(
+                  CurvedAnimation(parent: controller, curve: Curves.easeOutBack),
+                ),
+          )
+          .toList();
+
+      if (_currentIndex >= widget.coupons.length) {
+        _currentIndex = widget.coupons.isEmpty ? 0 : widget.coupons.length - 1;
+      }
+      _startAnimations();
+    }
+  }
+
   void _startAnimations() {
     for (int i = 0; i < _animationControllers.length; i++) {
       Future.delayed(Duration(milliseconds: i * 150), () {
@@ -290,19 +349,38 @@ class _StackedDealsCardsState extends State<StackedDealsCards>
           onTap: () => widget.onCouponTap?.call(coupon),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(24),
-            child: Stack(
-              children: [
-                // Gradient background
-                _buildGradientBackground(coupon, index),
-                // Decorative elements
-                _buildDecorations(index),
-                // Content
-                _buildCardContent(coupon),
-              ],
-            ),
+            child: coupon.isSpecialOffer && coupon.specialOfferImageUrl != null
+                ? _buildSpecialOfferImage(coupon)
+                : Stack(
+                    children: [
+                      // Gradient background
+                      _buildGradientBackground(coupon, index),
+                      // Decorative elements
+                      _buildDecorations(index),
+                      // Content
+                      _buildCardContent(coupon),
+                    ],
+                  ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildSpecialOfferImage(Coupon coupon) {
+    // If special image exists, render image only. On error, fallback to current UI.
+    return Image.network(
+      coupon.specialOfferImageUrl!,
+      fit: BoxFit.cover,
+      errorBuilder: (context, error, stackTrace) {
+        return Stack(
+          children: [
+            _buildGradientBackground(coupon, _currentIndex),
+            _buildDecorations(_currentIndex),
+            _buildCardContent(coupon),
+          ],
+        );
+      },
     );
   }
 
@@ -530,28 +608,5 @@ class _StackedDealsCardsState extends State<StackedDealsCards>
         ),
       ),
     );
-  }
-
-  // Mock data helpers - replace with real API calls
-  String _getMockVendorName(int vendorId) {
-    final vendorNames = [
-      'Tasty Bites',
-      'Sweet Treats',
-      'Burger House',
-      'Fashion Hub',
-      'Spa Retreat',
-    ];
-    return vendorNames[vendorId % vendorNames.length];
-  }
-
-  String _getMockCategory(int vendorId) {
-    final categories = [
-      'Restaurant',
-      'Dessert',
-      'Fast food',
-      'Clothing store',
-      'Spa',
-    ];
-    return categories[vendorId % categories.length];
   }
 }

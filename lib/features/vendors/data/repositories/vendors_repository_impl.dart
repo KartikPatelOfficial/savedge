@@ -115,6 +115,32 @@ class VendorsRepositoryImpl implements VendorsRepository {
     }
   }
 
+  @override
+  Future<Either<Failure, List<Vendor>>> getTopOfferVendors() async {
+    try {
+      final response = await remoteDataSource.getTopOfferVendors();
+      
+      // Parse the response data - expecting a direct list for top offers
+      final data = response.data;
+      if (data is List<dynamic>) {
+        final vendors = data
+            .map(
+              (item) => _mapVendorResponseToEntity(
+                VendorResponse.fromJson(item as Map<String, dynamic>),
+              ),
+            )
+            .toList();
+        return Right(vendors);
+      } else {
+        return const Left(ServerFailure('Invalid top offers response format'));
+      }
+    } on DioException catch (e) {
+      return Left(_handleDioError(e));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
   Vendor _mapVendorResponseToEntity(
     VendorResponse response, {
     List<domain.Coupon> coupons = const [],
@@ -175,6 +201,11 @@ class VendorsRepositoryImpl implements VendorsRepository {
       cashPrice: dto.cashPrice,
       termsAndConditions: dto.termsAndConditions,
       maxRedemptions: dto.maxRedemptions,
+      isSpecialOffer: dto.isSpecialOffer,
+      specialOfferStartDate: dto.specialOfferStartDate,
+      specialOfferEndDate: dto.specialOfferEndDate,
+      specialOfferPriority: dto.specialOfferPriority,
+      specialOfferImageUrl: dto.specialOfferImageUrl,
     );
   }
 

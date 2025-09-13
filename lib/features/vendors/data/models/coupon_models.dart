@@ -30,6 +30,15 @@ class CouponResponse {
       statusDisplay: json['statusDisplay'] as String?,
       isValid: json['isValid'] as bool? ?? true,
       isExpired: json['isExpired'] as bool? ?? false,
+      isSpecialOffer: json['isSpecialOffer'] as bool? ?? false,
+      specialOfferStartDate: json['specialOfferStartDate'] != null
+          ? DateTime.parse(json['specialOfferStartDate'] as String)
+          : null,
+      specialOfferEndDate: json['specialOfferEndDate'] != null
+          ? DateTime.parse(json['specialOfferEndDate'] as String)
+          : null,
+      specialOfferPriority: json['specialOfferPriority'] as int? ?? 0,
+      specialOfferImageUrl: json['specialOfferImageUrl'] as String?,
     );
   }
   const CouponResponse({
@@ -56,6 +65,11 @@ class CouponResponse {
     this.statusDisplay,
     this.isValid = true,
     this.isExpired = false,
+    this.isSpecialOffer = false,
+    this.specialOfferStartDate,
+    this.specialOfferEndDate,
+    this.specialOfferPriority = 0,
+    this.specialOfferImageUrl,
   });
 
   final int id;
@@ -81,6 +95,11 @@ class CouponResponse {
   final String? statusDisplay;
   final bool isValid;
   final bool isExpired;
+  final bool isSpecialOffer;
+  final DateTime? specialOfferStartDate;
+  final DateTime? specialOfferEndDate;
+  final int specialOfferPriority;
+  final String? specialOfferImageUrl;
 
   Map<String, dynamic> toJson() {
     return {

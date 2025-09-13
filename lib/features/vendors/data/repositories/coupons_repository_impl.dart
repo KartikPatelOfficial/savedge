@@ -88,6 +88,27 @@ class CouponsRepositoryImpl implements CouponsRepository {
     }
   }
 
+  @override
+  Future<Either<Failure, List<Coupon>>> getSpecialOfferCoupons() async {
+    try {
+      final response = await _remoteDataSource.getSpecialOfferCoupons();
+      
+      // Parse the response data
+      final data = response.data;
+      if (data is List<dynamic>) {
+        final coupons = data
+            .map((item) => CouponResponse.fromJson(item as Map<String, dynamic>))
+            .map(_mapResponseToEntity)
+            .toList();
+        return Right(coupons);
+      } else {
+        return const Left(UnexpectedFailure('Invalid response format'));
+      }
+    } catch (e) {
+      return Left(UnexpectedFailure(e.toString()));
+    }
+  }
+
   /// Maps API response model to domain entity
   Coupon _mapResponseToEntity(CouponResponse response) {
     return Coupon(
@@ -106,6 +127,11 @@ class CouponsRepositoryImpl implements CouponsRepository {
       cashPrice: response.cashPrice,
       termsAndConditions: response.termsAndConditions,
       maxRedemptions: response.maxRedemptions,
+      isSpecialOffer: response.isSpecialOffer,
+      specialOfferStartDate: response.specialOfferStartDate,
+      specialOfferEndDate: response.specialOfferEndDate,
+      specialOfferPriority: response.specialOfferPriority,
+      specialOfferImageUrl: response.specialOfferImageUrl,
     );
   }
 }

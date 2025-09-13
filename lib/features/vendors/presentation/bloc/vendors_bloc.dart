@@ -17,6 +17,7 @@ class VendorsBloc extends Bloc<VendorsEvent, VendorsState> {
     on<FilterVendorsByCategory>(_onFilterVendorsByCategory);
     on<LoadMoreVendors>(_onLoadMoreVendors);
     on<RefreshVendors>(_onRefreshVendors);
+    on<LoadTopOfferVendors>(_onLoadTopOfferVendors);
   }
 
   final GetVendorsUseCase getVendorsUseCase;
@@ -122,5 +123,33 @@ class VendorsBloc extends Bloc<VendorsEvent, VendorsState> {
     } else {
       add(const LoadVendors(refresh: true));
     }
+  }
+
+  Future<void> _onLoadTopOfferVendors(
+    LoadTopOfferVendors event,
+    Emitter<VendorsState> emit,
+  ) async {
+    emit(VendorsLoading());
+
+    // Call the use case with special flag to get top offers
+    final result = await getVendorsUseCase(
+      const GetVendorsParams(
+        isTopOffers: true,
+        pageSize: 10,
+      ),
+    );
+
+    result.fold(
+      (failure) => emit(
+        VendorsError(FailureMessageMapper.mapVendorFailureToMessage(failure)),
+      ),
+      (vendors) => emit(
+        VendorsLoaded(
+          vendors: vendors,
+          hasReachedMax: true,
+          currentPage: 1,
+        ),
+      ),
+    );
   }
 }

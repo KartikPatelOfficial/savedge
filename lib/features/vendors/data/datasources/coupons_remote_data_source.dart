@@ -41,4 +41,8 @@ abstract class CouponsRemoteDataSource {
     @Query('status') String? status = 'active',
     @Query('isExpired') bool isExpired = false,
   });
+
+  /// Gets special offer coupons with images
+  @GET('/api/Coupons/special-offers')
+  Future<HttpResponse<dynamic>> getSpecialOfferCoupons();
 }
