@@ -8,7 +8,7 @@ import 'package:savedge/features/vendors/presentation/bloc/vendors_event.dart';
 import 'package:savedge/features/vendors/presentation/bloc/vendors_state.dart';
 
 /// Top offers section showing top 10 vendors from API
-class TopOffersSection extends StatelessWidget {
+class TopOffersSection extends StatefulWidget {
   const TopOffersSection({
     super.key,
     this.title = 'Top Offers',
@@ -19,13 +19,34 @@ class TopOffersSection extends StatelessWidget {
   final Function(Vendor)? onVendorTap;
 
   @override
+  State<TopOffersSection> createState() => _TopOffersSectionState();
+}
+
+class _TopOffersSectionState extends State<TopOffersSection> {
+  bool _dispatched = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // If a VendorsBloc is already provided up the tree, trigger top offers load once
+    final existingBloc = context.read<VendorsBloc?>();
+    if (existingBloc != null && !_dispatched) {
+      existingBloc.add(const LoadTopOfferVendors());
+      _dispatched = true;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // Create a dedicated BLoC for top offers
-    return BlocProvider(
-      create: (context) =>
-          getIt<VendorsBloc>()..add(const LoadTopOfferVendors()),
-      child: TopOffersView(title: title, onVendorTap: onVendorTap),
-    );
+    // Use existing VendorsBloc if available; otherwise create one and load top offers
+    final vendorsBloc = context.read<VendorsBloc?>();
+    if (vendorsBloc == null) {
+      return BlocProvider(
+        create: (context) => getIt<VendorsBloc>()..add(const LoadTopOfferVendors()),
+        child: TopOffersView(title: widget.title, onVendorTap: widget.onVendorTap),
+      );
+    }
+    return TopOffersView(title: widget.title, onVendorTap: widget.onVendorTap);
   }
 }
 

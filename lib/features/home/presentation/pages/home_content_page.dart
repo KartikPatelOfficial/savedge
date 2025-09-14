@@ -39,8 +39,10 @@ class _HomeContentPageState extends State<HomeContentPage> {
   }
 
   void _loadInitialData() {
-    _couponsBloc.add(const LoadFeaturedCoupons(pageSize: 5));
-    _vendorsBloc.add(const LoadVendors(pageSize: 10));
+    // Load Hot Deals (special offers) instead of generic featured coupons
+    _couponsBloc.add(const LoadSpecialOfferCoupons());
+    // Load Top Offer vendors via the shared VendorsBloc
+    _vendorsBloc.add(const LoadTopOfferVendors());
     _subscriptionBloc.add(const LoadSubscriptionPlans());
   }
 
@@ -305,9 +307,10 @@ class _HomeContentPageState extends State<HomeContentPage> {
     HapticFeedback.lightImpact();
 
     // Reload all data from BLoCs
-    _couponsBloc.add(const LoadFeaturedCoupons(pageSize: 5));
-    // Use refresh event to avoid duplicate vendors on pull-to-refresh
-    _vendorsBloc.add(const RefreshVendors());
+    // Refresh Hot Deals (special offers)
+    _couponsBloc.add(const RefreshSpecialOfferCoupons());
+    // Refresh Top Offer vendors
+    _vendorsBloc.add(const LoadTopOfferVendors());
     _subscriptionBloc.add(const LoadSubscriptionPlans());
 
     // Also refresh subscription section if it has its own state
