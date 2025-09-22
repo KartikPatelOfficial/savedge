@@ -13,8 +13,8 @@ class BrandVouchersPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => getIt<BrandVouchersBloc>()
-        ..add(const LoadBrandVouchers()),
+      create: (context) =>
+          getIt<BrandVouchersBloc>()..add(const LoadBrandVouchers()),
       child: const BrandVouchersView(),
     );
   }
@@ -62,32 +62,19 @@ class _BrandVouchersViewState extends State<BrandVouchersView> {
         // Custom App Bar like Profile Page
         SliverAppBar(
           expandedHeight: 140,
-          backgroundColor: Colors.white,
           pinned: true,
           elevation: 0,
           scrolledUnderElevation: 0,
           surfaceTintColor: Colors.transparent,
           systemOverlayStyle: SystemUiOverlayStyle.dark,
-          leading: Padding(
-            padding: const EdgeInsets.only(left: 20),
-            child: IconButton(
-              onPressed: () => Navigator.pop(context),
-              icon: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF1A202C),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(
-                  Icons.arrow_back_ios_rounded,
-                  color: Colors.white,
-                  size: 16,
-                ),
-              ),
+          leading: IconButton(
+            onPressed: () => Navigator.pop(context),
+            icon: Container(
+              padding: const EdgeInsets.all(8),
+              child: const Icon(Icons.arrow_back_ios_rounded, size: 24),
             ),
           ),
           flexibleSpace: FlexibleSpaceBar(
-            background: Container(color: Colors.white),
             title: const Text(
               'Brand Vouchers',
               style: TextStyle(
@@ -96,7 +83,7 @@ class _BrandVouchersViewState extends State<BrandVouchersView> {
                 fontWeight: FontWeight.w700,
               ),
             ),
-            titlePadding: const EdgeInsets.only(left: 20, bottom: 16),
+            titlePadding: const EdgeInsets.only(left: 20),
           ),
           actions: [
             Container(
@@ -119,60 +106,24 @@ class _BrandVouchersViewState extends State<BrandVouchersView> {
         // Vouchers Content
         SliverToBoxAdapter(
           child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildSectionHeader(
-                  'Available Vouchers',
-                  'Choose from top brands and save with points',
-                ),
-                const SizedBox(height: 20),
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 16,
-                    crossAxisSpacing: 16,
-                    childAspectRatio: 0.8,
-                  ),
-                  itemCount: vouchers.length,
-                  itemBuilder: (context, index) {
-                    return BrandVoucherCard(
-                      voucher: vouchers[index],
-                      onTap: () => _showVoucherDetails(context, vouchers[index]),
-                    );
-                  },
-                ),
-                const SizedBox(height: 100), // Bottom padding for nav bar
-              ],
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                mainAxisSpacing: 16,
+                crossAxisSpacing: 16,
+                childAspectRatio: 0.8,
+              ),
+              itemCount: vouchers.length,
+              itemBuilder: (context, index) {
+                return BrandVoucherCard(
+                  voucher: vouchers[index],
+                  onTap: () => _showVoucherDetails(context, vouchers[index]),
+                );
+              },
             ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSectionHeader(String title, String subtitle) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.w700,
-            color: Color(0xFF1A202C),
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          subtitle,
-          style: TextStyle(
-            fontSize: 14,
-            color: Colors.grey[600],
-            height: 1.4,
           ),
         ),
       ],
@@ -293,7 +244,9 @@ class _BrandVouchersViewState extends State<BrandVouchersView> {
                   const SizedBox(height: 32),
                   ElevatedButton(
                     onPressed: () {
-                      context.read<BrandVouchersBloc>().add(const LoadBrandVouchers());
+                      context.read<BrandVouchersBloc>().add(
+                        const LoadBrandVouchers(),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF6F3FCC),
@@ -385,11 +338,7 @@ class _BrandVouchersViewState extends State<BrandVouchersView> {
   void _showVoucherDetails(BuildContext context, dynamic voucher) {
     // Navigate to voucher purchase page
     // This will be implemented next
-    Navigator.pushNamed(
-      context,
-      '/voucher-purchase',
-      arguments: voucher,
-    );
+    Navigator.pushNamed(context, '/voucher-purchase', arguments: voucher);
   }
 
   void _showVoucherOrdersPage(BuildContext context) {

@@ -717,8 +717,14 @@ class _PointsPaymentDialogState extends State<PointsPaymentDialog> {
     Color? valueColor,
     bool emphasize = false,
   }) {
+    // Check if this is a transaction reference (long text that needs special handling)
+    final isTransactionRef =
+        label.toLowerCase().contains('transaction') &&
+        label.toLowerCase().contains('ref');
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
@@ -728,12 +734,19 @@ class _PointsPaymentDialogState extends State<PointsPaymentDialog> {
             color: cs.onSurfaceVariant,
           ),
         ),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: emphasize ? 16 : 14,
-            fontWeight: emphasize ? FontWeight.w800 : FontWeight.w700,
-            color: valueColor ?? cs.onSurface,
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            value,
+            style: TextStyle(
+              fontSize: isTransactionRef ? 12 : (emphasize ? 16 : 14),
+              fontWeight: emphasize ? FontWeight.w800 : FontWeight.w700,
+              color: valueColor ?? cs.onSurface,
+              fontFamily: isTransactionRef ? 'monospace' : null,
+            ),
+            textAlign: TextAlign.end,
+            overflow: TextOverflow.ellipsis,
+            maxLines: isTransactionRef ? 2 : 1,
           ),
         ),
       ],

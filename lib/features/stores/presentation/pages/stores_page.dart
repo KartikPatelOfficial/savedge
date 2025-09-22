@@ -19,12 +19,12 @@ class StoresPage extends StatelessWidget {
     try {
       final String? categoryParam =
           (initialCategory.isEmpty || initialCategory == 'All')
-              ? null
-              : initialCategory;
+          ? null
+          : initialCategory;
 
       return BlocProvider(
-        create: (context) => getIt<VendorsBloc>()
-          ..add(LoadVendors(category: categoryParam)),
+        create: (context) =>
+            getIt<VendorsBloc>()..add(LoadVendors(category: categoryParam)),
         child: StoresView(initialCategory: initialCategory),
       );
     } catch (e) {
@@ -39,18 +39,12 @@ class StoresPage extends StatelessWidget {
               const SizedBox(height: 16),
               Text(
                 'Failed to load stores',
-                style: Theme
-                    .of(context)
-                    .textTheme
-                    .headlineSmall,
+                style: Theme.of(context).textTheme.headlineSmall,
               ),
               const SizedBox(height: 8),
               Text(
                 'Error: $e',
-                style: Theme
-                    .of(context)
-                    .textTheme
-                    .bodyMedium,
+                style: Theme.of(context).textTheme.bodyMedium,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 16),
@@ -141,17 +135,42 @@ class _StoresViewState extends State<StoresView> {
                 elevation: 0,
                 scrolledUnderElevation: 0,
                 surfaceTintColor: Colors.transparent,
-                flexibleSpace: FlexibleSpaceBar(
-                  title: const Text(
-                    'Discover Stores',
-                    style: TextStyle(
-                      color: Color(0xFF1A202C),
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: -0.3,
-                    ),
-                  ),
-                  titlePadding: const EdgeInsets.only(left: 20, bottom: 16),
+                leadingWidth: 56,
+                flexibleSpace: LayoutBuilder(
+                  builder: (context, constraints) {
+                    // Calculate the collapse progress
+                    final expandedHeight = 140.0;
+                    final minHeight =
+                        kToolbarHeight + MediaQuery.of(context).padding.top;
+                    final currentHeight = constraints.maxHeight;
+                    final deltaHeight = expandedHeight - minHeight;
+                    final t = ((currentHeight - minHeight) / deltaHeight).clamp(
+                      0.0,
+                      1.0,
+                    );
+
+                    // Interpolate left padding: expanded (20px) to collapsed (72px)
+                    final leftPadding =
+                        20.0 + (52.0 * (1 - t)); // 20 + 52 = 72 when collapsed
+
+                    return FlexibleSpaceBar(
+                      title: const Text(
+                        'Discover Stores',
+                        style: TextStyle(
+                          color: Color(0xFF1A202C),
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -0.3,
+                        ),
+                      ),
+                      titlePadding: EdgeInsets.only(
+                        left: leftPadding,
+                        bottom: 16,
+                        right: 20,
+                      ),
+                      centerTitle: false,
+                    );
+                  },
                 ),
                 iconTheme: const IconThemeData(color: Color(0xFF1A202C)),
               ),
@@ -165,14 +184,12 @@ class _StoresViewState extends State<StoresView> {
               // Vendors List
               if (state is VendorsLoading)
                 SliverFillRemaining(child: _buildLoadingWidget())
+              else if (state is VendorsError)
+                SliverFillRemaining(child: _buildErrorWidget(state.message))
+              else if (state is VendorsLoaded)
+                _buildSliverVendorsList(state)
               else
-                if (state is VendorsError)
-                  SliverFillRemaining(child: _buildErrorWidget(state.message))
-                else
-                  if (state is VendorsLoaded)
-                    _buildSliverVendorsList(state)
-                  else
-                    const SliverToBoxAdapter(child: SizedBox.shrink()),
+                const SliverToBoxAdapter(child: SizedBox.shrink()),
             ],
           );
         },
@@ -204,24 +221,24 @@ class _StoresViewState extends State<StoresView> {
           ),
           suffixIcon: _searchController.text.isNotEmpty
               ? Container(
-            margin: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Colors.grey[100],
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: IconButton(
-              icon: const Icon(
-                Icons.close_rounded,
-                color: Color(0xFF718096),
-                size: 18,
-              ),
-              onPressed: () {
-                _searchController.clear();
-                context.read<VendorsBloc>().add(const SearchVendors(''));
-                setState(() {});
-              },
-            ),
-          )
+                  margin: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[100],
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: IconButton(
+                    icon: const Icon(
+                      Icons.close_rounded,
+                      color: Color(0xFF718096),
+                      size: 18,
+                    ),
+                    onPressed: () {
+                      _searchController.clear();
+                      context.read<VendorsBloc>().add(const SearchVendors(''));
+                      setState(() {});
+                    },
+                  ),
+                )
               : null,
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(
@@ -324,7 +341,7 @@ class _StoresViewState extends State<StoresView> {
               final category = quickCategories[index];
               final isSelected =
                   _selectedCategory == category ||
-                      (category == 'All' && _selectedCategory == null);
+                  (category == 'All' && _selectedCategory == null);
 
               final categoryColors = [
                 const Color(0xFF6F3FCC),
@@ -455,7 +472,7 @@ class _StoresViewState extends State<StoresView> {
 
     return SliverList(
       delegate: SliverChildBuilderDelegate(
-            (context, index) {
+        (context, index) {
           if (index >= state.vendors.length) {
             if (!state.hasReachedMax) {
               return Container(
@@ -853,11 +870,11 @@ class ModernVendorCard extends StatelessWidget {
                         ),
                         child: imageUrl != null
                             ? Image.network(
-                          imageUrl,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) =>
-                              _buildPlaceholderImage(),
-                        )
+                                imageUrl,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) =>
+                                    _buildPlaceholderImage(),
+                              )
                             : _buildPlaceholderImage(),
                       ),
                     ),
@@ -993,25 +1010,24 @@ class ModernVendorCard extends StatelessWidget {
       ),
       child: categoryIcon.isNotEmpty
           ? ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: Image.asset(
-          categoryIcon,
-          fit: BoxFit.contain,
-          width: 40,
-          height: 40,
-          errorBuilder: (context, error, stackTrace) =>
-          const Icon(
-            Icons.storefront_rounded,
-            color: Color(0xFF6F3FCC),
-            size: 32,
-          ),
-        ),
-      )
+              borderRadius: BorderRadius.circular(16),
+              child: Image.asset(
+                categoryIcon,
+                fit: BoxFit.contain,
+                width: 40,
+                height: 40,
+                errorBuilder: (context, error, stackTrace) => const Icon(
+                  Icons.storefront_rounded,
+                  color: Color(0xFF6F3FCC),
+                  size: 32,
+                ),
+              ),
+            )
           : const Icon(
-        Icons.storefront_rounded,
-        color: Color(0xFF6F3FCC),
-        size: 32,
-      ),
+              Icons.storefront_rounded,
+              color: Color(0xFF6F3FCC),
+              size: 32,
+            ),
     );
   }
 }

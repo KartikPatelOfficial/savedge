@@ -1,17 +1,17 @@
-import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
 
 import '../../domain/entities/brand_voucher_entity.dart';
 
 class BrandVoucherCard extends StatelessWidget {
-  final BrandVoucherEntity voucher;
-  final VoidCallback onTap;
-
   const BrandVoucherCard({
     super.key,
     required this.voucher,
     required this.onTap,
   });
+
+  final BrandVoucherEntity voucher;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -130,7 +130,7 @@ class BrandVoucherCard extends StatelessWidget {
                   ),
                 ),
               ),
-              
+
               // Brand info
               Expanded(
                 flex: 2,

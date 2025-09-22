@@ -137,7 +137,6 @@ class FollowUsPage extends StatelessWidget {
       {
         'name': 'Facebook',
         'icon': Icons.facebook_rounded,
-        'followers': '25.4K',
         'description': 'Daily deals and community discussions',
         'color': const Color(0xFF1877F2),
         'handle': '@savedge.official',
@@ -145,7 +144,6 @@ class FollowUsPage extends StatelessWidget {
       {
         'name': 'Instagram',
         'icon': Icons.camera_alt_rounded,
-        'followers': '18.9K',
         'description': 'Visual stories and behind-the-scenes',
         'color': const Color(0xFFE1306C),
         'handle': '@savedge',
@@ -153,7 +151,6 @@ class FollowUsPage extends StatelessWidget {
       {
         'name': 'Twitter',
         'icon': Icons.alternate_email_rounded,
-        'followers': '12.7K',
         'description': 'Latest updates and customer support',
         'color': const Color(0xFF1DA1F2),
         'handle': '@savedge',
@@ -233,15 +230,6 @@ class FollowUsPage extends StatelessWidget {
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: Color(0xFF1A202C),
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              '${platform['followers']} followers',
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: platform['color'] as Color,
               ),
             ),
           ],

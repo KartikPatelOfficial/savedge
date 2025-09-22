@@ -53,10 +53,6 @@ class HomeDrawer extends StatelessWidget {
 
   List<DrawerMenuItem> _getMenuItems(BuildContext context) {
     return [
-      const DrawerMenuItem(
-        icon: Icons.local_offer_outlined,
-        title: 'Current Offers',
-      ),
       DrawerMenuItem(
         icon: Icons.history_outlined,
         title: 'Redemption History',
@@ -162,14 +158,14 @@ class _UserProfileSection extends StatelessWidget {
             ),
             child: userAvatar != null
                 ? ClipRRect(
-                    borderRadius: BorderRadius.circular(25),
-                    child: Image.network(
-                      userAvatar!,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) =>
-                          _DefaultAvatar(),
-                    ),
-                  )
+              borderRadius: BorderRadius.circular(25),
+              child: Image.network(
+                userAvatar!,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) =>
+                    _DefaultAvatar(),
+              ),
+            )
                 : _DefaultAvatar(),
           ),
           const SizedBox(width: 16),

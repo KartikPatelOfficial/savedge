@@ -46,17 +46,17 @@ Widget _buildErrorWidget(String message) {
             width: 80,
             height: 80,
             decoration: BoxDecoration(
-              color: const Color(0xFFEF4444).withOpacity(0.1),
+              color: const Color(0xFFEF4444).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(40),
               border: Border.all(
-                color: const Color(0xFFEF4444).withOpacity(0.2),
+                color: const Color(0xFFEF4444).withValues(alpha: 0.2),
                 width: 2,
               ),
             ),
             child: Icon(
               Icons.error_outline,
               size: 36,
-              color: const Color(0xFFEF4444).withOpacity(0.7),
+              color: const Color(0xFFEF4444).withValues(alpha: 0.7),
             ),
           ),
           const SizedBox(height: 16),
@@ -92,17 +92,17 @@ Widget _buildEmptyState() {
             width: 80,
             height: 80,
             decoration: BoxDecoration(
-              color: const Color(0xFF6F3FCC).withOpacity(0.1),
+              color: const Color(0xFF6F3FCC).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(40),
               border: Border.all(
-                color: const Color(0xFF6F3FCC).withOpacity(0.2),
+                color: const Color(0xFF6F3FCC).withValues(alpha: 0.2),
                 width: 2,
               ),
             ),
             child: Icon(
               Icons.local_offer_outlined,
               size: 36,
-              color: const Color(0xFF6F3FCC).withOpacity(0.7),
+              color: const Color(0xFF6F3FCC).withValues(alpha: 0.7),
             ),
           ),
           const SizedBox(height: 16),
@@ -241,7 +241,7 @@ class _VendorOffersBlocViewState extends State<VendorOffersBlocView> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF6F3FCC).withOpacity(0.1),
+                    color: const Color(0xFF6F3FCC).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(
@@ -259,25 +259,84 @@ class _VendorOffersBlocViewState extends State<VendorOffersBlocView> {
                     color: Color(0xFF1A202C),
                   ),
                 ),
-                const Spacer(),
-                // Membership only toggle
-                Row(
-                  children: [
-                    const Text(
-                      'Membership only',
-                      style: TextStyle(fontSize: 12, color: Color(0xFF4B5563)),
-                    ),
-                    const SizedBox(width: 8),
-                    Switch(
-                      value: membershipOnly,
-                      activeColor: const Color(0xFF6F3FCC),
-                      onChanged: (v) => setState(() => membershipOnly = v),
-                    ),
-                  ],
-                ),
               ],
             ),
           ),
+
+          // Filter chip section
+          Padding(
+            padding: const EdgeInsets.only(left: 24, right: 24, top: 12),
+            child: Row(
+              children: [
+                GestureDetector(
+                  onTap: () => setState(() => membershipOnly = !membershipOnly),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: membershipOnly
+                          ? const Color(0xFF6F3FCC)
+                          : const Color(0xFFF3F4F6),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: membershipOnly
+                            ? const Color(0xFF6F3FCC)
+                            : const Color(0xFFE5E7EB),
+                        width: 1,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          membershipOnly ? Icons.star : Icons.star_border,
+                          size: 16,
+                          color: membershipOnly
+                              ? Colors.white
+                              : const Color(0xFF6B7280),
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          'Membership Only',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: membershipOnly
+                                ? Colors.white
+                                : const Color(0xFF6B7280),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const Spacer(),
+                if (membershipOnly)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF6F3FCC).withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      'Premium filters active',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w500,
+                        color: const Color(0xFF6F3FCC),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+
           const SizedBox(height: 20),
           BlocBuilder<CouponsBloc, CouponsState>(
             builder: (context, state) {
@@ -292,7 +351,10 @@ class _VendorOffersBlocViewState extends State<VendorOffersBlocView> {
                   // Include coupons that can be claimed via membership (subscription),
                   // even if they also have a cash option. Treat maxRedemptions <= 0 or -1 as not membership-eligible.
                   visible = visible
-                      .where((c) => (c.maxRedemptions != null && c.maxRedemptions! > 0))
+                      .where(
+                        (c) =>
+                            (c.maxRedemptions != null && c.maxRedemptions! > 0),
+                      )
                       .toList();
                 }
                 return _buildCouponsList(
@@ -356,7 +418,7 @@ class _VendorOffersViewState extends State<VendorOffersView> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF6F3FCC).withOpacity(0.1),
+                    color: const Color(0xFF6F3FCC).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(
@@ -374,24 +436,64 @@ class _VendorOffersViewState extends State<VendorOffersView> {
                     color: Color(0xFF1A202C),
                   ),
                 ),
-                const Spacer(),
-                Row(
-                  children: [
-                    const Text(
-                      'Membership only',
-                      style: TextStyle(fontSize: 12, color: Color(0xFF4B5563)),
+              ],
+            ),
+          ),
+
+          // Filter chip section
+          Padding(
+            padding: const EdgeInsets.only(left: 24, right: 24, top: 12),
+            child: Row(
+              children: [
+                GestureDetector(
+                  onTap: () => setState(() => membershipOnly = !membershipOnly),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
                     ),
-                    const SizedBox(width: 8),
-                    Switch(
-                      value: membershipOnly,
-                      activeColor: const Color(0xFF6F3FCC),
-                      onChanged: (v) => setState(() => membershipOnly = v),
+                    decoration: BoxDecoration(
+                      color: membershipOnly
+                          ? const Color(0xFF6F3FCC)
+                          : const Color(0xFFF3F4F6),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: membershipOnly
+                            ? const Color(0xFF6F3FCC)
+                            : const Color(0xFFE5E7EB),
+                        width: 1,
+                      ),
                     ),
-                  ],
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          membershipOnly ? Icons.star : Icons.star_border,
+                          size: 16,
+                          color: membershipOnly
+                              ? Colors.white
+                              : const Color(0xFF6B7280),
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          'Membership Only',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: membershipOnly
+                                ? Colors.white
+                                : const Color(0xFF6B7280),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ],
             ),
           ),
+
           const SizedBox(height: 20),
           visible.isNotEmpty
               ? _buildCouponsList(visible, widget.vendorUid, widget.vendorName)
@@ -425,7 +527,6 @@ class _VendorOfferCardState extends State<VendorOfferCard>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
-  bool _isPressed = false;
 
   @override
   void initState() {
@@ -452,17 +553,14 @@ class _VendorOfferCardState extends State<VendorOfferCard>
 
     return GestureDetector(
       onTapDown: (_) {
-        setState(() => _isPressed = true);
         _animationController.forward();
         HapticFeedback.lightImpact();
       },
       onTapUp: (_) {
-        setState(() => _isPressed = false);
         _animationController.reverse();
         _onCouponTap(context);
       },
       onTapCancel: () {
-        setState(() => _isPressed = false);
         _animationController.reverse();
       },
       child: AnimatedBuilder(
@@ -480,7 +578,7 @@ class _VendorOfferCardState extends State<VendorOfferCard>
                 Positioned.fill(
                   child: CustomPaint(
                     painter: CouponPatternPainter(
-                      color: Colors.white.withOpacity(0.1),
+                      color: Colors.white.withValues(alpha: 0.1),
                       index: widget.index,
                     ),
                   ),
@@ -503,10 +601,10 @@ class _VendorOfferCardState extends State<VendorOfferCard>
                                 vertical: 4,
                               ),
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.25),
+                                color: Colors.white.withValues(alpha: 0.25),
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
-                                  color: Colors.white.withOpacity(0.3),
+                                  color: Colors.white.withValues(alpha: 0.3),
                                   width: 1,
                                 ),
                               ),
@@ -568,7 +666,7 @@ class _VendorOfferCardState extends State<VendorOfferCard>
                               Text(
                                 widget.coupon.minimumAmountDisplay,
                                 style: TextStyle(
-                                  color: Colors.white.withOpacity(0.9),
+                                  color: Colors.white.withValues(alpha: 0.9),
                                   fontSize: 12,
                                   fontWeight: FontWeight.w500,
                                   height: 1.2,
@@ -585,7 +683,8 @@ class _VendorOfferCardState extends State<VendorOfferCard>
                                     widget.coupon.cashPrice != null &&
                                     widget.coupon.cashPrice! > 0;
                                 final hasMembershipOption =
-                                    (widget.coupon.maxRedemptions != null && widget.coupon.maxRedemptions! > 0);
+                                    (widget.coupon.maxRedemptions != null &&
+                                    widget.coupon.maxRedemptions! > 0);
 
                                 if (hasCash && hasMembershipOption) {
                                   return Row(
@@ -596,7 +695,9 @@ class _VendorOfferCardState extends State<VendorOfferCard>
                                           vertical: 3,
                                         ),
                                         decoration: BoxDecoration(
-                                          color: Colors.white.withOpacity(0.2),
+                                          color: Colors.white.withValues(
+                                            alpha: 0.2,
+                                          ),
                                           borderRadius: BorderRadius.circular(
                                             8,
                                           ),
@@ -614,7 +715,9 @@ class _VendorOfferCardState extends State<VendorOfferCard>
                                       Text(
                                         'or Free with subscription',
                                         style: TextStyle(
-                                          color: Colors.white.withOpacity(0.85),
+                                          color: Colors.white.withValues(
+                                            alpha: 0.85,
+                                          ),
                                           fontSize: 11,
                                           fontWeight: FontWeight.w600,
                                         ),
@@ -630,7 +733,9 @@ class _VendorOfferCardState extends State<VendorOfferCard>
                                           vertical: 3,
                                         ),
                                         decoration: BoxDecoration(
-                                          color: Colors.white.withOpacity(0.2),
+                                          color: Colors.white.withValues(
+                                            alpha: 0.2,
+                                          ),
                                           borderRadius: BorderRadius.circular(
                                             8,
                                           ),
@@ -650,7 +755,9 @@ class _VendorOfferCardState extends State<VendorOfferCard>
                                   return Text(
                                     'Free with subscription',
                                     style: TextStyle(
-                                      color: Colors.white.withOpacity(0.9),
+                                      color: Colors.white.withValues(
+                                        alpha: 0.9,
+                                      ),
                                       fontSize: 11,
                                       fontWeight: FontWeight.w600,
                                     ),
@@ -675,7 +782,7 @@ class _VendorOfferCardState extends State<VendorOfferCard>
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.15),
+                              color: Colors.black.withValues(alpha: 0.15),
                               blurRadius: 8,
                               offset: const Offset(0, 4),
                             ),
@@ -692,7 +799,8 @@ class _VendorOfferCardState extends State<VendorOfferCard>
                                     widget.coupon.cashPrice != null &&
                                     widget.coupon.cashPrice! > 0;
                                 final hasMembershipOption =
-                                    (widget.coupon.maxRedemptions != null && widget.coupon.maxRedemptions! > 0);
+                                    (widget.coupon.maxRedemptions != null &&
+                                    widget.coupon.maxRedemptions! > 0);
                                 if (hasMembershipOption) return 'Claim';
                                 return hasCash ? 'Buy' : 'Claim';
                               })(),
@@ -826,7 +934,7 @@ class _VendorOfferCardState extends State<VendorOfferCard>
                         Text(
                           widget.coupon.title,
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.9),
+                            color: Colors.white.withValues(alpha: 0.9),
                             fontSize: 13,
                           ),
                           maxLines: 1,

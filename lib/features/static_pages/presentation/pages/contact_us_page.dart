@@ -63,10 +63,7 @@ class ContactUsPage extends StatelessWidget {
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF1A202C),
-            Color(0xFF2D3748),
-          ],
+          colors: [Color(0xFF1A202C), Color(0xFF2D3748)],
         ),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
@@ -157,7 +154,7 @@ class ContactUsPage extends StatelessWidget {
               Expanded(
                 child: _buildContactMethodCard(
                   'Email Support',
-                  'support@savedge.com',
+                  'info@savedge.in',
                   Icons.email_rounded,
                   const Color(0xFF059669),
                 ),
@@ -200,7 +197,12 @@ class ContactUsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildContactMethodCard(String title, String subtitle, IconData icon, Color color) {
+  Widget _buildContactMethodCard(
+    String title,
+    String subtitle,
+    IconData icon,
+    Color color,
+  ) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -240,7 +242,7 @@ class ContactUsPage extends StatelessWidget {
           Text(
             subtitle,
             style: TextStyle(
-              fontSize: 12,
+              fontSize: 10,
               color: Colors.grey[600],
               height: 1.3,
             ),
@@ -388,9 +390,9 @@ class ContactUsPage extends StatelessWidget {
             ),
             child: Column(
               children: [
-                _buildSupportHourItem('Monday - Friday', '9:00 AM - 6:00 PM IST'),
+                _buildSupportHourItem('Monday - Friday', '9:00 AM - 6:00 PM'),
                 const SizedBox(height: 12),
-                _buildSupportHourItem('Saturday', '10:00 AM - 4:00 PM IST'),
+                _buildSupportHourItem('Saturday', '10:00 AM - 4:00 PM'),
                 const SizedBox(height: 12),
                 _buildSupportHourItem('Sunday', 'Closed'),
                 const SizedBox(height: 16),
@@ -436,7 +438,7 @@ class ContactUsPage extends StatelessWidget {
         Text(
           day,
           style: const TextStyle(
-            fontSize: 16,
+            fontSize: 14,
             fontWeight: FontWeight.w600,
             color: Color(0xFF1A202C),
           ),
@@ -444,7 +446,7 @@ class ContactUsPage extends StatelessWidget {
         Text(
           hours,
           style: TextStyle(
-            fontSize: 16,
+            fontSize: 14,
             color: Colors.grey[600],
             fontWeight: FontWeight.w500,
           ),
