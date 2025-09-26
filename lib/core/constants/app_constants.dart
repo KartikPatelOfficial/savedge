@@ -6,8 +6,8 @@ class AppConstants {
 
   // API Constants
   static const String baseUrl = kDebugMode
-      ? 'https://10.0.2.2:44447'
-      : 'https://web-app-20250829054601.salmonhill-0be6c935.centralindia.azurecontainerapps.io/';
+      ? 'https://web-app-20250829054601.salmonhill-0be6c935.centralindia.azurecontainerapps.io/'
+      : 'https://savedge-prod.calmmoss-be0e7220.centralindia.azurecontainerapps.io/';
   static const String apiVersion = 'v1';
   static const Duration connectionTimeout = Duration(seconds: 30);
   static const Duration receiveTimeout = Duration(seconds: 30);
