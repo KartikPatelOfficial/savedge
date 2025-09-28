@@ -168,12 +168,6 @@ class _HomeContentPageState extends State<HomeContentPage> {
                         icon: Icons.favorite_outline,
                         onTap: _onFavoriteTap,
                       ),
-                      const SizedBox(width: 12),
-                      _buildActionButton(
-                        icon: Icons.notifications_none,
-                        onTap: _onNotificationTap,
-                        hasBadge: true,
-                      ),
                     ],
                   ),
                 ],

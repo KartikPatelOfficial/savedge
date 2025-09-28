@@ -41,10 +41,6 @@ class HomeHeader extends StatelessWidget {
           // Action buttons
           _ActionButton(icon: Icons.favorite_border, onPressed: onFavoriteTap),
           const SizedBox(width: 8),
-          _NotificationButton(
-            count: notificationCount,
-            onPressed: onNotificationTap,
-          ),
         ],
       ),
     );
@@ -145,60 +141,6 @@ class _ActionButton extends StatelessWidget {
         icon: Icon(icon, color: const Color(0xFF6F3FCC)),
         iconSize: 22,
       ),
-    );
-  }
-}
-
-class _NotificationButton extends StatelessWidget {
-  const _NotificationButton({required this.count, this.onPressed});
-
-  final int count;
-  final VoidCallback? onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Container(
-          width: 44,
-          height: 44,
-          decoration: BoxDecoration(
-            color: const Color(0xFF6F3FCC).withOpacity(0.1),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: IconButton(
-            onPressed: onPressed,
-            icon: const Icon(
-              Icons.notifications_outlined,
-              color: Color(0xFF6F3FCC),
-            ),
-            iconSize: 22,
-          ),
-        ),
-        if (count > 0)
-          Positioned(
-            right: 4,
-            top: 4,
-            child: Container(
-              width: 20,
-              height: 20,
-              decoration: const BoxDecoration(
-                color: Color(0xFFE53E3E),
-                shape: BoxShape.circle,
-              ),
-              child: Center(
-                child: Text(
-                  count.toString(),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ),
-          ),
-      ],
     );
   }
 }
