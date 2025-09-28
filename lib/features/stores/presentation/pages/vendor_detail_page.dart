@@ -358,7 +358,7 @@ class _VendorDetailView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFFAFBFC),
       body: CustomScrollView(
         slivers: [
           // Image Gallery with App Bar
@@ -403,13 +403,35 @@ class _VendorDetailView extends StatelessWidget {
         : vendor.images.take(3).toList(); // Show up to 3 images
 
     return SliverAppBar(
-      expandedHeight: 300,
+      expandedHeight: 320,
       pinned: true,
       backgroundColor: Colors.white,
       foregroundColor: const Color(0xFF1A202C),
       elevation: 0,
       scrolledUnderElevation: 0,
       surfaceTintColor: Colors.transparent,
+      leading: Container(
+        margin: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.9),
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_ios_new,
+            color: Color(0xFF1A202C),
+            size: 18,
+          ),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
       flexibleSpace: FlexibleSpaceBar(
         background: Stack(
           children: [
@@ -569,58 +591,107 @@ class _VendorDetailView extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Restaurant name and rating
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Text(
-                  vendor.businessName,
-                  style: const TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w800,
-                    color: Color(0xFF1A202C),
-                  ),
-                ),
-              ),
-            ],
+          // Business name with enhanced styling
+          Text(
+            vendor.businessName,
+            style: const TextStyle(
+              fontSize: 32,
+              fontWeight: FontWeight.w900,
+              color: Color(0xFF1A202C),
+              letterSpacing: -0.5,
+              height: 1.2,
+            ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 8),
 
-          // Address with icon
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF6F3FCC).withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Icon(
-                  Icons.location_on_outlined,
-                  color: Color(0xFF6F3FCC),
-                  size: 18,
-                ),
+          // Category badge
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: const Color(0xFF6F3FCC).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: const Color(0xFF6F3FCC).withOpacity(0.2),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  _fullAddress,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: Color(0xFF4A5568),
-                    height: 1.4,
+            ),
+            child: Text(
+              vendor.category,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF6F3FCC),
+                letterSpacing: 0.5,
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          // Business description section
+          if (vendor.description != null &&
+              vendor.description!.trim().isNotEmpty) ...[
+            _buildDescriptionSection(),
+            const SizedBox(height: 24),
+          ],
+
+          // Address with improved styling
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF8F9FA),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0xFFE2E8F0)),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF6F3FCC).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(
+                    Icons.location_on_rounded,
+                    color: Color(0xFF6F3FCC),
+                    size: 20,
                   ),
                 ),
-              ),
-            ],
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Location',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF6B7280),
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        _fullAddress,
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xFF374151),
+                          height: 1.4,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
 
           const SizedBox(height: 24),
 
-          // Action buttons row
+          // Action buttons row with improved styling
           Row(
             children: [
               Expanded(
@@ -633,10 +704,29 @@ class _VendorDetailView extends StatelessWidget {
                     return Container(
                       height: 56,
                       decoration: BoxDecoration(
-                        color: isFavorite
-                            ? const Color(0xFFEF4444)
-                            : const Color(0xFF6F3FCC),
+                        gradient: LinearGradient(
+                          colors: isFavorite
+                              ? [
+                                  const Color(0xFFEF4444),
+                                  const Color(0xFFDC2626),
+                                ]
+                              : [
+                                  const Color(0xFF6F3FCC),
+                                  const Color(0xFF9F7AEA),
+                                ],
+                        ),
                         borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color:
+                                (isFavorite
+                                        ? const Color(0xFFEF4444)
+                                        : const Color(0xFF6F3FCC))
+                                    .withOpacity(0.25),
+                            blurRadius: 12,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
                       child: Material(
                         color: Colors.transparent,
@@ -660,13 +750,12 @@ class _VendorDetailView extends StatelessWidget {
                               ),
                               const SizedBox(width: 8),
                               Text(
-                                isFavorite
-                                    ? 'Remove from Favorites'
-                                    : 'Add to Favorites',
+                                isFavorite ? 'Favorited' : 'Add to Favorites',
                                 style: const TextStyle(
                                   color: Colors.white,
-                                  fontSize: 16,
+                                  fontSize: 15,
                                   fontWeight: FontWeight.w600,
+                                  letterSpacing: 0.1,
                                 ),
                               ),
                             ],
@@ -680,57 +769,31 @@ class _VendorDetailView extends StatelessWidget {
               const SizedBox(width: 12),
               if (vendor.contactPhone != null &&
                   vendor.contactPhone!.trim().isNotEmpty)
-                Container(
-                  height: 56,
-                  width: 56,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF38A169),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(16),
-                      onTap: () {
-                        HapticFeedback.lightImpact();
-                        final raw = vendor.contactPhone!.trim();
-                        final phone = raw.replaceAll(RegExp(r'[^0-9+]'), '');
-                        if (phone.isNotEmpty) {
-                          launchUrlString('tel:$phone');
-                        }
-                      },
-                      child: const Icon(
-                        Icons.call_rounded,
-                        color: Colors.white,
-                        size: 22,
-                      ),
-                    ),
-                  ),
+                _buildActionButton(
+                  onTap: () {
+                    HapticFeedback.lightImpact();
+                    final raw = vendor.contactPhone!.trim();
+                    final phone = raw.replaceAll(RegExp(r'[^0-9+]'), '');
+                    if (phone.isNotEmpty) {
+                      launchUrlString('tel:$phone');
+                    }
+                  },
+                  icon: Icons.call_rounded,
+                  color: const Color(0xFF10B981),
+                  tooltip: 'Call',
                 ),
-              const SizedBox(width: 12),
+              if (vendor.contactPhone != null &&
+                  vendor.contactPhone!.trim().isNotEmpty)
+                const SizedBox(width: 12),
               if (_googleMapsUrl != null)
-                Container(
-                  height: 56,
-                  width: 56,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFD69E2E),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(16),
-                      onTap: () {
-                        HapticFeedback.lightImpact();
-                        launchUrlString(_googleMapsUrl!);
-                      },
-                      child: const Icon(
-                        Icons.directions_rounded,
-                        color: Colors.white,
-                        size: 22,
-                      ),
-                    ),
-                  ),
+                _buildActionButton(
+                  onTap: () {
+                    HapticFeedback.lightImpact();
+                    launchUrlString(_googleMapsUrl!);
+                  },
+                  icon: Icons.directions_rounded,
+                  color: const Color(0xFFF59E0B),
+                  tooltip: 'Directions',
                 ),
             ],
           ),
@@ -759,12 +822,12 @@ class _VendorDetailView extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF6366F1).withOpacity(0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
+            color: const Color(0xFF6366F1).withOpacity(0.35),
+            blurRadius: 25,
+            offset: const Offset(0, 10),
           ),
         ],
       ),
@@ -777,12 +840,26 @@ class _VendorDetailView extends StatelessWidget {
 
           // Card content
           Padding(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.all(28),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
+                    Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: const Icon(
+                        Icons.account_balance_wallet_rounded,
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -790,20 +867,21 @@ class _VendorDetailView extends StatelessWidget {
                           const Text(
                             'Pay with Points',
                             style: TextStyle(
-                              fontSize: 20,
+                              fontSize: 22,
                               fontWeight: FontWeight.w800,
                               color: Colors.white,
                               height: 1.1,
+                              letterSpacing: -0.5,
                             ),
                           ),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: 6),
                           Text(
                             'Use your reward points to pay bills',
                             style: TextStyle(
-                              fontSize: 14,
+                              fontSize: 15,
                               fontWeight: FontWeight.w500,
                               color: Colors.white.withOpacity(0.9),
-                              height: 1.2,
+                              height: 1.3,
                             ),
                           ),
                         ],
@@ -946,27 +1024,161 @@ class _VendorDetailView extends StatelessWidget {
     );
   }
 
-  /// Build social media links section
-  Widget _buildSocialMediaSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Follow Us',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            color: Color(0xFF1A202C),
+  /// Build action button helper
+  Widget _buildActionButton({
+    required VoidCallback onTap,
+    required IconData icon,
+    required Color color,
+    required String tooltip,
+  }) {
+    return Tooltip(
+      message: tooltip,
+      child: Container(
+        height: 56,
+        width: 56,
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: color.withOpacity(0.25),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(16),
+            onTap: onTap,
+            child: Icon(icon, color: Colors.white, size: 22),
           ),
         ),
-        const SizedBox(height: 12),
-        Row(
-          children: vendor.socialMediaLinks
-              .where((social) => social.isActive)
-              .map((social) => _buildSocialMediaIcon(social))
-              .toList(),
+      ),
+    );
+  }
+
+  /// Build business description section
+  Widget _buildDescriptionSection() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            const Color(0xFF6F3FCC).withOpacity(0.05),
+            const Color(0xFF9F7AEA).withOpacity(0.05),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
-      ],
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFF6F3FCC).withOpacity(0.1)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF6F3FCC).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.business_rounded,
+                  color: Color(0xFF6F3FCC),
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 12),
+              const Text(
+                'About This Business',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF1A202C),
+                  letterSpacing: -0.3,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Text(
+            vendor.description!,
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w400,
+              color: Color(0xFF4A5568),
+              height: 1.6,
+              letterSpacing: 0.1,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Build social media links section
+  Widget _buildSocialMediaSection() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF6F3FCC).withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF6F3FCC).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.share_rounded,
+                  color: Color(0xFF6F3FCC),
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 12),
+              const Text(
+                'Connect With Us',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF1A202C),
+                  letterSpacing: -0.3,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            children: vendor.socialMediaLinks
+                .where((social) => social.isActive)
+                .where((social) => social.platform != 6)
+                .map((social) => _buildSocialMediaIcon(social))
+                .toList(),
+          ),
+        ],
+      ),
     );
   }
 
@@ -990,68 +1202,71 @@ class _VendorDetailView extends StatelessWidget {
 
   /// Build individual social media icon
   Widget _buildSocialMediaIcon(VendorSocialMedia social) {
-    IconData iconData;
+    Image iconData;
     Color backgroundColor;
 
     // Map platform integers to icons and colors
     switch (social.platform) {
       case 1: // Instagram
-        iconData = Icons.camera_alt;
+        iconData = Image.asset(
+          'assets/icons/social_media_platforms/Instagram.png',
+        );
         backgroundColor = const Color(0xFFE4405F);
         break;
       case 2: // Facebook
-        iconData = Icons.facebook;
+        iconData = Image.asset(
+          'assets/icons/social_media_platforms/Facebook.png',
+        );
         backgroundColor = const Color(0xFF1877F2);
         break;
       case 3: // Twitter
-        iconData = Icons.alternate_email;
-        backgroundColor = const Color(0xFF1DA1F2);
+        iconData = Image.asset('assets/icons/social_media_platforms/X.png');
+        backgroundColor = const Color(0xFF000000);
         break;
       case 4: // LinkedIn
-        iconData = Icons.business;
+        iconData = Image.asset(
+          'assets/icons/social_media_platforms/LinkedIn.png',
+        );
         backgroundColor = const Color(0xFF0A66C2);
         break;
       case 5: // YouTube
-        iconData = Icons.play_arrow;
+        iconData = Image.asset(
+          'assets/icons/social_media_platforms/YouTube.png',
+        );
         backgroundColor = const Color(0xFFFF0000);
         break;
       case 6: // Google Maps
-        iconData = Icons.map;
+        iconData = Image.asset(
+          'assets/icons/social_media_platforms/GoogleMaps.png',
+        );
         backgroundColor = const Color(0xFF4285F4);
         break;
       case 7: // WhatsApp
-        iconData = Icons.chat;
+        iconData = Image.asset(
+          'assets/icons/social_media_platforms/WhatsApp.png',
+        );
         backgroundColor = const Color(0xFF25D366);
         break;
       default: // Other
-        iconData = Icons.link;
+        iconData = Image.asset('assets/icons/social_media_platforms/Link.png');
         backgroundColor = const Color(0xFF6B7280);
         break;
     }
 
     return Container(
-      margin: const EdgeInsets.only(right: 12),
-      child: Container(
-        width: 48,
-        height: 48,
-        decoration: BoxDecoration(
-          color: backgroundColor,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: backgroundColor.withOpacity(0.3),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: () => _launchSocialMediaUrl(social.url),
-            borderRadius: BorderRadius.circular(12),
-            child: Icon(iconData, color: Colors.white, size: 24),
-          ),
+      width: 56,
+      height: 56,
+      decoration: BoxDecoration(
+        color: backgroundColor.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: backgroundColor.withOpacity(0.2)),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => _launchSocialMediaUrl(social.url),
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(padding: const EdgeInsets.all(8), child: iconData),
         ),
       ),
     );
