@@ -689,6 +689,82 @@ class _VendorDetailView extends StatelessWidget {
             ),
           ),
 
+          // Website link if available
+          if (vendor.website != null && vendor.website!.trim().isNotEmpty) ...[
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF8F9FA),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: const Color(0xFFE2E8F0)),
+              ),
+              child: InkWell(
+                onTap: () {
+                  HapticFeedback.lightImpact();
+                  String url = vendor.website!.trim();
+                  // Add https:// if not present
+                  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                    url = 'https://$url';
+                  }
+                  launchUrlString(url);
+                },
+                borderRadius: BorderRadius.circular(16),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF6F3FCC).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.language_rounded,
+                        color: Color(0xFF6F3FCC),
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Website',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF6B7280),
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            vendor.website!.trim(),
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xFF374151),
+                              height: 1.4,
+                              decoration: TextDecoration.underline,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Icon(
+                      Icons.open_in_new_rounded,
+                      color: Color(0xFF6B7280),
+                      size: 18,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+
           const SizedBox(height: 24),
 
           // Action buttons row with improved styling
