@@ -292,15 +292,7 @@ class _BrandVouchersViewState extends State<BrandVouchersView> {
           onPressed: () => Navigator.pop(context),
           icon: Container(
             padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: const Color(0xFF1A202C),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Icon(
-              Icons.arrow_back_ios_rounded,
-              color: Colors.white,
-              size: 16,
-            ),
+            child: const Icon(Icons.arrow_back_ios_rounded, size: 24),
           ),
         ),
       ),

@@ -48,7 +48,6 @@ class AboutUsPage extends StatelessWidget {
             _buildMissionSection(),
             _buildValuesSection(),
             _buildTeamSection(),
-            _buildStatsSection(),
             const SizedBox(height: 40),
           ],
         ),
@@ -344,74 +343,6 @@ class AboutUsPage extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildStatsSection() {
-    return Container(
-      margin: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Our Impact',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.w700,
-              color: Color(0xFF1A202C),
-            ),
-          ),
-          const SizedBox(height: 20),
-          Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: const Color(0xFFFAFAFA),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.grey),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: _buildStatItem('125+', 'Active Deals', const Color(0xFF059669)),
-                ),
-                Container(width: 1, height: 40, color: Colors.grey),
-                Expanded(
-                  child: _buildStatItem('50K+', 'Happy Users', const Color(0xFF0EA5E9)),
-                ),
-                Container(width: 1, height: 40, color: Colors.grey),
-                Expanded(
-                  child: _buildStatItem('₹2L+', 'Money Saved', const Color(0xFFEF4444)),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStatItem(String value, String label, Color color) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.w800,
-            color: color,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 13,
-            color: Colors.grey[600],
-            fontWeight: FontWeight.w500,
-          ),
-          textAlign: TextAlign.center,
-        ),
-      ],
     );
   }
 }
