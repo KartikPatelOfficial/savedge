@@ -13,6 +13,7 @@ import 'package:savedge/features/favorites/presentation/bloc/favorites_bloc.dart
 import 'package:savedge/features/favorites/presentation/bloc/favorites_event.dart';
 import 'package:savedge/features/favorites/presentation/pages/favorites_page.dart';
 import 'package:savedge/features/static_pages/presentation/pages/about_us_page.dart';
+import 'package:savedge/features/static_pages/presentation/pages/contact_us_page.dart';
 import 'package:savedge/features/stores/presentation/pages/stores_page.dart';
 import 'package:savedge/features/subscription/domain/entities/subscription_plan.dart';
 import 'package:savedge/features/subscription/presentation/pages/subscription_purchase_page.dart';
@@ -627,8 +628,8 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _onNotificationsTap() {
-    debugPrint('Notifications tapped');
-    // TODO: Navigate to notification settings
+    // Open Settings app on the notifications page
+    launchUrlString('app-settings:', mode: LaunchMode.externalApplication);
   }
 
   void _onOrderHistoryTap() {
@@ -706,8 +707,10 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _onHelpTap() {
-    debugPrint('Help & Support tapped');
-    // TODO: Navigate to help center
+    // Open Contact Us Page
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (context) => const ContactUsPage()));
   }
 
   void _onFeedbackTap() {

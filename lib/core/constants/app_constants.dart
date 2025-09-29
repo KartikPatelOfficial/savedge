@@ -4,10 +4,39 @@ import 'package:flutter/foundation.dart';
 class AppConstants {
   AppConstants._();
 
-  // API Constants
-  static const String baseUrl = kDebugMode
-      ? 'https://web-app-20250829054601.salmonhill-0be6c935.centralindia.azurecontainerapps.io/'
-      : 'https://savedge-prod.calmmoss-be0e7220.centralindia.azurecontainerapps.io/';
+  // Environment keys
+  static const String _developmentEnv = 'development';
+  static const String _stagingEnv = 'staging';
+  static const String _productionEnv = 'production';
+
+  // API Endpoints per environment
+  static const String _developmentBaseUrl = 'https://10.0.2.2:44447';
+  static const String _stagingBaseUrl =
+      'https://web-app-20250829054601.salmonhill-0be6c935.centralindia.azurecontainerapps.io';
+  static const String _productionBaseUrl =
+      'https://savedge-prod.calmmoss-be0e7220.centralindia.azurecontainerapps.io';
+
+  /// Compile-time environment (can be overridden via --dart-define=APP_ENV=staging)
+  static const String _environment = String.fromEnvironment(
+    'APP_ENV',
+    defaultValue: kDebugMode ? _developmentEnv : _productionEnv,
+  );
+
+  /// Normalized environment value in lowercase
+  static String get environment => _environment.toLowerCase();
+
+  /// The active API base URL for the current environment
+  static String get baseUrl {
+    switch (environment) {
+      case _stagingEnv:
+        return _stagingBaseUrl;
+      case _productionEnv:
+        return _productionBaseUrl;
+      default:
+        return _developmentBaseUrl;
+    }
+  }
+
   static const String apiVersion = 'v1';
   static const Duration connectionTimeout = Duration(seconds: 30);
   static const Duration receiveTimeout = Duration(seconds: 30);

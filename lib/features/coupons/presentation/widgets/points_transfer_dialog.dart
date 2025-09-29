@@ -268,28 +268,47 @@ class _PointsTransferDialogState extends State<PointsTransferDialog> {
                         const SizedBox(width: 16),
                         Expanded(
                           child: ElevatedButton(
-                            onPressed: state is! GiftingLoading &&
-                                    _formKey.currentState?.validate() == true
-                                ? () {
-                                    final points = int.parse(
+                            onPressed: state is GiftingLoading
+                                ? null
+                                : () {
+                                    final isValid =
+                                        _formKey.currentState?.validate() ??
+                                        false;
+                                    if (!isValid) {
+                                      return;
+                                    }
+
+                                    final points = int.tryParse(
                                       _pointsController.text,
                                     );
-                                    final phone =
-                                        _phoneController.text.replaceAll(' ', '');
+                                    if (points == null) {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                            'Enter a valid number of points',
+                                          ),
+                                          backgroundColor: Color(0xFFE53E3E),
+                                        ),
+                                      );
+                                      return;
+                                    }
+
+                                    final phone = _phoneController.text
+                                        .replaceAll(' ', '');
                                     final request = TransferPointsRequest(
                                       toUserId: phone,
                                       points: points,
-                                      message: _messageController.text
-                                              .trim()
-                                              .isEmpty
+                                      message:
+                                          _messageController.text.trim().isEmpty
                                           ? null
                                           : _messageController.text.trim(),
                                     );
                                     context.read<GiftingBloc>().add(
                                       TransferPoints(request),
                                     );
-                                  }
-                                : null,
+                                  },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFFD69E2E),
                               padding: const EdgeInsets.symmetric(vertical: 16),
