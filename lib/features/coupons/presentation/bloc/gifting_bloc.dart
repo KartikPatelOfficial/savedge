@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 
@@ -47,7 +48,11 @@ class GiftingBloc extends Bloc<GiftingEvent, GiftingState> {
         emit(GiftingError(response.message));
       }
     } catch (e) {
-      emit(GiftingError('Failed to gift coupon: ${e.toString()}'));
+      emit(
+        GiftingError(
+          _extractErrorMessage(e, fallback: 'Failed to gift coupon'),
+        ),
+      );
     }
   }
 
@@ -65,7 +70,11 @@ class GiftingBloc extends Bloc<GiftingEvent, GiftingState> {
         emit(GiftingError(response.message));
       }
     } catch (e) {
-      emit(GiftingError('Failed to transfer points: ${e.toString()}'));
+      emit(
+        GiftingError(
+          _extractErrorMessage(e, fallback: 'Failed to transfer points'),
+        ),
+      );
     }
   }
 
@@ -79,7 +88,11 @@ class GiftingBloc extends Bloc<GiftingEvent, GiftingState> {
       final history = await _giftingService.getGiftedCouponsHistory();
       emit(GiftHistoryLoaded(history));
     } catch (e) {
-      emit(GiftingError('Failed to load gift history: ${e.toString()}'));
+      emit(
+        GiftingError(
+          _extractErrorMessage(e, fallback: 'Failed to load gift history'),
+        ),
+      );
     }
   }
 
@@ -93,7 +106,11 @@ class GiftingBloc extends Bloc<GiftingEvent, GiftingState> {
       final history = await _giftingService.getPointsTransferHistory();
       emit(PointsHistoryLoaded(history));
     } catch (e) {
-      emit(GiftingError('Failed to load points history: ${e.toString()}'));
+      emit(
+        GiftingError(
+          _extractErrorMessage(e, fallback: 'Failed to load points history'),
+        ),
+      );
     }
   }
 
@@ -113,12 +130,18 @@ class GiftingBloc extends Bloc<GiftingEvent, GiftingState> {
           .where((p) => (p.direction).toLowerCase() == 'sent')
           .toList();
 
-      emit(GiftingHistoryLoaded(
-        giftedCoupons: history.sentCoupons,
-        transferredPoints: sentPoints,
-      ));
+      emit(
+        GiftingHistoryLoaded(
+          giftedCoupons: history.sentCoupons,
+          transferredPoints: sentPoints,
+        ),
+      );
     } catch (e) {
-      emit(GiftingError('Failed to load gifting history: ${e.toString()}'));
+      emit(
+        GiftingError(
+          _extractErrorMessage(e, fallback: 'Failed to load gifting history'),
+        ),
+      );
     }
   }
 
@@ -137,12 +160,41 @@ class GiftingBloc extends Bloc<GiftingEvent, GiftingState> {
           .where((p) => (p.direction).toLowerCase() == 'received')
           .toList();
 
-      emit(ReceivedGiftsLoaded(
-        receivedCoupons: history.receivedCoupons,
-        receivedPoints: receivedPoints,
-      ));
+      emit(
+        ReceivedGiftsLoaded(
+          receivedCoupons: history.receivedCoupons,
+          receivedPoints: receivedPoints,
+        ),
+      );
     } catch (e) {
-      emit(GiftingError('Failed to load received gifts: ${e.toString()}'));
+      emit(
+        GiftingError(
+          _extractErrorMessage(e, fallback: 'Failed to load received gifts'),
+        ),
+      );
     }
+  }
+
+  String _extractErrorMessage(Object error, {required String fallback}) {
+    if (error is DioException) {
+      final response = error.response;
+      if (response?.data is Map) {
+        final data = response!.data as Map;
+        final message = data['message'] ?? data['Message'] ?? data['error'];
+        if (message is String && message.isNotEmpty) {
+          return message;
+        }
+      } else if (response?.data is String) {
+        final data = (response!.data as String).trim();
+        if (data.isNotEmpty) {
+          return data;
+        }
+      }
+      if (error.message != null && error.message!.isNotEmpty) {
+        return error.message!;
+      }
+    }
+
+    return fallback;
   }
 }

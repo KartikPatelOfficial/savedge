@@ -35,16 +35,24 @@ class _PointsTransferDialogState extends State<PointsTransferDialog> {
       create: (context) => getIt<GiftingBloc>(),
       child: BlocConsumer<GiftingBloc, GiftingState>(
         listener: (context, state) {
+          final messenger = ScaffoldMessenger.of(context);
+          final navigator = Navigator.of(context);
+
           if (state is GiftingSuccess) {
-            Navigator.of(context).pop();
-            ScaffoldMessenger.of(context).showSnackBar(
+            if (navigator.canPop()) {
+              navigator.pop();
+            }
+            messenger.showSnackBar(
               SnackBar(
                 content: Text(state.message),
                 backgroundColor: const Color(0xFF38A169),
               ),
             );
           } else if (state is GiftingError) {
-            ScaffoldMessenger.of(context).showSnackBar(
+            if (navigator.canPop()) {
+              navigator.pop();
+            }
+            messenger.showSnackBar(
               SnackBar(
                 content: Text(state.message),
                 backgroundColor: const Color(0xFFE53E3E),

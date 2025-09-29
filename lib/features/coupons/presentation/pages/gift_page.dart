@@ -628,6 +628,9 @@ class _GiftPageState extends State<GiftPage> with TickerProviderStateMixin {
     final String when = points is PointsTransferHistoryModel
         ? points.transferDate.toLocal().toString()
         : (points.receivedAt ?? 'Recently');
+    final String sender = points is PointsTransferHistoryModel
+        ? _formatTransferContact(points, sent: false)
+        : (points.senderName ?? 'Colleague');
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -666,7 +669,7 @@ class _GiftPageState extends State<GiftPage> with TickerProviderStateMixin {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Points from ${points.senderName ?? 'Colleague'}',
+                      'Points from $sender',
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
@@ -847,6 +850,27 @@ class _GiftPageState extends State<GiftPage> with TickerProviderStateMixin {
     );
   }
 
+  String _formatTransferContact(
+    PointsTransferHistoryModel transfer, {
+    required bool sent,
+  }) {
+    final raw = sent ? transfer.toUserId : transfer.fromUserId;
+    if (raw.isEmpty) {
+      return 'Colleague';
+    }
+
+    final trimmed = raw.trim();
+    if (trimmed.contains('@')) {
+      return trimmed;
+    }
+
+    if (trimmed.length <= 4) {
+      return trimmed;
+    }
+
+    return '••••${trimmed.substring(trimmed.length - 4)}';
+  }
+
   Widget _buildSentPointsCard(dynamic points) {
     final int amount = points is PointsTransferHistoryModel
         ? points.points
@@ -854,6 +878,9 @@ class _GiftPageState extends State<GiftPage> with TickerProviderStateMixin {
     final String when = points is PointsTransferHistoryModel
         ? points.transferDate.toLocal().toString()
         : (points.sentAt ?? 'Recently');
+    final String recipient = points is PointsTransferHistoryModel
+        ? _formatTransferContact(points, sent: true)
+        : (points.recipientName ?? 'Colleague');
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -885,7 +912,7 @@ class _GiftPageState extends State<GiftPage> with TickerProviderStateMixin {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Sent to ${points.recipientName ?? 'Colleague'}',
+                  'Sent to $recipient',
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
