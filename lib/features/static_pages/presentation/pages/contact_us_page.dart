@@ -163,7 +163,7 @@ class ContactUsPage extends StatelessWidget {
               Expanded(
                 child: _buildContactMethodCard(
                   'Phone Support',
-                  '+91 98765 43210',
+                  '+91 99099 11482',
                   Icons.phone_rounded,
                   const Color(0xFF0EA5E9),
                 ),

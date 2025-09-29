@@ -169,6 +169,7 @@ class _ProfilePageState extends State<ProfilePage> {
             backgroundColor: Colors.white,
             pinned: true,
             elevation: 0,
+            centerTitle: false,
             scrolledUnderElevation: 0,
             surfaceTintColor: Colors.transparent,
             flexibleSpace: FlexibleSpaceBar(
