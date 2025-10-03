@@ -62,6 +62,7 @@ dependencies:
   flutter_staggered_animations: ^1.1.1
   share_plus: ^10.0.3
   url_launcher: ^6.3.2
+  lottie: ^3.3.1
 
 dev_dependencies:
   flutter_test:
@@ -97,6 +98,7 @@ flutter:
     - assets/images/
     - assets/icons/categories/
     - assets/icons/social_media_platforms/
+    - assets/animations/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
