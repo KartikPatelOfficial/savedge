@@ -15,7 +15,7 @@ abstract class BrandVoucherService {
   @GET('/api/BrandVouchers')
   Future<PaginatedBrandVoucherResponse> getBrandVouchers({
     @Query('PageNumber') int pageNumber = 1,
-    @Query('PageSize') int pageSize = 10,
+    @Query('PageSize') int pageSize = 1000,
     @Query('IsActive') bool? isActive,
     @Query('SearchTerm') String? searchTerm,
   });

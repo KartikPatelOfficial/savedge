@@ -584,6 +584,13 @@ class _VendorOfferCardState extends State<VendorOfferCard>
                   ),
                 ),
 
+                // Availability text in top-right corner
+                Positioned(
+                  top: 12,
+                  right: 12,
+                  child: _buildAvailabilityText(),
+                ),
+
                 // Main content
                 Padding(
                   padding: const EdgeInsets.all(20),
@@ -875,6 +882,47 @@ class _VendorOfferCardState extends State<VendorOfferCard>
     ];
 
     return colors[widget.index % colors.length];
+  }
+
+  /// Build availability text showing coupon availability info
+  Widget _buildAvailabilityText() {
+    final hasCash = widget.coupon.cashPrice != null && widget.coupon.cashPrice! > 0;
+    final hasMembershipOption = (widget.coupon.maxRedemptions != null && widget.coupon.maxRedemptions! > 0);
+    final hasRemainingClaims = widget.coupon.remainingClaims != null;
+
+    String displayText;
+
+    if (hasMembershipOption && hasRemainingClaims) {
+      // Show remaining/total format (e.g., "7/10")
+      final remaining = widget.coupon.remainingClaims!;
+      final total = widget.coupon.maxRedemptions!;
+      displayText = '$remaining/$total';
+    } else if (hasCash && !hasMembershipOption) {
+      // Purchase only - show price
+      displayText = '₹${widget.coupon.cashPrice!.toInt()}';
+    } else if (hasMembershipOption && !hasRemainingClaims) {
+      // Membership option but no remaining claims data - show total
+      displayText = '${widget.coupon.maxRedemptions}';
+    } else {
+      // Free or other cases
+      return const SizedBox.shrink();
+    }
+
+    return Text(
+      displayText,
+      style: TextStyle(
+        fontSize: 12,
+        fontWeight: FontWeight.w600,
+        color: Colors.white.withValues(alpha: 0.9),
+        shadows: const [
+          Shadow(
+            color: Colors.black26,
+            blurRadius: 4,
+            offset: Offset(0, 1),
+          ),
+        ],
+      ),
+    );
   }
 
   void _onCouponTap(BuildContext context) async {

@@ -201,6 +201,8 @@ class VendorsRepositoryImpl implements VendorsRepository {
       cashPrice: dto.cashPrice,
       termsAndConditions: dto.termsAndConditions,
       maxRedemptions: dto.maxRedemptions,
+      totalClaimed: dto.totalClaimed,
+      remainingClaims: dto.remainingClaims,
       isSpecialOffer: dto.isSpecialOffer,
       specialOfferStartDate: dto.specialOfferStartDate,
       specialOfferEndDate: dto.specialOfferEndDate,

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -327,29 +329,83 @@ class VendorDetailPage extends StatelessWidget {
   }
 }
 
-class _VendorDetailView extends StatelessWidget {
+class _VendorDetailView extends StatefulWidget {
   const _VendorDetailView({required this.vendor});
 
   final Vendor vendor;
 
+  @override
+  State<_VendorDetailView> createState() => _VendorDetailViewState();
+}
+
+class _VendorDetailViewState extends State<_VendorDetailView> {
+  late PageController _pageController;
+  int _currentPage = 0;
+  Timer? _autoScrollTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController();
+    _startAutoScroll();
+  }
+
+  @override
+  void dispose() {
+    _autoScrollTimer?.cancel();
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void _startAutoScroll() {
+    final galleryImages = widget.vendor.images
+        .where((img) => img.imageType == 'gallery' || img.imageType == 'Gallery')
+        .toList();
+    final imagesToShow = galleryImages.isNotEmpty
+        ? galleryImages
+        : widget.vendor.images.take(3).toList();
+
+    // Only start auto-scroll if there are multiple images
+    if (imagesToShow.length > 1) {
+      _autoScrollTimer = Timer.periodic(const Duration(seconds: 4), (timer) {
+        if (_pageController.hasClients) {
+          final nextPage = (_currentPage + 1) % imagesToShow.length;
+          _pageController.animateToPage(
+            nextPage,
+            duration: const Duration(milliseconds: 800),
+            curve: Curves.easeInOut,
+          );
+        }
+      });
+    }
+  }
+
   /// Resolve vendor UID for QR and coupon flows.
   String get _resolvedVendorUid {
-    final uid = vendor.vendorUserId.trim();
+    final uid = widget.vendor.vendorUserId.trim();
     if (uid.isNotEmpty) return uid;
-    for (final c in vendor.coupons) {
+    for (final c in widget.vendor.coupons) {
       final u = c.vendorUserId.trim();
       if (u.isNotEmpty) return u;
     }
-    return vendor.id.toString();
+    return widget.vendor.id.toString();
   }
 
   /// Get full address string
   String get _fullAddress {
     final addressParts = <String>[];
-    if (vendor.address?.isNotEmpty == true) addressParts.add(vendor.address!);
-    if (vendor.city?.isNotEmpty == true) addressParts.add(vendor.city!);
-    if (vendor.state?.isNotEmpty == true) addressParts.add(vendor.state!);
-    if (vendor.pinCode?.isNotEmpty == true) addressParts.add(vendor.pinCode!);
+    if (widget.vendor.address?.isNotEmpty == true) {
+      addressParts.add(widget.vendor.address!);
+    }
+    if (widget.vendor.city?.isNotEmpty == true) {
+      addressParts.add(widget.vendor.city!);
+    }
+    if (widget.vendor.state?.isNotEmpty == true) {
+      addressParts.add(widget.vendor.state!);
+    }
+    if (widget.vendor.pinCode?.isNotEmpty == true) {
+      addressParts.add(widget.vendor.pinCode!);
+    }
     return addressParts.isNotEmpty
         ? addressParts.join(', ')
         : 'Address not available';
@@ -368,10 +424,10 @@ class _VendorDetailView extends StatelessWidget {
           // Offers Section
           SliverToBoxAdapter(
             child: VendorOffersSection(
-              vendorId: vendor.id,
+              vendorId: widget.vendor.id,
               vendorUid: _resolvedVendorUid,
-              vendorName: vendor.businessName,
-              coupons: vendor.coupons,
+              vendorName: widget.vendor.businessName,
+              coupons: widget.vendor.coupons,
             ),
           ),
           // Yearly Subscription
@@ -392,7 +448,7 @@ class _VendorDetailView extends StatelessWidget {
 
   Widget _buildSliverAppBar(BuildContext context) {
     // Get all gallery images or use primary image as fallback
-    final galleryImages = vendor.images
+    final galleryImages = widget.vendor.images
         .where(
           (img) => img.imageType == 'gallery' || img.imageType == 'Gallery',
         )
@@ -400,7 +456,7 @@ class _VendorDetailView extends StatelessWidget {
 
     final imagesToShow = galleryImages.isNotEmpty
         ? galleryImages
-        : vendor.images.take(3).toList(); // Show up to 3 images
+        : widget.vendor.images.take(3).toList(); // Show up to 3 images
 
     return SliverAppBar(
       expandedHeight: 320,
@@ -438,7 +494,13 @@ class _VendorDetailView extends StatelessWidget {
             // Image Carousel
             imagesToShow.isNotEmpty
                 ? PageView.builder(
+                    controller: _pageController,
                     itemCount: imagesToShow.length,
+                    onPageChanged: (index) {
+                      setState(() {
+                        _currentPage = index;
+                      });
+                    },
                     itemBuilder: (context, index) {
                       final image = imagesToShow[index];
                       return CachedNetworkImage(
@@ -528,41 +590,37 @@ class _VendorDetailView extends StatelessWidget {
                       ),
                     ),
                   ),
-            // Navigation arrows (only show if multiple images)
-            if (imagesToShow.length > 1) ...[
+            // Page indicators (only show if multiple images)
+            if (imagesToShow.length > 1)
               Positioned(
-                left: 16,
-                top: 0,
-                bottom: 0,
-                child: Center(
-                  child: Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.5),
-                      shape: BoxShape.circle,
+                bottom: 16,
+                left: 0,
+                right: 0,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(
+                    imagesToShow.length,
+                    (index) => Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 4),
+                      width: _currentPage == index ? 24 : 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: _currentPage == index
+                            ? Colors.white
+                            : Colors.white.withOpacity(0.4),
+                        borderRadius: BorderRadius.circular(4),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.3),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
                     ),
-                    child: const Icon(Icons.chevron_left, color: Colors.white),
                   ),
                 ),
               ),
-              Positioned(
-                right: 16,
-                top: 0,
-                bottom: 0,
-                child: Center(
-                  child: Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.5),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(Icons.chevron_right, color: Colors.white),
-                  ),
-                ),
-              ),
-            ],
             // Modern overlay at bottom
             Positioned(
               bottom: 0,
@@ -593,7 +651,7 @@ class _VendorDetailView extends StatelessWidget {
         children: [
           // Business name with enhanced styling
           Text(
-            vendor.businessName,
+            widget.vendor.businessName,
             style: const TextStyle(
               fontSize: 32,
               fontWeight: FontWeight.w900,
@@ -615,7 +673,7 @@ class _VendorDetailView extends StatelessWidget {
               ),
             ),
             child: Text(
-              vendor.category,
+              widget.vendor.category,
               style: const TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
@@ -628,8 +686,8 @@ class _VendorDetailView extends StatelessWidget {
           const SizedBox(height: 20),
 
           // Business description section
-          if (vendor.description != null &&
-              vendor.description!.trim().isNotEmpty) ...[
+          if (widget.vendor.description != null &&
+              widget.vendor.description!.trim().isNotEmpty) ...[
             _buildDescriptionSection(),
             const SizedBox(height: 24),
           ],
@@ -690,7 +748,7 @@ class _VendorDetailView extends StatelessWidget {
           ),
 
           // Website link if available
-          if (vendor.website != null && vendor.website!.trim().isNotEmpty) ...[
+          if (widget.vendor.website != null && widget.vendor.website!.trim().isNotEmpty) ...[
             const SizedBox(height: 16),
             Container(
               padding: const EdgeInsets.all(16),
@@ -702,7 +760,7 @@ class _VendorDetailView extends StatelessWidget {
               child: InkWell(
                 onTap: () {
                   HapticFeedback.lightImpact();
-                  String url = vendor.website!.trim();
+                  String url = widget.vendor.website!.trim();
                   // Add https:// if not present
                   if (!url.startsWith('http://') && !url.startsWith('https://')) {
                     url = 'https://$url';
@@ -742,7 +800,7 @@ class _VendorDetailView extends StatelessWidget {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            vendor.website!.trim(),
+                            widget.vendor.website!.trim(),
                             style: const TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w500,
@@ -775,7 +833,7 @@ class _VendorDetailView extends StatelessWidget {
                   builder: (context, favState) {
                     final isFavorite =
                         favState is FavoritesLoaded &&
-                        favState.isFavorite(vendor.id);
+                        favState.isFavorite(widget.vendor.id);
 
                     return Container(
                       height: 56,
@@ -810,7 +868,7 @@ class _VendorDetailView extends StatelessWidget {
                           onTap: () {
                             HapticFeedback.lightImpact();
                             context.read<FavoritesBloc>().add(
-                              ToggleFavorite(vendor),
+                              ToggleFavorite(widget.vendor),
                             );
                           },
                           borderRadius: BorderRadius.circular(16),
@@ -843,12 +901,12 @@ class _VendorDetailView extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
-              if (vendor.contactPhone != null &&
-                  vendor.contactPhone!.trim().isNotEmpty)
+              if (widget.vendor.contactPhone != null &&
+                  widget.vendor.contactPhone!.trim().isNotEmpty)
                 _buildActionButton(
                   onTap: () {
                     HapticFeedback.lightImpact();
-                    final raw = vendor.contactPhone!.trim();
+                    final raw = widget.vendor.contactPhone!.trim();
                     final phone = raw.replaceAll(RegExp(r'[^0-9+]'), '');
                     if (phone.isNotEmpty) {
                       launchUrlString('tel:$phone');
@@ -858,8 +916,8 @@ class _VendorDetailView extends StatelessWidget {
                   color: const Color(0xFF10B981),
                   tooltip: 'Call',
                 ),
-              if (vendor.contactPhone != null &&
-                  vendor.contactPhone!.trim().isNotEmpty)
+              if (widget.vendor.contactPhone != null &&
+                  widget.vendor.contactPhone!.trim().isNotEmpty)
                 const SizedBox(width: 12),
               if (_googleMapsUrl != null)
                 _buildActionButton(
@@ -875,7 +933,7 @@ class _VendorDetailView extends StatelessWidget {
           ),
 
           // Social Media Links
-          if (vendor.socialMediaLinks.isNotEmpty) ...[
+          if (widget.vendor.socialMediaLinks.isNotEmpty) ...[
             const SizedBox(height: 24),
             _buildSocialMediaSection(),
           ],
@@ -1183,7 +1241,7 @@ class _VendorDetailView extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            vendor.description!,
+            widget.vendor.description!,
             style: const TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w400,
@@ -1247,7 +1305,7 @@ class _VendorDetailView extends StatelessWidget {
           Wrap(
             spacing: 12,
             runSpacing: 12,
-            children: vendor.socialMediaLinks
+            children: widget.vendor.socialMediaLinks
                 .where((social) => social.isActive)
                 .where((social) => social.platform != 6)
                 .map((social) => _buildSocialMediaIcon(social))
@@ -1260,8 +1318,8 @@ class _VendorDetailView extends StatelessWidget {
 
   /// Find a Google Maps URL from vendor social links, if available
   String? get _googleMapsUrl {
-    if (vendor.socialMediaLinks.isEmpty) return null;
-    for (final s in vendor.socialMediaLinks) {
+    if (widget.vendor.socialMediaLinks.isEmpty) return null;
+    for (final s in widget.vendor.socialMediaLinks) {
       if (!s.isActive) continue;
       final url = s.url;
       if (s.platform == 6) return url; // Platform 6 designated for Google Maps
@@ -1363,7 +1421,7 @@ class _VendorDetailView extends StatelessWidget {
       MaterialPageRoute(
         builder: (context) => QRScannerPage(
           expectedVendorUid: _resolvedVendorUid,
-          expectedVendorName: vendor.businessName,
+          expectedVendorName: widget.vendor.businessName,
           verifyOnly: true,
         ),
       ),
@@ -1382,8 +1440,10 @@ class _VendorDetailView extends StatelessWidget {
     showDialog(
       context: context,
       barrierDismissible: true,
-      builder: (BuildContext context) =>
-          PointsPaymentDialog(vendor: vendor, availablePoints: availablePoints),
+      builder: (BuildContext context) => PointsPaymentDialog(
+        vendor: widget.vendor,
+        availablePoints: availablePoints,
+      ),
     );
   }
 }

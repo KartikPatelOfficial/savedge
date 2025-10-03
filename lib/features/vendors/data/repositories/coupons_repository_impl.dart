@@ -127,6 +127,8 @@ class CouponsRepositoryImpl implements CouponsRepository {
       cashPrice: response.cashPrice,
       termsAndConditions: response.termsAndConditions,
       maxRedemptions: response.maxRedemptions,
+      totalClaimed: response.totalClaimed,
+      remainingClaims: response.remainingClaims,
       isSpecialOffer: response.isSpecialOffer,
       specialOfferStartDate: response.specialOfferStartDate,
       specialOfferEndDate: response.specialOfferEndDate,

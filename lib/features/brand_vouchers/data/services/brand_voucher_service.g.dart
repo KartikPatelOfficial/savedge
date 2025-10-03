@@ -20,7 +20,7 @@ class _BrandVoucherService implements BrandVoucherService {
   @override
   Future<PaginatedBrandVoucherResponse> getBrandVouchers({
     int pageNumber = 1,
-    int pageSize = 10,
+    int pageSize = 1000,
     bool? isActive,
     String? searchTerm,
   }) async {

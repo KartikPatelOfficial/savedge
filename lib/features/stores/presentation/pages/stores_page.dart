@@ -81,6 +81,7 @@ class _StoresViewState extends State<StoresView> {
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   String? _selectedCategory;
+  bool _isLoadingMore = false;
 
   @override
   void initState() {
@@ -106,8 +107,14 @@ class _StoresViewState extends State<StoresView> {
   }
 
   void _onScroll() {
-    if (_isBottom) {
-      context.read<VendorsBloc>().add(const LoadMoreVendors());
+    if (_isBottom && !_isLoadingMore) {
+      final currentState = context.read<VendorsBloc>().state;
+      if (currentState is VendorsLoaded && !currentState.hasReachedMax) {
+        setState(() {
+          _isLoadingMore = true;
+        });
+        context.read<VendorsBloc>().add(const LoadMoreVendors());
+      }
     }
   }
 
@@ -122,7 +129,17 @@ class _StoresViewState extends State<StoresView> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFFAFBFC),
-      body: BlocBuilder<VendorsBloc, VendorsState>(
+      body: BlocConsumer<VendorsBloc, VendorsState>(
+        listener: (context, state) {
+          // Reset loading flag when state changes
+          if (state is VendorsLoaded || state is VendorsError) {
+            if (_isLoadingMore) {
+              setState(() {
+                _isLoadingMore = false;
+              });
+            }
+          }
+        },
         builder: (context, state) {
           return CustomScrollView(
             controller: _scrollController,
@@ -770,25 +787,9 @@ class ModernVendorCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Colors.white, const Color(0xFFFAFBFC)],
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF6F3FCC).withOpacity(0.08),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-            spreadRadius: 0,
-          ),
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-            spreadRadius: 0,
-          ),
-        ],
+        border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
+
+        color: Colors.white,
       ),
       child: Stack(
         children: [

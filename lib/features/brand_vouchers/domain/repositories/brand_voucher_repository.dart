@@ -5,8 +5,6 @@ import '../entities/brand_voucher_entity.dart';
 
 abstract class BrandVoucherRepository {
   Future<Either<Failure, List<BrandVoucherEntity>>> getBrandVouchers({
-    int pageNumber = 1,
-    int pageSize = 10,
     bool? isActive,
     String? searchTerm,
   });

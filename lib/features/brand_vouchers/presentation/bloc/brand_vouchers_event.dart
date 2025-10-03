@@ -8,20 +8,16 @@ abstract class BrandVouchersEvent extends Equatable {
 }
 
 class LoadBrandVouchers extends BrandVouchersEvent {
-  final int pageNumber;
-  final int pageSize;
   final bool? isActive;
   final String? searchTerm;
 
   const LoadBrandVouchers({
-    this.pageNumber = 1,
-    this.pageSize = 20,
     this.isActive = true,
     this.searchTerm,
   });
 
   @override
-  List<Object?> get props => [pageNumber, pageSize, isActive, searchTerm];
+  List<Object?> get props => [isActive, searchTerm];
 }
 
 class RefreshBrandVouchers extends BrandVouchersEvent {

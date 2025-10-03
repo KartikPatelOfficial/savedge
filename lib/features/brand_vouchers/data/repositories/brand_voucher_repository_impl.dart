@@ -15,23 +15,21 @@ class BrandVoucherRepositoryImpl implements BrandVoucherRepository {
 
   @override
   Future<Either<Failure, List<BrandVoucherEntity>>> getBrandVouchers({
-    int pageNumber = 1,
-    int pageSize = 10,
     bool? isActive,
     String? searchTerm,
   }) async {
     try {
       final response = await _service.getBrandVouchers(
-        pageNumber: pageNumber,
-        pageSize: pageSize,
+        pageNumber: 1,
+        pageSize: 1000,
         isActive: isActive,
         searchTerm: searchTerm,
       );
-      
+
       final entities = response.items
           .map((model) => _mapToEntity(model))
           .toList();
-          
+
       return Right(entities);
     } catch (e) {
       return Left(ServerFailure(e.toString()));

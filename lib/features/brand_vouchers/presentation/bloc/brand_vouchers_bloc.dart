@@ -35,8 +35,6 @@ class BrandVouchersBloc extends Bloc<BrandVouchersEvent, BrandVouchersState> {
 
     final result = await getBrandVouchersUseCase(
       GetBrandVouchersParams(
-        pageNumber: event.pageNumber,
-        pageSize: event.pageSize,
         isActive: event.isActive,
         searchTerm: event.searchTerm,
       ),

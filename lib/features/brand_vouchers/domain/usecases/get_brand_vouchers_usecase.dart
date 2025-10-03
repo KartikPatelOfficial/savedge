@@ -19,8 +19,6 @@ class GetBrandVouchersUseCase
     GetBrandVouchersParams params,
   ) async {
     return await repository.getBrandVouchers(
-      pageNumber: params.pageNumber,
-      pageSize: params.pageSize,
       isActive: params.isActive,
       searchTerm: params.searchTerm,
     );
@@ -28,18 +26,14 @@ class GetBrandVouchersUseCase
 }
 
 class GetBrandVouchersParams extends Equatable {
-  final int pageNumber;
-  final int pageSize;
   final bool? isActive;
   final String? searchTerm;
 
   const GetBrandVouchersParams({
-    this.pageNumber = 1,
-    this.pageSize = 10,
     this.isActive,
     this.searchTerm,
   });
 
   @override
-  List<Object?> get props => [pageNumber, pageSize, isActive, searchTerm];
+  List<Object?> get props => [isActive, searchTerm];
 }

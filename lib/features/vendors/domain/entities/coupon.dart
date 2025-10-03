@@ -18,6 +18,8 @@ class Coupon extends Equatable {
     this.cashPrice,
     this.termsAndConditions,
     this.maxRedemptions,
+    this.totalClaimed = 0,
+    this.remainingClaims,
     this.isSpecialOffer = false,
     this.specialOfferStartDate,
     this.specialOfferEndDate,
@@ -40,6 +42,8 @@ class Coupon extends Equatable {
   final double? cashPrice;
   final String? termsAndConditions;
   final int? maxRedemptions;
+  final int totalClaimed;
+  final int? remainingClaims;
   final bool isSpecialOffer;
   final DateTime? specialOfferStartDate;
   final DateTime? specialOfferEndDate;
@@ -97,6 +101,8 @@ class Coupon extends Equatable {
     cashPrice,
     termsAndConditions,
     maxRedemptions,
+    totalClaimed,
+    remainingClaims,
     isSpecialOffer,
     specialOfferStartDate,
     specialOfferEndDate,

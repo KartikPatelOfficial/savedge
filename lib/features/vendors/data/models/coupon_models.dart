@@ -18,6 +18,8 @@ class CouponResponse {
       status: _mapStatusFromInt(json['status'] as int),
       termsAndConditions: json['terms'] as String?,
       maxRedemptions: json['maxRedemptions'] as int?,
+      totalClaimed: json['totalClaimed'] as int? ?? 0,
+      remainingClaims: json['remainingClaims'] as int?,
       createdAt: json['createdAt'] != null
           ? DateTime.parse(json['createdAt'] as String)
           : null,
@@ -57,6 +59,8 @@ class CouponResponse {
     this.cashPrice,
     this.termsAndConditions,
     this.maxRedemptions,
+    this.totalClaimed = 0,
+    this.remainingClaims,
     this.createdAt,
     this.lastModifiedAt,
     this.vendorName,
@@ -87,6 +91,8 @@ class CouponResponse {
   final String status;
   final String? termsAndConditions;
   final int? maxRedemptions;
+  final int totalClaimed;
+  final int? remainingClaims;
   final DateTime? createdAt;
   final DateTime? lastModifiedAt;
   final String? vendorName;
