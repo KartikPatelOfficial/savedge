@@ -514,12 +514,6 @@ class _ProfilePageState extends State<ProfilePage> {
                         onTap: _onHelpTap,
                       ),
                       ProfileMenuItem(
-                        icon: Icons.feedback,
-                        title: 'Send Feedback',
-                        subtitle: 'Tell us how we can improve',
-                        onTap: _onFeedbackTap,
-                      ),
-                      ProfileMenuItem(
                         icon: Icons.info,
                         title: 'About',
                         subtitle: 'App version and information',
@@ -711,11 +705,6 @@ class _ProfilePageState extends State<ProfilePage> {
     Navigator.of(
       context,
     ).push(MaterialPageRoute(builder: (context) => const ContactUsPage()));
-  }
-
-  void _onFeedbackTap() {
-    debugPrint('Send Feedback tapped');
-    // TODO: Navigate to feedback form
   }
 
   void _onAboutTap() {

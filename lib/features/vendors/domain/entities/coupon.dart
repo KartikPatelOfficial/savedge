@@ -54,7 +54,7 @@ class Coupon extends Equatable {
   bool get isValid {
     final now = DateTime.now();
     return status.toLowerCase() == 'active' &&
-        now.isAfter(validFrom) &&
+        (now.isAfter(validFrom) || now.isAtSameMomentAs(validFrom)) &&
         now.isBefore(validTo);
   }
 

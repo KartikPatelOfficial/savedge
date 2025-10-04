@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 /// Professional Follow Us page with clean white design
 class FollowUsPage extends StatelessWidget {
@@ -136,24 +137,17 @@ class FollowUsPage extends StatelessWidget {
     final socialPlatforms = [
       {
         'name': 'Facebook',
-        'icon': Icons.facebook_rounded,
+        'icon': 'assets/icons/social_media_platforms/Facebook.png',
         'description': 'Daily deals and community discussions',
         'color': const Color(0xFF1877F2),
-        'handle': '@savedge.official',
+        'handle': 'https://www.facebook.com/SavEdge01',
       },
       {
         'name': 'Instagram',
-        'icon': Icons.camera_alt_rounded,
+        'icon': 'assets/icons/social_media_platforms/Instagram.png',
         'description': 'Visual stories and behind-the-scenes',
         'color': const Color(0xFFE1306C),
-        'handle': '@savedge',
-      },
-      {
-        'name': 'Twitter',
-        'icon': Icons.alternate_email_rounded,
-        'description': 'Latest updates and customer support',
-        'color': const Color(0xFF1DA1F2),
-        'handle': '@savedge',
+        'handle': 'https://www.instagram.com/savedge_in',
       },
     ];
 
@@ -192,47 +186,49 @@ class FollowUsPage extends StatelessWidget {
   }
 
   Widget _buildSocialCard(Map<String, dynamic> platform) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey[200]!),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 52,
-              height: 52,
-              decoration: BoxDecoration(
-                color: (platform['color'] as Color).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Icon(
-                platform['icon'] as IconData,
-                color: platform['color'] as Color,
-                size: 24,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              platform['name'] as String,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF1A202C),
-              ),
+    return InkWell(
+      onTap: () {
+        launchUrlString(
+          platform['handle'],
+          mode: LaunchMode.externalApplication,
+        );
+      },
+      borderRadius: BorderRadius.circular(16),
+
+      child: Container(
+        decoration: BoxDecoration(
+          color: platform['color'].withOpacity(0.1),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.grey[200]!),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
             ),
           ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: 52,
+                height: 52,
+                child: Image.asset(platform['icon']),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                platform['name'] as String,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF1A202C),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

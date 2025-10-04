@@ -51,6 +51,7 @@ import 'package:savedge/features/favorites/domain/usecases/remove_favorite_useca
 import 'package:savedge/features/favorites/presentation/bloc/favorites_bloc.dart';
 // Points payment imports
 import 'package:savedge/features/points_payment/data/services/points_payment_service.dart';
+import 'package:savedge/features/static_pages/data/services/contact_message_service.dart';
 // Subscription imports
 import 'package:savedge/features/subscription/data/datasources/subscription_plan_remote_data_source.dart';
 import 'package:savedge/features/subscription/data/datasources/subscription_remote_data_source.dart';
@@ -63,7 +64,6 @@ import 'package:savedge/features/subscription/domain/repositories/subscription_r
 import 'package:savedge/features/subscription/domain/usecases/subscription_usecases.dart';
 import 'package:savedge/features/subscription/presentation/bloc/subscription_bloc.dart';
 import 'package:savedge/features/subscription/presentation/bloc/subscription_plan_bloc.dart';
-// Points and Subscription imports
 import 'package:savedge/features/user_profile/data/datasources/points_remote_data_source.dart';
 import 'package:savedge/features/user_profile/data/repositories/points_repository_impl.dart';
 import 'package:savedge/features/user_profile/domain/repositories/points_repository.dart';
@@ -399,6 +399,11 @@ Future<void> configureDependencies() async {
   getIt.registerLazySingleton<CouponService>(() => CouponService());
   getIt.registerLazySingleton<CouponPaymentService>(
     () => CouponPaymentService(),
+  );
+
+  // Contact us services
+  getIt.registerSingleton<ContactMessageService>(
+    ContactMessageService(getIt<Dio>()),
   );
 
   // Enhanced coupon services

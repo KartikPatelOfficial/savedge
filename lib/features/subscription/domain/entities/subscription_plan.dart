@@ -21,7 +21,7 @@ class SubscriptionPlan {
   final bool isActive;
 
   /// Get formatted price display
-  String get priceDisplay => '\$${price.toStringAsFixed(2)}';
+  String get priceDisplay => '₹${price.toStringAsFixed(2)}';
 
   /// Get duration display
   String get durationDisplay {

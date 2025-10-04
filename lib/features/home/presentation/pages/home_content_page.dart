@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:get_it/get_it.dart';
 import 'package:savedge/core/injection/injection.dart';
+import 'package:savedge/features/auth/data/models/user_profile_models.dart';
+import 'package:savedge/features/auth/domain/repositories/auth_repository.dart';
 import 'package:savedge/features/favorites/presentation/pages/favorites_page.dart';
 import 'package:savedge/features/home/presentation/widgets/widgets.dart';
 import 'package:savedge/features/stores/presentation/pages/stores_page.dart';
@@ -29,6 +32,11 @@ class _HomeContentPageState extends State<HomeContentPage> {
   late final SubscriptionPlanBloc _subscriptionBloc;
   final GlobalKey<SubscriptionPlansSectionState> _subscriptionKey = GlobalKey();
 
+  bool _isEmployee = false;
+  String _userName = 'Welcome';
+
+  AuthRepository get _authRepository => GetIt.I<AuthRepository>();
+
   @override
   void initState() {
     super.initState();
@@ -36,6 +44,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
     _vendorsBloc = getIt<VendorsBloc>();
     _subscriptionBloc = getIt<SubscriptionPlanBloc>();
     _loadInitialData();
+    _loadUserProfile();
   }
 
   void _loadInitialData() {
@@ -44,6 +53,29 @@ class _HomeContentPageState extends State<HomeContentPage> {
     // Load Top Offer vendors via the shared VendorsBloc
     _vendorsBloc.add(const LoadTopOfferVendors());
     _subscriptionBloc.add(const LoadSubscriptionPlans());
+  }
+
+  Future<void> _loadUserProfile() async {
+    try {
+      final UserProfileResponse3 profile = await _authRepository
+          .getCurrentUserProfile();
+      if (mounted) {
+        setState(() {
+          _isEmployee = profile.isEmployee;
+          _userName = profile.fullName.isNotEmpty
+              ? profile.fullName
+              : 'Welcome';
+        });
+      }
+    } catch (e) {
+      // Default to non-employee if profile fetch fails
+      if (mounted) {
+        setState(() {
+          _isEmployee = false;
+          _userName = 'Welcome';
+        });
+      }
+    }
   }
 
   @override
@@ -67,8 +99,9 @@ class _HomeContentPageState extends State<HomeContentPage> {
         key: _scaffoldKey,
         backgroundColor: Colors.white,
         drawer: HomeDrawer(
-          userName: 'Welcome',
+          userName: _userName,
           onMenuItemTap: _onDrawerMenuItemTap,
+          isEmployee: _isEmployee,
         ),
         body: _buildMainContent(),
       ),

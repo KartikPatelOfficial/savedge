@@ -1,9 +1,119 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:savedge/core/injection/injection.dart';
+import 'package:savedge/features/static_pages/data/models/contact_message_models.dart';
+import 'package:savedge/features/static_pages/data/services/contact_message_service.dart';
 
 /// Professional Contact Us page with clean white design
-class ContactUsPage extends StatelessWidget {
+class ContactUsPage extends StatefulWidget {
   const ContactUsPage({super.key});
+
+  @override
+  State<ContactUsPage> createState() => _ContactUsPageState();
+}
+
+class _ContactUsPageState extends State<ContactUsPage> {
+  final _formKey = GlobalKey<FormState>();
+  final _fullNameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _subjectController = TextEditingController();
+  final _messageController = TextEditingController();
+  bool _isSubmitting = false;
+
+  @override
+  void dispose() {
+    _fullNameController.dispose();
+    _emailController.dispose();
+    _subjectController.dispose();
+    _messageController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submitForm(BuildContext context) async {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    FocusScope.of(context).unfocus();
+
+    setState(() {
+      _isSubmitting = true;
+    });
+
+    final service = getIt<ContactMessageService>();
+    final request = SubmitContactMessageRequest(
+      fullName: _fullNameController.text.trim(),
+      email: _emailController.text.trim(),
+      subject: _subjectController.text.trim().isEmpty
+          ? null
+          : _subjectController.text.trim(),
+      message: _messageController.text.trim(),
+      source: 'mobile',
+    );
+
+    try {
+      await service.submitContactMessage(request);
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Message sent successfully! Our team will reach out soon.',
+          ),
+          backgroundColor: Color(0xFF059669),
+        ),
+      );
+
+      _formKey.currentState?.reset();
+      _fullNameController.clear();
+      _emailController.clear();
+      _subjectController.clear();
+      _messageController.clear();
+    } on DioException catch (e) {
+      if (!mounted) return;
+      final serverMessage = _extractErrorMessage(e);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            serverMessage ?? 'Unable to send your message. Please try again.',
+          ),
+          backgroundColor: const Color(0xFFE53E3E),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Unexpected error: ${e.toString()}'),
+          backgroundColor: const Color(0xFFE53E3E),
+        ),
+      );
+    } finally {
+      if (!mounted) return;
+      setState(() {
+        _isSubmitting = false;
+      });
+    }
+  }
+
+  String? _extractErrorMessage(DioException exception) {
+    final responseData = exception.response?.data;
+    if (responseData is Map<String, dynamic>) {
+      final message = responseData['message'];
+      if (message is String && message.isNotEmpty) {
+        return message;
+      }
+      final errors = responseData['errors'];
+      if (errors is List && errors.isNotEmpty) {
+        final first = errors.first;
+        if (first is String && first.isNotEmpty) {
+          return first;
+        }
+      }
+    }
+    return exception.message;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -126,7 +236,41 @@ class ContactUsPage extends StatelessWidget {
               color: Colors.grey[300],
               fontSize: 16,
               height: 1.6,
-              fontWeight: FontWeight.w400,
+            ),
+          ),
+          const SizedBox(height: 24),
+          Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            children: [
+              _buildQuickChip(Icons.bolt_outlined, 'Fast Response'),
+              _buildQuickChip(Icons.send_rounded, 'Instant Feedback'),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuickChip(IconData icon, String label) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.12),
+        borderRadius: BorderRadius.circular(50),
+        border: Border.all(color: Colors.white.withOpacity(0.2)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: Colors.white, size: 16),
+          const SizedBox(width: 8),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ],
@@ -136,59 +280,38 @@ class ContactUsPage extends StatelessWidget {
 
   Widget _buildContactMethods() {
     return Container(
-      margin: const EdgeInsets.all(20),
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Contact Methods',
+            'How can we help you?',
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.w700,
               color: Color(0xFF1A202C),
             ),
           ),
-          const SizedBox(height: 20),
-          Row(
+          const SizedBox(height: 16),
+          GridView.count(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            crossAxisCount: 2,
+            crossAxisSpacing: 16,
+            mainAxisSpacing: 16,
+            childAspectRatio: 1.2,
             children: [
-              Expanded(
-                child: _buildContactMethodCard(
-                  'Email Support',
-                  'info@savedge.in',
-                  Icons.email_rounded,
-                  const Color(0xFF059669),
-                ),
+              _buildContactMethodCard(
+                title: 'Email',
+                subtitle: 'info@savedge.com',
+                icon: Icons.email,
+                color: const Color(0xFF6366F1),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildContactMethodCard(
-                  'Phone Support',
-                  '+91 99099 11482',
-                  Icons.phone_rounded,
-                  const Color(0xFF0EA5E9),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: _buildContactMethodCard(
-                  'Live Chat',
-                  'Available 24/7',
-                  Icons.chat_bubble_rounded,
-                  const Color(0xFFEF4444),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildContactMethodCard(
-                  'Help Center',
-                  'FAQ & Guides',
-                  Icons.help_center_rounded,
-                  const Color(0xFFFF9800),
-                ),
+              _buildContactMethodCard(
+                title: 'Phone',
+                subtitle: '+91 99099 11482',
+                icon: Icons.phone,
+                color: const Color(0xFF14B8A6),
               ),
             ],
           ),
@@ -197,12 +320,12 @@ class ContactUsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildContactMethodCard(
-    String title,
-    String subtitle,
-    IconData icon,
-    Color color,
-  ) {
+  Widget _buildContactMethodCard({
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required Color color,
+  }) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -275,47 +398,121 @@ class ContactUsPage extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: Colors.grey),
             ),
-            child: Column(
-              children: [
-                _buildFormField('Full Name', Icons.person_rounded),
-                const SizedBox(height: 16),
-                _buildFormField('Email Address', Icons.email_rounded),
-                const SizedBox(height: 16),
-                _buildFormField('Subject', Icons.subject_rounded),
-                const SizedBox(height: 16),
-                _buildFormField('Message', Icons.message_rounded, maxLines: 4),
-                const SizedBox(height: 24),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      // Handle form submission
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Message sent successfully!'),
-                          backgroundColor: Color(0xFF059669),
-                        ),
-                      );
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  _buildFormField(
+                    label: 'Full Name',
+                    icon: Icons.person_rounded,
+                    controller: _fullNameController,
+                    validator: (value) {
+                      final text = value?.trim() ?? '';
+                      if (text.isEmpty) {
+                        return 'Full name is required';
+                      }
+                      if (text.length < 3) {
+                        return 'Please enter at least 3 characters';
+                      }
+                      return null;
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF1A202C),
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                  ),
+                  const SizedBox(height: 16),
+                  _buildFormField(
+                    label: 'Email Address',
+                    icon: Icons.email_rounded,
+                    controller: _emailController,
+                    keyboardType: TextInputType.emailAddress,
+                    validator: (value) {
+                      final text = value?.trim() ?? '';
+                      if (text.isEmpty) {
+                        return 'Email address is required';
+                      }
+                      final emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
+                      if (!emailRegex.hasMatch(text)) {
+                        return 'Please enter a valid email address';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  _buildFormField(
+                    label: 'Subject',
+                    icon: Icons.subject_rounded,
+                    controller: _subjectController,
+                    validator: (value) {
+                      final text = value?.trim() ?? '';
+                      if (text.length > 200) {
+                        return 'Subject should be under 200 characters';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  _buildFormField(
+                    label: 'Message',
+                    icon: Icons.message_rounded,
+                    controller: _messageController,
+                    maxLines: 4,
+                    textInputAction: TextInputAction.newline,
+                    validator: (value) {
+                      final text = value?.trim() ?? '';
+                      if (text.isEmpty) {
+                        return 'Please share a few details so we can help you better.';
+                      }
+                      if (text.length < 10) {
+                        return 'Message should be at least 10 characters long';
+                      }
+                      if (text.length > 2000) {
+                        return 'Message should be under 2000 characters';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 24),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: _isSubmitting
+                          ? null
+                          : () => _submitForm(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF1A202C),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 2,
                       ),
-                      elevation: 2,
-                    ),
-                    child: const Text(
-                      'Send Message',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
+                      child: _isSubmitting
+                          ? Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: const [
+                                SizedBox(
+                                  width: 18,
+                                  height: 18,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                SizedBox(width: 12),
+                                Text('Sending...'),
+                              ],
+                            )
+                          : const Text(
+                              'Send Message',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ],
@@ -323,7 +520,15 @@ class ContactUsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildFormField(String label, IconData icon, {int maxLines = 1}) {
+  Widget _buildFormField({
+    required String label,
+    required IconData icon,
+    required TextEditingController controller,
+    int maxLines = 1,
+    String? Function(String?)? validator,
+    TextInputType? keyboardType,
+    TextInputAction? textInputAction,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -337,7 +542,14 @@ class ContactUsPage extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         TextFormField(
+          controller: controller,
+          validator: validator,
+          keyboardType: keyboardType,
+          textInputAction:
+              textInputAction ??
+              (maxLines > 1 ? TextInputAction.newline : TextInputAction.next),
           maxLines: maxLines,
+          minLines: maxLines,
           decoration: InputDecoration(
             prefixIcon: Icon(icon, color: Colors.grey[400], size: 20),
             hintText: 'Enter your ${label.toLowerCase()}',

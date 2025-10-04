@@ -22,11 +22,13 @@ class HomeBottomNavBar extends StatelessWidget {
     this.currentIndex = 0,
     this.onTap,
     this.items = const [],
+    this.isEmployee = false,
   });
 
   final int currentIndex;
   final ValueChanged<int>? onTap;
   final List<BottomNavItem> items;
+  final bool isEmployee;
 
   @override
   Widget build(BuildContext context) {
@@ -58,28 +60,39 @@ class HomeBottomNavBar extends StatelessWidget {
   }
 
   List<BottomNavItem> _getDefaultItems() {
-    return const [
-      BottomNavItem(
+    final List<BottomNavItem> navItems = [
+      const BottomNavItem(
         icon: Icons.home_outlined,
         selectedIcon: Icons.home,
         label: 'Home',
       ),
-      BottomNavItem(
-        icon: Icons.card_giftcard_outlined,
-        selectedIcon: Icons.card_giftcard,
-        label: 'Gift',
-      ),
-      BottomNavItem(
+    ];
+
+    // Only show Gift tab for employees
+    if (isEmployee) {
+      navItems.add(
+        const BottomNavItem(
+          icon: Icons.card_giftcard_outlined,
+          selectedIcon: Icons.card_giftcard,
+          label: 'Gift',
+        ),
+      );
+    }
+
+    navItems.addAll([
+      const BottomNavItem(
         icon: Icons.local_offer_outlined,
         selectedIcon: Icons.local_offer,
         label: 'Coupons',
       ),
-      BottomNavItem(
+      const BottomNavItem(
         icon: Icons.person_outline,
         selectedIcon: Icons.person,
         label: 'Profile',
       ),
-    ];
+    ]);
+
+    return navItems;
   }
 }
 

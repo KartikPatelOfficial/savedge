@@ -4,7 +4,7 @@ class CouponResponse {
     return CouponResponse(
       id: json['id'] as int,
       title: json['title'] as String,
-      description: json['description'] as String,
+      description: (json['description'] as String?)?.trim() ?? '',
       discountValue: (json['discountValue'] as num).toDouble(),
       discountType: _mapDiscountTypeFromInt(json['discountType'] as int),
       minimumOrderAmount: (json['minCartValue'] as num?)?.toDouble() ?? 0.0,
@@ -14,7 +14,7 @@ class CouponResponse {
       validFrom: DateTime.parse(json['validFrom'] as String),
       validTo: DateTime.parse(json['validUntil'] as String),
       vendorId: json['vendorProfileId'] as int,
-      vendorUserId: json['vendorUserId'] as String,
+      vendorUserId: (json['vendorUserId'] as String?)?.trim() ?? '',
       status: _mapStatusFromInt(json['status'] as int),
       termsAndConditions: json['terms'] as String?,
       maxRedemptions: json['maxRedemptions'] as int?,
@@ -26,7 +26,7 @@ class CouponResponse {
       lastModifiedAt: json['lastModifiedAt'] != null
           ? DateTime.parse(json['lastModifiedAt'] as String)
           : null,
-      vendorName: json['vendorName'] as String?,
+      vendorName: (json['vendorName'] as String?)?.trim(),
       discountTypeDisplay: json['discountTypeDisplay'] as String?,
       discountDisplay: json['discountDisplay'] as String?,
       statusDisplay: json['statusDisplay'] as String?,
@@ -209,3 +209,4 @@ class GetCouponsResponse {
     };
   }
 }
+

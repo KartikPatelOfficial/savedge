@@ -22,11 +22,13 @@ class HomeDrawer extends StatelessWidget {
     this.userName = 'Jacob David',
     this.userAvatar,
     this.onMenuItemTap,
+    this.isEmployee = false,
   });
 
   final String userName;
   final String? userAvatar;
   final Function(String)? onMenuItemTap;
+  final bool isEmployee;
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +54,7 @@ class HomeDrawer extends StatelessWidget {
   }
 
   List<DrawerMenuItem> _getMenuItems(BuildContext context) {
-    return [
+    final List<DrawerMenuItem> menuItems = [
       DrawerMenuItem(
         icon: Icons.history_outlined,
         title: 'Redemption History',
@@ -68,7 +70,6 @@ class HomeDrawer extends StatelessWidget {
         title: 'About Us',
         onTap: () => _navigateToAboutUs(context),
       ),
-      const DrawerMenuItem(icon: Icons.feedback_outlined, title: 'Feedback'),
       DrawerMenuItem(
         icon: Icons.phone_outlined,
         title: 'Contact Us',
@@ -79,12 +80,20 @@ class HomeDrawer extends StatelessWidget {
         title: 'Follow Us',
         onTap: () => _navigateToFollowUs(context),
       ),
-      DrawerMenuItem(
-        icon: Icons.card_giftcard_outlined,
-        title: 'Brand Vouchers',
-        onTap: () => _navigateToBrandVouchers(context),
-      ),
     ];
+
+    // Only show Brand Vouchers for employees
+    if (isEmployee) {
+      menuItems.add(
+        DrawerMenuItem(
+          icon: Icons.card_giftcard_outlined,
+          title: 'Brand Vouchers',
+          onTap: () => _navigateToBrandVouchers(context),
+        ),
+      );
+    }
+
+    return menuItems;
   }
 
   void _navigateToRedemptionHistory(BuildContext context) {
@@ -158,14 +167,14 @@ class _UserProfileSection extends StatelessWidget {
             ),
             child: userAvatar != null
                 ? ClipRRect(
-              borderRadius: BorderRadius.circular(25),
-              child: Image.network(
-                userAvatar!,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) =>
-                    _DefaultAvatar(),
-              ),
-            )
+                    borderRadius: BorderRadius.circular(25),
+                    child: Image.network(
+                      userAvatar!,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) =>
+                          _DefaultAvatar(),
+                    ),
+                  )
                 : _DefaultAvatar(),
           ),
           const SizedBox(width: 16),
