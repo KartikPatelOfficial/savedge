@@ -46,8 +46,11 @@ class OtpAuthCubit extends Cubit<OtpAuthState> {
           case UserStatus.newUser:
             emit(OtpAuthNewUser(phoneNumber));
             break;
+          case UserStatus.deletedAccountCanRecreate:
+            emit(OtpAuthDeletedAccountCanRecreate(phoneNumber));
+            break;
           case UserStatus.existingIndividualUser:
-            if (verificationResult.user != null && 
+            if (verificationResult.user != null &&
                 verificationResult.accessToken != null) {
               emit(OtpAuthIndividualUserAuthenticated(
                 verificationResult.user!,
@@ -60,7 +63,7 @@ class OtpAuthCubit extends Cubit<OtpAuthState> {
             }
             break;
           case UserStatus.existingEmployee:
-            if (verificationResult.employee != null && 
+            if (verificationResult.employee != null &&
                 verificationResult.accessToken != null) {
               emit(OtpAuthEmployeeAuthenticated(
                 verificationResult.employee!,

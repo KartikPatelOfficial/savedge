@@ -28,6 +28,15 @@ class OtpAuthNewUser extends OtpAuthState {
   List<Object> get props => [phoneNumber];
 }
 
+class OtpAuthDeletedAccountCanRecreate extends OtpAuthState {
+  final String phoneNumber;
+
+  const OtpAuthDeletedAccountCanRecreate(this.phoneNumber);
+
+  @override
+  List<Object> get props => [phoneNumber];
+}
+
 class OtpAuthIndividualUserAuthenticated extends OtpAuthState {
   final UserInfoModel user;
   final String accessToken;

@@ -83,6 +83,8 @@ enum UserStatus {
   existingIndividualUser,
   @JsonValue(2)
   existingEmployee,
+  @JsonValue(3)
+  deletedAccountCanRecreate,
 }
 
 @freezed

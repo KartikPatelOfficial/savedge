@@ -108,6 +108,7 @@ const _$UserStatusEnumMap = {
   UserStatus.newUser: 0,
   UserStatus.existingIndividualUser: 1,
   UserStatus.existingEmployee: 2,
+  UserStatus.deletedAccountCanRecreate: 3,
 };
 
 _UserInfoModel _$UserInfoModelFromJson(Map<String, dynamic> json) =>

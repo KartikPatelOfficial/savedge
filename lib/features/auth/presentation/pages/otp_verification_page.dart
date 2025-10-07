@@ -145,6 +145,40 @@ class _OtpVerificationPageState extends State<OtpVerificationPage>
               transitionDuration: const Duration(milliseconds: 400),
             ),
           );
+        } else if (state is OtpAuthDeletedAccountCanRecreate) {
+          // Show friendly message about deleted account
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                '👋 Welcome back! Your previous account was deleted. Let\'s create a fresh new account for you!',
+              ),
+              backgroundColor: Colors.blue,
+              duration: Duration(seconds: 4),
+            ),
+          );
+          // Navigate to registration screen
+          Future.delayed(const Duration(milliseconds: 500), () {
+            Navigator.pushReplacement(
+              context,
+              PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    IndividualSignupPage(phoneNumber: widget.phoneNumber),
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                  return SlideTransition(
+                    position: animation.drive(
+                      Tween(
+                        begin: const Offset(1.0, 0.0),
+                        end: Offset.zero,
+                      ).chain(CurveTween(curve: Curves.easeInOutCubic)),
+                    ),
+                    child: child,
+                  );
+                },
+                transitionDuration: const Duration(milliseconds: 400),
+              ),
+            );
+          });
         } else if (state is OtpAuthIndividualUserAuthenticated) {
           HapticFeedback.lightImpact();
           _saveAuthTokens(
