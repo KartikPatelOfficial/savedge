@@ -255,4 +255,9 @@ class AuthRepositoryImpl implements AuthRepository {
       ),
     );
   }
+
+  @override
+  Future<void> deleteAccount() async {
+    await _remote.deleteCurrentUserAccount();
+  }
 }

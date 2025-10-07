@@ -30,6 +30,9 @@ abstract class AuthRemoteDataSource {
     @Body() UpdateUserProfileRequest3 request,
   );
 
+  @DELETE('/api/users/me')
+  Future<HttpResponse<void>> deleteCurrentUserAccount();
+
   // Unified authentication flow endpoints
   @POST('/api/users/check-auth-status')
   Future<AuthStatusResponse> checkAuthStatus();

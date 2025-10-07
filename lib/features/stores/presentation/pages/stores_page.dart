@@ -824,13 +824,7 @@ class ModernVendorCard extends StatelessWidget {
                       padding: const EdgeInsets.all(3),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(20),
-                        gradient: const LinearGradient(
-                          colors: [
-                            Color(0xFF6F3FCC),
-                            Color(0xFF9F7AEA),
-                            Color(0xFFEC4899),
-                          ],
-                        ),
+                        border: Border.all(width: 1, color: Colors.blueGrey),
                       ),
                       child: Container(
                         width: 74,

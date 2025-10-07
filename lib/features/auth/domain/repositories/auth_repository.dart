@@ -20,6 +20,7 @@ abstract class AuthRepository {
     String? email,
     String? profileImageUrl,
   });
+  Future<void> deleteAccount();
 
   // Unified authentication flow methods
   Future<AuthStatusResponse> checkAuthStatus();
