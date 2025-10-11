@@ -10,6 +10,7 @@ import 'package:savedge/features/coupons/presentation/bloc/coupon_manager_event.
 import 'package:savedge/features/coupons/presentation/bloc/coupon_manager_state.dart';
 import 'package:savedge/features/coupons/presentation/pages/coupon_confirmation_page.dart';
 import 'package:savedge/features/coupons/presentation/pages/redeemed_coupon_page.dart';
+import 'package:savedge/features/coupons/presentation/widgets/stacked_coupon_card.dart';
 
 class CouponsPage extends StatelessWidget {
   const CouponsPage({super.key});
@@ -87,7 +88,7 @@ class _CleanCouponsViewState extends State<CleanCouponsView>
     );
   }
 
-  void _handleCouponTap(UserCouponDetailModel coupon) {
+  void _handleCouponTap(UserCouponDetailModel coupon) async {
     HapticFeedback.lightImpact();
 
     if (coupon.isExpired) {
@@ -108,7 +109,7 @@ class _CleanCouponsViewState extends State<CleanCouponsView>
     }
 
     // Active coupon → go to confirmation to use
-    Navigator.of(context).push(
+    final result = await Navigator.of(context).push<bool>(
       MaterialPageRoute(
         builder: (_) => CouponConfirmationPage(
           userCoupon: coupon,
@@ -116,6 +117,11 @@ class _CleanCouponsViewState extends State<CleanCouponsView>
         ),
       ),
     );
+
+    // Refresh coupons if the action was successful
+    if (result == true && mounted) {
+      context.read<CouponManagerBloc>().add(const RefreshAllCoupons());
+    }
   }
 
   UserCouponModel _convertToUserCouponModel(UserCouponDetailModel userCoupon) {
@@ -318,6 +324,8 @@ class _CleanCouponsViewState extends State<CleanCouponsView>
       ),
       child: TabBar(
         controller: _tabController,
+        isScrollable: true,
+        tabAlignment: TabAlignment.start,
         indicator: BoxDecoration(
           color: const Color(0xFF6F3FCC),
           borderRadius: BorderRadius.circular(12),
@@ -338,6 +346,7 @@ class _CleanCouponsViewState extends State<CleanCouponsView>
           fontWeight: FontWeight.w500,
           fontSize: 13,
         ),
+        labelPadding: const EdgeInsets.symmetric(horizontal: 8),
         tabs: [
           Tab(child: _buildTabContent('All', totalCount, totalCount > 0)),
           Tab(child: _buildTabContent('Active', activeCount, activeCount > 0)),
@@ -394,12 +403,23 @@ class _CleanCouponsViewState extends State<CleanCouponsView>
       return _buildEmptyState(title);
     }
 
+    // Group coupons by couponId (same offer type)
+    final groupedCoupons = <int, List<UserCouponDetailModel>>{};
+    for (final coupon in coupons) {
+      groupedCoupons.putIfAbsent(coupon.couponId, () => []).add(coupon);
+    }
+
+    // Convert to list of groups and sort by purchase date
+    final couponGroups = groupedCoupons.values.toList()
+      ..sort((a, b) => b.first.acquiredDate.compareTo(a.first.acquiredDate));
+
     return AnimationLimiter(
       child: ListView.builder(
         padding: const EdgeInsets.symmetric(horizontal: 24),
         physics: const BouncingScrollPhysics(),
-        itemCount: coupons.length,
+        itemCount: couponGroups.length,
         itemBuilder: (context, index) {
+          final group = couponGroups[index];
           return AnimationConfiguration.staggeredList(
             position: index,
             duration: const Duration(milliseconds: 500),
@@ -408,7 +428,11 @@ class _CleanCouponsViewState extends State<CleanCouponsView>
               child: FadeInAnimation(
                 child: Padding(
                   padding: const EdgeInsets.only(bottom: 20),
-                  child: _buildModernCouponCard(coupons[index], index),
+                  child: StackedCouponCard(
+                    coupons: group,
+                    onTap: _handleCouponTap,
+                    index: index,
+                  ),
                 ),
               ),
             ),
@@ -583,423 +607,6 @@ class _CleanCouponsViewState extends State<CleanCouponsView>
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildModernCouponCard(UserCouponDetailModel coupon, int index) {
-    // Define colors based on coupon status
-    Color primaryColor;
-    Color backgroundColor;
-    Color textColor;
-    IconData statusIcon;
-
-    if (coupon.isActive) {
-      primaryColor = const Color(0xFF10B981);
-      backgroundColor = const Color(0xFF10B981).withOpacity(0.05);
-      textColor = const Color(0xFF10B981);
-      statusIcon = Icons.check_circle;
-    } else if (coupon.isUsed) {
-      primaryColor = const Color(0xFF6366F1);
-      backgroundColor = const Color(0xFF6366F1).withOpacity(0.05);
-      textColor = const Color(0xFF6366F1);
-      statusIcon = Icons.history;
-    } else {
-      primaryColor = const Color(0xFFEF4444);
-      backgroundColor = const Color(0xFFEF4444).withOpacity(0.05);
-      textColor = const Color(0xFFEF4444);
-      statusIcon = Icons.schedule;
-    }
-
-    // Generate gradient colors based on index for visual variety
-    final gradients = [
-      [const Color(0xFF6F3FCC), const Color(0xFF9F7AEA)],
-      [const Color(0xFF38B2AC), const Color(0xFF4FD1C7)],
-      [const Color(0xFFED8936), const Color(0xFFF56500)],
-      [const Color(0xFF3182CE), const Color(0xFF63B3ED)],
-      [const Color(0xFF38A169), const Color(0xFF68D391)],
-      [const Color(0xFFE53E3E), const Color(0xFFF56565)],
-    ];
-
-    final gradientColors = gradients[index % gradients.length];
-
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () => _handleCouponTap(coupon),
-        borderRadius: BorderRadius.circular(20),
-        child: Opacity(
-          opacity: coupon.isUsed ? 0.6 : 1.0,
-          child: ColorFiltered(
-            colorFilter: coupon.isUsed
-                ? const ColorFilter.matrix(<double>[
-                    0.2126,
-                    0.7152,
-                    0.0722,
-                    0,
-                    0,
-                    0.2126,
-                    0.7152,
-                    0.0722,
-                    0,
-                    0,
-                    0.2126,
-                    0.7152,
-                    0.0722,
-                    0,
-                    0,
-                    0,
-                    0,
-                    0,
-                    1,
-                    0,
-                  ])
-                : const ColorFilter.matrix(<double>[
-                    1,
-                    0,
-                    0,
-                    0,
-                    0,
-                    0,
-                    1,
-                    0,
-                    0,
-                    0,
-                    0,
-                    0,
-                    1,
-                    0,
-                    0,
-                    0,
-                    0,
-                    0,
-                    1,
-                    0,
-                  ]),
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(
-                      coupon.isUsed ? 0.04 : 0.08,
-                    ),
-                    blurRadius: 20,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
-                border: Border.all(
-                  color: coupon.isUsed
-                      ? Colors.grey.withOpacity(0.3)
-                      : gradientColors[0].withAlpha(58),
-                  width: 1,
-                ),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: coupon.isUsed
-                        ? Colors.grey.withOpacity(0.1)
-                        : gradientColors[0].withOpacity(0.05),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Stack(
-                    children: [
-                      // Background gradient accent
-                      Positioned(
-                        right: -20,
-                        top: -20,
-                        child: Container(
-                          width: 120,
-                          height: 120,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            gradient: LinearGradient(
-                              colors: [
-                                gradientColors[0].withOpacity(0.1),
-                                gradientColors[1].withOpacity(0.05),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      // Content
-                      Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Header row with vendor and status
-                            Row(
-                              children: [
-                                // Vendor info
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        coupon.vendorName,
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w700,
-                                          color: coupon.isUsed
-                                              ? const Color(0xFF9CA3AF)
-                                              : const Color(0xFF1A202C),
-                                          decoration: coupon.isUsed
-                                              ? TextDecoration.lineThrough
-                                              : TextDecoration.none,
-                                          decorationColor: const Color(
-                                            0xFF9CA3AF,
-                                          ),
-                                        ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                      const SizedBox(height: 2),
-                                      Text(
-                                        coupon.title,
-                                        style: TextStyle(
-                                          fontSize: 13,
-                                          color: coupon.isUsed
-                                              ? const Color(0xFFD1D5DB)
-                                              : const Color(0xFF6B7280),
-                                          fontWeight: FontWeight.w500,
-                                          decoration: coupon.isUsed
-                                              ? TextDecoration.lineThrough
-                                              : TextDecoration.none,
-                                          decorationColor: const Color(
-                                            0xFFD1D5DB,
-                                          ),
-                                        ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-
-                                // Status indicator
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 6,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: backgroundColor,
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                      color: primaryColor.withOpacity(0.2),
-                                    ),
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(
-                                        statusIcon,
-                                        size: 14,
-                                        color: textColor,
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        coupon.statusDisplay,
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w600,
-                                          color: textColor,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-
-                            const SizedBox(height: 16),
-
-                            // Discount value
-                            Row(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 10,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      colors: coupon.isUsed
-                                          ? [Colors.grey, Colors.grey.shade600]
-                                          : gradientColors,
-                                    ),
-                                    borderRadius: BorderRadius.circular(14),
-                                  ),
-                                  child: Text(
-                                    coupon.discountDisplay,
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w700,
-                                      color: Colors.white,
-                                      decoration: coupon.isUsed
-                                          ? TextDecoration.lineThrough
-                                          : TextDecoration.none,
-                                      decorationColor: Colors.white,
-                                      decorationThickness: 2.0,
-                                    ),
-                                  ),
-                                ),
-
-                                const Spacer(),
-
-                                // Expiry info
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    const Text(
-                                      'Valid until',
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        color: Color(0xFF6B7280),
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      _formatDate(coupon.expiryDate),
-                                      style: const TextStyle(
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w600,
-                                        color: Color(0xFF1A202C),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-
-                            const SizedBox(height: 16),
-
-                            // Bottom row with coupon code and action
-                            Row(
-                              children: [
-                                // Coupon code
-                                Expanded(
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                      vertical: 8,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFF8F9FA),
-                                      borderRadius: BorderRadius.circular(10),
-                                      border: Border.all(
-                                        color: const Color(0xFFE2E8F0),
-                                      ),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        const Icon(
-                                          Icons.qr_code,
-                                          size: 16,
-                                          color: Color(0xFF6B7280),
-                                        ),
-                                        const SizedBox(width: 6),
-                                        Expanded(
-                                          child: Text(
-                                            coupon.uniqueCode,
-                                            style: const TextStyle(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w600,
-                                              color: Color(0xFF4A5568),
-                                              letterSpacing: 0.5,
-                                            ),
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-
-                                const SizedBox(width: 12),
-
-                                // Action button
-                                Container(
-                                  width: 40,
-                                  height: 40,
-                                  decoration: BoxDecoration(
-                                    color: const Color(
-                                      0xFF6F3FCC,
-                                    ).withOpacity(0.1),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Material(
-                                    color: Colors.transparent,
-                                    child: InkWell(
-                                      onTap: () => _handleCouponTap(coupon),
-                                      borderRadius: BorderRadius.circular(12),
-                                      child: const Icon(
-                                        Icons.arrow_forward_ios,
-                                        size: 16,
-                                        color: Color(0xFF6F3FCC),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      // USED Overlay for used coupons
-                      if (coupon.isUsed)
-                        Positioned.fill(
-                          child: Center(
-                            child: Transform.rotate(
-                              angle: -0.3,
-                              child: Container(
-                                width: 140,
-                                height: 60,
-                                decoration: BoxDecoration(
-                                  color: Colors.red.withOpacity(0.9),
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: Colors.red.shade700,
-                                    width: 3,
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.red.withOpacity(0.3),
-                                      blurRadius: 8,
-                                      offset: const Offset(0, 4),
-                                    ),
-                                  ],
-                                ),
-                                child: const Center(
-                                  child: Text(
-                                    'USED',
-                                    style: TextStyle(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.w900,
-                                      color: Colors.white,
-                                      letterSpacing: 2.0,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
         ),
       ),
     );

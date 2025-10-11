@@ -820,6 +820,10 @@ class _ProfilePageState extends State<ProfilePage> {
       context: context,
       builder: (context) => _DeleteAccountDialog(
         onConfirm: () async {
+          // Capture navigator and messenger before async operations
+          final navigator = Navigator.of(context, rootNavigator: true);
+          final messenger = ScaffoldMessenger.of(context);
+
           try {
             // Call the API to delete the account
             await _authRepository.deleteAccount();
@@ -835,19 +839,11 @@ class _ProfilePageState extends State<ProfilePage> {
 
             // Navigate back to authentication flow
             if (mounted) {
-              Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
-
-              // Show success message
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Your account has been deleted successfully'),
-                  backgroundColor: Colors.green,
-                ),
-              );
+              navigator.pushNamedAndRemoveUntil('/', (route) => false);
             }
           } catch (e) {
             if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
+              messenger.showSnackBar(
                 SnackBar(
                   content: Text('Error deleting account: $e'),
                   backgroundColor: const Color(0xFFE53E3E),
