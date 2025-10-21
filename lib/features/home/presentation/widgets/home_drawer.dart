@@ -22,13 +22,11 @@ class HomeDrawer extends StatelessWidget {
     this.userName = 'Jacob David',
     this.userAvatar,
     this.onMenuItemTap,
-    this.isEmployee = false,
   });
 
   final String userName;
   final String? userAvatar;
   final Function(String)? onMenuItemTap;
-  final bool isEmployee;
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +52,7 @@ class HomeDrawer extends StatelessWidget {
   }
 
   List<DrawerMenuItem> _getMenuItems(BuildContext context) {
-    final List<DrawerMenuItem> menuItems = [
+    return [
       DrawerMenuItem(
         icon: Icons.history_outlined,
         title: 'Redemption History',
@@ -64,6 +62,11 @@ class HomeDrawer extends StatelessWidget {
         icon: Icons.store_outlined,
         title: 'Stores',
         onTap: () => _navigateToStores(context),
+      ),
+      DrawerMenuItem(
+        icon: Icons.card_giftcard_outlined,
+        title: 'Brand Vouchers',
+        onTap: () => _navigateToBrandVouchers(context),
       ),
       DrawerMenuItem(
         icon: Icons.info_outline,
@@ -81,19 +84,6 @@ class HomeDrawer extends StatelessWidget {
         onTap: () => _navigateToFollowUs(context),
       ),
     ];
-
-    // Only show Brand Vouchers for employees
-    if (isEmployee) {
-      menuItems.add(
-        DrawerMenuItem(
-          icon: Icons.card_giftcard_outlined,
-          title: 'Brand Vouchers',
-          onTap: () => _navigateToBrandVouchers(context),
-        ),
-      );
-    }
-
-    return menuItems;
   }
 
   void _navigateToRedemptionHistory(BuildContext context) {

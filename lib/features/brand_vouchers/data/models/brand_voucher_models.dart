@@ -56,6 +56,7 @@ abstract class CreateVoucherOrderRequest with _$CreateVoucherOrderRequest {
     required String userId,
     required int brandVoucherId,
     required double voucherAmount,
+    @Default(VoucherPaymentMethod.points) VoucherPaymentMethod paymentMethod,
   }) = _CreateVoucherOrderRequest;
 
   factory CreateVoucherOrderRequest.fromJson(Map<String, dynamic> json) =>
@@ -107,6 +108,13 @@ enum VoucherOrderStatus {
   cancelled,
 }
 
+enum VoucherPaymentMethod {
+  @JsonValue(1)
+  points,
+  @JsonValue(2)
+  razorpay,
+}
+
 extension VoucherOrderStatusExtension on VoucherOrderStatus {
   String get displayName {
     switch (this) {
@@ -137,4 +145,73 @@ extension VoucherOrderStatusExtension on VoucherOrderStatus {
         return 'Your order was cancelled';
     }
   }
+}
+
+extension VoucherPaymentMethodExtension on VoucherPaymentMethod {
+  String get displayName {
+    switch (this) {
+      case VoucherPaymentMethod.points:
+        return 'Points';
+      case VoucherPaymentMethod.razorpay:
+        return 'Razorpay';
+    }
+  }
+}
+
+// Razorpay payment models
+@freezed
+abstract class CreateVoucherPaymentOrderRequest with _$CreateVoucherPaymentOrderRequest {
+  const factory CreateVoucherPaymentOrderRequest({
+    required int brandVoucherId,
+    required double voucherAmount,
+  }) = _CreateVoucherPaymentOrderRequest;
+
+  factory CreateVoucherPaymentOrderRequest.fromJson(Map<String, dynamic> json) =>
+      _$CreateVoucherPaymentOrderRequestFromJson(json);
+}
+
+@freezed
+abstract class CreateVoucherPaymentOrderResponse with _$CreateVoucherPaymentOrderResponse {
+  const factory CreateVoucherPaymentOrderResponse({
+    required String orderId,
+    required int amount,
+    required String currency,
+    required String receipt,
+    required int voucherOrderId,
+    required String brandName,
+    required double voucherAmount,
+    required double processingFee,
+    required double totalAmount,
+  }) = _CreateVoucherPaymentOrderResponse;
+
+  factory CreateVoucherPaymentOrderResponse.fromJson(Map<String, dynamic> json) =>
+      _$CreateVoucherPaymentOrderResponseFromJson(json);
+}
+
+@freezed
+abstract class VerifyVoucherPaymentRequest with _$VerifyVoucherPaymentRequest {
+  const factory VerifyVoucherPaymentRequest({
+    required int voucherOrderId,
+    required String razorpayOrderId,
+    required String razorpayPaymentId,
+    required String razorpaySignature,
+  }) = _VerifyVoucherPaymentRequest;
+
+  factory VerifyVoucherPaymentRequest.fromJson(Map<String, dynamic> json) =>
+      _$VerifyVoucherPaymentRequestFromJson(json);
+}
+
+@freezed
+abstract class VerifyVoucherPaymentResponse with _$VerifyVoucherPaymentResponse {
+  const factory VerifyVoucherPaymentResponse({
+    required bool success,
+    required String message,
+    required int voucherOrderId,
+    required String brandName,
+    required double voucherAmount,
+    required String status,
+  }) = _VerifyVoucherPaymentResponse;
+
+  factory VerifyVoucherPaymentResponse.fromJson(Map<String, dynamic> json) =>
+      _$VerifyVoucherPaymentResponseFromJson(json);
 }

@@ -622,7 +622,7 @@ as DateTime,
 /// @nodoc
 mixin _$CreateVoucherOrderRequest {
 
- String get userId; int get brandVoucherId; double get voucherAmount;
+ String get userId; int get brandVoucherId; double get voucherAmount; VoucherPaymentMethod get paymentMethod;
 /// Create a copy of CreateVoucherOrderRequest
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -635,16 +635,16 @@ $CreateVoucherOrderRequestCopyWith<CreateVoucherOrderRequest> get copyWith => _$
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CreateVoucherOrderRequest&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.brandVoucherId, brandVoucherId) || other.brandVoucherId == brandVoucherId)&&(identical(other.voucherAmount, voucherAmount) || other.voucherAmount == voucherAmount));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CreateVoucherOrderRequest&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.brandVoucherId, brandVoucherId) || other.brandVoucherId == brandVoucherId)&&(identical(other.voucherAmount, voucherAmount) || other.voucherAmount == voucherAmount)&&(identical(other.paymentMethod, paymentMethod) || other.paymentMethod == paymentMethod));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,userId,brandVoucherId,voucherAmount);
+int get hashCode => Object.hash(runtimeType,userId,brandVoucherId,voucherAmount,paymentMethod);
 
 @override
 String toString() {
-  return 'CreateVoucherOrderRequest(userId: $userId, brandVoucherId: $brandVoucherId, voucherAmount: $voucherAmount)';
+  return 'CreateVoucherOrderRequest(userId: $userId, brandVoucherId: $brandVoucherId, voucherAmount: $voucherAmount, paymentMethod: $paymentMethod)';
 }
 
 
@@ -655,7 +655,7 @@ abstract mixin class $CreateVoucherOrderRequestCopyWith<$Res>  {
   factory $CreateVoucherOrderRequestCopyWith(CreateVoucherOrderRequest value, $Res Function(CreateVoucherOrderRequest) _then) = _$CreateVoucherOrderRequestCopyWithImpl;
 @useResult
 $Res call({
- String userId, int brandVoucherId, double voucherAmount
+ String userId, int brandVoucherId, double voucherAmount, VoucherPaymentMethod paymentMethod
 });
 
 
@@ -672,12 +672,13 @@ class _$CreateVoucherOrderRequestCopyWithImpl<$Res>
 
 /// Create a copy of CreateVoucherOrderRequest
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? userId = null,Object? brandVoucherId = null,Object? voucherAmount = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? userId = null,Object? brandVoucherId = null,Object? voucherAmount = null,Object? paymentMethod = null,}) {
   return _then(_self.copyWith(
 userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
 as String,brandVoucherId: null == brandVoucherId ? _self.brandVoucherId : brandVoucherId // ignore: cast_nullable_to_non_nullable
 as int,voucherAmount: null == voucherAmount ? _self.voucherAmount : voucherAmount // ignore: cast_nullable_to_non_nullable
-as double,
+as double,paymentMethod: null == paymentMethod ? _self.paymentMethod : paymentMethod // ignore: cast_nullable_to_non_nullable
+as VoucherPaymentMethod,
   ));
 }
 
@@ -762,10 +763,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String userId,  int brandVoucherId,  double voucherAmount)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String userId,  int brandVoucherId,  double voucherAmount,  VoucherPaymentMethod paymentMethod)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _CreateVoucherOrderRequest() when $default != null:
-return $default(_that.userId,_that.brandVoucherId,_that.voucherAmount);case _:
+return $default(_that.userId,_that.brandVoucherId,_that.voucherAmount,_that.paymentMethod);case _:
   return orElse();
 
 }
@@ -783,10 +784,10 @@ return $default(_that.userId,_that.brandVoucherId,_that.voucherAmount);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String userId,  int brandVoucherId,  double voucherAmount)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String userId,  int brandVoucherId,  double voucherAmount,  VoucherPaymentMethod paymentMethod)  $default,) {final _that = this;
 switch (_that) {
 case _CreateVoucherOrderRequest():
-return $default(_that.userId,_that.brandVoucherId,_that.voucherAmount);case _:
+return $default(_that.userId,_that.brandVoucherId,_that.voucherAmount,_that.paymentMethod);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -803,10 +804,10 @@ return $default(_that.userId,_that.brandVoucherId,_that.voucherAmount);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String userId,  int brandVoucherId,  double voucherAmount)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String userId,  int brandVoucherId,  double voucherAmount,  VoucherPaymentMethod paymentMethod)?  $default,) {final _that = this;
 switch (_that) {
 case _CreateVoucherOrderRequest() when $default != null:
-return $default(_that.userId,_that.brandVoucherId,_that.voucherAmount);case _:
+return $default(_that.userId,_that.brandVoucherId,_that.voucherAmount,_that.paymentMethod);case _:
   return null;
 
 }
@@ -818,12 +819,13 @@ return $default(_that.userId,_that.brandVoucherId,_that.voucherAmount);case _:
 @JsonSerializable()
 
 class _CreateVoucherOrderRequest implements CreateVoucherOrderRequest {
-  const _CreateVoucherOrderRequest({required this.userId, required this.brandVoucherId, required this.voucherAmount});
+  const _CreateVoucherOrderRequest({required this.userId, required this.brandVoucherId, required this.voucherAmount, this.paymentMethod = VoucherPaymentMethod.points});
   factory _CreateVoucherOrderRequest.fromJson(Map<String, dynamic> json) => _$CreateVoucherOrderRequestFromJson(json);
 
 @override final  String userId;
 @override final  int brandVoucherId;
 @override final  double voucherAmount;
+@override@JsonKey() final  VoucherPaymentMethod paymentMethod;
 
 /// Create a copy of CreateVoucherOrderRequest
 /// with the given fields replaced by the non-null parameter values.
@@ -838,16 +840,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CreateVoucherOrderRequest&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.brandVoucherId, brandVoucherId) || other.brandVoucherId == brandVoucherId)&&(identical(other.voucherAmount, voucherAmount) || other.voucherAmount == voucherAmount));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CreateVoucherOrderRequest&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.brandVoucherId, brandVoucherId) || other.brandVoucherId == brandVoucherId)&&(identical(other.voucherAmount, voucherAmount) || other.voucherAmount == voucherAmount)&&(identical(other.paymentMethod, paymentMethod) || other.paymentMethod == paymentMethod));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,userId,brandVoucherId,voucherAmount);
+int get hashCode => Object.hash(runtimeType,userId,brandVoucherId,voucherAmount,paymentMethod);
 
 @override
 String toString() {
-  return 'CreateVoucherOrderRequest(userId: $userId, brandVoucherId: $brandVoucherId, voucherAmount: $voucherAmount)';
+  return 'CreateVoucherOrderRequest(userId: $userId, brandVoucherId: $brandVoucherId, voucherAmount: $voucherAmount, paymentMethod: $paymentMethod)';
 }
 
 
@@ -858,7 +860,7 @@ abstract mixin class _$CreateVoucherOrderRequestCopyWith<$Res> implements $Creat
   factory _$CreateVoucherOrderRequestCopyWith(_CreateVoucherOrderRequest value, $Res Function(_CreateVoucherOrderRequest) _then) = __$CreateVoucherOrderRequestCopyWithImpl;
 @override @useResult
 $Res call({
- String userId, int brandVoucherId, double voucherAmount
+ String userId, int brandVoucherId, double voucherAmount, VoucherPaymentMethod paymentMethod
 });
 
 
@@ -875,12 +877,13 @@ class __$CreateVoucherOrderRequestCopyWithImpl<$Res>
 
 /// Create a copy of CreateVoucherOrderRequest
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? userId = null,Object? brandVoucherId = null,Object? voucherAmount = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? userId = null,Object? brandVoucherId = null,Object? voucherAmount = null,Object? paymentMethod = null,}) {
   return _then(_CreateVoucherOrderRequest(
 userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
 as String,brandVoucherId: null == brandVoucherId ? _self.brandVoucherId : brandVoucherId // ignore: cast_nullable_to_non_nullable
 as int,voucherAmount: null == voucherAmount ? _self.voucherAmount : voucherAmount // ignore: cast_nullable_to_non_nullable
-as double,
+as double,paymentMethod: null == paymentMethod ? _self.paymentMethod : paymentMethod // ignore: cast_nullable_to_non_nullable
+as VoucherPaymentMethod,
   ));
 }
 
@@ -1449,6 +1452,1109 @@ as int,totalCount: null == totalCount ? _self.totalCount : totalCount // ignore:
 as int,hasPreviousPage: null == hasPreviousPage ? _self.hasPreviousPage : hasPreviousPage // ignore: cast_nullable_to_non_nullable
 as bool,hasNextPage: null == hasNextPage ? _self.hasNextPage : hasNextPage // ignore: cast_nullable_to_non_nullable
 as bool,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$CreateVoucherPaymentOrderRequest {
+
+ int get brandVoucherId; double get voucherAmount;
+/// Create a copy of CreateVoucherPaymentOrderRequest
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$CreateVoucherPaymentOrderRequestCopyWith<CreateVoucherPaymentOrderRequest> get copyWith => _$CreateVoucherPaymentOrderRequestCopyWithImpl<CreateVoucherPaymentOrderRequest>(this as CreateVoucherPaymentOrderRequest, _$identity);
+
+  /// Serializes this CreateVoucherPaymentOrderRequest to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CreateVoucherPaymentOrderRequest&&(identical(other.brandVoucherId, brandVoucherId) || other.brandVoucherId == brandVoucherId)&&(identical(other.voucherAmount, voucherAmount) || other.voucherAmount == voucherAmount));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,brandVoucherId,voucherAmount);
+
+@override
+String toString() {
+  return 'CreateVoucherPaymentOrderRequest(brandVoucherId: $brandVoucherId, voucherAmount: $voucherAmount)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $CreateVoucherPaymentOrderRequestCopyWith<$Res>  {
+  factory $CreateVoucherPaymentOrderRequestCopyWith(CreateVoucherPaymentOrderRequest value, $Res Function(CreateVoucherPaymentOrderRequest) _then) = _$CreateVoucherPaymentOrderRequestCopyWithImpl;
+@useResult
+$Res call({
+ int brandVoucherId, double voucherAmount
+});
+
+
+
+
+}
+/// @nodoc
+class _$CreateVoucherPaymentOrderRequestCopyWithImpl<$Res>
+    implements $CreateVoucherPaymentOrderRequestCopyWith<$Res> {
+  _$CreateVoucherPaymentOrderRequestCopyWithImpl(this._self, this._then);
+
+  final CreateVoucherPaymentOrderRequest _self;
+  final $Res Function(CreateVoucherPaymentOrderRequest) _then;
+
+/// Create a copy of CreateVoucherPaymentOrderRequest
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? brandVoucherId = null,Object? voucherAmount = null,}) {
+  return _then(_self.copyWith(
+brandVoucherId: null == brandVoucherId ? _self.brandVoucherId : brandVoucherId // ignore: cast_nullable_to_non_nullable
+as int,voucherAmount: null == voucherAmount ? _self.voucherAmount : voucherAmount // ignore: cast_nullable_to_non_nullable
+as double,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [CreateVoucherPaymentOrderRequest].
+extension CreateVoucherPaymentOrderRequestPatterns on CreateVoucherPaymentOrderRequest {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _CreateVoucherPaymentOrderRequest value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _CreateVoucherPaymentOrderRequest() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _CreateVoucherPaymentOrderRequest value)  $default,){
+final _that = this;
+switch (_that) {
+case _CreateVoucherPaymentOrderRequest():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _CreateVoucherPaymentOrderRequest value)?  $default,){
+final _that = this;
+switch (_that) {
+case _CreateVoucherPaymentOrderRequest() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int brandVoucherId,  double voucherAmount)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _CreateVoucherPaymentOrderRequest() when $default != null:
+return $default(_that.brandVoucherId,_that.voucherAmount);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int brandVoucherId,  double voucherAmount)  $default,) {final _that = this;
+switch (_that) {
+case _CreateVoucherPaymentOrderRequest():
+return $default(_that.brandVoucherId,_that.voucherAmount);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int brandVoucherId,  double voucherAmount)?  $default,) {final _that = this;
+switch (_that) {
+case _CreateVoucherPaymentOrderRequest() when $default != null:
+return $default(_that.brandVoucherId,_that.voucherAmount);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _CreateVoucherPaymentOrderRequest implements CreateVoucherPaymentOrderRequest {
+  const _CreateVoucherPaymentOrderRequest({required this.brandVoucherId, required this.voucherAmount});
+  factory _CreateVoucherPaymentOrderRequest.fromJson(Map<String, dynamic> json) => _$CreateVoucherPaymentOrderRequestFromJson(json);
+
+@override final  int brandVoucherId;
+@override final  double voucherAmount;
+
+/// Create a copy of CreateVoucherPaymentOrderRequest
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$CreateVoucherPaymentOrderRequestCopyWith<_CreateVoucherPaymentOrderRequest> get copyWith => __$CreateVoucherPaymentOrderRequestCopyWithImpl<_CreateVoucherPaymentOrderRequest>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$CreateVoucherPaymentOrderRequestToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CreateVoucherPaymentOrderRequest&&(identical(other.brandVoucherId, brandVoucherId) || other.brandVoucherId == brandVoucherId)&&(identical(other.voucherAmount, voucherAmount) || other.voucherAmount == voucherAmount));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,brandVoucherId,voucherAmount);
+
+@override
+String toString() {
+  return 'CreateVoucherPaymentOrderRequest(brandVoucherId: $brandVoucherId, voucherAmount: $voucherAmount)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$CreateVoucherPaymentOrderRequestCopyWith<$Res> implements $CreateVoucherPaymentOrderRequestCopyWith<$Res> {
+  factory _$CreateVoucherPaymentOrderRequestCopyWith(_CreateVoucherPaymentOrderRequest value, $Res Function(_CreateVoucherPaymentOrderRequest) _then) = __$CreateVoucherPaymentOrderRequestCopyWithImpl;
+@override @useResult
+$Res call({
+ int brandVoucherId, double voucherAmount
+});
+
+
+
+
+}
+/// @nodoc
+class __$CreateVoucherPaymentOrderRequestCopyWithImpl<$Res>
+    implements _$CreateVoucherPaymentOrderRequestCopyWith<$Res> {
+  __$CreateVoucherPaymentOrderRequestCopyWithImpl(this._self, this._then);
+
+  final _CreateVoucherPaymentOrderRequest _self;
+  final $Res Function(_CreateVoucherPaymentOrderRequest) _then;
+
+/// Create a copy of CreateVoucherPaymentOrderRequest
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? brandVoucherId = null,Object? voucherAmount = null,}) {
+  return _then(_CreateVoucherPaymentOrderRequest(
+brandVoucherId: null == brandVoucherId ? _self.brandVoucherId : brandVoucherId // ignore: cast_nullable_to_non_nullable
+as int,voucherAmount: null == voucherAmount ? _self.voucherAmount : voucherAmount // ignore: cast_nullable_to_non_nullable
+as double,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$CreateVoucherPaymentOrderResponse {
+
+ String get orderId; int get amount; String get currency; String get receipt; int get voucherOrderId; String get brandName; double get voucherAmount; double get processingFee; double get totalAmount;
+/// Create a copy of CreateVoucherPaymentOrderResponse
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$CreateVoucherPaymentOrderResponseCopyWith<CreateVoucherPaymentOrderResponse> get copyWith => _$CreateVoucherPaymentOrderResponseCopyWithImpl<CreateVoucherPaymentOrderResponse>(this as CreateVoucherPaymentOrderResponse, _$identity);
+
+  /// Serializes this CreateVoucherPaymentOrderResponse to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CreateVoucherPaymentOrderResponse&&(identical(other.orderId, orderId) || other.orderId == orderId)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.currency, currency) || other.currency == currency)&&(identical(other.receipt, receipt) || other.receipt == receipt)&&(identical(other.voucherOrderId, voucherOrderId) || other.voucherOrderId == voucherOrderId)&&(identical(other.brandName, brandName) || other.brandName == brandName)&&(identical(other.voucherAmount, voucherAmount) || other.voucherAmount == voucherAmount)&&(identical(other.processingFee, processingFee) || other.processingFee == processingFee)&&(identical(other.totalAmount, totalAmount) || other.totalAmount == totalAmount));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,orderId,amount,currency,receipt,voucherOrderId,brandName,voucherAmount,processingFee,totalAmount);
+
+@override
+String toString() {
+  return 'CreateVoucherPaymentOrderResponse(orderId: $orderId, amount: $amount, currency: $currency, receipt: $receipt, voucherOrderId: $voucherOrderId, brandName: $brandName, voucherAmount: $voucherAmount, processingFee: $processingFee, totalAmount: $totalAmount)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $CreateVoucherPaymentOrderResponseCopyWith<$Res>  {
+  factory $CreateVoucherPaymentOrderResponseCopyWith(CreateVoucherPaymentOrderResponse value, $Res Function(CreateVoucherPaymentOrderResponse) _then) = _$CreateVoucherPaymentOrderResponseCopyWithImpl;
+@useResult
+$Res call({
+ String orderId, int amount, String currency, String receipt, int voucherOrderId, String brandName, double voucherAmount, double processingFee, double totalAmount
+});
+
+
+
+
+}
+/// @nodoc
+class _$CreateVoucherPaymentOrderResponseCopyWithImpl<$Res>
+    implements $CreateVoucherPaymentOrderResponseCopyWith<$Res> {
+  _$CreateVoucherPaymentOrderResponseCopyWithImpl(this._self, this._then);
+
+  final CreateVoucherPaymentOrderResponse _self;
+  final $Res Function(CreateVoucherPaymentOrderResponse) _then;
+
+/// Create a copy of CreateVoucherPaymentOrderResponse
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? orderId = null,Object? amount = null,Object? currency = null,Object? receipt = null,Object? voucherOrderId = null,Object? brandName = null,Object? voucherAmount = null,Object? processingFee = null,Object? totalAmount = null,}) {
+  return _then(_self.copyWith(
+orderId: null == orderId ? _self.orderId : orderId // ignore: cast_nullable_to_non_nullable
+as String,amount: null == amount ? _self.amount : amount // ignore: cast_nullable_to_non_nullable
+as int,currency: null == currency ? _self.currency : currency // ignore: cast_nullable_to_non_nullable
+as String,receipt: null == receipt ? _self.receipt : receipt // ignore: cast_nullable_to_non_nullable
+as String,voucherOrderId: null == voucherOrderId ? _self.voucherOrderId : voucherOrderId // ignore: cast_nullable_to_non_nullable
+as int,brandName: null == brandName ? _self.brandName : brandName // ignore: cast_nullable_to_non_nullable
+as String,voucherAmount: null == voucherAmount ? _self.voucherAmount : voucherAmount // ignore: cast_nullable_to_non_nullable
+as double,processingFee: null == processingFee ? _self.processingFee : processingFee // ignore: cast_nullable_to_non_nullable
+as double,totalAmount: null == totalAmount ? _self.totalAmount : totalAmount // ignore: cast_nullable_to_non_nullable
+as double,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [CreateVoucherPaymentOrderResponse].
+extension CreateVoucherPaymentOrderResponsePatterns on CreateVoucherPaymentOrderResponse {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _CreateVoucherPaymentOrderResponse value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _CreateVoucherPaymentOrderResponse() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _CreateVoucherPaymentOrderResponse value)  $default,){
+final _that = this;
+switch (_that) {
+case _CreateVoucherPaymentOrderResponse():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _CreateVoucherPaymentOrderResponse value)?  $default,){
+final _that = this;
+switch (_that) {
+case _CreateVoucherPaymentOrderResponse() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String orderId,  int amount,  String currency,  String receipt,  int voucherOrderId,  String brandName,  double voucherAmount,  double processingFee,  double totalAmount)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _CreateVoucherPaymentOrderResponse() when $default != null:
+return $default(_that.orderId,_that.amount,_that.currency,_that.receipt,_that.voucherOrderId,_that.brandName,_that.voucherAmount,_that.processingFee,_that.totalAmount);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String orderId,  int amount,  String currency,  String receipt,  int voucherOrderId,  String brandName,  double voucherAmount,  double processingFee,  double totalAmount)  $default,) {final _that = this;
+switch (_that) {
+case _CreateVoucherPaymentOrderResponse():
+return $default(_that.orderId,_that.amount,_that.currency,_that.receipt,_that.voucherOrderId,_that.brandName,_that.voucherAmount,_that.processingFee,_that.totalAmount);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String orderId,  int amount,  String currency,  String receipt,  int voucherOrderId,  String brandName,  double voucherAmount,  double processingFee,  double totalAmount)?  $default,) {final _that = this;
+switch (_that) {
+case _CreateVoucherPaymentOrderResponse() when $default != null:
+return $default(_that.orderId,_that.amount,_that.currency,_that.receipt,_that.voucherOrderId,_that.brandName,_that.voucherAmount,_that.processingFee,_that.totalAmount);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _CreateVoucherPaymentOrderResponse implements CreateVoucherPaymentOrderResponse {
+  const _CreateVoucherPaymentOrderResponse({required this.orderId, required this.amount, required this.currency, required this.receipt, required this.voucherOrderId, required this.brandName, required this.voucherAmount, required this.processingFee, required this.totalAmount});
+  factory _CreateVoucherPaymentOrderResponse.fromJson(Map<String, dynamic> json) => _$CreateVoucherPaymentOrderResponseFromJson(json);
+
+@override final  String orderId;
+@override final  int amount;
+@override final  String currency;
+@override final  String receipt;
+@override final  int voucherOrderId;
+@override final  String brandName;
+@override final  double voucherAmount;
+@override final  double processingFee;
+@override final  double totalAmount;
+
+/// Create a copy of CreateVoucherPaymentOrderResponse
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$CreateVoucherPaymentOrderResponseCopyWith<_CreateVoucherPaymentOrderResponse> get copyWith => __$CreateVoucherPaymentOrderResponseCopyWithImpl<_CreateVoucherPaymentOrderResponse>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$CreateVoucherPaymentOrderResponseToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CreateVoucherPaymentOrderResponse&&(identical(other.orderId, orderId) || other.orderId == orderId)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.currency, currency) || other.currency == currency)&&(identical(other.receipt, receipt) || other.receipt == receipt)&&(identical(other.voucherOrderId, voucherOrderId) || other.voucherOrderId == voucherOrderId)&&(identical(other.brandName, brandName) || other.brandName == brandName)&&(identical(other.voucherAmount, voucherAmount) || other.voucherAmount == voucherAmount)&&(identical(other.processingFee, processingFee) || other.processingFee == processingFee)&&(identical(other.totalAmount, totalAmount) || other.totalAmount == totalAmount));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,orderId,amount,currency,receipt,voucherOrderId,brandName,voucherAmount,processingFee,totalAmount);
+
+@override
+String toString() {
+  return 'CreateVoucherPaymentOrderResponse(orderId: $orderId, amount: $amount, currency: $currency, receipt: $receipt, voucherOrderId: $voucherOrderId, brandName: $brandName, voucherAmount: $voucherAmount, processingFee: $processingFee, totalAmount: $totalAmount)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$CreateVoucherPaymentOrderResponseCopyWith<$Res> implements $CreateVoucherPaymentOrderResponseCopyWith<$Res> {
+  factory _$CreateVoucherPaymentOrderResponseCopyWith(_CreateVoucherPaymentOrderResponse value, $Res Function(_CreateVoucherPaymentOrderResponse) _then) = __$CreateVoucherPaymentOrderResponseCopyWithImpl;
+@override @useResult
+$Res call({
+ String orderId, int amount, String currency, String receipt, int voucherOrderId, String brandName, double voucherAmount, double processingFee, double totalAmount
+});
+
+
+
+
+}
+/// @nodoc
+class __$CreateVoucherPaymentOrderResponseCopyWithImpl<$Res>
+    implements _$CreateVoucherPaymentOrderResponseCopyWith<$Res> {
+  __$CreateVoucherPaymentOrderResponseCopyWithImpl(this._self, this._then);
+
+  final _CreateVoucherPaymentOrderResponse _self;
+  final $Res Function(_CreateVoucherPaymentOrderResponse) _then;
+
+/// Create a copy of CreateVoucherPaymentOrderResponse
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? orderId = null,Object? amount = null,Object? currency = null,Object? receipt = null,Object? voucherOrderId = null,Object? brandName = null,Object? voucherAmount = null,Object? processingFee = null,Object? totalAmount = null,}) {
+  return _then(_CreateVoucherPaymentOrderResponse(
+orderId: null == orderId ? _self.orderId : orderId // ignore: cast_nullable_to_non_nullable
+as String,amount: null == amount ? _self.amount : amount // ignore: cast_nullable_to_non_nullable
+as int,currency: null == currency ? _self.currency : currency // ignore: cast_nullable_to_non_nullable
+as String,receipt: null == receipt ? _self.receipt : receipt // ignore: cast_nullable_to_non_nullable
+as String,voucherOrderId: null == voucherOrderId ? _self.voucherOrderId : voucherOrderId // ignore: cast_nullable_to_non_nullable
+as int,brandName: null == brandName ? _self.brandName : brandName // ignore: cast_nullable_to_non_nullable
+as String,voucherAmount: null == voucherAmount ? _self.voucherAmount : voucherAmount // ignore: cast_nullable_to_non_nullable
+as double,processingFee: null == processingFee ? _self.processingFee : processingFee // ignore: cast_nullable_to_non_nullable
+as double,totalAmount: null == totalAmount ? _self.totalAmount : totalAmount // ignore: cast_nullable_to_non_nullable
+as double,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$VerifyVoucherPaymentRequest {
+
+ int get voucherOrderId; String get razorpayOrderId; String get razorpayPaymentId; String get razorpaySignature;
+/// Create a copy of VerifyVoucherPaymentRequest
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$VerifyVoucherPaymentRequestCopyWith<VerifyVoucherPaymentRequest> get copyWith => _$VerifyVoucherPaymentRequestCopyWithImpl<VerifyVoucherPaymentRequest>(this as VerifyVoucherPaymentRequest, _$identity);
+
+  /// Serializes this VerifyVoucherPaymentRequest to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is VerifyVoucherPaymentRequest&&(identical(other.voucherOrderId, voucherOrderId) || other.voucherOrderId == voucherOrderId)&&(identical(other.razorpayOrderId, razorpayOrderId) || other.razorpayOrderId == razorpayOrderId)&&(identical(other.razorpayPaymentId, razorpayPaymentId) || other.razorpayPaymentId == razorpayPaymentId)&&(identical(other.razorpaySignature, razorpaySignature) || other.razorpaySignature == razorpaySignature));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,voucherOrderId,razorpayOrderId,razorpayPaymentId,razorpaySignature);
+
+@override
+String toString() {
+  return 'VerifyVoucherPaymentRequest(voucherOrderId: $voucherOrderId, razorpayOrderId: $razorpayOrderId, razorpayPaymentId: $razorpayPaymentId, razorpaySignature: $razorpaySignature)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $VerifyVoucherPaymentRequestCopyWith<$Res>  {
+  factory $VerifyVoucherPaymentRequestCopyWith(VerifyVoucherPaymentRequest value, $Res Function(VerifyVoucherPaymentRequest) _then) = _$VerifyVoucherPaymentRequestCopyWithImpl;
+@useResult
+$Res call({
+ int voucherOrderId, String razorpayOrderId, String razorpayPaymentId, String razorpaySignature
+});
+
+
+
+
+}
+/// @nodoc
+class _$VerifyVoucherPaymentRequestCopyWithImpl<$Res>
+    implements $VerifyVoucherPaymentRequestCopyWith<$Res> {
+  _$VerifyVoucherPaymentRequestCopyWithImpl(this._self, this._then);
+
+  final VerifyVoucherPaymentRequest _self;
+  final $Res Function(VerifyVoucherPaymentRequest) _then;
+
+/// Create a copy of VerifyVoucherPaymentRequest
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? voucherOrderId = null,Object? razorpayOrderId = null,Object? razorpayPaymentId = null,Object? razorpaySignature = null,}) {
+  return _then(_self.copyWith(
+voucherOrderId: null == voucherOrderId ? _self.voucherOrderId : voucherOrderId // ignore: cast_nullable_to_non_nullable
+as int,razorpayOrderId: null == razorpayOrderId ? _self.razorpayOrderId : razorpayOrderId // ignore: cast_nullable_to_non_nullable
+as String,razorpayPaymentId: null == razorpayPaymentId ? _self.razorpayPaymentId : razorpayPaymentId // ignore: cast_nullable_to_non_nullable
+as String,razorpaySignature: null == razorpaySignature ? _self.razorpaySignature : razorpaySignature // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [VerifyVoucherPaymentRequest].
+extension VerifyVoucherPaymentRequestPatterns on VerifyVoucherPaymentRequest {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _VerifyVoucherPaymentRequest value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _VerifyVoucherPaymentRequest() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _VerifyVoucherPaymentRequest value)  $default,){
+final _that = this;
+switch (_that) {
+case _VerifyVoucherPaymentRequest():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _VerifyVoucherPaymentRequest value)?  $default,){
+final _that = this;
+switch (_that) {
+case _VerifyVoucherPaymentRequest() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int voucherOrderId,  String razorpayOrderId,  String razorpayPaymentId,  String razorpaySignature)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _VerifyVoucherPaymentRequest() when $default != null:
+return $default(_that.voucherOrderId,_that.razorpayOrderId,_that.razorpayPaymentId,_that.razorpaySignature);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int voucherOrderId,  String razorpayOrderId,  String razorpayPaymentId,  String razorpaySignature)  $default,) {final _that = this;
+switch (_that) {
+case _VerifyVoucherPaymentRequest():
+return $default(_that.voucherOrderId,_that.razorpayOrderId,_that.razorpayPaymentId,_that.razorpaySignature);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int voucherOrderId,  String razorpayOrderId,  String razorpayPaymentId,  String razorpaySignature)?  $default,) {final _that = this;
+switch (_that) {
+case _VerifyVoucherPaymentRequest() when $default != null:
+return $default(_that.voucherOrderId,_that.razorpayOrderId,_that.razorpayPaymentId,_that.razorpaySignature);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _VerifyVoucherPaymentRequest implements VerifyVoucherPaymentRequest {
+  const _VerifyVoucherPaymentRequest({required this.voucherOrderId, required this.razorpayOrderId, required this.razorpayPaymentId, required this.razorpaySignature});
+  factory _VerifyVoucherPaymentRequest.fromJson(Map<String, dynamic> json) => _$VerifyVoucherPaymentRequestFromJson(json);
+
+@override final  int voucherOrderId;
+@override final  String razorpayOrderId;
+@override final  String razorpayPaymentId;
+@override final  String razorpaySignature;
+
+/// Create a copy of VerifyVoucherPaymentRequest
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$VerifyVoucherPaymentRequestCopyWith<_VerifyVoucherPaymentRequest> get copyWith => __$VerifyVoucherPaymentRequestCopyWithImpl<_VerifyVoucherPaymentRequest>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$VerifyVoucherPaymentRequestToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _VerifyVoucherPaymentRequest&&(identical(other.voucherOrderId, voucherOrderId) || other.voucherOrderId == voucherOrderId)&&(identical(other.razorpayOrderId, razorpayOrderId) || other.razorpayOrderId == razorpayOrderId)&&(identical(other.razorpayPaymentId, razorpayPaymentId) || other.razorpayPaymentId == razorpayPaymentId)&&(identical(other.razorpaySignature, razorpaySignature) || other.razorpaySignature == razorpaySignature));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,voucherOrderId,razorpayOrderId,razorpayPaymentId,razorpaySignature);
+
+@override
+String toString() {
+  return 'VerifyVoucherPaymentRequest(voucherOrderId: $voucherOrderId, razorpayOrderId: $razorpayOrderId, razorpayPaymentId: $razorpayPaymentId, razorpaySignature: $razorpaySignature)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$VerifyVoucherPaymentRequestCopyWith<$Res> implements $VerifyVoucherPaymentRequestCopyWith<$Res> {
+  factory _$VerifyVoucherPaymentRequestCopyWith(_VerifyVoucherPaymentRequest value, $Res Function(_VerifyVoucherPaymentRequest) _then) = __$VerifyVoucherPaymentRequestCopyWithImpl;
+@override @useResult
+$Res call({
+ int voucherOrderId, String razorpayOrderId, String razorpayPaymentId, String razorpaySignature
+});
+
+
+
+
+}
+/// @nodoc
+class __$VerifyVoucherPaymentRequestCopyWithImpl<$Res>
+    implements _$VerifyVoucherPaymentRequestCopyWith<$Res> {
+  __$VerifyVoucherPaymentRequestCopyWithImpl(this._self, this._then);
+
+  final _VerifyVoucherPaymentRequest _self;
+  final $Res Function(_VerifyVoucherPaymentRequest) _then;
+
+/// Create a copy of VerifyVoucherPaymentRequest
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? voucherOrderId = null,Object? razorpayOrderId = null,Object? razorpayPaymentId = null,Object? razorpaySignature = null,}) {
+  return _then(_VerifyVoucherPaymentRequest(
+voucherOrderId: null == voucherOrderId ? _self.voucherOrderId : voucherOrderId // ignore: cast_nullable_to_non_nullable
+as int,razorpayOrderId: null == razorpayOrderId ? _self.razorpayOrderId : razorpayOrderId // ignore: cast_nullable_to_non_nullable
+as String,razorpayPaymentId: null == razorpayPaymentId ? _self.razorpayPaymentId : razorpayPaymentId // ignore: cast_nullable_to_non_nullable
+as String,razorpaySignature: null == razorpaySignature ? _self.razorpaySignature : razorpaySignature // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$VerifyVoucherPaymentResponse {
+
+ bool get success; String get message; int get voucherOrderId; String get brandName; double get voucherAmount; String get status;
+/// Create a copy of VerifyVoucherPaymentResponse
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$VerifyVoucherPaymentResponseCopyWith<VerifyVoucherPaymentResponse> get copyWith => _$VerifyVoucherPaymentResponseCopyWithImpl<VerifyVoucherPaymentResponse>(this as VerifyVoucherPaymentResponse, _$identity);
+
+  /// Serializes this VerifyVoucherPaymentResponse to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is VerifyVoucherPaymentResponse&&(identical(other.success, success) || other.success == success)&&(identical(other.message, message) || other.message == message)&&(identical(other.voucherOrderId, voucherOrderId) || other.voucherOrderId == voucherOrderId)&&(identical(other.brandName, brandName) || other.brandName == brandName)&&(identical(other.voucherAmount, voucherAmount) || other.voucherAmount == voucherAmount)&&(identical(other.status, status) || other.status == status));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,success,message,voucherOrderId,brandName,voucherAmount,status);
+
+@override
+String toString() {
+  return 'VerifyVoucherPaymentResponse(success: $success, message: $message, voucherOrderId: $voucherOrderId, brandName: $brandName, voucherAmount: $voucherAmount, status: $status)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $VerifyVoucherPaymentResponseCopyWith<$Res>  {
+  factory $VerifyVoucherPaymentResponseCopyWith(VerifyVoucherPaymentResponse value, $Res Function(VerifyVoucherPaymentResponse) _then) = _$VerifyVoucherPaymentResponseCopyWithImpl;
+@useResult
+$Res call({
+ bool success, String message, int voucherOrderId, String brandName, double voucherAmount, String status
+});
+
+
+
+
+}
+/// @nodoc
+class _$VerifyVoucherPaymentResponseCopyWithImpl<$Res>
+    implements $VerifyVoucherPaymentResponseCopyWith<$Res> {
+  _$VerifyVoucherPaymentResponseCopyWithImpl(this._self, this._then);
+
+  final VerifyVoucherPaymentResponse _self;
+  final $Res Function(VerifyVoucherPaymentResponse) _then;
+
+/// Create a copy of VerifyVoucherPaymentResponse
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? success = null,Object? message = null,Object? voucherOrderId = null,Object? brandName = null,Object? voucherAmount = null,Object? status = null,}) {
+  return _then(_self.copyWith(
+success: null == success ? _self.success : success // ignore: cast_nullable_to_non_nullable
+as bool,message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
+as String,voucherOrderId: null == voucherOrderId ? _self.voucherOrderId : voucherOrderId // ignore: cast_nullable_to_non_nullable
+as int,brandName: null == brandName ? _self.brandName : brandName // ignore: cast_nullable_to_non_nullable
+as String,voucherAmount: null == voucherAmount ? _self.voucherAmount : voucherAmount // ignore: cast_nullable_to_non_nullable
+as double,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [VerifyVoucherPaymentResponse].
+extension VerifyVoucherPaymentResponsePatterns on VerifyVoucherPaymentResponse {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _VerifyVoucherPaymentResponse value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _VerifyVoucherPaymentResponse() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _VerifyVoucherPaymentResponse value)  $default,){
+final _that = this;
+switch (_that) {
+case _VerifyVoucherPaymentResponse():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _VerifyVoucherPaymentResponse value)?  $default,){
+final _that = this;
+switch (_that) {
+case _VerifyVoucherPaymentResponse() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool success,  String message,  int voucherOrderId,  String brandName,  double voucherAmount,  String status)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _VerifyVoucherPaymentResponse() when $default != null:
+return $default(_that.success,_that.message,_that.voucherOrderId,_that.brandName,_that.voucherAmount,_that.status);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool success,  String message,  int voucherOrderId,  String brandName,  double voucherAmount,  String status)  $default,) {final _that = this;
+switch (_that) {
+case _VerifyVoucherPaymentResponse():
+return $default(_that.success,_that.message,_that.voucherOrderId,_that.brandName,_that.voucherAmount,_that.status);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool success,  String message,  int voucherOrderId,  String brandName,  double voucherAmount,  String status)?  $default,) {final _that = this;
+switch (_that) {
+case _VerifyVoucherPaymentResponse() when $default != null:
+return $default(_that.success,_that.message,_that.voucherOrderId,_that.brandName,_that.voucherAmount,_that.status);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _VerifyVoucherPaymentResponse implements VerifyVoucherPaymentResponse {
+  const _VerifyVoucherPaymentResponse({required this.success, required this.message, required this.voucherOrderId, required this.brandName, required this.voucherAmount, required this.status});
+  factory _VerifyVoucherPaymentResponse.fromJson(Map<String, dynamic> json) => _$VerifyVoucherPaymentResponseFromJson(json);
+
+@override final  bool success;
+@override final  String message;
+@override final  int voucherOrderId;
+@override final  String brandName;
+@override final  double voucherAmount;
+@override final  String status;
+
+/// Create a copy of VerifyVoucherPaymentResponse
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$VerifyVoucherPaymentResponseCopyWith<_VerifyVoucherPaymentResponse> get copyWith => __$VerifyVoucherPaymentResponseCopyWithImpl<_VerifyVoucherPaymentResponse>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$VerifyVoucherPaymentResponseToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _VerifyVoucherPaymentResponse&&(identical(other.success, success) || other.success == success)&&(identical(other.message, message) || other.message == message)&&(identical(other.voucherOrderId, voucherOrderId) || other.voucherOrderId == voucherOrderId)&&(identical(other.brandName, brandName) || other.brandName == brandName)&&(identical(other.voucherAmount, voucherAmount) || other.voucherAmount == voucherAmount)&&(identical(other.status, status) || other.status == status));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,success,message,voucherOrderId,brandName,voucherAmount,status);
+
+@override
+String toString() {
+  return 'VerifyVoucherPaymentResponse(success: $success, message: $message, voucherOrderId: $voucherOrderId, brandName: $brandName, voucherAmount: $voucherAmount, status: $status)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$VerifyVoucherPaymentResponseCopyWith<$Res> implements $VerifyVoucherPaymentResponseCopyWith<$Res> {
+  factory _$VerifyVoucherPaymentResponseCopyWith(_VerifyVoucherPaymentResponse value, $Res Function(_VerifyVoucherPaymentResponse) _then) = __$VerifyVoucherPaymentResponseCopyWithImpl;
+@override @useResult
+$Res call({
+ bool success, String message, int voucherOrderId, String brandName, double voucherAmount, String status
+});
+
+
+
+
+}
+/// @nodoc
+class __$VerifyVoucherPaymentResponseCopyWithImpl<$Res>
+    implements _$VerifyVoucherPaymentResponseCopyWith<$Res> {
+  __$VerifyVoucherPaymentResponseCopyWithImpl(this._self, this._then);
+
+  final _VerifyVoucherPaymentResponse _self;
+  final $Res Function(_VerifyVoucherPaymentResponse) _then;
+
+/// Create a copy of VerifyVoucherPaymentResponse
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? success = null,Object? message = null,Object? voucherOrderId = null,Object? brandName = null,Object? voucherAmount = null,Object? status = null,}) {
+  return _then(_VerifyVoucherPaymentResponse(
+success: null == success ? _self.success : success // ignore: cast_nullable_to_non_nullable
+as bool,message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
+as String,voucherOrderId: null == voucherOrderId ? _self.voucherOrderId : voucherOrderId // ignore: cast_nullable_to_non_nullable
+as int,brandName: null == brandName ? _self.brandName : brandName // ignore: cast_nullable_to_non_nullable
+as String,voucherAmount: null == voucherAmount ? _self.voucherAmount : voucherAmount // ignore: cast_nullable_to_non_nullable
+as double,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as String,
   ));
 }
 

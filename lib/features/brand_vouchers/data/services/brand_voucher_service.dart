@@ -35,4 +35,15 @@ abstract class BrandVoucherService {
 
   @GET('/api/VoucherOrders/{id}')
   Future<VoucherOrder> getVoucherOrder(@Path('id') int id);
+
+  // Razorpay payment endpoints
+  @POST('/api/VoucherOrders/create-razorpay-order')
+  Future<CreateVoucherPaymentOrderResponse> createRazorpayOrder(
+    @Body() CreateVoucherPaymentOrderRequest request,
+  );
+
+  @POST('/api/VoucherOrders/verify-razorpay-payment')
+  Future<VerifyVoucherPaymentResponse> verifyRazorpayPayment(
+    @Body() VerifyVoucherPaymentRequest request,
+  );
 }

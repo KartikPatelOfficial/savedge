@@ -99,6 +99,12 @@ _CreateVoucherOrderRequest _$CreateVoucherOrderRequestFromJson(
   userId: json['userId'] as String,
   brandVoucherId: (json['brandVoucherId'] as num).toInt(),
   voucherAmount: (json['voucherAmount'] as num).toDouble(),
+  paymentMethod:
+      $enumDecodeNullable(
+        _$VoucherPaymentMethodEnumMap,
+        json['paymentMethod'],
+      ) ??
+      VoucherPaymentMethod.points,
 );
 
 Map<String, dynamic> _$CreateVoucherOrderRequestToJson(
@@ -107,6 +113,12 @@ Map<String, dynamic> _$CreateVoucherOrderRequestToJson(
   'userId': instance.userId,
   'brandVoucherId': instance.brandVoucherId,
   'voucherAmount': instance.voucherAmount,
+  'paymentMethod': _$VoucherPaymentMethodEnumMap[instance.paymentMethod]!,
+};
+
+const _$VoucherPaymentMethodEnumMap = {
+  VoucherPaymentMethod.points: 1,
+  VoucherPaymentMethod.razorpay: 2,
 };
 
 _PaginatedBrandVoucherResponse _$PaginatedBrandVoucherResponseFromJson(
@@ -155,4 +167,86 @@ Map<String, dynamic> _$PaginatedVoucherOrderResponseToJson(
   'totalCount': instance.totalCount,
   'hasPreviousPage': instance.hasPreviousPage,
   'hasNextPage': instance.hasNextPage,
+};
+
+_CreateVoucherPaymentOrderRequest _$CreateVoucherPaymentOrderRequestFromJson(
+  Map<String, dynamic> json,
+) => _CreateVoucherPaymentOrderRequest(
+  brandVoucherId: (json['brandVoucherId'] as num).toInt(),
+  voucherAmount: (json['voucherAmount'] as num).toDouble(),
+);
+
+Map<String, dynamic> _$CreateVoucherPaymentOrderRequestToJson(
+  _CreateVoucherPaymentOrderRequest instance,
+) => <String, dynamic>{
+  'brandVoucherId': instance.brandVoucherId,
+  'voucherAmount': instance.voucherAmount,
+};
+
+_CreateVoucherPaymentOrderResponse _$CreateVoucherPaymentOrderResponseFromJson(
+  Map<String, dynamic> json,
+) => _CreateVoucherPaymentOrderResponse(
+  orderId: json['orderId'] as String,
+  amount: (json['amount'] as num).toInt(),
+  currency: json['currency'] as String,
+  receipt: json['receipt'] as String,
+  voucherOrderId: (json['voucherOrderId'] as num).toInt(),
+  brandName: json['brandName'] as String,
+  voucherAmount: (json['voucherAmount'] as num).toDouble(),
+  processingFee: (json['processingFee'] as num).toDouble(),
+  totalAmount: (json['totalAmount'] as num).toDouble(),
+);
+
+Map<String, dynamic> _$CreateVoucherPaymentOrderResponseToJson(
+  _CreateVoucherPaymentOrderResponse instance,
+) => <String, dynamic>{
+  'orderId': instance.orderId,
+  'amount': instance.amount,
+  'currency': instance.currency,
+  'receipt': instance.receipt,
+  'voucherOrderId': instance.voucherOrderId,
+  'brandName': instance.brandName,
+  'voucherAmount': instance.voucherAmount,
+  'processingFee': instance.processingFee,
+  'totalAmount': instance.totalAmount,
+};
+
+_VerifyVoucherPaymentRequest _$VerifyVoucherPaymentRequestFromJson(
+  Map<String, dynamic> json,
+) => _VerifyVoucherPaymentRequest(
+  voucherOrderId: (json['voucherOrderId'] as num).toInt(),
+  razorpayOrderId: json['razorpayOrderId'] as String,
+  razorpayPaymentId: json['razorpayPaymentId'] as String,
+  razorpaySignature: json['razorpaySignature'] as String,
+);
+
+Map<String, dynamic> _$VerifyVoucherPaymentRequestToJson(
+  _VerifyVoucherPaymentRequest instance,
+) => <String, dynamic>{
+  'voucherOrderId': instance.voucherOrderId,
+  'razorpayOrderId': instance.razorpayOrderId,
+  'razorpayPaymentId': instance.razorpayPaymentId,
+  'razorpaySignature': instance.razorpaySignature,
+};
+
+_VerifyVoucherPaymentResponse _$VerifyVoucherPaymentResponseFromJson(
+  Map<String, dynamic> json,
+) => _VerifyVoucherPaymentResponse(
+  success: json['success'] as bool,
+  message: json['message'] as String,
+  voucherOrderId: (json['voucherOrderId'] as num).toInt(),
+  brandName: json['brandName'] as String,
+  voucherAmount: (json['voucherAmount'] as num).toDouble(),
+  status: json['status'] as String,
+);
+
+Map<String, dynamic> _$VerifyVoucherPaymentResponseToJson(
+  _VerifyVoucherPaymentResponse instance,
+) => <String, dynamic>{
+  'success': instance.success,
+  'message': instance.message,
+  'voucherOrderId': instance.voucherOrderId,
+  'brandName': instance.brandName,
+  'voucherAmount': instance.voucherAmount,
+  'status': instance.status,
 };
