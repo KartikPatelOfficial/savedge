@@ -11,10 +11,8 @@ class AppConstants {
 
   // API Endpoints per environment
   static const String _developmentBaseUrl = 'https://10.0.2.2:44447';
-  static const String _stagingBaseUrl =
-      'https://web-app-20250829054601.salmonhill-0be6c935.centralindia.azurecontainerapps.io';
-  static const String _productionBaseUrl =
-      'https://savedge-prod.calmmoss-be0e7220.centralindia.azurecontainerapps.io';
+  static const String _stagingBaseUrl = 'https://portal.savedge.in';
+  static const String _productionBaseUrl = 'https://portal.savedge.in';
 
   /// Compile-time environment (can be overridden via --dart-define=APP_ENV=staging)
   static const String _environment = String.fromEnvironment(

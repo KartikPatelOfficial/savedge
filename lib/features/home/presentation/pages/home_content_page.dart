@@ -101,7 +101,6 @@ class _HomeContentPageState extends State<HomeContentPage> {
         drawer: HomeDrawer(
           userName: _userName,
           onMenuItemTap: _onDrawerMenuItemTap,
-          isEmployee: _isEmployee,
         ),
         body: _buildMainContent(),
       ),
