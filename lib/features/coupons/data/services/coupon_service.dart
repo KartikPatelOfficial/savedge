@@ -231,4 +231,35 @@ class CouponService {
       throw Exception('Failed to get coupon payment status: $e');
     }
   }
+
+  /// Get occasion-based coupons for the current user
+  /// These are coupons that match the user's upcoming occasions (birthday, anniversary, etc.)
+  Future<UserCouponsResponse> getMyOccasionCoupons() async {
+    try {
+      final response = await _httpClient.get('/api/coupons/my-occasion-coupons');
+
+      // Handle the response which should be a list of occasion coupons
+      final List<dynamic> couponsData = response.data is List
+          ? response.data as List<dynamic>
+          : [];
+
+      final coupons = couponsData
+          .map(
+            (coupon) => UserCouponModel.fromJson(coupon as Map<String, dynamic>),
+          )
+          .toList();
+
+      return UserCouponsResponse(
+        success: true,
+        message: 'Occasion coupons loaded successfully',
+        coupons: coupons,
+        totalCount: coupons.length,
+        activeCount: coupons.where((c) => !c.isUsed && !c.isExpired).length,
+        usedCount: coupons.where((c) => c.isUsed).length,
+        expiredCount: coupons.where((c) => c.isExpired && !c.isUsed).length,
+      );
+    } catch (e) {
+      throw Exception('Failed to get occasion coupons: $e');
+    }
+  }
 }

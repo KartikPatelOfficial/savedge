@@ -245,6 +245,8 @@ class AuthRepositoryImpl implements AuthRepository {
     String? lastName,
     String? email,
     String? profileImageUrl,
+    DateTime? dateOfBirth,
+    DateTime? anniversaryDate,
   }) async {
     return await _remote.updateUserProfile(
       UpdateUserProfileRequest3(
@@ -252,6 +254,8 @@ class AuthRepositoryImpl implements AuthRepository {
         lastName: lastName,
         email: email,
         profileImageUrl: profileImageUrl,
+        dateOfBirth: dateOfBirth,
+        anniversaryDate: anniversaryDate,
       ),
     );
   }

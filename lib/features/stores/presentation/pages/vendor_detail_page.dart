@@ -15,12 +15,16 @@ import 'package:savedge/features/qr_scanner/presentation/pages/qr_scanner_page.d
 import 'package:savedge/features/stores/presentation/widgets/vendor_offers_section.dart';
 import 'package:savedge/features/user_profile/presentation/bloc/points_bloc.dart';
 import 'package:savedge/features/vendors/domain/entities/vendor.dart';
+import 'package:savedge/features/auth/domain/repositories/auth_repository.dart';
+import 'package:savedge/features/auth/data/models/user_profile_models.dart';
+import 'package:savedge/core/enums/coupon_enums.dart';
+import 'package:savedge/features/vendors/domain/entities/coupon.dart';
 import 'package:savedge/features/vendors/presentation/bloc/vendor_detail_bloc.dart';
 import 'package:savedge/features/vendors/presentation/bloc/vendor_detail_event.dart';
 import 'package:savedge/features/vendors/presentation/bloc/vendor_detail_state.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
-class VendorDetailPage extends StatelessWidget {
+class VendorDetailPage extends StatefulWidget {
   const VendorDetailPage({super.key, this.vendor, this.vendorId})
     : assert(
         vendor != null || vendorId != null,
@@ -31,9 +35,37 @@ class VendorDetailPage extends StatelessWidget {
   final int? vendorId;
 
   @override
+  State<VendorDetailPage> createState() => _VendorDetailPageState();
+}
+
+class _VendorDetailPageState extends State<VendorDetailPage> {
+  UserProfileResponse3? _userProfile;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserProfile();
+  }
+
+  Future<void> _loadUserProfile() async {
+    try {
+      final authRepo = getIt<AuthRepository>();
+      final profile = await authRepo.getCurrentUserProfile();
+      if (mounted) {
+        setState(() {
+          _userProfile = profile;
+        });
+      }
+    } catch (e) {
+      // User might not be authenticated or profile fetch failed
+      // This is okay - occasion coupons just won't be shown
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     // Always load vendor details from API to get complete data (images, coupons, etc.)
-    final int id = vendorId ?? vendor!.id;
+    final int id = widget.vendorId ?? widget.vendor!.id;
 
     return MultiBlocProvider(
       providers: [
@@ -145,7 +177,10 @@ class VendorDetailPage extends StatelessWidget {
               ),
             );
           } else if (state is VendorDetailLoaded) {
-            return _VendorDetailView(vendor: state.vendor);
+            return _VendorDetailView(
+              vendor: state.vendor,
+              userProfile: _userProfile,
+            );
           } else if (state is VendorDetailError) {
             return Scaffold(
               backgroundColor: Colors.white,
@@ -330,9 +365,10 @@ class VendorDetailPage extends StatelessWidget {
 }
 
 class _VendorDetailView extends StatefulWidget {
-  const _VendorDetailView({required this.vendor});
+  const _VendorDetailView({required this.vendor, this.userProfile});
 
   final Vendor vendor;
+  final UserProfileResponse3? userProfile;
 
   @override
   State<_VendorDetailView> createState() => _VendorDetailViewState();
@@ -359,7 +395,9 @@ class _VendorDetailViewState extends State<_VendorDetailView> {
 
   void _startAutoScroll() {
     final galleryImages = widget.vendor.images
-        .where((img) => img.imageType == 'gallery' || img.imageType == 'Gallery')
+        .where(
+          (img) => img.imageType == 'gallery' || img.imageType == 'Gallery',
+        )
         .toList();
     final imagesToShow = galleryImages.isNotEmpty
         ? galleryImages
@@ -413,6 +451,25 @@ class _VendorDetailViewState extends State<_VendorDetailView> {
 
   @override
   Widget build(BuildContext context) {
+    // Debug: Print coupon occasion types
+    debugPrint('===== VENDOR COUPONS DEBUG =====');
+    for (final coupon in widget.vendor.coupons) {
+      debugPrint('Coupon: ${coupon.title}');
+      debugPrint('  - occasionType: ${coupon.occasionType}');
+      debugPrint('  - isOccasionBased: ${coupon.isOccasionBased}');
+      debugPrint('  - daysBeforeOccasion: ${coupon.daysBeforeOccasion}');
+      debugPrint('  - daysAfterOccasion: ${coupon.daysAfterOccasion}');
+    }
+    final regularCoupons = widget.vendor.coupons
+        .where((c) => !c.isOccasionBased)
+        .toList();
+    final occasionCoupons = widget.vendor.coupons
+        .where((c) => c.isOccasionBased)
+        .toList();
+    debugPrint('Regular coupons count: ${regularCoupons.length}');
+    debugPrint('Occasion coupons count: ${occasionCoupons.length}');
+    debugPrint('================================');
+
     return Scaffold(
       backgroundColor: const Color(0xFFFAFBFC),
       body: CustomScrollView(
@@ -421,13 +478,21 @@ class _VendorDetailViewState extends State<_VendorDetailView> {
           _buildSliverAppBar(context),
           // Vendor Info
           SliverToBoxAdapter(child: _buildVendorInfo(context)),
-          // Offers Section
+          // Regular Offers Section (excluding occasion-based coupons)
           SliverToBoxAdapter(
             child: VendorOffersSection(
               vendorId: widget.vendor.id,
               vendorUid: _resolvedVendorUid,
               vendorName: widget.vendor.businessName,
-              coupons: widget.vendor.coupons,
+              coupons: regularCoupons,
+            ),
+          ),
+          // Occasion-Based Offers Section (only if available)
+          SliverToBoxAdapter(
+            child: _buildOccasionOffersSection(
+              context,
+              widget.vendor,
+              _resolvedVendorUid,
             ),
           ),
           // Yearly Subscription
@@ -748,7 +813,8 @@ class _VendorDetailViewState extends State<_VendorDetailView> {
           ),
 
           // Website link if available
-          if (widget.vendor.website != null && widget.vendor.website!.trim().isNotEmpty) ...[
+          if (widget.vendor.website != null &&
+              widget.vendor.website!.trim().isNotEmpty) ...[
             const SizedBox(height: 16),
             Container(
               padding: const EdgeInsets.all(16),
@@ -762,7 +828,8 @@ class _VendorDetailViewState extends State<_VendorDetailView> {
                   HapticFeedback.lightImpact();
                   String url = widget.vendor.website!.trim();
                   // Add https:// if not present
-                  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                  if (!url.startsWith('http://') &&
+                      !url.startsWith('https://')) {
                     url = 'https://$url';
                   }
                   launchUrlString(url);
@@ -1409,6 +1476,319 @@ class _VendorDetailViewState extends State<_VendorDetailView> {
   /// Launch social media URL
   void _launchSocialMediaUrl(String url) {
     launchUrlString(url);
+  }
+
+  /// Check if an occasion coupon is currently available for the user
+  bool _isOccasionCouponAvailable(
+    Coupon coupon,
+    DateTime? userDateOfBirth,
+    DateTime? userAnniversaryDate,
+  ) {
+    if (!coupon.isOccasionBased) return false;
+
+    final now = DateTime.now();
+
+    switch (coupon.occasionType) {
+      case CouponOccasionType.birthday:
+        if (userDateOfBirth == null) return false;
+        return _isWithinOccasionWindow(
+          now,
+          userDateOfBirth,
+          coupon.daysBeforeOccasion ?? 0,
+          coupon.daysAfterOccasion ?? 0,
+        );
+
+      case CouponOccasionType.anniversary:
+        if (userAnniversaryDate == null) return false;
+        return _isWithinOccasionWindow(
+          now,
+          userAnniversaryDate,
+          coupon.daysBeforeOccasion ?? 0,
+          coupon.daysAfterOccasion ?? 0,
+        );
+
+      case CouponOccasionType.newYear:
+        // Check if current date is within the New Year window
+        final currentYearNewYear = DateTime(now.year, 1, 1);
+        return _isWithinOccasionWindow(
+          now,
+          currentYearNewYear,
+          coupon.daysBeforeOccasion ?? 0,
+          coupon.daysAfterOccasion ?? 0,
+        );
+
+      case CouponOccasionType.regular:
+        return false;
+    }
+  }
+
+  /// Check if current date is within the occasion window
+  bool _isWithinOccasionWindow(
+    DateTime now,
+    DateTime occasionDate,
+    int daysBefore,
+    int daysAfter,
+  ) {
+    // Adjust occasion date to current year for recurring occasions
+    final thisYearOccasion = DateTime(
+      now.year,
+      occasionDate.month,
+      occasionDate.day,
+    );
+
+    final windowStart = thisYearOccasion.subtract(Duration(days: daysBefore));
+    final windowEnd = thisYearOccasion.add(Duration(days: daysAfter));
+
+    return now.isAfter(windowStart) &&
+        now.isBefore(windowEnd.add(const Duration(days: 1)));
+  }
+
+  /// Build occasion-based offers section
+  Widget _buildOccasionOffersSection(
+    BuildContext context,
+    Vendor vendor,
+    String vendorUid,
+  ) {
+    // Get user's dates from profile if available
+    final userDateOfBirth = widget.userProfile?.dateOfBirth;
+    final userAnniversaryDate = widget.userProfile?.anniversaryDate;
+
+    // Get all occasion coupons (both available and unavailable)
+    final allOccasionCoupons = vendor.coupons
+        .where((c) => c.isOccasionBased && c.isValid)
+        .toList();
+
+    // Only show section if there are any occasion coupons
+    if (allOccasionCoupons.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    // Build custom occasion section with availability info
+    return _buildCustomOccasionSection(
+      context,
+      allOccasionCoupons,
+      vendorUid,
+      vendor.businessName,
+      userDateOfBirth,
+      userAnniversaryDate,
+    );
+  }
+
+  Widget _buildCustomOccasionSection(
+    BuildContext context,
+    List<Coupon> occasionCoupons,
+    String vendorUid,
+    String vendorName,
+    DateTime? userDateOfBirth,
+    DateTime? userAnniversaryDate,
+  ) {
+    return Container(
+      margin: const EdgeInsets.only(top: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Section header
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF6F3FCC).withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(
+                    Icons.celebration,
+                    color: Color(0xFF6F3FCC),
+                    size: 20,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                const Text(
+                  'Special Occasion Offers 🎉',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF1A202C),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+          // Coupon cards
+          ...occasionCoupons.asMap().entries.map((entry) {
+            final index = entry.key;
+            final coupon = entry.value;
+            final isAvailable = _isOccasionCouponAvailable(
+              coupon,
+              userDateOfBirth,
+              userAnniversaryDate,
+            );
+
+            return _buildOccasionCouponCard(
+              context,
+              coupon,
+              vendorUid,
+              vendorName,
+              isAvailable,
+              userDateOfBirth,
+              userAnniversaryDate,
+              index,
+            );
+          }),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildOccasionCouponCard(
+    BuildContext context,
+    Coupon coupon,
+    String vendorUid,
+    String vendorName,
+    bool isAvailable,
+    DateTime? userDateOfBirth,
+    DateTime? userAnniversaryDate,
+    int index,
+  ) {
+    // Calculate availability message
+    String availabilityMessage = '';
+    if (!isAvailable) {
+      availabilityMessage = _getAvailabilityMessage(
+        coupon,
+        userDateOfBirth,
+        userAnniversaryDate,
+      );
+    }
+
+    return Opacity(
+      opacity: isAvailable ? 1.0 : 0.5,
+      child: AbsorbPointer(
+        absorbing: !isAvailable,
+        child: Container(
+          margin: const EdgeInsets.only(left: 24, right: 24, bottom: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              VendorOfferCard(
+                coupon: coupon,
+                vendorUid: vendorUid,
+                vendorName: vendorName,
+                index: index,
+              ),
+              if (!isAvailable && availabilityMessage.isNotEmpty)
+                Container(
+                  margin: const EdgeInsets.only(top: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFF3CD),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: const Color(0xFFFFC107),
+                      width: 1,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.schedule,
+                        size: 16,
+                        color: Color(0xFFF57C00),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          availabilityMessage,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Color(0xFFF57C00),
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  String _getAvailabilityMessage(
+    Coupon coupon,
+    DateTime? userDateOfBirth,
+    DateTime? userAnniversaryDate,
+  ) {
+    final now = DateTime.now();
+
+    switch (coupon.occasionType) {
+      case CouponOccasionType.birthday:
+        if (userDateOfBirth == null) {
+          return 'Add your birthday to your profile to use this offer';
+        }
+        final thisYearBirthday = DateTime(
+          now.year,
+          userDateOfBirth.month,
+          userDateOfBirth.day,
+        );
+        final daysBefore = coupon.daysBeforeOccasion ?? 0;
+        final windowStart = thisYearBirthday.subtract(
+          Duration(days: daysBefore),
+        );
+
+        if (now.isBefore(windowStart)) {
+          final daysUntil = windowStart.difference(now).inDays;
+          return 'Available in $daysUntil days ($daysBefore days before your birthday)';
+        } else {
+          // Already passed this year
+          return 'Available $daysBefore days before your birthday';
+        }
+
+      case CouponOccasionType.anniversary:
+        if (userAnniversaryDate == null) {
+          return 'Add your anniversary date to your profile to use this offer';
+        }
+        final thisYearAnniversary = DateTime(
+          now.year,
+          userAnniversaryDate.month,
+          userAnniversaryDate.day,
+        );
+        final daysBefore = coupon.daysBeforeOccasion ?? 0;
+        final windowStart = thisYearAnniversary.subtract(
+          Duration(days: daysBefore),
+        );
+
+        if (now.isBefore(windowStart)) {
+          final daysUntil = windowStart.difference(now).inDays;
+          return 'Available in $daysUntil days ($daysBefore days before your anniversary)';
+        } else {
+          return 'Available $daysBefore days before your anniversary';
+        }
+
+      case CouponOccasionType.newYear:
+        final nextYearNewYear = DateTime(now.year + 1, 1, 1);
+        final daysBefore = coupon.daysBeforeOccasion ?? 0;
+        final windowStart = nextYearNewYear.subtract(
+          Duration(days: daysBefore),
+        );
+
+        if (now.isBefore(windowStart)) {
+          final daysUntil = windowStart.difference(now).inDays;
+          return 'Available in $daysUntil days ($daysBefore days before New Year)';
+        } else {
+          return 'Available $daysBefore days before New Year';
+        }
+
+      case CouponOccasionType.regular:
+        return '';
+    }
   }
 
   /// Start pay-with-points flow: verify vendor via QR, then open payment dialog

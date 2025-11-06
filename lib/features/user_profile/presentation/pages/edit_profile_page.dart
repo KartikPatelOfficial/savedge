@@ -28,6 +28,9 @@ class _EditProfilePageState extends State<EditProfilePage>
   bool _isEmployee = false;
   bool _hasChanges = false;
 
+  DateTime? _dateOfBirth;
+  DateTime? _anniversaryDate;
+
   AuthRepository get _authRepository => GetIt.I<AuthRepository>();
 
   @override
@@ -38,10 +41,12 @@ class _EditProfilePageState extends State<EditProfilePage>
   }
 
   void _initializeControllers() {
-    _firstNameController.text = widget.userProfile.firstName ?? '';
-    _lastNameController.text = widget.userProfile.lastName ?? '';
+    _firstNameController.text = widget.userProfile.firstName;
+    _lastNameController.text = widget.userProfile.lastName;
     _emailController.text = widget.userProfile.email;
     _isEmployee = widget.userProfile.isEmployee;
+    _dateOfBirth = widget.userProfile.dateOfBirth;
+    _anniversaryDate = widget.userProfile.anniversaryDate;
 
     // Listen for changes
     _firstNameController.addListener(_checkForChanges);
@@ -513,6 +518,96 @@ class _EditProfilePageState extends State<EditProfilePage>
 
           const SizedBox(height: 24),
 
+          // Occasion Dates Section
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  const Color(0xFF6366F1).withOpacity(0.05),
+                  const Color(0xFF8B5CF6).withOpacity(0.05),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: const Color(0xFF6366F1).withOpacity(0.2),
+                width: 1.5,
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFFF59E0B), Color(0xFFFBBF24)],
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.cake_outlined,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Special Occasions',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          SizedBox(height: 2),
+                          Text(
+                            'Get exclusive deals on your special days',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.black54,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+
+                // Birthday Field
+                _buildDateField(
+                  label: 'Birthday',
+                  icon: Icons.cake,
+                  value: _dateOfBirth,
+                  onTap: () => _selectDate(context, true),
+                  helperText: 'Receive birthday coupons',
+                ),
+
+                const SizedBox(height: 16),
+
+                // Anniversary Field
+                _buildDateField(
+                  label: 'Anniversary',
+                  icon: Icons.favorite,
+                  value: _anniversaryDate,
+                  onTap: () => _selectDate(context, false),
+                  helperText: 'Receive anniversary coupons',
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 24),
+
           // Action Buttons
           Row(
             children: [
@@ -703,6 +798,123 @@ class _EditProfilePageState extends State<EditProfilePage>
     );
   }
 
+  Widget _buildDateField({
+    required String label,
+    required IconData icon,
+    required DateTime? value,
+    required VoidCallback onTap,
+    String? helperText,
+  }) {
+    final displayText = value != null
+        ? '${value.day}/${value.month}/${value.year}'
+        : 'Not set';
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.grey[50],
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: Colors.grey[200]!,
+            width: 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              margin: const EdgeInsets.only(right: 12),
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: const Color(0xFF6366F1).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                icon,
+                size: 18,
+                color: const Color(0xFF6366F1),
+              ),
+            ),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 14,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    displayText,
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                      color: value != null ? Colors.black87 : Colors.grey[400],
+                    ),
+                  ),
+                  if (helperText != null) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      helperText,
+                      style: TextStyle(
+                        color: Colors.grey[500],
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            Icon(
+              Icons.calendar_today_outlined,
+              size: 18,
+              color: Colors.grey[400],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _selectDate(BuildContext context, bool isBirthday) async {
+    final DateTime? initialDate = isBirthday ? _dateOfBirth : _anniversaryDate;
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: initialDate ?? DateTime(2000, 1, 1),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: Color(0xFF6366F1),
+              onPrimary: Colors.white,
+              surface: Colors.white,
+              onSurface: Colors.black87,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null) {
+      setState(() {
+        if (isBirthday) {
+          _dateOfBirth = picked;
+        } else {
+          _anniversaryDate = picked;
+        }
+        _hasChanges = true;
+      });
+    }
+  }
+
   Future<void> _saveProfile() async {
     if (!_formKey.currentState!.validate()) {
       return;
@@ -711,14 +923,18 @@ class _EditProfilePageState extends State<EditProfilePage>
     try {
       setState(() => _isLoading = true);
 
-      await _authRepository.updateProfile(
-        email: widget.userProfile.email,
+      await _authRepository.updateCurrentUserProfile(
         firstName: _firstNameController.text.trim(),
         lastName: _lastNameController.text.trim(),
+        dateOfBirth: _dateOfBirth,
+        anniversaryDate: _anniversaryDate,
       );
 
       if (mounted) {
-        // Success animation
+        // Success message - with special occasion note if dates were added
+        final hasNewOccasionDates = (_dateOfBirth != null || _anniversaryDate != null) &&
+            (widget.userProfile.dateOfBirth == null && widget.userProfile.anniversaryDate == null);
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Row(
@@ -736,7 +952,13 @@ class _EditProfilePageState extends State<EditProfilePage>
                   ),
                 ),
                 const SizedBox(width: 12),
-                const Text('Profile updated successfully!'),
+                Expanded(
+                  child: Text(
+                    hasNewOccasionDates
+                        ? 'Profile updated! You\'ll now receive special occasion coupons 🎉'
+                        : 'Profile updated successfully!',
+                  ),
+                ),
               ],
             ),
             backgroundColor: Colors.green,
@@ -745,6 +967,7 @@ class _EditProfilePageState extends State<EditProfilePage>
               borderRadius: BorderRadius.circular(10),
             ),
             margin: const EdgeInsets.all(16),
+            duration: const Duration(seconds: 4),
           ),
         );
 

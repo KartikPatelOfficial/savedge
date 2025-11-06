@@ -19,6 +19,8 @@ abstract class AuthRepository {
     String? lastName,
     String? email,
     String? profileImageUrl,
+    DateTime? dateOfBirth,
+    DateTime? anniversaryDate,
   });
   Future<void> deleteAccount();
 

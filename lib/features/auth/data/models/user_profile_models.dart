@@ -22,6 +22,8 @@ abstract class UserProfileResponse3 with _$UserProfileResponse3 {
     VendorInfo? vendorInfo,
     OrganizationInfo? organizationInfo,
     SubscriptionInfo? subscriptionInfo,
+    DateTime? dateOfBirth,
+    DateTime? anniversaryDate,
   }) = _UserProfileResponse3;
 
   factory UserProfileResponse3.fromJson(Map<String, dynamic> json) =>
@@ -147,6 +149,40 @@ extension UserProfileResponse3Extensions on UserProfileResponse3 {
 
   /// Check if user has an active subscription
   bool get hasActiveSubscription => subscriptionInfo?.isActive == true;
+
+  /// Check if user has added occasion dates
+  bool get hasOccasionDates => this.dateOfBirth != null || this.anniversaryDate != null;
+
+  /// Check if user needs to add occasion dates for better experience
+  bool get needsOccasionDates => !hasOccasionDates && isIndividual;
+
+  /// Check if birthday is within specified days
+  bool isBirthdayWithinDays(int days) {
+    if (this.dateOfBirth == null) return false;
+    final now = DateTime.now();
+    final thisYearBirthday = DateTime(now.year, this.dateOfBirth!.month, this.dateOfBirth!.day);
+    final nextYearBirthday = DateTime(now.year + 1, this.dateOfBirth!.month, this.dateOfBirth!.day);
+
+    final daysUntilThisYear = thisYearBirthday.difference(now).inDays;
+    final daysUntilNextYear = nextYearBirthday.difference(now).inDays;
+
+    return (daysUntilThisYear >= 0 && daysUntilThisYear <= days) ||
+           (daysUntilNextYear >= 0 && daysUntilNextYear <= days);
+  }
+
+  /// Check if anniversary is within specified days
+  bool isAnniversaryWithinDays(int days) {
+    if (this.anniversaryDate == null) return false;
+    final now = DateTime.now();
+    final thisYearAnniversary = DateTime(now.year, this.anniversaryDate!.month, this.anniversaryDate!.day);
+    final nextYearAnniversary = DateTime(now.year + 1, this.anniversaryDate!.month, this.anniversaryDate!.day);
+
+    final daysUntilThisYear = thisYearAnniversary.difference(now).inDays;
+    final daysUntilNextYear = nextYearAnniversary.difference(now).inDays;
+
+    return (daysUntilThisYear >= 0 && daysUntilThisYear <= days) ||
+           (daysUntilNextYear >= 0 && daysUntilNextYear <= days);
+  }
 }
 
 /// Update user profile request
@@ -157,6 +193,8 @@ abstract class UpdateUserProfileRequest3 with _$UpdateUserProfileRequest3 {
     String? lastName,
     String? email,
     String? profileImageUrl,
+    DateTime? dateOfBirth,
+    DateTime? anniversaryDate,
   }) = _UpdateUserProfileRequest3;
 
   factory UpdateUserProfileRequest3.fromJson(Map<String, dynamic> json) =>

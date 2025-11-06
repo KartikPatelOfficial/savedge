@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:savedge/core/error/failures.dart';
 import 'package:savedge/features/vendors/data/datasources/vendors_remote_data_source.dart';
 import 'package:savedge/features/vendors/data/models/coupon_models.dart';
@@ -185,6 +186,13 @@ class VendorsRepositoryImpl implements VendorsRepository {
   }
 
   domain.Coupon _mapCouponResponseToEntity(CouponResponse dto) {
+    // Debug: Log occasion data from API
+    debugPrint('Mapping coupon: ${dto.title}');
+    debugPrint('  DTO occasionType: ${dto.occasionType}');
+    debugPrint('  DTO daysBeforeOccasion: ${dto.daysBeforeOccasion}');
+    debugPrint('  DTO daysAfterOccasion: ${dto.daysAfterOccasion}');
+    debugPrint('  DTO isOccasionBased: ${dto.isOccasionBased}');
+
     return domain.Coupon(
       id: dto.id,
       title: dto.title,
@@ -208,6 +216,9 @@ class VendorsRepositoryImpl implements VendorsRepository {
       specialOfferEndDate: dto.specialOfferEndDate,
       specialOfferPriority: dto.specialOfferPriority,
       specialOfferImageUrl: dto.specialOfferImageUrl,
+      occasionType: dto.occasionType,
+      daysBeforeOccasion: dto.daysBeforeOccasion,
+      daysAfterOccasion: dto.daysAfterOccasion,
     );
   }
 

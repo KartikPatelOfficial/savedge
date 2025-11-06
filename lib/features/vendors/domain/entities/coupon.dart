@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:savedge/core/enums/coupon_enums.dart';
 
 /// Coupon domain entity
 class Coupon extends Equatable {
@@ -25,6 +26,9 @@ class Coupon extends Equatable {
     this.specialOfferEndDate,
     this.specialOfferPriority = 0,
     this.specialOfferImageUrl,
+    this.occasionType = CouponOccasionType.regular,
+    this.daysBeforeOccasion,
+    this.daysAfterOccasion,
   });
 
   final int id;
@@ -49,6 +53,9 @@ class Coupon extends Equatable {
   final DateTime? specialOfferEndDate;
   final int specialOfferPriority;
   final String? specialOfferImageUrl;
+  final CouponOccasionType occasionType;
+  final int? daysBeforeOccasion;
+  final int? daysAfterOccasion;
 
   /// Check if coupon is currently valid
   bool get isValid {
@@ -84,6 +91,9 @@ class Coupon extends Equatable {
     return now.isAfter(specialOfferStartDate!) && now.isBefore(specialOfferEndDate!);
   }
 
+  /// Check if this is an occasion-based coupon
+  bool get isOccasionBased => occasionType != CouponOccasionType.regular;
+
   @override
   List<Object?> get props => [
     id,
@@ -108,5 +118,8 @@ class Coupon extends Equatable {
     specialOfferEndDate,
     specialOfferPriority,
     specialOfferImageUrl,
+    occasionType,
+    daysBeforeOccasion,
+    daysAfterOccasion,
   ];
 }

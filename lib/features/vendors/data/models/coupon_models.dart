@@ -1,3 +1,5 @@
+import 'package:savedge/core/enums/coupon_enums.dart';
+
 /// Coupon response model
 class CouponResponse {
   factory CouponResponse.fromJson(Map<String, dynamic> json) {
@@ -41,6 +43,10 @@ class CouponResponse {
           : null,
       specialOfferPriority: json['specialOfferPriority'] as int? ?? 0,
       specialOfferImageUrl: json['specialOfferImageUrl'] as String?,
+      occasionType: _mapOccasionTypeFromInt(json['occasionType'] as int? ?? 0),
+      daysBeforeOccasion: json['daysBeforeOccasion'] as int?,
+      daysAfterOccasion: json['daysAfterOccasion'] as int?,
+      isOccasionBased: json['isOccasionBased'] as bool? ?? false,
     );
   }
   const CouponResponse({
@@ -74,6 +80,10 @@ class CouponResponse {
     this.specialOfferEndDate,
     this.specialOfferPriority = 0,
     this.specialOfferImageUrl,
+    this.occasionType = CouponOccasionType.regular,
+    this.daysBeforeOccasion,
+    this.daysAfterOccasion,
+    this.isOccasionBased = false,
   });
 
   final int id;
@@ -106,6 +116,10 @@ class CouponResponse {
   final DateTime? specialOfferEndDate;
   final int specialOfferPriority;
   final String? specialOfferImageUrl;
+  final CouponOccasionType occasionType;
+  final int? daysBeforeOccasion;
+  final int? daysAfterOccasion;
+  final bool isOccasionBased;
 
   Map<String, dynamic> toJson() {
     return {
@@ -160,6 +174,23 @@ class CouponResponse {
         return 'expired';
       default:
         return 'active'; // Default fallback
+    }
+  }
+
+  /// Maps integer occasion type from API to CouponOccasionType enum
+  /// 0 = Regular, 1 = Birthday, 2 = Anniversary, 3 = NewYear
+  static CouponOccasionType _mapOccasionTypeFromInt(int occasionType) {
+    switch (occasionType) {
+      case 0:
+        return CouponOccasionType.regular;
+      case 1:
+        return CouponOccasionType.birthday;
+      case 2:
+        return CouponOccasionType.anniversary;
+      case 3:
+        return CouponOccasionType.newYear;
+      default:
+        return CouponOccasionType.regular; // Default fallback
     }
   }
 }

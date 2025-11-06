@@ -38,6 +38,12 @@ _UserProfileResponse3 _$UserProfileResponse3FromJson(
       : SubscriptionInfo.fromJson(
           json['subscriptionInfo'] as Map<String, dynamic>,
         ),
+  dateOfBirth: json['dateOfBirth'] == null
+      ? null
+      : DateTime.parse(json['dateOfBirth'] as String),
+  anniversaryDate: json['anniversaryDate'] == null
+      ? null
+      : DateTime.parse(json['anniversaryDate'] as String),
 );
 
 Map<String, dynamic> _$UserProfileResponse3ToJson(
@@ -58,6 +64,8 @@ Map<String, dynamic> _$UserProfileResponse3ToJson(
   'vendorInfo': instance.vendorInfo,
   'organizationInfo': instance.organizationInfo,
   'subscriptionInfo': instance.subscriptionInfo,
+  'dateOfBirth': instance.dateOfBirth?.toIso8601String(),
+  'anniversaryDate': instance.anniversaryDate?.toIso8601String(),
 };
 
 _EmployeeInfo _$EmployeeInfoFromJson(Map<String, dynamic> json) =>
@@ -138,6 +146,12 @@ _UpdateUserProfileRequest3 _$UpdateUserProfileRequest3FromJson(
   lastName: json['lastName'] as String?,
   email: json['email'] as String?,
   profileImageUrl: json['profileImageUrl'] as String?,
+  dateOfBirth: json['dateOfBirth'] == null
+      ? null
+      : DateTime.parse(json['dateOfBirth'] as String),
+  anniversaryDate: json['anniversaryDate'] == null
+      ? null
+      : DateTime.parse(json['anniversaryDate'] as String),
 );
 
 Map<String, dynamic> _$UpdateUserProfileRequest3ToJson(
@@ -147,4 +161,6 @@ Map<String, dynamic> _$UpdateUserProfileRequest3ToJson(
   'lastName': instance.lastName,
   'email': instance.email,
   'profileImageUrl': instance.profileImageUrl,
+  'dateOfBirth': instance.dateOfBirth?.toIso8601String(),
+  'anniversaryDate': instance.anniversaryDate?.toIso8601String(),
 };
