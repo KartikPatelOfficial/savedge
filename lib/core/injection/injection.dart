@@ -83,6 +83,9 @@ import 'package:savedge/features/vendors/domain/usecases/get_vendors_usecase.dar
 import 'package:savedge/features/vendors/presentation/bloc/coupons_bloc.dart';
 import 'package:savedge/features/vendors/presentation/bloc/vendor_detail_bloc.dart';
 import 'package:savedge/features/vendors/presentation/bloc/vendors_bloc.dart';
+// Free trial imports
+import 'package:savedge/features/free_trial/data/repositories/free_trial_repository.dart';
+import 'package:savedge/features/free_trial/presentation/bloc/free_trial_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final GetIt getIt = GetIt.instance;
@@ -195,6 +198,11 @@ Future<void> configureDependencies() async {
 
   getIt.registerSingleton<BrandVoucherRepository>(
     BrandVoucherRepositoryImpl(getIt<BrandVoucherService>()),
+  );
+
+  // Free trial layer
+  getIt.registerSingleton<FreeTrialRepository>(
+    FreeTrialRepositoryImpl(getIt<Dio>()),
   );
 
   // Favorites layer
@@ -386,6 +394,11 @@ Future<void> configureDependencies() async {
       removeFavoriteUseCase: getIt<RemoveFavoriteUseCase>(),
       checkFavoriteUseCase: getIt<CheckFavoriteUseCase>(),
     ),
+  );
+
+  // Free trial BLoC
+  getIt.registerFactory<FreeTrialBloc>(
+    () => FreeTrialBloc(getIt<FreeTrialRepository>()),
   );
 
   // Payment services

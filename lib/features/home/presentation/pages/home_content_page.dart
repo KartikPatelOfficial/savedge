@@ -15,6 +15,8 @@ import 'package:savedge/features/vendors/domain/entities/vendor.dart';
 import 'package:savedge/features/vendors/presentation/bloc/coupons_bloc.dart';
 import 'package:savedge/features/vendors/presentation/bloc/vendors_bloc.dart';
 import 'package:savedge/features/vendors/presentation/bloc/vendors_event.dart';
+import 'package:savedge/features/free_trial/presentation/bloc/free_trial_bloc.dart';
+import 'package:savedge/features/free_trial/presentation/widgets/free_trial_card.dart';
 
 /// Beautiful home content page with modern design and real data integration
 class HomeContentPage extends StatefulWidget {
@@ -30,6 +32,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
   late final CouponsBloc _couponsBloc;
   late final VendorsBloc _vendorsBloc;
   late final SubscriptionPlanBloc _subscriptionBloc;
+  late final FreeTrialBloc _freeTrialBloc;
   final GlobalKey<SubscriptionPlansSectionState> _subscriptionKey = GlobalKey();
 
   bool _isEmployee = false;
@@ -43,8 +46,11 @@ class _HomeContentPageState extends State<HomeContentPage> {
     _couponsBloc = getIt<CouponsBloc>();
     _vendorsBloc = getIt<VendorsBloc>();
     _subscriptionBloc = getIt<SubscriptionPlanBloc>();
+    _freeTrialBloc = getIt<FreeTrialBloc>();
     _loadInitialData();
     _loadUserProfile();
+    // Load free trial status
+    _freeTrialBloc.add(const FreeTrialEvent.loadStatus());
   }
 
   void _loadInitialData() {
@@ -84,6 +90,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
     _couponsBloc.close();
     _vendorsBloc.close();
     _subscriptionBloc.close();
+    _freeTrialBloc.close();
     super.dispose();
   }
 
@@ -94,6 +101,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
         BlocProvider.value(value: _couponsBloc),
         BlocProvider.value(value: _vendorsBloc),
         BlocProvider.value(value: _subscriptionBloc),
+        BlocProvider.value(value: _freeTrialBloc),
       ],
       child: Scaffold(
         key: _scaffoldKey,
@@ -130,6 +138,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
                     child: FadeInAnimation(child: widget),
                   ),
                   children: [
+                    const FreeTrialCard(),
                     _buildHotDealsSection(),
                     _buildCategoriesSection(),
                     _buildSubscriptionPlansSection(),
