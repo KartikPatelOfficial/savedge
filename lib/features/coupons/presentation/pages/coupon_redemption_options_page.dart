@@ -5,6 +5,8 @@ import 'package:savedge/features/auth/data/models/user_profile_models.dart';
 import 'package:savedge/features/auth/domain/repositories/auth_repository.dart';
 import 'package:savedge/features/coupons/data/models/coupon_claim_models.dart';
 import 'package:savedge/features/coupons/data/models/coupon_gifting_models.dart';
+import 'package:savedge/features/free_trial/data/models/free_trial_models.dart';
+import 'package:savedge/features/free_trial/data/repositories/free_trial_repository.dart';
 import 'package:savedge/features/user_profile/presentation/widgets/subscription_status_card.dart';
 
 import 'coupon_confirmation_page.dart';
@@ -28,6 +30,7 @@ class _CouponRedemptionOptionsPageState
   RedemptionMethod? selectedMethod;
   UserProfileResponse3? _userProfile;
   String? _profileError;
+  FreeTrialStatusResponse? _freeTrialStatus;
 
   late AnimationController _slideController;
   late AnimationController _fadeController;
@@ -36,6 +39,7 @@ class _CouponRedemptionOptionsPageState
 
   AuthRepository get _authRepository => GetIt.I<AuthRepository>();
   SecureStorageService get _secureStorage => GetIt.I<SecureStorageService>();
+  FreeTrialRepository get _freeTrialRepository => GetIt.I<FreeTrialRepository>();
 
   @override
   void initState() {
@@ -84,8 +88,19 @@ class _CouponRedemptionOptionsPageState
 
       // Get user profile to check subscription status
       final profile = await _authRepository.getCurrentUserProfile();
+
+      // Get free trial status
+      FreeTrialStatusResponse? freeTrialStatus;
+      try {
+        freeTrialStatus = await _freeTrialRepository.getFreeTrialStatus();
+      } catch (e) {
+        // Free trial status is optional, don't fail if it errors
+        print('Failed to load free trial status: $e');
+      }
+
       setState(() {
         _userProfile = profile;
+        _freeTrialStatus = freeTrialStatus;
         isLoadingProfile = false;
       });
     } catch (e) {
@@ -472,10 +487,12 @@ class _CouponRedemptionOptionsPageState
         // Subscription/Membership Option - Show only if user has active subscription and redemption allowance
         if (widget.couponData.userMaxRedemptions != null &&
             widget.couponData.userMaxRedemptions! > 0) ...[
-          if (isLoadingProfile) 
+          if (isLoadingProfile)
             _buildLoadingMembershipOption()
           else if (_hasActiveSubscription())
-            _buildModernMembershipOption(),
+            _buildModernMembershipOption()
+          else if (_hasActiveFreeTrial())
+            _buildModernFreeTrialOption(),
         ],
       ],
     );
@@ -736,6 +753,172 @@ class _CouponRedemptionOptionsPageState
     );
   }
 
+  Widget _buildModernFreeTrialOption() {
+    final remainingClaims = widget.couponData.remainingSubscriptionClaims ??
+        (widget.couponData.userMaxRedemptions! -
+            widget.couponData.userUsedRedemptions);
+
+    final isEnabled = remainingClaims > 0;
+    final isSelected = selectedMethod == RedemptionMethod.freeTrial;
+    final color = const Color(0xFFFF6B35); // Orange color for free trial
+    final gradient = const LinearGradient(
+      colors: [Color(0xFFFF6B35), Color(0xFFF7931E)],
+    );
+
+    // Get remaining days from free trial status
+    final remainingDays = _freeTrialStatus?.remainingTime?.days ?? 0;
+
+    return GestureDetector(
+      onTap: isEnabled
+          ? () => setState(() => selectedMethod = RedemptionMethod.freeTrial)
+          : null,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOutCubic,
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected ? color : Colors.grey[200]!,
+            width: isSelected ? 2 : 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: isSelected
+                  ? color.withOpacity(0.2)
+                  : Colors.black.withOpacity(0.05),
+              blurRadius: isSelected ? 20 : 10,
+              offset: Offset(0, isSelected ? 8 : 4),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 56,
+              height: 56,
+              decoration: BoxDecoration(
+                gradient: isEnabled ? gradient : null,
+                color: !isEnabled ? Colors.grey[200] : null,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: isEnabled
+                    ? [
+                        BoxShadow(
+                          color: color.withOpacity(0.3),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ]
+                    : null,
+              ),
+              child: Icon(
+                Icons.celebration,
+                color: isEnabled ? Colors.white : Colors.grey[400],
+                size: 26,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        'Free Trial',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: isEnabled ? Colors.black87 : Colors.grey[500],
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          gradient: isEnabled ? gradient : null,
+                          color: !isEnabled ? Colors.grey[200] : null,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          '$remainingDays days left',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: isEnabled ? Colors.white : Colors.grey[500],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Text(
+                        'FREE',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: isEnabled ? color : Colors.grey[400],
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: color.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          '$remainingClaims left',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: color,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    isEnabled
+                        ? 'Try SavEdge with your 5-day trial'
+                        : 'No claims remaining',
+                    style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                  ),
+                ],
+              ),
+            ),
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              width: 24,
+              height: 24,
+              decoration: BoxDecoration(
+                color: isSelected ? color : Colors.transparent,
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: isSelected ? color : Colors.grey[300]!,
+                  width: 2,
+                ),
+              ),
+              child: isSelected
+                  ? const Icon(Icons.check, color: Colors.white, size: 16)
+                  : null,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildModernClaimButton() {
     final isEnabled = selectedMethod != null && !isProcessing;
 
@@ -824,6 +1007,8 @@ class _CouponRedemptionOptionsPageState
         return 'Pay & Get Coupon';
       case RedemptionMethod.membership:
         return 'Claim for FREE';
+      case RedemptionMethod.freeTrial:
+        return 'Claim with Free Trial';
     }
   }
 
@@ -832,14 +1017,23 @@ class _CouponRedemptionOptionsPageState
     if (isLoadingProfile || _userProfile == null) {
       return false; // Don't show membership option while loading or if no profile
     }
-    
+
     final subscription = _userProfile!.subscriptionInfo;
     if (subscription == null) {
       return false; // No subscription
     }
-    
+
     // Use the extension method from subscription_status_card.dart
     return subscription.isCurrentlyActive;
+  }
+
+  /// Check if user has an active free trial
+  bool _hasActiveFreeTrial() {
+    if (isLoadingProfile || _freeTrialStatus == null) {
+      return false;
+    }
+
+    return _freeTrialStatus!.status == FreeTrialStatus.active;
   }
 
   /// Build loading state for membership option
@@ -1013,6 +1207,8 @@ class _CouponRedemptionOptionsPageState
         return 'razorpay';
       case RedemptionMethod.membership:
         return 'membership';
+      case RedemptionMethod.freeTrial:
+        return 'freeTrial';
     }
   }
 
@@ -1051,4 +1247,4 @@ class _CouponRedemptionOptionsPageState
   }
 }
 
-enum RedemptionMethod { existing, razorpay, membership }
+enum RedemptionMethod { existing, razorpay, membership, freeTrial }

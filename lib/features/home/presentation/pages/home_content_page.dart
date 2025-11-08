@@ -36,6 +36,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
   final GlobalKey<SubscriptionPlansSectionState> _subscriptionKey = GlobalKey();
 
   bool _isEmployee = false;
+  bool _hasLoadedFreeTrialStatus = false;
   String _userName = 'Welcome';
 
   AuthRepository get _authRepository => GetIt.I<AuthRepository>();
@@ -49,8 +50,6 @@ class _HomeContentPageState extends State<HomeContentPage> {
     _freeTrialBloc = getIt<FreeTrialBloc>();
     _loadInitialData();
     _loadUserProfile();
-    // Load free trial status
-    _freeTrialBloc.add(const FreeTrialEvent.loadStatus());
   }
 
   void _loadInitialData() {
@@ -62,26 +61,36 @@ class _HomeContentPageState extends State<HomeContentPage> {
   }
 
   Future<void> _loadUserProfile() async {
+    var isEmployee = false;
+    var displayName = 'Welcome';
+
     try {
-      final UserProfileResponse3 profile = await _authRepository
-          .getCurrentUserProfile();
-      if (mounted) {
-        setState(() {
-          _isEmployee = profile.isEmployee;
-          _userName = profile.fullName.isNotEmpty
-              ? profile.fullName
-              : 'Welcome';
-        });
-      }
-    } catch (e) {
-      // Default to non-employee if profile fetch fails
-      if (mounted) {
-        setState(() {
-          _isEmployee = false;
-          _userName = 'Welcome';
-        });
-      }
+      final UserProfileResponse3 profile =
+          await _authRepository.getCurrentUserProfile();
+      isEmployee = profile.isEmployee;
+      displayName =
+          profile.fullName.isNotEmpty ? profile.fullName : 'Welcome';
+    } catch (_) {
+      // Default values already set; fall through so UI keeps showing fallback
     }
+
+    if (!mounted) return;
+
+    setState(() {
+      _isEmployee = isEmployee;
+      _userName = displayName;
+    });
+
+    _maybeLoadFreeTrialStatus(isEmployee);
+  }
+
+  void _maybeLoadFreeTrialStatus(bool isEmployee) {
+    if (_hasLoadedFreeTrialStatus || isEmployee) {
+      return;
+    }
+
+    _hasLoadedFreeTrialStatus = true;
+    _freeTrialBloc.add(const FreeTrialEvent.loadStatus());
   }
 
   @override
@@ -138,7 +147,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
                     child: FadeInAnimation(child: widget),
                   ),
                   children: [
-                    const FreeTrialCard(),
+                    if (!_isEmployee) const FreeTrialCard(),
                     _buildHotDealsSection(),
                     _buildCategoriesSection(),
                     _buildSubscriptionPlansSection(),
@@ -347,6 +356,9 @@ class _HomeContentPageState extends State<HomeContentPage> {
     // Refresh Top Offer vendors
     _vendorsBloc.add(const LoadTopOfferVendors());
     _subscriptionBloc.add(const LoadSubscriptionPlans());
+    if (!_isEmployee) {
+      _freeTrialBloc.add(const FreeTrialEvent.loadStatus());
+    }
 
     // Also refresh subscription section if it has its own state
     _subscriptionKey.currentState?.checkSubscriptionStatus();

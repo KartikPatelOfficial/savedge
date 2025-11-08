@@ -33,7 +33,33 @@ class CouponService {
         throw Exception('Failed to redeem coupon');
       }
     } catch (e) {
-      throw Exception('Failed to redeem coupon: $e');
+      // Extract meaningful error messages from backend
+      String errorMessage = 'Failed to redeem coupon';
+
+      final errorString = e.toString().toLowerCase();
+
+      // Free trial specific errors
+      if (errorString.contains('free trial')) {
+        if (errorString.contains('disabled') || errorString.contains('contact support')) {
+          errorMessage = 'Free trial coupon redemption is currently disabled. Please contact support or purchase a subscription.';
+        } else if (errorString.contains('only be redeemed while') || errorString.contains('trial is active')) {
+          errorMessage = 'This coupon was claimed with a free trial and can only be redeemed while your trial is active. Please purchase a subscription to continue using your coupons.';
+        } else {
+          errorMessage = 'Free trial coupon redemption is not available. Please upgrade to a paid subscription.';
+        }
+      }
+      // Other redemption errors
+      else if (errorString.contains('already been used')) {
+        errorMessage = 'This coupon has already been used';
+      } else if (errorString.contains('offer has expired') || errorString.contains('coupon.*expired')) {
+        errorMessage = 'This coupon offer has expired';
+      } else if (errorString.contains('usage period has expired')) {
+        errorMessage = 'Your usage period for this coupon has expired';
+      } else if (errorString.contains('no longer valid') || errorString.contains('not.*valid')) {
+        errorMessage = 'This coupon is no longer valid';
+      }
+
+      throw Exception(errorMessage);
     }
   }
 

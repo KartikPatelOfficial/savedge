@@ -360,37 +360,40 @@ class _CleanCouponsViewState extends State<CleanCouponsView>
   }
 
   Widget _buildTabContent(String label, int count, bool hasCount) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(label),
-        if (hasCount) ...[
-          const SizedBox(width: 4),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-            decoration: BoxDecoration(
-              color:
-                  _selectedIndex ==
-                      ['All', 'Active', 'Used', 'Expired'].indexOf(label)
-                  ? Colors.white.withOpacity(0.2)
-                  : const Color(0xFF6F3FCC).withOpacity(0.1),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              count.toString(),
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(label),
+          if (hasCount) ...[
+            const SizedBox(width: 4),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
                 color:
                     _selectedIndex ==
                         ['All', 'Active', 'Used', 'Expired'].indexOf(label)
-                    ? Colors.white
-                    : const Color(0xFF6F3FCC),
+                    ? Colors.white.withOpacity(0.2)
+                    : const Color(0xFF6F3FCC).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                count.toString(),
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color:
+                      _selectedIndex ==
+                          ['All', 'Active', 'Used', 'Expired'].indexOf(label)
+                      ? Colors.white
+                      : const Color(0xFF6F3FCC),
+                ),
               ),
             ),
-          ),
+          ],
         ],
-      ],
+      ),
     );
   }
 

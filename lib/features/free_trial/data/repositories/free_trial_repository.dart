@@ -35,9 +35,22 @@ class FreeTrialRepositoryImpl implements FreeTrialRepository {
 
   Exception _handleError(DioException e) {
     if (e.response != null) {
-      final message = e.response?.data['message'] ?? 'An error occurred';
-      return Exception(message);
+      final data = e.response!.data;
+      final statusText =
+          'Request failed with status ${e.response?.statusCode ?? 'unknown'}';
+
+      if (data is Map<String, dynamic>) {
+        final message = data['message'] ?? data['error'];
+        if (message is String && message.isNotEmpty) {
+          return Exception(message);
+        }
+      } else if (data is String && data.isNotEmpty) {
+        return Exception(data);
+      }
+
+      return Exception(statusText);
     }
+
     return Exception('Network error: ${e.message}');
   }
 }

@@ -474,6 +474,23 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
             ),
           );
         }
+
+        if (widget.redemptionMethod == 'freeTrial') {
+          // Remaining claims should be based on total subscription claims (not used count)
+          // Prefer server-computed remaining claims if available
+          final remaining =
+              widget.claimCoupon?.remainingSubscriptionClaims ??
+              ((widget.claimCoupon?.userMaxRedemptions ?? 1) -
+                  (widget.claimCoupon?.userUsedRedemptions ?? 0));
+          items.add(
+            _buildModernConfirmationItem(
+              icon: Icons.celebration,
+              title: 'Free Trial Status',
+              subtitle: 'You\'ll have ${remaining - 1} claims remaining',
+              color: const Color(0xFFFF6B35),
+            ),
+          );
+        }
         break;
     }
 
@@ -667,6 +684,8 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
         return 'Pay ₹$amount with card/UPI';
       case 'membership':
         return 'Use membership benefits';
+      case 'freeTrial':
+        return 'Use free trial benefits';
       default:
         return 'Unknown payment method';
     }
@@ -696,6 +715,8 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
         return Icons.credit_card;
       case 'membership':
         return Icons.workspace_premium;
+      case 'freeTrial':
+        return Icons.celebration;
       default:
         return Icons.payment;
     }
@@ -707,6 +728,8 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
         return const Color(0xFF00C851);
       case 'membership':
         return const Color(0xFF6F3FCC);
+      case 'freeTrial':
+        return const Color(0xFFFF6B35);
       default:
         return const Color(0xFF2196F3);
     }
@@ -734,7 +757,7 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
 
         // Route based on redemption method. For Razorpay, do not show success
         // here; wait for payment verification callback.
-        if (widget.redemptionMethod == 'membership') {
+        if (widget.redemptionMethod == 'membership' || widget.redemptionMethod == 'freeTrial') {
           await _claimNewCoupon();
           if (!mounted) return;
           _showSuccessDialog();
@@ -790,6 +813,7 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
 
     switch (widget.redemptionMethod) {
       case 'membership':
+      case 'freeTrial':
         final response = await _couponService.claimCouponFromSubscription(
           widget.claimCoupon!.couponId,
         );
