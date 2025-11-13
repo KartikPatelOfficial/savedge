@@ -99,6 +99,46 @@ class BrandVoucherRepositoryImpl implements BrandVoucherRepository {
     }
   }
 
+  @override
+  Future<Either<Failure, CreateVoucherPaymentOrderResponse>> createRazorpayOrder({
+    required int brandVoucherId,
+    required double voucherAmount,
+  }) async {
+    try {
+      final request = CreateVoucherPaymentOrderRequest(
+        brandVoucherId: brandVoucherId,
+        voucherAmount: voucherAmount,
+      );
+
+      final response = await _service.createRazorpayOrder(request);
+      return Right(response);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, VerifyVoucherPaymentResponse>> verifyRazorpayPayment({
+    required int voucherOrderId,
+    required String razorpayOrderId,
+    required String razorpayPaymentId,
+    required String razorpaySignature,
+  }) async {
+    try {
+      final request = VerifyVoucherPaymentRequest(
+        voucherOrderId: voucherOrderId,
+        razorpayOrderId: razorpayOrderId,
+        razorpayPaymentId: razorpayPaymentId,
+        razorpaySignature: razorpaySignature,
+      );
+
+      final response = await _service.verifyRazorpayPayment(request);
+      return Right(response);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
   BrandVoucherEntity _mapToEntity(BrandVoucher model) {
     return BrandVoucherEntity(
       id: model.id,
@@ -135,6 +175,10 @@ class BrandVoucherRepositoryImpl implements BrandVoucherRepository {
       expiresAt: model.expiresAt,
       notes: model.notes,
       created: model.created,
+      paymentMethod: _mapToEntityPaymentMethod(model.paymentMethod),
+      razorpayOrderId: model.razorpayOrderId,
+      razorpayPaymentId: model.razorpayPaymentId,
+      amountPaid: model.amountPaid,
     );
   }
 
@@ -165,6 +209,17 @@ class BrandVoucherRepositoryImpl implements BrandVoucherRepository {
         return VoucherOrderStatusEntity.rejected;
       case VoucherOrderStatus.cancelled:
         return VoucherOrderStatusEntity.cancelled;
+    }
+  }
+
+  VoucherPaymentMethodEntity _mapToEntityPaymentMethod(VoucherPaymentMethod method) {
+    switch (method) {
+      case VoucherPaymentMethod.none:
+        return VoucherPaymentMethodEntity.none;
+      case VoucherPaymentMethod.points:
+        return VoucherPaymentMethodEntity.points;
+      case VoucherPaymentMethod.razorpay:
+        return VoucherPaymentMethodEntity.razorpay;
     }
   }
 }

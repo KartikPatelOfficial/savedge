@@ -72,6 +72,10 @@ class VoucherOrderEntity extends Equatable {
   final DateTime? expiresAt;
   final String? notes;
   final DateTime created;
+  final VoucherPaymentMethodEntity paymentMethod;
+  final String? razorpayOrderId;
+  final String? razorpayPaymentId;
+  final double? amountPaid;
 
   const VoucherOrderEntity({
     required this.id,
@@ -91,6 +95,10 @@ class VoucherOrderEntity extends Equatable {
     this.expiresAt,
     this.notes,
     required this.created,
+    required this.paymentMethod,
+    this.razorpayOrderId,
+    this.razorpayPaymentId,
+    this.amountPaid,
   });
 
   bool get isCompleted => status == VoucherOrderStatusEntity.fulfilled;
@@ -117,6 +125,10 @@ class VoucherOrderEntity extends Equatable {
         expiresAt,
         notes,
         created,
+        paymentMethod,
+        razorpayOrderId,
+        razorpayPaymentId,
+        amountPaid,
       ];
 }
 
@@ -156,6 +168,36 @@ extension VoucherOrderStatusEntityExtension on VoucherOrderStatusEntity {
         return 'Your order was rejected';
       case VoucherOrderStatusEntity.cancelled:
         return 'Your order was cancelled';
+    }
+  }
+}
+
+enum VoucherPaymentMethodEntity {
+  none,
+  points,
+  razorpay,
+}
+
+extension VoucherPaymentMethodEntityExtension on VoucherPaymentMethodEntity {
+  String get displayName {
+    switch (this) {
+      case VoucherPaymentMethodEntity.none:
+        return 'Not Specified';
+      case VoucherPaymentMethodEntity.points:
+        return 'Points';
+      case VoucherPaymentMethodEntity.razorpay:
+        return 'Razorpay';
+    }
+  }
+
+  String get icon {
+    switch (this) {
+      case VoucherPaymentMethodEntity.none:
+        return '❓';
+      case VoucherPaymentMethodEntity.points:
+        return '⭐';
+      case VoucherPaymentMethodEntity.razorpay:
+        return '💳';
     }
   }
 }

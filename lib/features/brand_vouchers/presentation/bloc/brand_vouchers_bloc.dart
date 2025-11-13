@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../domain/entities/brand_voucher_entity.dart';
+import '../../domain/repositories/brand_voucher_repository.dart';
 import '../../domain/usecases/get_brand_vouchers_usecase.dart';
 import '../../domain/usecases/create_voucher_order_usecase.dart';
 import '../../domain/usecases/get_voucher_orders_usecase.dart';
@@ -15,16 +16,20 @@ class BrandVouchersBloc extends Bloc<BrandVouchersEvent, BrandVouchersState> {
   final GetBrandVouchersUseCase getBrandVouchersUseCase;
   final CreateVoucherOrderUseCase createVoucherOrderUseCase;
   final GetVoucherOrdersUseCase getVoucherOrdersUseCase;
+  final BrandVoucherRepository brandVoucherRepository;
 
   BrandVouchersBloc({
     required this.getBrandVouchersUseCase,
     required this.createVoucherOrderUseCase,
     required this.getVoucherOrdersUseCase,
+    required this.brandVoucherRepository,
   }) : super(BrandVouchersInitial()) {
     on<LoadBrandVouchers>(_onLoadBrandVouchers);
     on<RefreshBrandVouchers>(_onRefreshBrandVouchers);
     on<CreateVoucherOrder>(_onCreateVoucherOrder);
     on<LoadVoucherOrders>(_onLoadVoucherOrders);
+    on<CreateRazorpayOrder>(_onCreateRazorpayOrder);
+    on<VerifyRazorpayPayment>(_onVerifyRazorpayPayment);
   }
 
   Future<void> _onLoadBrandVouchers(
@@ -98,6 +103,59 @@ class BrandVouchersBloc extends Bloc<BrandVouchersEvent, BrandVouchersState> {
     result.fold(
       (failure) => emit(VoucherOrdersError(failure.toString())),
       (orders) => emit(VoucherOrdersLoaded(orders)),
+    );
+  }
+
+  Future<void> _onCreateRazorpayOrder(
+    CreateRazorpayOrder event,
+    Emitter<BrandVouchersState> emit,
+  ) async {
+    emit(RazorpayOrderCreating());
+
+    final result = await brandVoucherRepository.createRazorpayOrder(
+      brandVoucherId: event.brandVoucherId,
+      voucherAmount: event.voucherAmount,
+    );
+
+    result.fold(
+      (failure) => emit(RazorpayOrderError(failure.toString())),
+      (response) => emit(
+        RazorpayOrderCreated(
+          orderId: response.orderId,
+          amount: response.amount,
+          currency: response.currency,
+          voucherOrderId: response.voucherOrderId,
+          brandName: response.brandName,
+          voucherAmount: response.voucherAmount,
+          processingFee: response.processingFee,
+          totalAmount: response.totalAmount,
+          razorpayKey: response.razorpayKey,
+        ),
+      ),
+    );
+  }
+
+  Future<void> _onVerifyRazorpayPayment(
+    VerifyRazorpayPayment event,
+    Emitter<BrandVouchersState> emit,
+  ) async {
+    emit(RazorpayPaymentVerifying());
+
+    final result = await brandVoucherRepository.verifyRazorpayPayment(
+      voucherOrderId: event.voucherOrderId,
+      razorpayOrderId: event.razorpayOrderId,
+      razorpayPaymentId: event.razorpayPaymentId,
+      razorpaySignature: event.razorpaySignature,
+    );
+
+    result.fold(
+      (failure) => emit(RazorpayPaymentError(failure.toString())),
+      (response) => emit(
+        RazorpayPaymentVerified(
+          voucherOrderId: response.voucherOrderId,
+          message: response.message,
+        ),
+      ),
     );
   }
 }

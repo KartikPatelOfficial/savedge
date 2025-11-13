@@ -439,7 +439,11 @@ class VoucherOrderDetailsSheet extends StatelessWidget {
           _buildDetailRow('Brand', order.brandName),
           _buildDetailRow('Voucher Amount', '₹${order.voucherAmount.toStringAsFixed(2)}'),
           _buildDetailRow('Processing Fee', '₹${order.processingFee.toStringAsFixed(2)}'),
-          _buildDetailRow('Total Points Used', '${order.totalPointsUsed.toStringAsFixed(0)} Points'),
+          if (order.paymentMethod == VoucherPaymentMethodEntity.points)
+            _buildDetailRow('Total Points Used', '${order.totalPointsUsed.toStringAsFixed(0)} Points'),
+          if (order.paymentMethod == VoucherPaymentMethodEntity.razorpay && order.amountPaid != null)
+            _buildDetailRow('Amount Paid', '₹${order.amountPaid!.toStringAsFixed(2)}'),
+          _buildDetailRow('Payment Method', '${order.paymentMethod.icon} ${order.paymentMethod.displayName}'),
           _buildDetailRow('Order Date', _formatDate(order.created)),
           _buildDetailRow('Status', order.status.displayName, isStatus: true),
         ],
@@ -659,6 +663,8 @@ class VoucherOrderDetailsSheet extends StatelessWidget {
   }
 
   String _formatDate(DateTime date) {
-    return '${date.day}/${date.month}/${date.year} at ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
+    // Convert UTC to local time
+    final localDate = date.toLocal();
+    return '${localDate.day}/${localDate.month}/${localDate.year} at ${localDate.hour.toString().padLeft(2, '0')}:${localDate.minute.toString().padLeft(2, '0')}';
   }
 }

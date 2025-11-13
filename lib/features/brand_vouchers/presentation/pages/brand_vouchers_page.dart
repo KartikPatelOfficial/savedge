@@ -66,15 +66,19 @@ class _BrandVouchersViewState extends State<BrandVouchersView> {
           elevation: 0,
           scrolledUnderElevation: 0,
           surfaceTintColor: Colors.transparent,
+          backgroundColor: Colors.white,
           systemOverlayStyle: SystemUiOverlayStyle.dark,
+          leadingWidth: 56,
           leading: IconButton(
             onPressed: () => Navigator.pop(context),
-            icon: Container(
-              padding: const EdgeInsets.all(8),
-              child: const Icon(Icons.arrow_back_ios_rounded, size: 24),
+            icon: const Icon(
+              Icons.arrow_back_ios_rounded,
+              size: 24,
+              color: Color(0xFF1A202C),
             ),
           ),
           flexibleSpace: FlexibleSpaceBar(
+            titlePadding: const EdgeInsets.only(left: 56, bottom: 16),
             title: const Text(
               'Brand Vouchers',
               style: TextStyle(
@@ -83,13 +87,12 @@ class _BrandVouchersViewState extends State<BrandVouchersView> {
                 fontWeight: FontWeight.w700,
               ),
             ),
-            titlePadding: const EdgeInsets.only(left: 20),
           ),
           actions: [
             Container(
               margin: const EdgeInsets.only(right: 20),
               decoration: BoxDecoration(
-                color: const Color(0xFF6F3FCC).withOpacity(0.1),
+                color: const Color(0xFF6F3FCC).withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: IconButton(
@@ -161,7 +164,7 @@ class _BrandVouchersViewState extends State<BrandVouchersView> {
                     width: 100,
                     height: 100,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF6F3FCC).withOpacity(0.1),
+                      color: const Color(0xFF6F3FCC).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(50),
                     ),
                     child: const Icon(
@@ -213,7 +216,7 @@ class _BrandVouchersViewState extends State<BrandVouchersView> {
                     width: 100,
                     height: 100,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFE53E3E).withOpacity(0.1),
+                      color: const Color(0xFFE53E3E).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(50),
                     ),
                     child: const Icon(
@@ -286,18 +289,18 @@ class _BrandVouchersViewState extends State<BrandVouchersView> {
       scrolledUnderElevation: 0,
       surfaceTintColor: Colors.transparent,
       systemOverlayStyle: SystemUiOverlayStyle.dark,
-      leading: Padding(
-        padding: const EdgeInsets.only(left: 20),
-        child: IconButton(
-          onPressed: () => Navigator.pop(context),
-          icon: Container(
-            padding: const EdgeInsets.all(8),
-            child: const Icon(Icons.arrow_back_ios_rounded, size: 24),
-          ),
+      leadingWidth: 56,
+      leading: IconButton(
+        onPressed: () => Navigator.pop(context),
+        icon: const Icon(
+          Icons.arrow_back_ios_rounded,
+          size: 24,
+          color: Color(0xFF1A202C),
         ),
       ),
       flexibleSpace: FlexibleSpaceBar(
         background: Container(color: Colors.white),
+        titlePadding: const EdgeInsets.only(left: 56, bottom: 16),
         title: const Text(
           'Brand Vouchers',
           style: TextStyle(
@@ -306,13 +309,12 @@ class _BrandVouchersViewState extends State<BrandVouchersView> {
             fontWeight: FontWeight.w700,
           ),
         ),
-        titlePadding: const EdgeInsets.only(left: 20, bottom: 16),
       ),
       actions: [
         Container(
           margin: const EdgeInsets.only(right: 20),
           decoration: BoxDecoration(
-            color: const Color(0xFF6F3FCC).withOpacity(0.1),
+            color: const Color(0xFF6F3FCC).withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
           ),
           child: IconButton(

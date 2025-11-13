@@ -44,6 +44,12 @@ abstract class VoucherOrder with _$VoucherOrder {
     DateTime? expiresAt,
     String? notes,
     required DateTime created,
+    // Payment information
+    required VoucherPaymentMethod paymentMethod,
+    String? razorpayOrderId,
+    String? razorpayPaymentId,
+    String? razorpaySignature,
+    double? amountPaid,
   }) = _VoucherOrder;
 
   factory VoucherOrder.fromJson(Map<String, dynamic> json) =>
@@ -109,6 +115,8 @@ enum VoucherOrderStatus {
 }
 
 enum VoucherPaymentMethod {
+  @JsonValue(0)
+  none,
   @JsonValue(1)
   points,
   @JsonValue(2)
@@ -150,6 +158,8 @@ extension VoucherOrderStatusExtension on VoucherOrderStatus {
 extension VoucherPaymentMethodExtension on VoucherPaymentMethod {
   String get displayName {
     switch (this) {
+      case VoucherPaymentMethod.none:
+        return 'Not Specified';
       case VoucherPaymentMethod.points:
         return 'Points';
       case VoucherPaymentMethod.razorpay:
@@ -182,6 +192,7 @@ abstract class CreateVoucherPaymentOrderResponse with _$CreateVoucherPaymentOrde
     required double voucherAmount,
     required double processingFee,
     required double totalAmount,
+    required String razorpayKey,
   }) = _CreateVoucherPaymentOrderResponse;
 
   factory CreateVoucherPaymentOrderResponse.fromJson(Map<String, dynamic> json) =>

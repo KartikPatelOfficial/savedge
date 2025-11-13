@@ -115,8 +115,8 @@ class VoucherOrderCard extends StatelessWidget {
                     ),
                     Expanded(
                       child: _buildInfoColumn(
-                        'Points Used',
-                        '${order.totalPointsUsed.toStringAsFixed(0)}',
+                        'Paid Via',
+                        order.paymentMethod.icon,
                       ),
                     ),
                     Container(
@@ -294,9 +294,11 @@ class VoucherOrderCard extends StatelessWidget {
   }
 
   String _formatDate(DateTime date) {
+    // Convert UTC to local time
+    final localDate = date.toLocal();
     final now = DateTime.now();
-    final difference = now.difference(date);
-    
+    final difference = now.difference(localDate);
+
     if (difference.inDays == 0) {
       if (difference.inHours == 0) {
         return '${difference.inMinutes}m ago';
@@ -305,7 +307,7 @@ class VoucherOrderCard extends StatelessWidget {
     } else if (difference.inDays < 7) {
       return '${difference.inDays}d ago';
     } else {
-      return '${date.day}/${date.month}';
+      return '${localDate.day}/${localDate.month}';
     }
   }
 }

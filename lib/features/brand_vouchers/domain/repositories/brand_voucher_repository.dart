@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 
 import '../../../../core/error/failures.dart';
+import '../../data/models/brand_voucher_models.dart';
 import '../entities/brand_voucher_entity.dart';
 
 abstract class BrandVoucherRepository {
@@ -24,4 +25,17 @@ abstract class BrandVoucherRepository {
   });
 
   Future<Either<Failure, VoucherOrderEntity>> getVoucherOrder(int id);
+
+  // Razorpay payment methods
+  Future<Either<Failure, CreateVoucherPaymentOrderResponse>> createRazorpayOrder({
+    required int brandVoucherId,
+    required double voucherAmount,
+  });
+
+  Future<Either<Failure, VerifyVoucherPaymentResponse>> verifyRazorpayPayment({
+    required int voucherOrderId,
+    required String razorpayOrderId,
+    required String razorpayPaymentId,
+    required String razorpaySignature,
+  });
 }

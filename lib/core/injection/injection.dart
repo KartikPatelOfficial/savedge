@@ -383,6 +383,7 @@ Future<void> configureDependencies() async {
       getBrandVouchersUseCase: getIt<GetBrandVouchersUseCase>(),
       createVoucherOrderUseCase: getIt<CreateVoucherOrderUseCase>(),
       getVoucherOrdersUseCase: getIt<GetVoucherOrdersUseCase>(),
+      brandVoucherRepository: getIt<BrandVoucherRepository>(),
     ),
   );
 

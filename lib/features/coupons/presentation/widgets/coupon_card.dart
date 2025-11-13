@@ -16,7 +16,7 @@ class CouponCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        height: 160,
+        height: 165,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
@@ -151,7 +151,7 @@ class CouponCard extends StatelessWidget {
 
           // Middle: Offer description
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 6),
+            padding: const EdgeInsets.symmetric(vertical: 4),
             child: Text(
               coupon.description ?? coupon.title,
               style: const TextStyle(
@@ -188,7 +188,7 @@ class CouponCard extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 6),
               // Barcode strip
               _buildBarcodeStrip(),
             ],

@@ -68,3 +68,76 @@ class VoucherOrdersError extends BrandVouchersState {
   @override
   List<Object> get props => [message];
 }
+
+// Razorpay payment states
+class RazorpayOrderCreating extends BrandVouchersState {}
+
+class RazorpayOrderCreated extends BrandVouchersState {
+  final String orderId;
+  final int amount;
+  final String currency;
+  final int voucherOrderId;
+  final String brandName;
+  final double voucherAmount;
+  final double processingFee;
+  final double totalAmount;
+  final String razorpayKey;
+
+  const RazorpayOrderCreated({
+    required this.orderId,
+    required this.amount,
+    required this.currency,
+    required this.voucherOrderId,
+    required this.brandName,
+    required this.voucherAmount,
+    required this.processingFee,
+    required this.totalAmount,
+    required this.razorpayKey,
+  });
+
+  @override
+  List<Object> get props => [
+        orderId,
+        amount,
+        currency,
+        voucherOrderId,
+        brandName,
+        voucherAmount,
+        processingFee,
+        totalAmount,
+        razorpayKey,
+      ];
+}
+
+class RazorpayOrderError extends BrandVouchersState {
+  final String message;
+
+  const RazorpayOrderError(this.message);
+
+  @override
+  List<Object> get props => [message];
+}
+
+class RazorpayPaymentVerifying extends BrandVouchersState {}
+
+class RazorpayPaymentVerified extends BrandVouchersState {
+  final int voucherOrderId;
+  final String message;
+
+  const RazorpayPaymentVerified({
+    required this.voucherOrderId,
+    required this.message,
+  });
+
+  @override
+  List<Object> get props => [voucherOrderId, message];
+}
+
+class RazorpayPaymentError extends BrandVouchersState {
+  final String message;
+
+  const RazorpayPaymentError(this.message);
+
+  @override
+  List<Object> get props => [message];
+}

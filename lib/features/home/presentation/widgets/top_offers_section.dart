@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:savedge/core/constants/categories_constants.dart';
 import 'package:savedge/core/injection/injection.dart';
 import 'package:savedge/features/vendors/domain/entities/vendor.dart';
 import 'package:savedge/features/vendors/presentation/bloc/vendors_bloc.dart';
@@ -42,8 +41,12 @@ class _TopOffersSectionState extends State<TopOffersSection> {
     final vendorsBloc = context.read<VendorsBloc?>();
     if (vendorsBloc == null) {
       return BlocProvider(
-        create: (context) => getIt<VendorsBloc>()..add(const LoadTopOfferVendors()),
-        child: TopOffersView(title: widget.title, onVendorTap: widget.onVendorTap),
+        create: (context) =>
+            getIt<VendorsBloc>()..add(const LoadTopOfferVendors()),
+        child: TopOffersView(
+          title: widget.title,
+          onVendorTap: widget.onVendorTap,
+        ),
       );
     }
     return TopOffersView(title: widget.title, onVendorTap: widget.onVendorTap);
@@ -338,33 +341,6 @@ class TopVendorCard extends StatelessWidget {
                     Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        // Category icon
-                        Container(
-                          width: 48,
-                          height: 48,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.15),
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(14),
-                            child: Image.asset(
-                              CategoriesConstants.getCategoryIcon(
-                                vendor.category,
-                              ),
-                              width: 48,
-                              height: 48,
-                              fit: BoxFit.contain,
-                              errorBuilder: (context, error, stackTrace) =>
-                                  const Icon(
-                                    Icons.store,
-                                    color: Colors.white,
-                                    size: 24,
-                                  ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 12),
                         // Arrow indicator
                         Container(
                           padding: const EdgeInsets.all(8),

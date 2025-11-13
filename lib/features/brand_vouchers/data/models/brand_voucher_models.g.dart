@@ -62,6 +62,14 @@ _VoucherOrder _$VoucherOrderFromJson(Map<String, dynamic> json) =>
           : DateTime.parse(json['expiresAt'] as String),
       notes: json['notes'] as String?,
       created: DateTime.parse(json['created'] as String),
+      paymentMethod: $enumDecode(
+        _$VoucherPaymentMethodEnumMap,
+        json['paymentMethod'],
+      ),
+      razorpayOrderId: json['razorpayOrderId'] as String?,
+      razorpayPaymentId: json['razorpayPaymentId'] as String?,
+      razorpaySignature: json['razorpaySignature'] as String?,
+      amountPaid: (json['amountPaid'] as num?)?.toDouble(),
     );
 
 Map<String, dynamic> _$VoucherOrderToJson(_VoucherOrder instance) =>
@@ -83,6 +91,11 @@ Map<String, dynamic> _$VoucherOrderToJson(_VoucherOrder instance) =>
       'expiresAt': instance.expiresAt?.toIso8601String(),
       'notes': instance.notes,
       'created': instance.created.toIso8601String(),
+      'paymentMethod': _$VoucherPaymentMethodEnumMap[instance.paymentMethod]!,
+      'razorpayOrderId': instance.razorpayOrderId,
+      'razorpayPaymentId': instance.razorpayPaymentId,
+      'razorpaySignature': instance.razorpaySignature,
+      'amountPaid': instance.amountPaid,
     };
 
 const _$VoucherOrderStatusEnumMap = {
@@ -91,6 +104,12 @@ const _$VoucherOrderStatusEnumMap = {
   VoucherOrderStatus.fulfilled: 3,
   VoucherOrderStatus.rejected: 4,
   VoucherOrderStatus.cancelled: 5,
+};
+
+const _$VoucherPaymentMethodEnumMap = {
+  VoucherPaymentMethod.none: 0,
+  VoucherPaymentMethod.points: 1,
+  VoucherPaymentMethod.razorpay: 2,
 };
 
 _CreateVoucherOrderRequest _$CreateVoucherOrderRequestFromJson(
@@ -114,11 +133,6 @@ Map<String, dynamic> _$CreateVoucherOrderRequestToJson(
   'brandVoucherId': instance.brandVoucherId,
   'voucherAmount': instance.voucherAmount,
   'paymentMethod': _$VoucherPaymentMethodEnumMap[instance.paymentMethod]!,
-};
-
-const _$VoucherPaymentMethodEnumMap = {
-  VoucherPaymentMethod.points: 1,
-  VoucherPaymentMethod.razorpay: 2,
 };
 
 _PaginatedBrandVoucherResponse _$PaginatedBrandVoucherResponseFromJson(
@@ -195,6 +209,7 @@ _CreateVoucherPaymentOrderResponse _$CreateVoucherPaymentOrderResponseFromJson(
   voucherAmount: (json['voucherAmount'] as num).toDouble(),
   processingFee: (json['processingFee'] as num).toDouble(),
   totalAmount: (json['totalAmount'] as num).toDouble(),
+  razorpayKey: json['razorpayKey'] as String,
 );
 
 Map<String, dynamic> _$CreateVoucherPaymentOrderResponseToJson(
@@ -209,6 +224,7 @@ Map<String, dynamic> _$CreateVoucherPaymentOrderResponseToJson(
   'voucherAmount': instance.voucherAmount,
   'processingFee': instance.processingFee,
   'totalAmount': instance.totalAmount,
+  'razorpayKey': instance.razorpayKey,
 };
 
 _VerifyVoucherPaymentRequest _$VerifyVoucherPaymentRequestFromJson(
