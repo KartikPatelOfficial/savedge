@@ -79,6 +79,7 @@ abstract class UserCouponDetailModel with _$UserCouponDetailModel {
     @JsonKey(name: 'vendorProfileId') required int vendorId,
     required String vendorUserId,
     required String vendorName,
+    @Default('') String vendorCategory,
     required String status,
     @JsonKey(name: 'purchasedDate') required DateTime acquiredDate,
     DateTime? redeemedDate,

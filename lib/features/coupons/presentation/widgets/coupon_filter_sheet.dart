@@ -1,173 +1,154 @@
 import 'package:flutter/material.dart';
+import 'package:savedge/features/coupons/data/models/coupon_gifting_models.dart';
 
 class CouponFilterSheet extends StatefulWidget {
   const CouponFilterSheet({
     super.key,
-    required this.selectedCategory,
-    required this.sortBy,
+    required this.selectedStatus,
+    required this.selectedCategories,
+    required this.couponsData,
     required this.onFiltersChanged,
   });
 
-  final String selectedCategory;
-  final String sortBy;
-  final Function(String category, String sortBy) onFiltersChanged;
+  final String selectedStatus;
+  final List<String> selectedCategories;
+  final UserCouponsResponseModel couponsData;
+  final Function(String status, List<String> categories) onFiltersChanged;
 
   @override
   State<CouponFilterSheet> createState() => _CouponFilterSheetState();
 }
 
-class _CouponFilterSheetState extends State<CouponFilterSheet>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
-  late Animation<double> _animation;
-  
-  late String _selectedCategory;
-  late String _selectedSort;
-  double _minDiscount = 0;
-  double _maxDiscount = 100;
-  bool _showExpiringSoon = false;
-  bool _showGiftedOnly = false;
+class _CouponFilterSheetState extends State<CouponFilterSheet> {
+  late String _selectedStatus;
+  late Set<String> _selectedCategories;
+  late List<Map<String, dynamic>> _categoryOptions;
 
-  final List<Map<String, dynamic>> _categories = [
+  // Status filter options
+  final List<Map<String, dynamic>> _statusOptions = [
     {
-      'id': 'all',
-      'title': 'All Coupons',
-      'subtitle': 'Show all available coupons',
+      'id': 'All',
+      'title': 'All',
       'icon': Icons.dashboard_rounded,
       'color': const Color(0xFF6F3FCC),
     },
     {
-      'id': 'active',
+      'id': 'Active',
       'title': 'Active',
-      'subtitle': 'Ready to use coupons',
       'icon': Icons.local_offer_rounded,
       'color': const Color(0xFF10B981),
     },
     {
-      'id': 'used',
+      'id': 'Used',
       'title': 'Used',
-      'subtitle': 'Already redeemed coupons',
       'icon': Icons.check_circle_rounded,
       'color': const Color(0xFFF59E0B),
     },
     {
-      'id': 'gifts',
-      'title': 'Gifts',
-      'subtitle': 'Received as gifts',
-      'icon': Icons.card_giftcard_rounded,
-      'color': const Color(0xFFEF4444),
-    },
-    {
-      'id': 'expiring',
-      'title': 'Expiring Soon',
-      'subtitle': 'Expires within 7 days',
+      'id': 'Expired',
+      'title': 'Expired',
       'icon': Icons.schedule_rounded,
-      'color': const Color(0xFFFF6B35),
+      'color': const Color(0xFFEF4444),
     },
   ];
 
-  final List<Map<String, dynamic>> _sortOptions = [
-    {
-      'id': 'newest',
-      'title': 'Newest First',
-      'subtitle': 'Recently acquired coupons',
-      'icon': Icons.fiber_new_rounded,
-    },
-    {
-      'id': 'expiry',
-      'title': 'Expiry Date',
-      'subtitle': 'Expiring soonest first',
-      'icon': Icons.schedule_rounded,
-    },
-    {
-      'id': 'value',
-      'title': 'Discount Value',
-      'subtitle': 'Highest discount first',
-      'icon': Icons.trending_up_rounded,
-    },
-    {
-      'id': 'vendor',
-      'title': 'Vendor Name',
-      'subtitle': 'Alphabetical order',
-      'icon': Icons.sort_by_alpha_rounded,
-    },
-  ];
+  // Map of category IDs to icons
+  final Map<String, IconData> _categoryIconMap = {
+    'Fast food': Icons.fastfood_rounded,
+    'Restaurant': Icons.restaurant_rounded,
+    'Salon': Icons.content_cut_rounded,
+    'Gym': Icons.fitness_center_rounded,
+    'Hotels': Icons.hotel_rounded,
+    'Clothing store': Icons.checkroom_rounded,
+    'Grocery': Icons.shopping_cart_rounded,
+    'Cafe': Icons.local_cafe_rounded,
+  };
 
   @override
   void initState() {
     super.initState();
-    _selectedCategory = widget.selectedCategory;
-    _selectedSort = widget.sortBy;
-    
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 400),
-      vsync: this,
-    );
-    _animation = CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeOutBack,
-    );
-    
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _animationController.forward();
-    });
+    _selectedStatus = widget.selectedStatus;
+    _selectedCategories = widget.selectedCategories.toSet();
+    _categoryOptions = _extractCategories();
   }
 
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
+  // Extract unique categories from loaded coupons
+  List<Map<String, dynamic>> _extractCategories() {
+    final Set<String> categories = {};
+
+    // Get all coupons
+    final allCoupons = [
+      ...widget.couponsData.purchasedCoupons,
+      ...widget.couponsData.giftedReceivedCoupons,
+      ...widget.couponsData.usedCoupons,
+      ...widget.couponsData.expiredCoupons,
+    ];
+
+    // Extract unique categories
+    for (final coupon in allCoupons) {
+      if (coupon.vendorCategory.isNotEmpty) {
+        categories.add(coupon.vendorCategory);
+      }
+    }
+
+    // Build category options list
+    final List<Map<String, dynamic>> options = [
+      {
+        'id': 'All',
+        'title': 'All Categories',
+        'icon': Icons.grid_view_rounded,
+      },
+    ];
+
+    // Add found categories with icons
+    for (final category in categories) {
+      options.add({
+        'id': category,
+        'title': category,
+        'icon': _categoryIconMap[category] ?? Icons.local_offer_rounded,
+      });
+    }
+
+    return options;
   }
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _animation,
-      builder: (context, child) {
-        return Transform.translate(
-          offset: Offset(0, (1 - _animation.value) * 400),
-          child: Container(
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(24),
-                topRight: Radius.circular(24),
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(24),
+          topRight: Radius.circular(24),
+        ),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _buildHeader(),
+          Flexible(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildStatusSection(),
+                  const SizedBox(height: 24),
+                  _buildCategorySection(),
+                  const SizedBox(height: 24),
+                  _buildActionButtons(),
+                ],
               ),
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _buildHeader(),
-                Flexible(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildCategoriesSection(),
-                        const SizedBox(height: 32),
-                        _buildSortSection(),
-                        const SizedBox(height: 32),
-                        _buildDiscountRangeSection(),
-                        const SizedBox(height: 32),
-                        _buildAdvancedFilters(),
-                        const SizedBox(height: 32),
-                        _buildActionButtons(),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
           ),
-        );
-      },
+        ],
+      ),
     );
   }
 
   Widget _buildHeader() {
     return Container(
-      padding: const EdgeInsets.fromLTRB(24, 20, 24, 24),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: const BorderRadius.only(
@@ -176,7 +157,7 @@ class _CouponFilterSheetState extends State<CouponFilterSheet>
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -188,7 +169,7 @@ class _CouponFilterSheetState extends State<CouponFilterSheet>
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: const Color(0xFF6F3FCC).withOpacity(0.1),
+              color: const Color(0xFF6F3FCC).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(
@@ -197,383 +178,178 @@ class _CouponFilterSheetState extends State<CouponFilterSheet>
               size: 22,
             ),
           ),
-          const SizedBox(width: 16),
-          const Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Filter & Sort',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.black87,
-                  ),
-                ),
-                Text(
-                  'Find exactly what you\'re looking for',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Color(0xFF64748B),
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
+          const SizedBox(width: 12),
+          const Text(
+            'Filter Coupons',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF1A202C),
             ),
           ),
+          const Spacer(),
           IconButton(
-            onPressed: () => Navigator.of(context).pop(),
-            icon: const Icon(
-              Icons.close_rounded,
-              color: Color(0xFF64748B),
-              size: 24,
-            ),
+            icon: const Icon(Icons.close_rounded, size: 24),
+            color: const Color(0xFF6B7280),
+            onPressed: () => Navigator.pop(context),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildCategoriesSection() {
+  Widget _buildStatusSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Type',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF1A202C),
+          ),
+        ),
+        const SizedBox(height: 12),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: _statusOptions.map((status) {
+            final isSelected = _selectedStatus == status['id'];
+            return GestureDetector(
+              onTap: () {
+                setState(() => _selectedStatus = status['id']);
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? (status['color'] as Color).withValues(alpha: 0.1)
+                      : const Color(0xFFF3F4F6),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: isSelected
+                        ? (status['color'] as Color)
+                        : Colors.transparent,
+                    width: 2,
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      status['icon'] as IconData,
+                      size: 18,
+                      color: isSelected
+                          ? (status['color'] as Color)
+                          : const Color(0xFF6B7280),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      status['title'],
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: isSelected
+                            ? (status['color'] as Color)
+                            : const Color(0xFF6B7280),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCategorySection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
           'Category',
           style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            color: Colors.black87,
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF1A202C),
           ),
-        ),
-        const SizedBox(height: 16),
-        ...(_categories.map((category) {
-          final isSelected = _selectedCategory == category['id'];
-          return Container(
-            margin: const EdgeInsets.only(bottom: 12),
-            child: Material(
-              borderRadius: BorderRadius.circular(16),
-              color: isSelected
-                  ? const Color(0xFF6F3FCC).withOpacity(0.1)
-                  : Colors.grey[50],
-              child: InkWell(
-                borderRadius: BorderRadius.circular(16),
-                onTap: () {
-                  setState(() => _selectedCategory = category['id']);
-                },
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: isSelected
-                          ? const Color(0xFF6F3FCC)
-                          : Colors.grey[200]!,
-                      width: isSelected ? 2 : 1,
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 44,
-                        height: 44,
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? (category['color'] as Color)
-                              : Colors.grey[300],
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Icon(
-                          category['icon'] as IconData,
-                          color: isSelected ? Colors.white : Colors.grey[600],
-                          size: 20,
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              category['title'] as String,
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                color: isSelected
-                                    ? const Color(0xFF6F3FCC)
-                                    : Colors.black87,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              category['subtitle'] as String,
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: Colors.grey[600],
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      if (isSelected)
-                        const Icon(
-                          Icons.check_circle_rounded,
-                          color: Color(0xFF6F3FCC),
-                          size: 24,
-                        ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          );
-        }).toList()),
-      ],
-    );
-  }
-
-  Widget _buildSortSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Sort By',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            color: Colors.black87,
-          ),
-        ),
-        const SizedBox(height: 16),
-        ...(_sortOptions.map((option) {
-          final isSelected = _selectedSort == option['id'];
-          return Container(
-            margin: const EdgeInsets.only(bottom: 8),
-            child: Material(
-              borderRadius: BorderRadius.circular(12),
-              color: isSelected
-                  ? const Color(0xFF6F3FCC).withOpacity(0.1)
-                  : Colors.transparent,
-              child: InkWell(
-                borderRadius: BorderRadius.circular(12),
-                onTap: () {
-                  setState(() => _selectedSort = option['id']);
-                },
-                child: Container(
-                  padding: const EdgeInsets.all(12),
-                  child: Row(
-                    children: [
-                      Icon(
-                        option['icon'] as IconData,
-                        color: isSelected
-                            ? const Color(0xFF6F3FCC)
-                            : Colors.grey[600],
-                        size: 20,
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              option['title'] as String,
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
-                                color: isSelected
-                                    ? const Color(0xFF6F3FCC)
-                                    : Colors.black87,
-                              ),
-                            ),
-                            Text(
-                              option['subtitle'] as String,
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey[600],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Radio<String>(
-                        value: option['id'],
-                        groupValue: _selectedSort,
-                        onChanged: (value) {
-                          setState(() => _selectedSort = value!);
-                        },
-                        activeColor: const Color(0xFF6F3FCC),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          );
-        }).toList()),
-      ],
-    );
-  }
-
-  Widget _buildDiscountRangeSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Discount Range',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            color: Colors.black87,
-          ),
-        ),
-        const SizedBox(height: 16),
-        Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Colors.grey[50],
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.grey[200]!),
-          ),
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    '${_minDiscount.toInt()}%',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF6F3FCC),
-                    ),
-                  ),
-                  Text(
-                    '${_maxDiscount.toInt()}%',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF6F3FCC),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              RangeSlider(
-                values: RangeValues(_minDiscount, _maxDiscount),
-                min: 0,
-                max: 100,
-                divisions: 20,
-                activeColor: const Color(0xFF6F3FCC),
-                inactiveColor: Colors.grey[300],
-                onChanged: (values) {
-                  setState(() {
-                    _minDiscount = values.start;
-                    _maxDiscount = values.end;
-                  });
-                },
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildAdvancedFilters() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Advanced Filters',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            color: Colors.black87,
-          ),
-        ),
-        const SizedBox(height: 16),
-        _buildFilterToggle(
-          title: 'Expiring Soon',
-          subtitle: 'Show coupons expiring within 7 days',
-          icon: Icons.schedule_rounded,
-          value: _showExpiringSoon,
-          onChanged: (value) => setState(() => _showExpiringSoon = value),
         ),
         const SizedBox(height: 12),
-        _buildFilterToggle(
-          title: 'Gifted Coupons Only',
-          subtitle: 'Show only received gift coupons',
-          icon: Icons.card_giftcard_rounded,
-          value: _showGiftedOnly,
-          onChanged: (value) => setState(() => _showGiftedOnly = value),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: _categoryOptions.map((category) {
+            final categoryId = category['id'] as String;
+            final isAll = categoryId == 'All';
+            final isSelected = isAll
+                ? _selectedCategories.isEmpty
+                : _selectedCategories.contains(categoryId);
+
+            return GestureDetector(
+              onTap: () {
+                setState(() {
+                  if (isAll) {
+                    // Selecting "All" clears all other selections
+                    _selectedCategories.clear();
+                  } else {
+                    // Toggle this category
+                    if (_selectedCategories.contains(categoryId)) {
+                      _selectedCategories.remove(categoryId);
+                      // If no categories selected, default to "All"
+                      if (_selectedCategories.isEmpty) {
+                        // Do nothing, empty set means "All"
+                      }
+                    } else {
+                      _selectedCategories.add(categoryId);
+                    }
+                  }
+                });
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? const Color(0xFF6F3FCC).withValues(alpha: 0.1)
+                      : const Color(0xFFF3F4F6),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: isSelected
+                        ? const Color(0xFF6F3FCC)
+                        : Colors.transparent,
+                    width: 2,
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      category['icon'] as IconData,
+                      size: 18,
+                      color: isSelected
+                          ? const Color(0xFF6F3FCC)
+                          : const Color(0xFF6B7280),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      category['title'],
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: isSelected
+                            ? const Color(0xFF6F3FCC)
+                            : const Color(0xFF6B7280),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }).toList(),
         ),
       ],
-    );
-  }
-
-  Widget _buildFilterToggle({
-    required String title,
-    required String subtitle,
-    required IconData icon,
-    required bool value,
-    required ValueChanged<bool> onChanged,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: value ? const Color(0xFF6F3FCC).withOpacity(0.1) : Colors.grey[50],
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: value ? const Color(0xFF6F3FCC) : Colors.grey[200]!,
-          width: value ? 2 : 1,
-        ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: value ? const Color(0xFF6F3FCC) : Colors.grey[300],
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(
-              icon,
-              color: value ? Colors.white : Colors.grey[600],
-              size: 18,
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: value ? const Color(0xFF6F3FCC) : Colors.black87,
-                  ),
-                ),
-                Text(
-                  subtitle,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey[600],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Switch(
-            value: value,
-            onChanged: onChanged,
-            activeColor: const Color(0xFF6F3FCC),
-          ),
-        ],
-      ),
     );
   }
 
@@ -584,53 +360,52 @@ class _CouponFilterSheetState extends State<CouponFilterSheet>
           child: OutlinedButton(
             onPressed: () {
               setState(() {
-                _selectedCategory = 'all';
-                _selectedSort = 'newest';
-                _minDiscount = 0;
-                _maxDiscount = 100;
-                _showExpiringSoon = false;
-                _showGiftedOnly = false;
+                _selectedStatus = 'All';
+                _selectedCategories.clear();
               });
             },
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 16),
               side: const BorderSide(color: Color(0xFF6F3FCC), width: 2),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(12),
               ),
             ),
             child: const Text(
-              'Reset',
+              'Clear All',
               style: TextStyle(
                 fontSize: 16,
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w600,
                 color: Color(0xFF6F3FCC),
               ),
             ),
           ),
         ),
-        const SizedBox(width: 16),
+        const SizedBox(width: 12),
         Expanded(
           flex: 2,
           child: ElevatedButton(
             onPressed: () {
-              widget.onFiltersChanged(_selectedCategory, _selectedSort);
-              Navigator.of(context).pop();
+              widget.onFiltersChanged(
+                _selectedStatus,
+                _selectedCategories.toList(),
+              );
+              Navigator.pop(context);
             },
             style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 16),
               backgroundColor: const Color(0xFF6F3FCC),
               foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
               elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
             child: const Text(
               'Apply Filters',
               style: TextStyle(
                 fontSize: 16,
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ),

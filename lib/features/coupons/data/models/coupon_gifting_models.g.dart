@@ -102,6 +102,7 @@ _UserCouponDetailModel _$UserCouponDetailModelFromJson(
   vendorId: (json['vendorProfileId'] as num).toInt(),
   vendorUserId: json['vendorUserId'] as String,
   vendorName: json['vendorName'] as String,
+  vendorCategory: json['vendorCategory'] as String? ?? '',
   status: json['status'] as String,
   acquiredDate: DateTime.parse(json['purchasedDate'] as String),
   redeemedDate: json['redeemedDate'] == null
@@ -135,6 +136,7 @@ Map<String, dynamic> _$UserCouponDetailModelToJson(
   'vendorProfileId': instance.vendorId,
   'vendorUserId': instance.vendorUserId,
   'vendorName': instance.vendorName,
+  'vendorCategory': instance.vendorCategory,
   'status': instance.status,
   'purchasedDate': instance.acquiredDate.toIso8601String(),
   'redeemedDate': instance.redeemedDate?.toIso8601String(),

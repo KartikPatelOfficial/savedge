@@ -44,7 +44,7 @@ class _VendorsRemoteDataSource implements VendorsRemoteDataSource {
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/api/Vendors',
+            '/api/vendor-profiles',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -66,7 +66,7 @@ class _VendorsRemoteDataSource implements VendorsRemoteDataSource {
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/api/Vendors/${id}',
+            '/api/vendor-profiles/${id}',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -96,7 +96,7 @@ class _VendorsRemoteDataSource implements VendorsRemoteDataSource {
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/api/vendors/${vendorId}/Images',
+            '/api/vendor-media/${vendorId}/images',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -128,7 +128,7 @@ class _VendorsRemoteDataSource implements VendorsRemoteDataSource {
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/api/Vendors/top-offers',
+            '/api/vendor-profiles/top-offers',
             queryParameters: queryParameters,
             data: _data,
           )

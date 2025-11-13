@@ -7,9 +7,9 @@ import 'package:savedge/features/vendors/presentation/bloc/coupons_bloc.dart';
 
 /// Hot deals section widget with real coupon data
 class HotDealsSection extends StatefulWidget {
-  const HotDealsSection({super.key, this.deals = const []});
+  const HotDealsSection({super.key});
 
-  final List<HotDeal> deals;
+  // final List<HotDeal> deals;
 
   @override
   State<HotDealsSection> createState() => _HotDealsSectionState();
@@ -155,23 +155,6 @@ class HotDealsView extends StatelessWidget {
   }
 }
 
-/// Model class for hot deal items (now using vendor data)
-class HotDeal {
-  const HotDeal({
-    required this.name,
-    required this.rating,
-    required this.offer,
-    this.imageUrl,
-    this.onTap,
-  });
-
-  final String name;
-  final String rating;
-  final String offer;
-  final String? imageUrl;
-  final VoidCallback? onTap;
-}
-
 /// Stacked deals cards widget with beautiful animations
 class StackedDealsCards extends StatefulWidget {
   const StackedDealsCards({super.key, required this.coupons, this.onCouponTap});
@@ -263,7 +246,10 @@ class _StackedDealsCardsState extends State<StackedDealsCards>
                   begin: const Offset(0, 1),
                   end: Offset.zero,
                 ).animate(
-                  CurvedAnimation(parent: controller, curve: Curves.easeOutBack),
+                  CurvedAnimation(
+                    parent: controller,
+                    curve: Curves.easeOutBack,
+                  ),
                 ),
           )
           .toList();

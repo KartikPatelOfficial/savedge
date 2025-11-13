@@ -1,21 +1,19 @@
 import 'package:flutter/material.dart';
 
 import '../../data/models/coupon_gifting_models.dart';
-import 'enhanced_coupon_card.dart';
+import 'coupon_card.dart';
 
 class CouponCategorySection extends StatelessWidget {
   const CouponCategorySection({
     super.key,
     required this.title,
     required this.coupons,
-    this.onGiftTap,
-    this.showGiftButton = true,
+    this.onCouponTap,
   });
 
   final String title;
   final List<UserCouponDetailModel> coupons;
-  final Function(UserCouponDetailModel)? onGiftTap;
-  final bool showGiftButton;
+  final Function(UserCouponDetailModel)? onCouponTap;
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +38,7 @@ class CouponCategorySection extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: const Color(0xFF6F3FCC).withOpacity(0.1),
+                color: const Color(0xFF6F3FCC).withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
@@ -62,11 +60,9 @@ class CouponCategorySection extends StatelessWidget {
           itemBuilder: (context, index) {
             return Padding(
               padding: const EdgeInsets.only(bottom: 16),
-              child: EnhancedCouponCard(
+              child: CouponCard(
                 coupon: coupons[index],
-                onGiftTap: showGiftButton && onGiftTap != null
-                    ? () => onGiftTap!(coupons[index])
-                    : null,
+                onTap: () => onCouponTap?.call(coupons[index]),
               ),
             );
           },

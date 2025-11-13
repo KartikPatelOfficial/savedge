@@ -10,7 +10,7 @@ abstract class VendorsRemoteDataSource {
   factory VendorsRemoteDataSource(Dio dio, {String baseUrl}) =
       _VendorsRemoteDataSource;
 
-  @GET('/api/Vendors')
+  @GET('/api/vendor-profiles')
   Future<HttpResponse<dynamic>> getVendors({
     @Query('pageNumber') int pageNumber = 1,
     @Query('pageSize') int pageSize = 10,
@@ -21,14 +21,14 @@ abstract class VendorsRemoteDataSource {
     @Query('isActive') bool? isActive = true,
   });
 
-  @GET('/api/Vendors/{id}')
+  @GET('/api/vendor-profiles/{id}')
   Future<HttpResponse<VendorResponse>> getVendor(@Path('id') int id);
 
-  @GET('/api/vendors/{vendorId}/Images')
+  @GET('/api/vendor-media/{vendorId}/images')
   Future<HttpResponse<List<VendorImageDto>>> getVendorImages(
     @Path('vendorId') int vendorId,
   );
 
-  @GET('/api/Vendors/top-offers')
+  @GET('/api/vendor-profiles/top-offers')
   Future<HttpResponse<dynamic>> getTopOfferVendors();
 }
