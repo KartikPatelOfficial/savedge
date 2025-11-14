@@ -9,6 +9,7 @@ class Coupon extends Equatable {
     required this.description,
     required this.discountValue,
     required this.discountType,
+    this.freeItemDescription,
     required this.minimumOrderAmount,
     required this.maximumDiscountAmount,
     required this.validFrom,
@@ -36,6 +37,7 @@ class Coupon extends Equatable {
   final String description;
   final double discountValue;
   final String discountType;
+  final String? freeItemDescription;
   final double minimumOrderAmount;
   final double maximumDiscountAmount;
   final DateTime validFrom;
@@ -70,6 +72,8 @@ class Coupon extends Equatable {
     switch (discountType.toLowerCase()) {
       case 'percentage':
         return '${discountValue.toInt()}% Off';
+      case 'freeitem':
+        return 'Free ${freeItemDescription ?? 'Item'}';
       case 'fixedamount':
         return '₹${discountValue.toInt()} Off';
       default:
@@ -101,6 +105,7 @@ class Coupon extends Equatable {
     description,
     discountValue,
     discountType,
+    freeItemDescription,
     minimumOrderAmount,
     maximumDiscountAmount,
     validFrom,

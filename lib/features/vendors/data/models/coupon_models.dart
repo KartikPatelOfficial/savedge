@@ -9,6 +9,7 @@ class CouponResponse {
       description: (json['description'] as String?)?.trim() ?? '',
       discountValue: (json['discountValue'] as num).toDouble(),
       discountType: _mapDiscountTypeFromInt(json['discountType'] as int),
+      freeItemDescription: json['freeItemDescription'] as String?,
       minimumOrderAmount: (json['minCartValue'] as num?)?.toDouble() ?? 0.0,
       maximumDiscountAmount:
           (json['maxDiscountAmount'] as num?)?.toDouble() ?? 0.0,
@@ -55,6 +56,7 @@ class CouponResponse {
     required this.description,
     required this.discountValue,
     required this.discountType,
+    this.freeItemDescription,
     required this.minimumOrderAmount,
     required this.maximumDiscountAmount,
     required this.validFrom,
@@ -91,6 +93,7 @@ class CouponResponse {
   final String description;
   final double discountValue;
   final String discountType;
+  final String? freeItemDescription;
   final double minimumOrderAmount;
   final double maximumDiscountAmount;
   final double? cashPrice;
@@ -150,13 +153,15 @@ class CouponResponse {
   }
 
   /// Maps integer discount type from API to string representation
-  /// 1 = Percentage, 2 = FixedAmount
+  /// 1 = Percentage, 2 = FixedAmount, 3 = FreeItem
   static String _mapDiscountTypeFromInt(int discountType) {
     switch (discountType) {
       case 1:
         return 'percentage';
       case 2:
         return 'fixedamount';
+      case 3:
+        return 'freeitem';
       default:
         return 'percentage'; // Default fallback
     }

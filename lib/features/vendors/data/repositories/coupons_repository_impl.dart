@@ -117,6 +117,7 @@ class CouponsRepositoryImpl implements CouponsRepository {
       description: response.description,
       discountValue: response.discountValue,
       discountType: response.discountType,
+      freeItemDescription: response.freeItemDescription,
       minimumOrderAmount: response.minimumOrderAmount,
       maximumDiscountAmount: response.maximumDiscountAmount,
       validFrom: response.validFrom,

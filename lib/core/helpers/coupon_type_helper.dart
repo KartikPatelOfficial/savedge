@@ -6,6 +6,7 @@ enum CouponVisualType {
   cashback,
   percentDiscount,
   priceSlash,
+  freeItem,
 }
 
 /// Helper class for determining coupon visual type and associated styling
@@ -22,9 +23,12 @@ class CouponTypeHelper {
       return CouponVisualType.cashback;
     }
 
-    // Use discountType to determine between percentage and fixed amount
-    if (coupon.discountType.toLowerCase() == 'percentage') {
+    // Use discountType to determine between percentage, fixed amount, and free item
+    final discountTypeLower = coupon.discountType.toLowerCase();
+    if (discountTypeLower == 'percentage') {
       return CouponVisualType.percentDiscount;
+    } else if (discountTypeLower == 'freeitem') {
+      return CouponVisualType.freeItem;
     }
 
     return CouponVisualType.priceSlash;
@@ -39,6 +43,8 @@ class CouponTypeHelper {
         return const Color(0xFFE85D9A); // Pink
       case CouponVisualType.priceSlash:
         return const Color(0xFF4ECDC4); // Green/Teal
+      case CouponVisualType.freeItem:
+        return const Color(0xFF34D399); // Green for free items
     }
   }
 
@@ -51,6 +57,8 @@ class CouponTypeHelper {
         return '% DISCOUNT';
       case CouponVisualType.priceSlash:
         return 'PRICE SLASH';
+      case CouponVisualType.freeItem:
+        return 'FREE ITEM';
     }
   }
 
@@ -75,6 +83,9 @@ class CouponTypeHelper {
       case CouponVisualType.percentDiscount:
         // For percentage, show the percentage
         return '${coupon.discountValue.toStringAsFixed(0)}%';
+      case CouponVisualType.freeItem:
+        // For free item, show "FREE"
+        return 'FREE';
     }
   }
 
@@ -87,6 +98,8 @@ class CouponTypeHelper {
         return 'DISCOUNT';
       case CouponVisualType.priceSlash:
         return 'OFF';
+      case CouponVisualType.freeItem:
+        return 'ITEM';
     }
   }
 
