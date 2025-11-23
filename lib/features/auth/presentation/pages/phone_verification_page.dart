@@ -157,16 +157,16 @@ class _PhoneVerificationPageState extends State<PhoneVerificationPage>
                   OtpVerificationPage(phoneNumber: _fullPhoneNumber),
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) {
-                return SlideTransition(
-                  position: animation.drive(
-                    Tween(
-                      begin: const Offset(1.0, 0.0),
-                      end: Offset.zero,
-                    ).chain(CurveTween(curve: Curves.easeInOutCubic)),
-                  ),
-                  child: child,
-                );
-              },
+                    return SlideTransition(
+                      position: animation.drive(
+                        Tween(
+                          begin: const Offset(1.0, 0.0),
+                          end: Offset.zero,
+                        ).chain(CurveTween(curve: Curves.easeInOutCubic)),
+                      ),
+                      child: child,
+                    );
+                  },
               transitionDuration: const Duration(milliseconds: 400),
             ),
           );
@@ -196,254 +196,293 @@ class _PhoneVerificationPageState extends State<PhoneVerificationPage>
                 position: _slideAnimation,
                 child: Form(
                   key: _formKey,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                    child: Column(
-                      children: [
-                        const SizedBox(height: 60),
-
-                        // Lottie Animation
-                        SizedBox(
-                          height: 200,
-                          child: Lottie.asset(
-                            'assets/animations/phone_verification.json',
-                            fit: BoxFit.contain,
-                          ),
-                        ),
-
-                        const SizedBox(height: 40),
-
-                        // Title
-                        const Text(
-                          'Phone Verification',
-                          style: TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFF1F2937),
-                            letterSpacing: -0.5,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-
-                        const SizedBox(height: 12),
-
-                        // Subtitle
-                        const Text(
-                          'We need to verify your phone number.\nPlease enter your mobile number below.',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Color(0xFF6B7280),
-                            height: 1.5,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-
-                        const SizedBox(height: 60),
-
-                        // Phone Input Container
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                  child: SingleChildScrollView(
+                    padding: EdgeInsets.only(
+                      left: 24.0,
+                      right: 24.0,
+                      bottom: MediaQuery.of(context).viewInsets.bottom + 24.0,
+                    ),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight:
+                            MediaQuery.of(context).size.height -
+                            MediaQuery.of(context).padding.top -
+                            MediaQuery.of(context).viewInsets.bottom,
+                      ),
+                      child: IntrinsicHeight(
+                        child: Column(
                           children: [
-                            const Text(
-                              'Phone Number',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF374151),
+                            const SizedBox(height: 60),
+
+                            // Lottie Animation
+                            SizedBox(
+                              height: 200,
+                              child: Lottie.asset(
+                                'assets/animations/phone_verification.json',
+                                fit: BoxFit.contain,
                               ),
                             ),
+
+                            const SizedBox(height: 40),
+
+                            // Title
+                            const Text(
+                              'Phone Verification',
+                              style: TextStyle(
+                                fontSize: 28,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF1F2937),
+                                letterSpacing: -0.5,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+
                             const SizedBox(height: 12),
 
-                            Row(
+                            // Subtitle
+                            const Text(
+                              'We need to verify your phone number.\nPlease enter your mobile number below.',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Color(0xFF6B7280),
+                                height: 1.5,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+
+                            const SizedBox(height: 60),
+
+                            // Phone Input Container
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                // Country Picker
-                                GestureDetector(
-                                  onTap: _selectCountry,
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                      vertical: 16,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFF9FAFB),
-                                      border: Border.all(
-                                        color: const Color(0xFFD1D5DB),
-                                        width: 1,
-                                      ),
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Text(
-                                          _selectedCountry.flagEmoji,
-                                          style: const TextStyle(fontSize: 20),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Text(
-                                          '+${_selectedCountry.phoneCode}',
-                                          style: const TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w600,
-                                            color: Color(0xFF1F2937),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 4),
-                                        const Icon(
-                                          Icons.keyboard_arrow_down,
-                                          color: Color(0xFF6B7280),
-                                          size: 20,
-                                        ),
-                                      ],
-                                    ),
+                                const Text(
+                                  'Phone Number',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFF374151),
                                   ),
                                 ),
+                                const SizedBox(height: 12),
 
-                                const SizedBox(width: 12),
-
-                                // Phone Input
-                                Expanded(
-                                  child: TextFormField(
-                                    controller: _phoneController,
-                                    keyboardType: TextInputType.phone,
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500,
-                                      color: Color(0xFF1F2937),
-                                    ),
-                                    validator: (value) {
-                                      if (value == null || value.trim().isEmpty) {
-                                        return 'Enter your phone number';
-                                      }
-                                      if (value.trim().length < 8) {
-                                        return 'Enter a valid phone number';
-                                      }
-                                      return null;
-                                    },
-                                    decoration: InputDecoration(
-                                      hintText: _selectedCountry.example,
-                                      hintStyle: const TextStyle(
-                                        color: Color(0xFF9CA3AF),
-                                        fontSize: 16,
-                                      ),
-                                      filled: true,
-                                      fillColor: const Color(0xFFF9FAFB),
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                        borderSide: const BorderSide(
-                                          color: Color(0xFFD1D5DB),
-                                          width: 1,
+                                Row(
+                                  children: [
+                                    // Country Picker
+                                    GestureDetector(
+                                      onTap: _selectCountry,
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 16,
+                                          vertical: 16,
                                         ),
-                                      ),
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                        borderSide: const BorderSide(
-                                          color: Color(0xFFD1D5DB),
-                                          width: 1,
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFF9FAFB),
+                                          border: Border.all(
+                                            color: const Color(0xFFD1D5DB),
+                                            width: 1,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
                                         ),
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                        borderSide: const BorderSide(
-                                          color: Color(0xFF6366F1),
-                                          width: 2,
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Text(
+                                              _selectedCountry.flagEmoji,
+                                              style: const TextStyle(
+                                                fontSize: 20,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Text(
+                                              '+${_selectedCountry.phoneCode}',
+                                              style: const TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w600,
+                                                color: Color(0xFF1F2937),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 4),
+                                            const Icon(
+                                              Icons.keyboard_arrow_down,
+                                              color: Color(0xFF6B7280),
+                                              size: 20,
+                                            ),
+                                          ],
                                         ),
-                                      ),
-                                      errorBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                        borderSide: const BorderSide(
-                                          color: Color(0xFFEF4444),
-                                          width: 1,
-                                        ),
-                                      ),
-                                      focusedErrorBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                        borderSide: const BorderSide(
-                                          color: Color(0xFFEF4444),
-                                          width: 2,
-                                        ),
-                                      ),
-                                      contentPadding: const EdgeInsets.symmetric(
-                                        horizontal: 16,
-                                        vertical: 16,
                                       ),
                                     ),
-                                    onChanged: (_) => setState(() {}),
-                                  ),
+
+                                    const SizedBox(width: 12),
+
+                                    // Phone Input
+                                    Expanded(
+                                      child: TextFormField(
+                                        controller: _phoneController,
+                                        keyboardType: TextInputType.phone,
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500,
+                                          color: Color(0xFF1F2937),
+                                        ),
+                                        validator: (value) {
+                                          if (value == null ||
+                                              value.trim().isEmpty) {
+                                            return 'Enter your phone number';
+                                          }
+                                          if (value.trim().length < 8) {
+                                            return 'Enter a valid phone number';
+                                          }
+                                          return null;
+                                        },
+                                        decoration: InputDecoration(
+                                          hintText: _selectedCountry.example,
+                                          hintStyle: const TextStyle(
+                                            color: Color(0xFF9CA3AF),
+                                            fontSize: 16,
+                                          ),
+                                          filled: true,
+                                          fillColor: const Color(0xFFF9FAFB),
+                                          border: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                            borderSide: const BorderSide(
+                                              color: Color(0xFFD1D5DB),
+                                              width: 1,
+                                            ),
+                                          ),
+                                          enabledBorder: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                            borderSide: const BorderSide(
+                                              color: Color(0xFFD1D5DB),
+                                              width: 1,
+                                            ),
+                                          ),
+                                          focusedBorder: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                            borderSide: const BorderSide(
+                                              color: Color(0xFF6366F1),
+                                              width: 2,
+                                            ),
+                                          ),
+                                          errorBorder: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                            borderSide: const BorderSide(
+                                              color: Color(0xFFEF4444),
+                                              width: 1,
+                                            ),
+                                          ),
+                                          focusedErrorBorder:
+                                              OutlineInputBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                                borderSide: const BorderSide(
+                                                  color: Color(0xFFEF4444),
+                                                  width: 2,
+                                                ),
+                                              ),
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                                horizontal: 16,
+                                                vertical: 16,
+                                              ),
+                                        ),
+                                        onChanged: (_) => setState(() {}),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
-                          ],
-                        ),
 
-                        const Spacer(),
+                            const Spacer(),
 
-                        // Send OTP Button
-                        SizedBox(
-                          width: double.infinity,
-                          height: 52,
-                          child: ElevatedButton(
-                            onPressed: !_isValidPhone || isLoading ? null : _sendOtp,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF6366F1),
-                              foregroundColor: Colors.white,
-                              disabledBackgroundColor: const Color(0xFFE5E7EB),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
+                            // Send OTP Button
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 8.0,
                               ),
-                              elevation: 0,
-                            ),
-                            child: isLoading
-                                ? const SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(
-                                      color: Colors.white,
-                                      strokeWidth: 2,
+                              child: SizedBox(
+                                width: double.infinity,
+                                height: 52,
+                                child: ElevatedButton(
+                                  onPressed: !_isValidPhone || isLoading
+                                      ? null
+                                      : _sendOtp,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFF6366F1),
+                                    foregroundColor: Colors.white,
+                                    disabledBackgroundColor: const Color(
+                                      0xFFE5E7EB,
                                     ),
-                                  )
-                                : const Text(
-                                    'Continue',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
                                     ),
+                                    elevation: 0,
                                   ),
-                          ),
-                        ),
-
-                        const SizedBox(height: 20),
-
-                        // Privacy Policy
-                        Text.rich(
-                          TextSpan(
-                            text: 'By continuing, you agree to our ',
-                            style: const TextStyle(
-                              color: Color(0xFF9CA3AF),
-                              fontSize: 14,
-                            ),
-                            children: [
-                              WidgetSpan(
-                                child: GestureDetector(
-                                  onTap: _launchPrivacyPolicy,
-                                  child: const Text(
-                                    'Privacy Policy',
-                                    style: TextStyle(
-                                      color: Color(0xFF6366F1),
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                      decoration: TextDecoration.underline,
-                                    ),
-                                  ),
+                                  child: isLoading
+                                      ? const SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: CircularProgressIndicator(
+                                            color: Colors.white,
+                                            strokeWidth: 2,
+                                          ),
+                                        )
+                                      : const Text(
+                                          'Continue',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
                                 ),
                               ),
-                            ],
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
+                            ),
 
-                        const SizedBox(height: 40),
-                      ],
+                            const SizedBox(height: 20),
+
+                            // Privacy Policy
+                            Text.rich(
+                              TextSpan(
+                                text: 'By continuing, you agree to our ',
+                                style: const TextStyle(
+                                  color: Color(0xFF9CA3AF),
+                                  fontSize: 14,
+                                ),
+                                children: [
+                                  WidgetSpan(
+                                    child: GestureDetector(
+                                      onTap: _launchPrivacyPolicy,
+                                      child: const Text(
+                                        'Privacy Policy',
+                                        style: TextStyle(
+                                          color: Color(0xFF6366F1),
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500,
+                                          decoration: TextDecoration.underline,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+
+                            const SizedBox(height: 16),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 ),

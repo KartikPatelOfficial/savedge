@@ -263,227 +263,240 @@ class _OtpVerificationPageState extends State<OtpVerificationPage>
               opacity: _fadeAnimation,
               child: SlideTransition(
                 position: _slideAnimation,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 20),
-
-                      // Header with back button
-                      Row(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.only(
+                    left: 24.0,
+                    right: 24.0,
+                    bottom: MediaQuery.of(context).viewInsets.bottom + 24.0,
+                  ),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: MediaQuery.of(context).size.height -
+                          MediaQuery.of(context).padding.top -
+                          MediaQuery.of(context).viewInsets.bottom,
+                    ),
+                    child: IntrinsicHeight(
+                      child: Column(
                         children: [
-                          GestureDetector(
-                            onTap: () {
-                              HapticFeedback.lightImpact();
-                              Navigator.of(context).pop();
-                            },
-                            child: Container(
-                              width: 40,
-                              height: 40,
+                          const SizedBox(height: 20),
+
+                          // Header with back button
+                          Row(
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  HapticFeedback.lightImpact();
+                                  Navigator.of(context).pop();
+                                },
+                                child: Container(
+                                  width: 40,
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFF9FAFB),
+                                    border: Border.all(
+                                      color: const Color(0xFFD1D5DB),
+                                      width: 1,
+                                    ),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: const Icon(
+                                    Icons.arrow_back_ios_new,
+                                    color: Color(0xFF1F2937),
+                                    size: 16,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              const Text(
+                                'Verify Code',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF1F2937),
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          const SizedBox(height: 40),
+
+                          // Lottie Animation
+                          SizedBox(
+                            height: 180,
+                            child: Lottie.asset(
+                              'assets/animations/otp_verification.json',
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+
+                          const SizedBox(height: 40),
+
+                          // Title
+                          const Text(
+                            'Enter Verification Code',
+                            style: TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF1F2937),
+                              letterSpacing: -0.5,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+
+                          const SizedBox(height: 12),
+
+                          // Subtitle
+                          Text(
+                            'We sent a 6-digit code to\n${_formatPhoneNumber}',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              color: Color(0xFF6B7280),
+                              height: 1.5,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+
+                          const SizedBox(height: 60),
+
+                          // OTP Input
+                          Pinput(
+                            length: 6,
+                            controller: _otpController,
+                            enabled: !isLoading,
+                            onCompleted: _verifyOtp,
+                            defaultPinTheme: PinTheme(
+                              width: 48,
+                              height: 56,
+                              textStyle: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF1F2937),
+                              ),
                               decoration: BoxDecoration(
                                 color: const Color(0xFFF9FAFB),
+                                borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
                                   color: const Color(0xFFD1D5DB),
                                   width: 1,
                                 ),
-                                borderRadius: BorderRadius.circular(12),
                               ),
-                              child: const Icon(
-                                Icons.arrow_back_ios_new,
+                            ),
+                            focusedPinTheme: PinTheme(
+                              width: 48,
+                              height: 56,
+                              textStyle: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
                                 color: Color(0xFF1F2937),
-                                size: 16,
                               ),
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          const Text(
-                            'Verify Code',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFF1F2937),
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 40),
-
-                      // Lottie Animation
-                      SizedBox(
-                        height: 180,
-                        child: Lottie.asset(
-                          'assets/animations/otp_verification.json',
-                          fit: BoxFit.contain,
-                        ),
-                      ),
-
-                      const SizedBox(height: 40),
-
-                      // Title
-                      const Text(
-                        'Enter Verification Code',
-                        style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFF1F2937),
-                          letterSpacing: -0.5,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-
-                      const SizedBox(height: 12),
-
-                      // Subtitle
-                      Text(
-                        'We sent a 6-digit code to\n${_formatPhoneNumber}',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          color: Color(0xFF6B7280),
-                          height: 1.5,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-
-                      const SizedBox(height: 60),
-
-                      // OTP Input
-                      Pinput(
-                        length: 6,
-                        controller: _otpController,
-                        enabled: !isLoading,
-                        onCompleted: _verifyOtp,
-                        defaultPinTheme: PinTheme(
-                          width: 48,
-                          height: 56,
-                          textStyle: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF1F2937),
-                          ),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF9FAFB),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: const Color(0xFFD1D5DB),
-                              width: 1,
-                            ),
-                          ),
-                        ),
-                        focusedPinTheme: PinTheme(
-                          width: 48,
-                          height: 56,
-                          textStyle: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF1F2937),
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: const Color(0xFF6366F1),
-                              width: 2,
-                            ),
-                          ),
-                        ),
-                        submittedPinTheme: PinTheme(
-                          width: 48,
-                          height: 56,
-                          textStyle: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF1F2937),
-                          ),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF6366F1).withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: const Color(0xFF6366F1),
-                              width: 1,
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(height: 40),
-
-                      // Resend Section
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Text(
-                            "Didn't receive the code? ",
-                            style: TextStyle(
-                              color: Color(0xFF6B7280),
-                              fontSize: 14,
-                            ),
-                          ),
-                          if (!_canResend)
-                            Text(
-                              'Resend in ${_resendCountdown}s',
-                              style: const TextStyle(
-                                color: Color(0xFF9CA3AF),
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            )
-                          else
-                            GestureDetector(
-                              onTap: isLoading ? null : _resendOtp,
-                              child: const Text(
-                                'Resend Code',
-                                style: TextStyle(
-                                  color: Color(0xFF6366F1),
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                  decoration: TextDecoration.underline,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: const Color(0xFF6366F1),
+                                  width: 2,
                                 ),
                               ),
                             ),
-                        ],
-                      ),
-
-                      const Spacer(),
-
-                      // Verify Button
-                      SizedBox(
-                        width: double.infinity,
-                        height: 52,
-                        child: ElevatedButton(
-                          onPressed: isLoading || _otpController.text.length != 6
-                              ? null
-                              : () => _verifyOtp(_otpController.text),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF6366F1),
-                            foregroundColor: Colors.white,
-                            disabledBackgroundColor: const Color(0xFFE5E7EB),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                            submittedPinTheme: PinTheme(
+                              width: 48,
+                              height: 56,
+                              textStyle: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF1F2937),
+                              ),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF6366F1).withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: const Color(0xFF6366F1),
+                                  width: 1,
+                                ),
+                              ),
                             ),
-                            elevation: 0,
                           ),
-                          child: isLoading
-                              ? const SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                    strokeWidth: 2,
+
+                          const SizedBox(height: 40),
+
+                          // Resend Section
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text(
+                                "Didn't receive the code? ",
+                                style: TextStyle(
+                                  color: Color(0xFF6B7280),
+                                  fontSize: 14,
+                                ),
+                              ),
+                              if (!_canResend)
+                                Text(
+                                  'Resend in ${_resendCountdown}s',
+                                  style: const TextStyle(
+                                    color: Color(0xFF9CA3AF),
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
                                   ),
                                 )
-                              : const Text(
-                                  'Verify & Continue',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
+                              else
+                                GestureDetector(
+                                  onTap: isLoading ? null : _resendOtp,
+                                  child: const Text(
+                                    'Resend Code',
+                                    style: TextStyle(
+                                      color: Color(0xFF6366F1),
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      decoration: TextDecoration.underline,
+                                    ),
                                   ),
                                 ),
-                        ),
-                      ),
+                            ],
+                          ),
 
-                      const SizedBox(height: 40),
-                    ],
+                          const Spacer(),
+
+                          // Verify Button
+                          SizedBox(
+                            width: double.infinity,
+                            height: 52,
+                            child: ElevatedButton(
+                              onPressed: isLoading || _otpController.text.length != 6
+                                  ? null
+                                  : () => _verifyOtp(_otpController.text),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF6366F1),
+                                foregroundColor: Colors.white,
+                                disabledBackgroundColor: const Color(0xFFE5E7EB),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                elevation: 0,
+                              ),
+                              child: isLoading
+                                  ? const SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : const Text(
+                                      'Verify & Continue',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                            ),
+                          ),
+
+                          const SizedBox(height: 16),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ),

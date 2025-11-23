@@ -9,7 +9,12 @@ class CategoriesBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Container(
+      constraints: BoxConstraints(
+        maxHeight: screenHeight * 0.75,
+      ),
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.only(
@@ -160,16 +165,11 @@ class CategoriesBottomSheet extends StatelessWidget {
     return showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
+      isDismissible: true,
+      enableDrag: true,
       backgroundColor: Colors.transparent,
       builder: (BuildContext context) {
-        return DraggableScrollableSheet(
-          initialChildSize: 0.7,
-          minChildSize: 0.5,
-          maxChildSize: 0.9,
-          builder: (context, scrollController) {
-            return CategoriesBottomSheet(onCategoryTap: onCategoryTap);
-          },
-        );
+        return CategoriesBottomSheet(onCategoryTap: onCategoryTap);
       },
     );
   }

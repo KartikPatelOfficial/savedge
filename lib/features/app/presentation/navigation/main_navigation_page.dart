@@ -4,6 +4,7 @@ import 'package:savedge/features/auth/data/models/user_profile_models.dart';
 import 'package:savedge/features/auth/domain/repositories/auth_repository.dart';
 import 'package:savedge/features/coupons/presentation/pages/coupons_page.dart';
 import 'package:savedge/features/coupons/presentation/pages/gift_page.dart';
+import 'package:savedge/features/home/presentation/pages/home_content_page.dart';
 import 'package:savedge/features/home/presentation/widgets/widgets.dart';
 import 'package:savedge/features/user_profile/presentation/pages/profile_page.dart';
 

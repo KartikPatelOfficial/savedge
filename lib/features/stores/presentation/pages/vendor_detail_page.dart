@@ -9,7 +9,6 @@ import 'package:savedge/core/network/image_cache_manager.dart';
 import 'package:savedge/features/favorites/presentation/bloc/favorites_bloc.dart';
 import 'package:savedge/features/favorites/presentation/bloc/favorites_event.dart';
 import 'package:savedge/features/favorites/presentation/bloc/favorites_state.dart';
-import 'package:savedge/features/home/presentation/widgets/subscription_plans_section.dart';
 import 'package:savedge/features/points_payment/presentation/widgets/points_payment_dialog.dart';
 import 'package:savedge/features/qr_scanner/presentation/pages/qr_scanner_page.dart';
 import 'package:savedge/features/stores/presentation/widgets/vendor_offers_section.dart';
@@ -496,18 +495,11 @@ class _VendorDetailViewState extends State<_VendorDetailView> {
             ),
           ),
           // Yearly Subscription
-          SliverToBoxAdapter(child: _buildSubscriptionPlansSection()),
+          const SliverToBoxAdapter(child: SizedBox.shrink()),
           // Bottom spacing
           const SliverToBoxAdapter(child: SizedBox(height: 40)),
         ],
       ),
-    );
-  }
-
-  Widget _buildSubscriptionPlansSection() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-      child: SubscriptionPlansSection(),
     );
   }
 
@@ -2001,6 +1993,21 @@ class PaymentCardPatternPainter extends CustomPainter {
     );
   }
 
+  void _drawMeshGrid(Canvas canvas, Size size, Paint paint) {
+    paint
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0.5
+      ..color = Colors.white.withOpacity(0.04);
+
+    const step = 20.0;
+    for (double i = 0; i < size.width; i += step) {
+      canvas.drawLine(Offset(i, 0), Offset(i, size.height), paint);
+    }
+    for (double i = 0; i < size.height; i += step) {
+      canvas.drawLine(Offset(0, i), Offset(size.width, i), paint);
+    }
+  }
+
   void _drawDotAlongCurve(
     Canvas canvas,
     double x,
@@ -2011,28 +2018,6 @@ class PaymentCardPatternPainter extends CustomPainter {
     canvas.drawCircle(Offset(x, y), radius, paint);
   }
 
-  void _drawMeshGrid(Canvas canvas, Size size, Paint paint) {
-    // Create a very subtle mesh grid effect
-    paint
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 0.5
-      ..color = Colors.white.withOpacity(0.02);
-
-    // Vertical lines
-    for (double x = size.width * 0.2; x < size.width; x += size.width * 0.15) {
-      canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
-    }
-
-    // Horizontal lines
-    for (
-      double y = size.height * 0.25;
-      y < size.height;
-      y += size.height * 0.2
-    ) {
-      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
-    }
-  }
-
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(CustomPainter oldDelegate) => false;
 }

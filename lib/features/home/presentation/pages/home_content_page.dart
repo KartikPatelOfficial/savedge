@@ -7,6 +7,7 @@ import 'package:savedge/core/injection/injection.dart';
 import 'package:savedge/features/auth/data/models/user_profile_models.dart';
 import 'package:savedge/features/auth/domain/repositories/auth_repository.dart';
 import 'package:savedge/features/favorites/presentation/pages/favorites_page.dart';
+import 'package:savedge/features/free_trial/presentation/bloc/free_trial_bloc.dart';
 import 'package:savedge/features/home/presentation/widgets/widgets.dart';
 import 'package:savedge/features/stores/presentation/pages/stores_page.dart';
 import 'package:savedge/features/stores/presentation/pages/vendor_detail_page.dart';
@@ -15,8 +16,6 @@ import 'package:savedge/features/vendors/domain/entities/vendor.dart';
 import 'package:savedge/features/vendors/presentation/bloc/coupons_bloc.dart';
 import 'package:savedge/features/vendors/presentation/bloc/vendors_bloc.dart';
 import 'package:savedge/features/vendors/presentation/bloc/vendors_event.dart';
-import 'package:savedge/features/free_trial/presentation/bloc/free_trial_bloc.dart';
-import 'package:savedge/features/free_trial/presentation/widgets/free_trial_card.dart';
 
 /// Beautiful home content page with modern design and real data integration
 class HomeContentPage extends StatefulWidget {
@@ -33,7 +32,6 @@ class _HomeContentPageState extends State<HomeContentPage> {
   late final VendorsBloc _vendorsBloc;
   late final SubscriptionPlanBloc _subscriptionBloc;
   late final FreeTrialBloc _freeTrialBloc;
-  final GlobalKey<SubscriptionPlansSectionState> _subscriptionKey = GlobalKey();
 
   bool _isEmployee = false;
   bool _hasLoadedFreeTrialStatus = false;
@@ -65,11 +63,10 @@ class _HomeContentPageState extends State<HomeContentPage> {
     var displayName = 'Welcome';
 
     try {
-      final UserProfileResponse3 profile =
-          await _authRepository.getCurrentUserProfile();
+      final UserProfileResponse3 profile = await _authRepository
+          .getCurrentUserProfile();
       isEmployee = profile.isEmployee;
-      displayName =
-          profile.fullName.isNotEmpty ? profile.fullName : 'Welcome';
+      displayName = profile.fullName.isNotEmpty ? profile.fullName : 'Welcome';
     } catch (_) {
       // Default values already set; fall through so UI keeps showing fallback
     }
@@ -147,10 +144,9 @@ class _HomeContentPageState extends State<HomeContentPage> {
                     child: FadeInAnimation(child: widget),
                   ),
                   children: [
-                    if (!_isEmployee) const FreeTrialCard(),
                     _buildHotDealsSection(),
                     _buildCategoriesSection(),
-                    _buildSubscriptionPlansSection(),
+                    const SubscriptionCarousel(),
                     _buildTopOffersSection(),
                     const SizedBox(height: 40),
                   ],
@@ -283,13 +279,6 @@ class _HomeContentPageState extends State<HomeContentPage> {
     return CategoriesSection(onCategoryTap: _onCategoryTap);
   }
 
-  Widget _buildSubscriptionPlansSection() {
-    return Container(
-      margin: const EdgeInsets.all(20),
-      child: SubscriptionPlansSection(key: _subscriptionKey),
-    );
-  }
-
   Widget _buildHotDealsSection() {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 20),
@@ -359,9 +348,6 @@ class _HomeContentPageState extends State<HomeContentPage> {
     if (!_isEmployee) {
       _freeTrialBloc.add(const FreeTrialEvent.loadStatus());
     }
-
-    // Also refresh subscription section if it has its own state
-    _subscriptionKey.currentState?.checkSubscriptionStatus();
 
     // Wait for data to load (approximate time)
     await Future.delayed(const Duration(milliseconds: 800));
