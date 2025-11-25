@@ -334,7 +334,7 @@ Future<void> configureDependencies() async {
     ),
   );
 
-  getIt.registerFactory<SubscriptionPlanBloc>(
+  getIt.registerLazySingleton<SubscriptionPlanBloc>(
     () => SubscriptionPlanBloc(
       subscriptionPlanRepository: getIt<SubscriptionPlanRepository>(),
     ),
@@ -398,7 +398,7 @@ Future<void> configureDependencies() async {
   );
 
   // Free trial BLoC
-  getIt.registerFactory<FreeTrialBloc>(
+  getIt.registerLazySingleton<FreeTrialBloc>(
     () => FreeTrialBloc(getIt<FreeTrialRepository>()),
   );
 

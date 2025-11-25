@@ -5,7 +5,6 @@ import 'package:get_it/get_it.dart';
 import 'package:savedge/core/injection/injection.dart';
 import 'package:savedge/features/auth/domain/repositories/auth_repository.dart';
 import 'package:savedge/features/free_trial/data/models/free_trial_models.dart';
-import 'package:savedge/features/free_trial/data/repositories/free_trial_repository.dart';
 import 'package:savedge/features/free_trial/presentation/bloc/free_trial_bloc.dart';
 import 'package:savedge/features/subscription/domain/entities/subscription_plan.dart';
 import 'package:savedge/features/subscription/presentation/bloc/subscription_plan_bloc.dart';
@@ -19,20 +18,27 @@ class SubscriptionCarousel extends StatefulWidget {
 }
 
 class _SubscriptionCarouselState extends State<SubscriptionCarousel> {
-  final PageController _pageController = PageController();
+  late PageController _pageController;
+  int _currentPage = 0;
   bool _isLoading = true;
   bool _isVisible = false;
 
   AuthRepository get _authRepository => GetIt.I<AuthRepository>();
-  FreeTrialRepository get _freeTrialRepository => GetIt.I<FreeTrialRepository>();
 
   @override
   void initState() {
     super.initState();
+    _pageController = PageController(viewportFraction: 0.9);
     _checkVisibility();
     _pageController.addListener(() {
       if (_pageController.page == _pageController.page?.round()) {
         HapticFeedback.lightImpact();
+        final newPage = _pageController.page?.round() ?? 0;
+        if (newPage != _currentPage) {
+          setState(() {
+            _currentPage = newPage;
+          });
+        }
       }
     });
   }
@@ -40,11 +46,7 @@ class _SubscriptionCarouselState extends State<SubscriptionCarousel> {
   Future<void> _checkVisibility() async {
     try {
       final profile = await _authRepository.getUserProfileExtended();
-
       final bool hasActiveSubscription = profile.hasActiveSubscription;
-
-      // Show carousel if user doesn't have an active subscription
-      // This will show either free trial offer (if available) or subscription plans
       final bool shouldBeVisible = !hasActiveSubscription;
 
       if (mounted) {
@@ -57,7 +59,7 @@ class _SubscriptionCarouselState extends State<SubscriptionCarousel> {
       if (mounted) {
         setState(() {
           _isLoading = false;
-          _isVisible = true; // Show by default on error
+          _isVisible = true;
         });
       }
     }
@@ -79,128 +81,157 @@ class _SubscriptionCarouselState extends State<SubscriptionCarousel> {
       return const SizedBox.shrink();
     }
 
-    return AspectRatio(
-      aspectRatio: 4 / 5,
-      child: PageView(
-        controller: _pageController,
-        children: [
-          // Page 1: Free Trial Card
-          BlocProvider.value(
-            value: getIt<FreeTrialBloc>(),
-            child: const _FreeTrialPage(),
-          ),
-          // Page 2: Subscription Plans
-          BlocProvider.value(
-            value: getIt<SubscriptionPlanBloc>(),
-            child: const _SubscriptionPlansPage(),
-          ),
-        ],
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider.value(value: getIt<FreeTrialBloc>()),
+        BlocProvider.value(value: getIt<SubscriptionPlanBloc>()),
+      ],
+      child: _UnifiedCarousel(
+        pageController: _pageController,
+        currentPage: _currentPage,
       ),
     );
   }
 }
 
-class _FreeTrialPage extends StatelessWidget {
-  const _FreeTrialPage();
+class _UnifiedCarousel extends StatelessWidget {
+  const _UnifiedCarousel({
+    required this.pageController,
+    required this.currentPage,
+  });
+
+  final PageController pageController;
+  final int currentPage;
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<FreeTrialBloc, FreeTrialState>(
-      builder: (context, state) {
-        return state.when(
-          initial: () => const SizedBox.shrink(),
-          loading: () => const Center(child: CircularProgressIndicator()),
-          loaded: (status) => _buildFreeTrialCard(context, status),
-          activating: () => const Center(child: CircularProgressIndicator()),
-          activated: (response) {
-            Future.delayed(const Duration(seconds: 2), () {
-              context.read<FreeTrialBloc>().add(const FreeTrialEvent.loadStatus());
-            });
-            return _SuccessCard(message: response.message);
+      builder: (context, freeTrialState) {
+        return BlocBuilder<SubscriptionPlanBloc, SubscriptionPlanState>(
+          builder: (context, subscriptionState) {
+            final cards = _buildCards(
+              context,
+              freeTrialState,
+              subscriptionState,
+            );
+
+            if (cards.isEmpty) {
+              return const SizedBox.shrink();
+            }
+
+            // Calculate height based on screen width and aspect ratio
+            final screenWidth = MediaQuery.of(context).size.width;
+            final cardWidth = screenWidth * 0.9;
+            final cardHeight = cardWidth * (5 / 4); // 4:5 aspect ratio
+            final headerHeight = 60.0;
+            final dotsHeight = cards.length > 1 ? 24.0 : 0.0;
+            final totalHeight = headerHeight + dotsHeight + cardHeight;
+
+            return SizedBox(
+              height: totalHeight,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
+                    child: Text(
+                      'Our Plans',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF1A202C),
+                      ),
+                    ),
+                  ),
+
+                  Expanded(
+                    child: PageView.builder(
+                      controller: pageController,
+                      itemCount: cards.length,
+                      itemBuilder: (context, index) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: AspectRatio(
+                            aspectRatio: 4 / 5,
+                            child: cards[index],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  if (cards.length > 1)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: List.generate(
+                          cards.length,
+                          (index) => Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 4),
+                            width: 8,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: currentPage == index
+                                  ? const Color(0xFF1A202C)
+                                  : const Color(0xFFE2E8F0),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            );
           },
-          error: (message) => _ErrorCard(message: message),
         );
       },
     );
   }
 
-  Widget _buildFreeTrialCard(BuildContext context, FreeTrialStatusResponse status) {
-    if (status.status == FreeTrialStatus.notStarted && status.canActivate) {
-      return _OfferCard(
-        onActivate: () {
-          context.read<FreeTrialBloc>().add(const FreeTrialEvent.activateTrial());
-        },
-      );
-    }
+  List<Widget> _buildCards(
+    BuildContext context,
+    FreeTrialState freeTrialState,
+    SubscriptionPlanState subscriptionState,
+  ) {
+    final List<Widget> cards = [];
 
-    if (status.status == FreeTrialStatus.active && status.remainingTime != null) {
-      return _CountdownCard(remainingTime: status.remainingTime!);
-    }
-
-    return const SizedBox.shrink();
-  }
-}
-
-class _SubscriptionPlansPage extends StatelessWidget {
-  const _SubscriptionPlansPage();
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<SubscriptionPlanBloc, SubscriptionPlanState>(
-      builder: (context, state) {
-        if (state is SubscriptionPlanLoading) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (state is SubscriptionPlanLoaded) {
-          if (state.plans.isEmpty) {
-            return const Center(child: Text('No subscription plans available.'));
-          }
-          return _buildPlansWidget(context, state.plans);
-        } else if (state is SubscriptionPlanError) {
-          return Center(child: Text('Error: ${state.message}'));
-        } else {
-          return const SizedBox.shrink();
+    // Add free trial card if eligible
+    freeTrialState.whenOrNull(
+      loaded: (status) {
+        if (status.status == FreeTrialStatus.notStarted && status.canActivate) {
+          cards.add(
+            _OfferCard(
+              onActivate: () {
+                context.read<FreeTrialBloc>().add(
+                  const FreeTrialEvent.activateTrial(),
+                );
+              },
+            ),
+          );
+        } else if (status.status == FreeTrialStatus.active &&
+            status.remainingTime != null) {
+          cards.add(_CountdownCard(remainingTime: status.remainingTime!));
         }
       },
+      activated: (response) {
+        cards.add(_SuccessCard(message: response.message));
+      },
     );
-  }
 
-  Widget _buildPlansWidget(BuildContext context, List<SubscriptionPlan> plans) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Text(
-            'Subscription Plans',
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.w700,
-              color: Color(0xFF1A202C),
-            ),
+    // Add subscription plan cards
+    if (subscriptionState is SubscriptionPlanLoaded) {
+      for (var plan in subscriptionState.plans) {
+        cards.add(
+          _SubscriptionPlanCard(
+            plan: plan,
+            onTap: (plan) => _navigateToDetails(context, plan),
           ),
-        ),
-        Expanded(
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            itemCount: plans.length,
-            itemBuilder: (context, index) {
-              return Padding(
-                padding: EdgeInsets.only(right: index < plans.length - 1 ? 12 : 0),
-                child: SizedBox(
-                  width: 280,
-                  child: _SubscriptionPlanCard(
-                    plan: plans[index],
-                    onTap: (plan) => _navigateToDetails(context, plan),
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-      ],
-    );
+        );
+      }
+    }
+
+    return cards;
   }
 
   void _navigateToDetails(BuildContext context, SubscriptionPlan plan) {
@@ -208,10 +239,11 @@ class _SubscriptionPlansPage extends StatelessWidget {
   }
 }
 
-// Re-using cards from free_trial_card.dart
 class _OfferCard extends StatelessWidget {
   final VoidCallback onActivate;
+
   const _OfferCard({required this.onActivate});
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -250,18 +282,12 @@ class _OfferCard extends StatelessWidget {
             const SizedBox(height: 16),
             const Text(
               'Get 5 days of premium membership access for FREE!',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-              ),
+              style: TextStyle(color: Colors.white, fontSize: 16),
             ),
             const SizedBox(height: 8),
             const Text(
               '• Access all exclusive coupons\n• No credit card required\n• Cancel anytime',
-              style: TextStyle(
-                color: Colors.white70,
-                fontSize: 14,
-              ),
+              style: TextStyle(color: Colors.white70, fontSize: 14),
             ),
             const SizedBox(height: 20),
             SizedBox(
@@ -278,10 +304,7 @@ class _OfferCard extends StatelessWidget {
                 ),
                 child: const Text(
                   'Activate Free Trial',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -294,7 +317,9 @@ class _OfferCard extends StatelessWidget {
 
 class _CountdownCard extends StatelessWidget {
   final RemainingTimeResponse remainingTime;
+
   const _CountdownCard({required this.remainingTime});
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -331,27 +356,15 @@ class _CountdownCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _TimeUnit(
-                  value: remainingTime.days,
-                  label: 'Days',
-                ),
-                _TimeUnit(
-                  value: remainingTime.hours,
-                  label: 'Hours',
-                ),
-                _TimeUnit(
-                  value: remainingTime.minutes,
-                  label: 'Minutes',
-                ),
+                _TimeUnit(value: remainingTime.days, label: 'Days'),
+                _TimeUnit(value: remainingTime.hours, label: 'Hours'),
+                _TimeUnit(value: remainingTime.minutes, label: 'Minutes'),
               ],
             ),
             const SizedBox(height: 16),
             const Text(
               'Enjoy premium membership access!',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 14,
-              ),
+              style: TextStyle(color: Colors.white, fontSize: 14),
               textAlign: TextAlign.center,
             ),
           ],
@@ -364,7 +377,9 @@ class _CountdownCard extends StatelessWidget {
 class _TimeUnit extends StatelessWidget {
   final int value;
   final String label;
+
   const _TimeUnit({required this.value, required this.label});
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -387,10 +402,7 @@ class _TimeUnit extends StatelessWidget {
         const SizedBox(height: 8),
         Text(
           label,
-          style: const TextStyle(
-            color: Colors.white70,
-            fontSize: 14,
-          ),
+          style: const TextStyle(color: Colors.white70, fontSize: 14),
         ),
       ],
     );
@@ -399,7 +411,9 @@ class _TimeUnit extends StatelessWidget {
 
 class _SuccessCard extends StatelessWidget {
   final String message;
+
   const _SuccessCard({required this.message});
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -412,10 +426,7 @@ class _SuccessCard extends StatelessWidget {
             const Icon(Icons.check_circle, color: Colors.green, size: 32),
             const SizedBox(width: 16),
             Expanded(
-              child: Text(
-                message,
-                style: const TextStyle(fontSize: 16),
-              ),
+              child: Text(message, style: const TextStyle(fontSize: 16)),
             ),
           ],
         ),
@@ -423,34 +434,6 @@ class _SuccessCard extends StatelessWidget {
     );
   }
 }
-
-class _ErrorCard extends StatelessWidget {
-  final String message;
-  const _ErrorCard({required this.message});
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.all(16),
-      color: Colors.red.shade50,
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Row(
-          children: [
-            const Icon(Icons.error, color: Colors.red, size: 32),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Text(
-                message,
-                style: const TextStyle(fontSize: 16),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 
 class _SubscriptionPlanCard extends StatelessWidget {
   const _SubscriptionPlanCard({required this.plan, this.onTap});

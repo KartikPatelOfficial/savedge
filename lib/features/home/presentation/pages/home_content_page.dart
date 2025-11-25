@@ -146,7 +146,10 @@ class _HomeContentPageState extends State<HomeContentPage> {
                   children: [
                     _buildHotDealsSection(),
                     _buildCategoriesSection(),
-                    const SubscriptionCarousel(),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: const SubscriptionCarousel(),
+                    ),
                     _buildTopOffersSection(),
                     const SizedBox(height: 40),
                   ],

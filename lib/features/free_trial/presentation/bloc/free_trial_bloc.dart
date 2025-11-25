@@ -24,16 +24,24 @@ class FreeTrialBloc extends Bloc<FreeTrialEvent, FreeTrialState> {
     _LoadStatus event,
     Emitter<FreeTrialState> emit,
   ) async {
+    print('🔍 FreeTrialBloc: Loading free trial status...');
     emit(const FreeTrialState.loading());
     try {
       final status = await _repository.getFreeTrialStatus();
+      print('✅ FreeTrialBloc: Status loaded - ${status.status}');
+      print('   Can activate: ${status.canActivate}');
+      if (status.remainingTime != null) {
+        print('   Remaining time: ${status.remainingTime!.days}d ${status.remainingTime!.hours}h ${status.remainingTime!.minutes}m');
+      }
       emit(FreeTrialState.loaded(status: status));
 
       // Start countdown timer if trial is active
       if (status.status == FreeTrialStatus.active && status.remainingTime != null) {
+        print('⏰ FreeTrialBloc: Starting countdown timer');
         _startCountdownTimer();
       }
     } catch (e) {
+      print('❌ FreeTrialBloc: Error loading status: $e');
       emit(FreeTrialState.error(message: e.toString()));
     }
   }

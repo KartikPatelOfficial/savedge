@@ -71,47 +71,30 @@ class SubscriptionPlanBloc
     LoadSubscriptionPlans event,
     Emitter<SubscriptionPlanState> emit,
   ) async {
+    print('🔍 SubscriptionPlanBloc: Starting to load subscription plans...');
     emit(const SubscriptionPlanLoading());
 
     try {
+      print('📡 SubscriptionPlanBloc: Fetching plans from API...');
       final plans = await _subscriptionPlanRepository.getSubscriptionPlans();
-      // If no plans from API, use sample data for testing
+      print('✅ SubscriptionPlanBloc: Received ${plans.length} plans from API');
+
       if (plans.isEmpty) {
-        final samplePlans = _getSamplePlans();
-        emit(SubscriptionPlanLoaded(samplePlans));
+        print('⚠️ SubscriptionPlanBloc: Plans list is empty');
+        emit(const SubscriptionPlanError('No subscription plans available'));
       } else {
+        print('📦 SubscriptionPlanBloc: Plans loaded successfully');
+        for (var plan in plans) {
+          print('  - Plan: ${plan.name}, Price: ${plan.price}, Image: ${plan.imageUrl ?? "no image"}');
+        }
         emit(SubscriptionPlanLoaded(plans));
       }
-    } catch (error) {
-      // On error, show sample data for testing
-      final samplePlans = _getSamplePlans();
-      emit(SubscriptionPlanLoaded(samplePlans));
+    } catch (error, stackTrace) {
+      print('❌ SubscriptionPlanBloc: Error loading subscription plans');
+      print('   Error: $error');
+      print('   Stack trace: $stackTrace');
+      emit(SubscriptionPlanError('Failed to load plans: ${error.toString()}'));
     }
-  }
-
-  List<SubscriptionPlan> _getSamplePlans() {
-    return [
-      SubscriptionPlan(
-        id: 1,
-        name: 'Premium Membership',
-        description: 'Get exclusive access to all premium features',
-        price: 499.0,
-        durationMonths: 12,
-        imageUrl:
-            'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-        isActive: true,
-      ),
-      SubscriptionPlan(
-        id: 2,
-        name: 'Basic Plan',
-        description: 'Essential features for regular users',
-        price: 199.0,
-        durationMonths: 6,
-        imageUrl:
-            'https://images.unsplash.com/photo-1563013544-824ae1b704d3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-        isActive: true,
-      ),
-    ];
   }
 
   Future<void> _onRefreshSubscriptionPlans(
