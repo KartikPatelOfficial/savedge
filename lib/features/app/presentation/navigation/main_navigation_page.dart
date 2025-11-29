@@ -20,48 +20,66 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
   int _currentIndex = 0;
   bool _isEmployee = false;
   bool _isLoadingProfile = true;
+  late List<Widget> _pages;
 
   AuthRepository get _authRepository => GetIt.I<AuthRepository>();
 
   @override
   void initState() {
     super.initState();
+    _buildPages();
     _loadUserProfile();
   }
 
   Future<void> _loadUserProfile() async {
     try {
-      final UserProfileResponse3 profile = await _authRepository
-          .getCurrentUserProfile();
+      final UserProfileResponse3 profile =
+          await _authRepository.getCurrentUserProfile();
+      if (!mounted) return;
       setState(() {
+        final bool wasEmployee = _isEmployee;
         _isEmployee = profile.isEmployee;
+
+        if (wasEmployee != _isEmployee) {
+          _buildPages();
+          if (_currentIndex >= _pages.length) {
+            _currentIndex = 0;
+          }
+        }
+
         _isLoadingProfile = false;
       });
     } catch (e) {
+      if (!mounted) return;
       // Default to non-employee if profile fetch fails
       setState(() {
-        _isEmployee = false;
+        if (_isEmployee) {
+          // if it was employee, we need to rebuild pages
+          _isEmployee = false;
+          _buildPages();
+          if (_currentIndex >= _pages.length) {
+            _currentIndex = 0;
+          }
+        }
         _isLoadingProfile = false;
       });
     }
   }
 
-  List<Widget> get _pages {
-    final List<Widget> pages = [
+  void _buildPages() {
+    _pages = <Widget>[
       const HomeContentPage(), // Home page content without bottom nav
     ];
 
     // Only add Gift page for employees
     if (_isEmployee) {
-      pages.add(const GiftPage());
+      _pages.add(const GiftPage());
     }
 
-    pages.addAll([
+    _pages.addAll([
       const CouponsPage(), // Enhanced coupon management page
       const ProfilePage(),
     ]);
-
-    return pages;
   }
 
   @override

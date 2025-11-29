@@ -93,10 +93,6 @@ class _HomeContentPageState extends State<HomeContentPage> {
   @override
   void dispose() {
     _scrollController.dispose();
-    _couponsBloc.close();
-    _vendorsBloc.close();
-    _subscriptionBloc.close();
-    _freeTrialBloc.close();
     super.dispose();
   }
 

@@ -430,11 +430,13 @@ class _CouponsViewState extends State<CouponsView> {
         couponsData: state.couponsData,
         onFiltersChanged: (status, categories) {
           // Apply both filters using captured bloc reference
-          bloc.add(ApplyFilters(
-            status: status,
-            categories: categories,
-            vendorId: null,
-          ));
+          bloc.add(
+            ApplyFilters(
+              status: status,
+              categories: categories,
+              vendorId: null,
+            ),
+          );
         },
       ),
     );
@@ -445,7 +447,8 @@ class _CouponsViewState extends State<CouponsView> {
     if (state.selectedStatus != null && state.selectedStatus != 'All') {
       count++;
     }
-    if (state.selectedCategories != null && state.selectedCategories!.isNotEmpty) {
+    if (state.selectedCategories != null &&
+        state.selectedCategories!.isNotEmpty) {
       count++;
     }
     if (state.selectedVendorId != null) {
