@@ -9,7 +9,9 @@ import 'package:savedge/core/constants/app_constants.dart';
 import 'package:savedge/core/injection/injection.dart';
 import 'package:savedge/core/storage/secure_storage_service.dart';
 import 'package:savedge/features/app/presentation/navigation/main_navigation_page.dart';
+import 'package:savedge/features/app/presentation/pages/get_started_page.dart';
 import 'package:savedge/features/auth/presentation/pages/phone_verification_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthWrapper extends StatefulWidget {
   const AuthWrapper({super.key});
@@ -22,6 +24,7 @@ class _AuthWrapperState extends State<AuthWrapper>
     with SingleTickerProviderStateMixin {
   bool _isLoading = true;
   bool _isAuthenticated = false;
+  bool _isFirstTime = true;
 
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
@@ -79,6 +82,9 @@ class _AuthWrapperState extends State<AuthWrapper>
 
   Future<void> _checkAuthStatus() async {
     try {
+      final prefs = await SharedPreferences.getInstance();
+      final isFirstTime = prefs.getBool('isFirstTime') ?? true;
+
       final secureStorage = getIt<SecureStorageService>();
       final isAuthenticated = await secureStorage.isAuthenticated();
       final hasValidToken = await secureStorage.hasValidToken();
@@ -139,6 +145,7 @@ class _AuthWrapperState extends State<AuthWrapper>
 
       setState(() {
         _isAuthenticated = finalAuthenticated;
+        _isFirstTime = isFirstTime;
         _isLoading = false;
       });
 
@@ -158,6 +165,10 @@ class _AuthWrapperState extends State<AuthWrapper>
   Widget build(BuildContext context) {
     if (_isLoading) {
       return _buildSplashScreen(context);
+    }
+
+    if (_isFirstTime) {
+      return const GetStartedPage();
     }
 
     return _isAuthenticated
@@ -186,8 +197,8 @@ class _AuthWrapperState extends State<AuthWrapper>
                   decoration: BoxDecoration(
                     gradient: RadialGradient(
                       colors: [
-                        const Color(0xFF6F3FCC).withValues(alpha: 0.15),
-                        const Color(0xFF6F3FCC).withValues(alpha: 0.0),
+                        const Color(0xFF6F3FCC).withOpacity(0.15),
+                        const Color(0xFF6F3FCC).withOpacity(0.0),
                       ],
                     ),
                     shape: BoxShape.circle,
@@ -209,8 +220,8 @@ class _AuthWrapperState extends State<AuthWrapper>
                   decoration: BoxDecoration(
                     gradient: RadialGradient(
                       colors: [
-                        const Color(0xFFC0CA33).withValues(alpha: 0.2),
-                        const Color(0xFFC0CA33).withValues(alpha: 0.0),
+                        const Color(0xFFC0CA33).withOpacity(0.2),
+                        const Color(0xFFC0CA33).withOpacity(0.0),
                       ],
                     ),
                     shape: BoxShape.circle,
@@ -231,7 +242,7 @@ class _AuthWrapperState extends State<AuthWrapper>
                   width: 80,
                   height: 80,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF6F3FCC).withValues(alpha: 0.1),
+                    color: const Color(0xFF6F3FCC).withOpacity(0.1),
                     shape: BoxShape.circle,
                   ),
                 ),
@@ -347,7 +358,7 @@ class _AuthWrapperState extends State<AuthWrapper>
                                 borderRadius: BorderRadius.circular(2),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.1),
+                                    color: Colors.black.withOpacity(0.1),
                                     blurRadius: 4,
                                     offset: const Offset(0, 2),
                                   ),
@@ -405,7 +416,7 @@ class _AuthWrapperState extends State<AuthWrapper>
                           child: CircularProgressIndicator(
                             strokeWidth: 2.5,
                             valueColor: AlwaysStoppedAnimation<Color>(
-                              const Color(0xFF6F3FCC).withValues(alpha: 0.8),
+                              const Color(0xFF6F3FCC).withOpacity(0.8),
                             ),
                           ),
                         ),
@@ -428,7 +439,7 @@ class _AuthWrapperState extends State<AuthWrapper>
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: const Color(0xFF6F3FCC).withValues(alpha: 0.1),
+            color: const Color(0xFF6F3FCC).withOpacity(0.1),
             borderRadius: BorderRadius.circular(20),
           ),
           child: const Icon(

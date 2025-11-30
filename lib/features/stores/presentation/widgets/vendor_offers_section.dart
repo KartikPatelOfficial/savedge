@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:savedge/core/injection/injection.dart';
 import 'package:savedge/features/coupons/data/services/coupon_service.dart';
 import 'package:savedge/features/coupons/presentation/pages/coupon_redemption_options_page.dart';
+import 'package:savedge/features/coupons/presentation/widgets/coupon_hero_tag.dart';
 import 'package:savedge/features/vendors/domain/entities/coupon.dart';
 import 'package:savedge/features/vendors/presentation/bloc/coupons_bloc.dart';
 
@@ -537,6 +538,9 @@ class _VendorOfferCardState extends State<VendorOfferCard>
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
 
+  String get _heroTag =>
+      couponHeroTag(couponId: widget.coupon.id, source: 'vendor');
+
   @override
   void initState() {
     super.initState();
@@ -561,6 +565,11 @@ class _VendorOfferCardState extends State<VendorOfferCard>
     final hasCash =
         widget.coupon.cashPrice != null && widget.coupon.cashPrice! > 0;
     final hasMembership = _hasMembershipOption(widget.coupon);
+    final staticPreview = _buildStaticCard(
+      accentColor,
+      hasCash: hasCash,
+      hasMembership: hasMembership,
+    );
 
     return GestureDetector(
       onTapDown: (_) {
@@ -569,49 +578,107 @@ class _VendorOfferCardState extends State<VendorOfferCard>
       },
       onTapUp: (_) {
         _animationController.reverse();
-        _onCouponTap(context);
+        _onCouponTap(context, staticPreview);
       },
       onTapCancel: () {
         _animationController.reverse();
       },
+
       child: AnimatedBuilder(
         animation: _scaleAnimation,
         builder: (context, child) => Transform.scale(
           scale: _scaleAnimation.value,
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.08),
-                  blurRadius: 14,
-                  offset: const Offset(0, 6),
-                ),
-              ],
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: Stack(
-                children: [
-                  IntrinsicHeight(
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        _buildDiscountStub(accentColor),
-                        Expanded(
-                          child: _buildDetailsPanel(
-                            accentColor,
-                            hasCash: hasCash,
-                            hasMembership: hasMembership,
-                          ),
+          child: Hero(
+            tag: _heroTag,
+            child: Material(
+              color: Colors.transparent,
+              child: CustomPaint(
+                painter: _CouponOutlinePainter(color: accentColor),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.08),
+                          blurRadius: 14,
+                          offset: const Offset(0, 6),
                         ),
                       ],
                     ),
+                    child: Stack(
+                      children: [
+                        IntrinsicHeight(
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              _buildDiscountStub(accentColor),
+                              Expanded(
+                                child: _buildDetailsPanel(
+                                  accentColor,
+                                  hasCash: hasCash,
+                                  hasMembership: hasMembership,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        _buildInternalCutouts(accentColor),
+                      ],
+                    ),
                   ),
-                  _buildInternalCutouts(),
-                ],
+                ),
               ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStaticCard(
+    Color accentColor, {
+    required bool hasCash,
+    required bool hasMembership,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: CustomPaint(
+        painter: _CouponOutlinePainter(color: accentColor),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.08),
+                blurRadius: 14,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: Stack(
+              children: [
+                IntrinsicHeight(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _buildDiscountStub(accentColor),
+                      Expanded(
+                        child: _buildDetailsPanel(
+                          accentColor,
+                          hasCash: hasCash,
+                          hasMembership: hasMembership,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                _buildInternalCutouts(accentColor),
+              ],
             ),
           ),
         ),
@@ -637,10 +704,21 @@ class _VendorOfferCardState extends State<VendorOfferCard>
     return Container(
       width: 110,
       decoration: BoxDecoration(
-        color: accentColor,
+        color: Colors.white,
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(16),
           bottomLeft: Radius.circular(16),
+        ),
+        border: Border(
+          top: BorderSide(color: accentColor.withValues(alpha: 0.25), width: 1),
+          left: BorderSide(
+            color: accentColor.withValues(alpha: 0.25),
+            width: 1,
+          ),
+          bottom: BorderSide(
+            color: accentColor.withValues(alpha: 0.25),
+            width: 1,
+          ),
         ),
       ),
       child: Center(
@@ -649,10 +727,10 @@ class _VendorOfferCardState extends State<VendorOfferCard>
           children: [
             Text(
               _discountValueText(),
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 30,
                 fontWeight: FontWeight.w800,
-                color: Colors.white,
+                color: accentColor,
                 height: 1.0,
                 letterSpacing: -0.5,
               ),
@@ -661,15 +739,15 @@ class _VendorOfferCardState extends State<VendorOfferCard>
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.25),
+                color: accentColor.withValues(alpha: 0.25),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
                 _discountLabelText(),
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
-                  color: Colors.white,
+                  color: accentColor,
                   letterSpacing: 1.0,
                 ),
               ),
@@ -686,6 +764,23 @@ class _VendorOfferCardState extends State<VendorOfferCard>
     required bool hasMembership,
   }) {
     return Container(
+      decoration: BoxDecoration(
+        border: Border(
+          top: BorderSide(color: accentColor.withValues(alpha: 0.25), width: 1),
+          right: BorderSide(
+            color: accentColor.withValues(alpha: 0.25),
+            width: 1,
+          ),
+          bottom: BorderSide(
+            color: accentColor.withValues(alpha: 0.25),
+            width: 1,
+          ),
+        ),
+        borderRadius: const BorderRadius.only(
+          topRight: Radius.circular(16),
+          bottomRight: Radius.circular(16),
+        ),
+      ),
       padding: const EdgeInsets.all(14),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -701,7 +796,7 @@ class _VendorOfferCardState extends State<VendorOfferCard>
                     Text(
                       widget.vendorName,
                       style: const TextStyle(
-                        fontSize: 15,
+                        fontSize: 11,
                         fontWeight: FontWeight.w600,
                         color: Color(0xFF1A202C),
                       ),
@@ -711,9 +806,10 @@ class _VendorOfferCardState extends State<VendorOfferCard>
                     const SizedBox(height: 2),
                     Text(
                       widget.coupon.title,
-                      style: const TextStyle(
-                        fontSize: 11,
-                        color: Color(0xFF6B7280),
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: Theme.of(context).colorScheme.primary,
+                        fontWeight: FontWeight.bold,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -724,19 +820,6 @@ class _VendorOfferCardState extends State<VendorOfferCard>
               const SizedBox(width: 8),
               _buildClaimTypePill(accentColor, hasCash, hasMembership),
             ],
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4),
-            child: Text(
-              widget.coupon.description,
-              style: const TextStyle(
-                fontSize: 12,
-                color: Color(0xFF4B5563),
-                height: 1.3,
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
           ),
           if (widget.coupon.minimumAmountDisplay.isNotEmpty)
             Text(
@@ -789,15 +872,6 @@ class _VendorOfferCardState extends State<VendorOfferCard>
             size: 14,
             color: accentColor,
           ),
-          const SizedBox(width: 6),
-          Text(
-            text,
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w700,
-              color: accentColor,
-            ),
-          ),
         ],
       ),
     );
@@ -832,7 +906,7 @@ class _VendorOfferCardState extends State<VendorOfferCard>
           _claimChip(
             accentColor,
             icon: Icons.currency_rupee,
-            label: '₹${widget.coupon.cashPrice!.toInt()}',
+            label: 'buy at ₹${widget.coupon.cashPrice!.toInt()}',
           ),
         if (hasMembership)
           _claimChip(
@@ -874,14 +948,14 @@ class _VendorOfferCardState extends State<VendorOfferCard>
     );
   }
 
-  Widget _buildInternalCutouts() {
-    return const Positioned(
+  Widget _buildInternalCutouts(Color accentColor) {
+    return Positioned(
       left: 106,
       top: 0,
       bottom: 0,
       child: SizedBox(
         width: 12,
-        child: CustomPaint(painter: _TicketCutoutPainter()),
+        child: CustomPaint(painter: _TicketCutoutPainter(accentColor)),
       ),
     );
   }
@@ -934,7 +1008,7 @@ class _VendorOfferCardState extends State<VendorOfferCard>
     return const Color(0xFF10B981);
   }
 
-  void _onCouponTap(BuildContext context) async {
+  void _onCouponTap(BuildContext context, Widget staticPreview) async {
     try {
       // Show loading indicator with haptic feedback
       HapticFeedback.lightImpact();
@@ -946,8 +1020,12 @@ class _VendorOfferCardState extends State<VendorOfferCard>
       // Navigate to coupon redemption options page
       final result = await Navigator.of(context).push<bool>(
         MaterialPageRoute(
-          builder: (context) =>
-              CouponRedemptionOptionsPage(couponData: couponCheck),
+          builder: (context) => CouponRedemptionOptionsPage(
+            couponData: couponCheck,
+            heroTag: _heroTag,
+            previewSource: CouponPreviewSource.vendor,
+            previewContent: staticPreview,
+          ),
         ),
       );
 
@@ -1057,7 +1135,16 @@ class _VendorOfferCardState extends State<VendorOfferCard>
             action: SnackBarAction(
               label: 'RETRY',
               textColor: Colors.white,
-              onPressed: () => _onCouponTap(context),
+              onPressed: () => _onCouponTap(
+                context,
+                _buildStaticCard(
+                  _getPrimaryColor(),
+                  hasCash:
+                      widget.coupon.cashPrice != null &&
+                      widget.coupon.cashPrice! > 0,
+                  hasMembership: _hasMembershipOption(widget.coupon),
+                ),
+              ),
             ),
           ),
         );
@@ -1079,32 +1166,53 @@ class _VendorOfferCardState extends State<VendorOfferCard>
   }
 }
 
-/// Custom painter for ticket-style cutouts and dotted divider
 class _TicketCutoutPainter extends CustomPainter {
-  const _TicketCutoutPainter();
+  const _TicketCutoutPainter(this.accentColor);
+
+  final Color accentColor;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = const Color(0xFFF5F5F5)
+    // Fill for the cutout (matches card background)
+    final fillPaint = Paint()
+      ..color = const Color(0xFFF8F9FA)
       ..style = PaintingStyle.fill;
 
-    canvas.drawCircle(Offset(size.width / 2, 0), 8, paint);
-    canvas.drawCircle(Offset(size.width / 2, size.height), 8, paint);
+    // Stroke around cutout using accent color (subtle alpha)
+    final strokePaint = Paint()
+      ..color = accentColor.withValues(alpha: 0.25)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5;
 
+    // Dashed divider line in accent color
     final linePaint = Paint()
-      ..color = const Color(0xFFE5E7EB)
+      ..color = accentColor
       ..strokeWidth = 1.5
       ..style = PaintingStyle.stroke;
 
+    const double radius = 8.0;
+    final topCenter = Offset(size.width / 2, 0);
+    final bottomCenter = Offset(size.width / 2, size.height);
+
+    // Draw filled circles (cutouts)
+    canvas.drawCircle(topCenter, radius, fillPaint);
+    canvas.drawCircle(bottomCenter, radius, fillPaint);
+
+    // Draw stroke around cutouts so they have an accent border
+    canvas.drawCircle(topCenter, radius, strokePaint);
+    canvas.drawCircle(bottomCenter, radius, strokePaint);
+
+    // Draw dashed vertical divider between cutouts
     const dashHeight = 4.0;
     const dashSpace = 4.0;
-    double startY = 8;
+    double startY = radius; // start just after the top circle
+    final endY = size.height - radius; // end just before the bottom circle
 
-    while (startY < size.height - 8) {
+    while (startY < endY) {
+      final nextY = (startY + dashHeight).clamp(0.0, endY);
       canvas.drawLine(
         Offset(size.width / 2, startY),
-        Offset(size.width / 2, startY + dashHeight),
+        Offset(size.width / 2, nextY),
         linePaint,
       );
       startY += dashHeight + dashSpace;
@@ -1112,5 +1220,22 @@ class _TicketCutoutPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant _TicketCutoutPainter oldDelegate) =>
+      oldDelegate.accentColor != accentColor;
+}
+
+/// Outline painter to give the card a ticket-like silhouette.
+class _CouponOutlinePainter extends CustomPainter {
+  const _CouponOutlinePainter({required this.color});
+
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    // Intentionally blank: keeping the painter to avoid re-layout but disabling cutout/outline drawing.
+  }
+
+  @override
+  bool shouldRepaint(covariant _CouponOutlinePainter oldDelegate) =>
+      oldDelegate.color != color;
 }

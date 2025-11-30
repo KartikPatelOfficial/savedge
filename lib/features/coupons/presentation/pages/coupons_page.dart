@@ -4,13 +4,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:savedge/core/injection/injection.dart';
 import 'package:savedge/features/coupons/data/models/coupon_gifting_models.dart';
 import 'package:savedge/features/coupons/data/models/user_coupon_model.dart';
+import 'package:savedge/features/coupons/data/services/coupon_service.dart';
 import 'package:savedge/features/coupons/presentation/bloc/coupon_manager_bloc.dart';
 import 'package:savedge/features/coupons/presentation/bloc/coupon_manager_event.dart';
 import 'package:savedge/features/coupons/presentation/bloc/coupon_manager_state.dart';
 import 'package:savedge/features/coupons/presentation/pages/coupon_confirmation_page.dart';
+import 'package:savedge/features/coupons/presentation/pages/coupon_redemption_options_page.dart';
 import 'package:savedge/features/coupons/presentation/pages/redeemed_coupon_page.dart';
 import 'package:savedge/features/coupons/presentation/widgets/coupon_card.dart';
 import 'package:savedge/features/coupons/presentation/widgets/coupon_filter_sheet.dart';
+import 'package:savedge/features/coupons/presentation/widgets/coupon_hero_tag.dart';
 
 class CouponsPage extends StatelessWidget {
   const CouponsPage({super.key});
@@ -50,7 +53,6 @@ class _CouponsViewState extends State<CouponsView> {
   }
 
   void _onScroll() {
-    // Add shadow to filters when scrolled
     final scrolled = _scrollController.offset > 50;
     if (scrolled != _isScrolled) {
       setState(() => _isScrolled = scrolled);
@@ -168,7 +170,6 @@ class _CouponsViewState extends State<CouponsView> {
   }
 
   Widget _buildCouponsView(BuildContext context, CouponManagerLoaded state) {
-    // Get the coupons to display (filtered or all)
     final coupons = state.filteredCoupons ?? _getAllCoupons(state.couponsData);
     final activeFilterCount = _getActiveFilterCount(state);
 
@@ -176,7 +177,6 @@ class _CouponsViewState extends State<CouponsView> {
       onRefresh: () async {
         HapticFeedback.lightImpact();
         context.read<CouponManagerBloc>().add(const RefreshAllCoupons());
-        // Wait for the refresh to complete
         await Future.delayed(const Duration(milliseconds: 500));
       },
       color: const Color(0xFF6F3FCC),
@@ -186,20 +186,13 @@ class _CouponsViewState extends State<CouponsView> {
           parent: AlwaysScrollableScrollPhysics(),
         ),
         slivers: [
-          // Collapsing Header like Profile Page
           _buildCollapsingHeader(activeFilterCount),
-
-          // Spacing before coupons
           const SliverToBoxAdapter(child: SizedBox(height: 16)),
-
-          // Coupons List or Empty State
           coupons.isEmpty
               ? SliverFillRemaining(
                   child: _buildEmptyState(state.selectedStatus),
                 )
               : _buildCouponsSliverList(coupons),
-
-          // Bottom padding
           const SliverToBoxAdapter(child: SizedBox(height: 24)),
         ],
       ),
@@ -215,7 +208,6 @@ class _CouponsViewState extends State<CouponsView> {
       shadowColor: Colors.black.withValues(alpha: 0.1),
       flexibleSpace: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
-          // Calculate how much the header has collapsed
           final double collapsedPercentage =
               ((constraints.maxHeight - kToolbarHeight) /
                       (120 - kToolbarHeight))
@@ -226,7 +218,7 @@ class _CouponsViewState extends State<CouponsView> {
               left: 16,
               bottom: 16 * collapsedPercentage + 8,
             ),
-            title: Text(
+            title: const Text(
               'My Coupons',
               style: TextStyle(
                 color: Color(0xFF1A202C),
@@ -238,7 +230,6 @@ class _CouponsViewState extends State<CouponsView> {
         },
       ),
       actions: [
-        // Filter button with badge
         Stack(
           children: [
             IconButton(
@@ -417,7 +408,6 @@ class _CouponsViewState extends State<CouponsView> {
   void _showFilterSheet(BuildContext context, CouponManagerLoaded state) {
     HapticFeedback.lightImpact();
 
-    // Capture bloc reference before opening bottom sheet
     final bloc = context.read<CouponManagerBloc>();
 
     showModalBottomSheet(
@@ -429,7 +419,6 @@ class _CouponsViewState extends State<CouponsView> {
         selectedCategories: state.selectedCategories ?? [],
         couponsData: state.couponsData,
         onFiltersChanged: (status, categories) {
-          // Apply both filters using captured bloc reference
           bloc.add(
             ApplyFilters(
               status: status,
@@ -477,17 +466,35 @@ class _CouponsViewState extends State<CouponsView> {
       return;
     }
 
-    // Active coupon → go to confirmation to use
+    // Active coupon -> show redemption options with shared hero preview
+    final heroTag = couponHeroTag(
+      couponId: coupon.couponId,
+      userCouponId: coupon.id,
+      source: 'wallet',
+    );
+
+    // Disable nested hero inside the preview; redemption page wraps it.
+    final preview = CouponCard(
+      coupon: coupon,
+      onTap: () {},
+      enableHero: false,
+    );
+
+    final couponService = getIt<CouponService>();
+    final couponCheck = await couponService.checkCoupon(coupon.couponId);
+
     final result = await Navigator.of(context).push<bool>(
       MaterialPageRoute(
-        builder: (_) => CouponConfirmationPage(
+        builder: (_) => CouponRedemptionOptionsPage(
+          couponData: couponCheck,
+          heroTag: heroTag,
+          previewSource: CouponPreviewSource.wallet,
+          previewContent: preview,
           userCoupon: coupon,
-          confirmationType: CouponConfirmationType.use,
         ),
       ),
     );
 
-    // Refresh coupons if the action was successful
     if (result == true && mounted) {
       context.read<CouponManagerBloc>().add(const RefreshAllCoupons());
     }

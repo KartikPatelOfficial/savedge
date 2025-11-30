@@ -5,6 +5,7 @@ import 'package:savedge/features/auth/data/models/user_profile_models.dart';
 import 'package:savedge/features/auth/domain/repositories/auth_repository.dart';
 import 'package:savedge/features/coupons/data/models/coupon_claim_models.dart';
 import 'package:savedge/features/coupons/data/models/coupon_gifting_models.dart';
+import 'package:savedge/features/coupons/presentation/widgets/coupon_hero_tag.dart';
 import 'package:savedge/features/free_trial/data/models/free_trial_models.dart';
 import 'package:savedge/features/free_trial/data/repositories/free_trial_repository.dart';
 import 'package:savedge/features/user_profile/presentation/widgets/subscription_status_card.dart';
@@ -13,9 +14,20 @@ import 'coupon_confirmation_page.dart';
 
 /// Modern coupon claiming page with beautiful UI and smooth animations
 class CouponRedemptionOptionsPage extends StatefulWidget {
-  const CouponRedemptionOptionsPage({super.key, required this.couponData});
+  const CouponRedemptionOptionsPage({
+    super.key,
+    required this.couponData,
+    this.heroTag,
+    this.previewSource = CouponPreviewSource.vendor,
+    this.previewContent,
+    this.userCoupon,
+  });
 
   final CouponCheckResponse couponData;
+  final String? heroTag;
+  final CouponPreviewSource previewSource;
+  final Widget? previewContent;
+  final UserCouponDetailModel? userCoupon;
 
   @override
   State<CouponRedemptionOptionsPage> createState() =>
@@ -36,14 +48,20 @@ class _CouponRedemptionOptionsPageState
   late AnimationController _fadeController;
   late Animation<Offset> _slideAnimation;
   late Animation<double> _fadeAnimation;
+  late final String _heroTag;
 
   AuthRepository get _authRepository => GetIt.I<AuthRepository>();
+
   SecureStorageService get _secureStorage => GetIt.I<SecureStorageService>();
-  FreeTrialRepository get _freeTrialRepository => GetIt.I<FreeTrialRepository>();
+
+  FreeTrialRepository get _freeTrialRepository =>
+      GetIt.I<FreeTrialRepository>();
 
   @override
   void initState() {
     super.initState();
+    _heroTag =
+        widget.heroTag ?? couponHeroTag(couponId: widget.couponData.couponId);
     _slideController = AnimationController(
       duration: const Duration(milliseconds: 600),
       vsync: this,
@@ -153,6 +171,10 @@ class _CouponRedemptionOptionsPageState
 
                 // Coupon Card
                 _buildModernCouponCard(),
+                const SizedBox(height: 12),
+
+                // Full description
+                _buildDescriptionSection(),
                 const SizedBox(height: 32),
 
                 // Redemption Options
@@ -170,20 +192,23 @@ class _CouponRedemptionOptionsPageState
   }
 
   Widget _buildHeader() {
+    final isReadyUse = widget.previewSource == CouponPreviewSource.wallet ||
+        widget.userCoupon != null;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Claim Your',
-          style: TextStyle(
+        Text(
+          isReadyUse ? 'Ready to use' : 'Claim Your',
+          style: const TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.w300,
             color: Colors.black87,
           ),
         ),
-        const Text(
-          'Amazing Deal! 🎉',
-          style: TextStyle(
+        Text(
+          isReadyUse ? 'Show at checkout' : 'Amazing Deal! 🎉',
+          style: const TextStyle(
             fontSize: 32,
             fontWeight: FontWeight.w800,
             color: Color(0xFF6F3FCC),
@@ -191,7 +216,9 @@ class _CouponRedemptionOptionsPageState
         ),
         const SizedBox(height: 8),
         Text(
-          'Choose how you\'d like to get this coupon',
+          isReadyUse
+              ? 'Present this coupon to redeem'
+              : 'Choose how you\'d like to get this coupon',
           style: TextStyle(fontSize: 16, color: Colors.grey[600], height: 1.4),
         ),
       ],
@@ -199,188 +226,514 @@ class _CouponRedemptionOptionsPageState
   }
 
   Widget _buildModernCouponCard() {
+    if (widget.previewContent != null) {
+      final content = widget.previewContent!;
+
+      if (content is Hero) {
+        // Already wrapped at the source; reuse to avoid nested heroes.
+        return content;
+      }
+
+      return Hero(
+        tag: _heroTag,
+        child: IgnorePointer(child: content),
+      );
+    }
+
+    return Hero(
+      tag: _heroTag,
+      child: Material(
+        color: Colors.transparent,
+        child: widget.previewSource == CouponPreviewSource.wallet
+            ? _buildWalletStylePreview()
+            : _buildVendorStylePreview(),
+      ),
+    );
+  }
+
+  Widget _buildVendorStylePreview() {
+    final accentColor = _vendorAccentColor();
+    final expiryDate = DateTime.tryParse(widget.couponData.validUntil);
+    final splitDiscount = _splitDiscountText(widget.couponData.discountDisplay);
+
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF6F3FCC).withOpacity(0.2),
-            blurRadius: 30,
-            offset: const Offset(0, 15),
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 14,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
-      child: Stack(
-        children: [
-          // Main gradient card
-          Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF667eea), Color(0xFF764ba2)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(24),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Stack(
+          children: [
+            IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _buildVendorStub(accentColor, splitDiscount.$1),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            widget.couponData.title,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 22,
-                              fontWeight: FontWeight.w800,
-                              height: 1.2,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
                           Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 4,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.2),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Icon(
-                                      Icons.store_outlined,
-                                      color: Colors.white,
-                                      size: 14,
-                                    ),
-                                    const SizedBox(width: 4),
                                     Text(
                                       widget.couponData.vendorName,
                                       style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w700,
+                                        color: Colors.black87,
                                       ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      widget.couponData.title,
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey[700],
+                                      ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ],
                                 ),
                               ),
+                              const SizedBox(width: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: accentColor.withOpacity(0.12),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Text(
+                                  splitDiscount.$2,
+                                  style: TextStyle(
+                                    color: accentColor,
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            widget.couponData.description,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Color(0xFF6B7280),
+                              height: 1.35,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.access_time_rounded,
+                                size: 14,
+                                color: Colors.grey[600],
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                expiryDate != null
+                                    ? _formatDate(expiryDate)
+                                    : 'Valid until: -',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  color: _validityColor(expiryDate),
+                                ),
+                              ),
+                              const Spacer(),
+                              if (widget.couponData.cashPrice != null &&
+                                  widget.couponData.cashPrice! > 0)
+                                _infoChip(
+                                  icon: Icons.currency_rupee,
+                                  label:
+                                      'Rs${widget.couponData.cashPrice!.toStringAsFixed(0)}',
+                                  color: const Color(0xFF10B981),
+                                ),
+                              if (widget.couponData.userMaxRedemptions !=
+                                  null) ...[
+                                const SizedBox(width: 8),
+                                _infoChip(
+                                  icon: Icons.workspace_premium,
+                                  label: 'Membership',
+                                  color: const Color(0xFF6366F1),
+                                ),
+                              ],
                             ],
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(width: 16),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 12,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Text(
-                        widget.couponData.discountDisplay,
+                  ),
+                ],
+              ),
+            ),
+            Positioned(
+              left: 98,
+              top: 0,
+              bottom: 0,
+              child: SizedBox(
+                width: 12,
+                child: CustomPaint(painter: _InlineCutoutPainter()),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWalletStylePreview() {
+    final color = _walletColor();
+    final expiryDate = DateTime.tryParse(widget.couponData.validUntil);
+    final splitDiscount = _splitDiscountText(widget.couponData.discountDisplay);
+
+    return Container(
+      height: 165,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Stack(
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 100,
+                  decoration: BoxDecoration(
+                    color: color,
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(16),
+                      bottomLeft: Radius.circular(16),
+                    ),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        splitDiscount.$1,
                         style: const TextStyle(
-                          color: Color(0xFF6F3FCC),
-                          fontSize: 18,
-                          fontWeight: FontWeight.w900,
+                          fontSize: 32,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
+                          height: 1.0,
+                          letterSpacing: -0.5,
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  widget.couponData.description,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 15,
-                    height: 1.5,
-                    fontWeight: FontWeight.w400,
+                      const SizedBox(height: 6),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.25),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          splitDiscount.$2,
+                          style: const TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                            letterSpacing: 1.0,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                if (widget.couponData.minCartValue != null &&
-                    widget.couponData.minCartValue! > 0) ...[
-                  const SizedBox(height: 16),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: Colors.white.withOpacity(0.3),
-                        width: 1,
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.all(14),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Icon(
-                          Icons.shopping_cart_outlined,
-                          color: Colors.white,
-                          size: 16,
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 36,
+                              height: 36,
+                              decoration: BoxDecoration(
+                                color: color.withOpacity(0.12),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Icon(
+                                Icons.local_offer,
+                                color: color,
+                                size: 18,
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    widget.couponData.vendorName,
+                                    style: const TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600,
+                                      color: Color(0xFF111827),
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    widget.couponData.title,
+                                    style: const TextStyle(
+                                      fontSize: 11,
+                                      color: Color(0xFF6B7280),
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Minimum order: ₹${widget.couponData.minCartValue!.toStringAsFixed(0)}',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4),
+                          child: Text(
+                            widget.couponData.description,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Color(0xFF4B5563),
+                              height: 1.3,
+                            ),
                           ),
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                const Text(
+                                  'Valid until: ',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    color: Color(0xFF9CA3AF),
+                                  ),
+                                ),
+                                Text(
+                                  expiryDate != null
+                                      ? _formatDate(expiryDate)
+                                      : '-',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w600,
+                                    color: _validityColor(expiryDate),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 6),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 6,
+                              ),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF7F8FA),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 24,
+                                    height: 24,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(4),
+                                      border: Border.all(
+                                        color: const Color(0xFFE5E7EB),
+                                        width: 1,
+                                      ),
+                                    ),
+                                    child: const Icon(
+                                      Icons.qr_code_2,
+                                      size: 14,
+                                      color: Color(0xFF6B7280),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      widget.couponData.discountDisplay,
+                                      style: const TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w700,
+                                        fontFamily: 'monospace',
+                                        color: Color(0xFF111827),
+                                        letterSpacing: 0.5,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Icon(
+                                    Icons.arrow_forward_ios,
+                                    size: 12,
+                                    color: Colors.grey[500],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
                   ),
-                ],
+                ),
               ],
             ),
-          ),
-          // Decorative elements
-          Positioned(
-            right: -30,
-            top: -30,
-            child: Container(
-              width: 120,
-              height: 120,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.1),
+            Positioned(
+              left: 95,
+              top: 0,
+              bottom: 0,
+              child: SizedBox(
+                width: 10,
+                child: CustomPaint(painter: _InlineCutoutPainter()),
               ),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Color _vendorAccentColor() {
+    final colors = [
+      const Color(0xFF6F3FCC),
+      const Color(0xFF2196F3),
+      const Color(0xFF4CAF50),
+      const Color(0xFFFF9800),
+      const Color(0xFFE91E63),
+      const Color(0xFF00BCD4),
+      const Color(0xFFFF5722),
+      const Color(0xFF9C27B0),
+    ];
+    return colors[widget.couponData.couponId % colors.length];
+  }
+
+  Color _walletColor() => _vendorAccentColor();
+
+  (String, String) _splitDiscountText(String display) {
+    final parts = display.split(' ');
+    if (parts.length >= 2) {
+      final value = parts.take(parts.length - 1).join(' ');
+      final label = parts.last.toUpperCase();
+      return (value, label);
+    }
+    return (display, 'OFF');
+  }
+
+  String _formatDate(DateTime date) =>
+      '${date.day.toString().padLeft(2, '0')} ${_monthAbbrev(date.month)} ${date.year}';
+
+  String _monthAbbrev(int month) {
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    return months[(month - 1).clamp(0, months.length - 1)];
+  }
+
+  Color _validityColor(DateTime? expiry) {
+    if (expiry == null) return const Color(0xFF10B981);
+    final daysLeft = expiry.difference(DateTime.now()).inDays;
+    if (daysLeft < 0) return const Color(0xFFEF4444);
+    if (daysLeft <= 7) return const Color(0xFFF59E0B);
+    return const Color(0xFF10B981);
+  }
+
+  Widget _buildVendorStub(Color color, String value) {
+    return Container(
+      width: 110,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [color, color.withOpacity(0.85)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(16),
+          bottomLeft: Radius.circular(16),
+        ),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.w800,
+              color: Colors.white,
+              height: 1.0,
+              letterSpacing: -0.3,
+            ),
           ),
-          Positioned(
-            left: -20,
-            bottom: -20,
-            child: Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.05),
+          const SizedBox(height: 6),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.25),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Text(
+              'OFF',
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+                color: Colors.white,
+                letterSpacing: 1.0,
               ),
             ),
           ),
@@ -389,7 +742,92 @@ class _CouponRedemptionOptionsPageState
     );
   }
 
+  Widget _infoChip({
+    required IconData icon,
+    required String label,
+    required Color color,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: color.withOpacity(0.2)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: color),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+              color: color,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDescriptionSection() {
+    final rawDescription =
+        (widget.userCoupon?.description ?? widget.couponData.description).trim();
+    final description =
+        rawDescription.isEmpty ? widget.couponData.title : rawDescription;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Text(
+        description,
+        style: const TextStyle(
+          fontSize: 14,
+          color: Color(0xFF374151),
+          height: 1.5,
+        ),
+      ),
+    );
+  }
+
   Widget _buildRedemptionOptions() {
+    if (widget.previewSource == CouponPreviewSource.wallet ||
+        widget.userCoupon != null) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: const [
+          Text(
+            'This coupon is ready to use.',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: Colors.black87,
+            ),
+          ),
+          SizedBox(height: 8),
+          Text(
+            'Show it at checkout to redeem.',
+            style: TextStyle(
+              fontSize: 14,
+              color: Color(0xFF6B7280),
+            ),
+          ),
+        ],
+      );
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -614,7 +1052,8 @@ class _CouponRedemptionOptionsPageState
     // API provides userUsedRedemptions as total subscription claims (used + unused)
     // We intentionally base remaining claims on claimed count, not used count
     // Prefer server-computed remaining claims if available
-    final remainingClaims = widget.couponData.remainingSubscriptionClaims ??
+    final remainingClaims =
+        widget.couponData.remainingSubscriptionClaims ??
         (widget.couponData.userMaxRedemptions! -
             widget.couponData.userUsedRedemptions);
 
@@ -754,7 +1193,8 @@ class _CouponRedemptionOptionsPageState
   }
 
   Widget _buildModernFreeTrialOption() {
-    final remainingClaims = widget.couponData.remainingSubscriptionClaims ??
+    final remainingClaims =
+        widget.couponData.remainingSubscriptionClaims ??
         (widget.couponData.userMaxRedemptions! -
             widget.couponData.userUsedRedemptions);
 
@@ -920,7 +1360,10 @@ class _CouponRedemptionOptionsPageState
   }
 
   Widget _buildModernClaimButton() {
-    final isEnabled = selectedMethod != null && !isProcessing;
+    final isReadyUse =
+        widget.previewSource == CouponPreviewSource.wallet ||
+            widget.userCoupon != null;
+    final isEnabled = isReadyUse || (selectedMethod != null && !isProcessing);
 
     return Container(
       width: double.infinity,
@@ -938,7 +1381,11 @@ class _CouponRedemptionOptionsPageState
             : null,
       ),
       child: ElevatedButton(
-        onPressed: isEnabled ? _handleClaim : null,
+        onPressed: isEnabled
+            ? isReadyUse
+                ? _handleUseExisting
+                : _handleClaim
+            : null,
         style: ElevatedButton.styleFrom(
           backgroundColor: isEnabled
               ? const Color(0xFF6F3FCC)
@@ -976,11 +1423,13 @@ class _CouponRedemptionOptionsPageState
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
-                    selectedMethod == RedemptionMethod.existing
+                    isReadyUse
                         ? Icons.redeem
-                        : selectedMethod == RedemptionMethod.membership
-                        ? Icons.workspace_premium
-                        : Icons.credit_card,
+                        : selectedMethod == RedemptionMethod.existing
+                            ? Icons.redeem
+                            : selectedMethod == RedemptionMethod.membership
+                                ? Icons.workspace_premium
+                                : Icons.credit_card,
                     size: 20,
                   ),
                   const SizedBox(width: 8),
@@ -998,6 +1447,13 @@ class _CouponRedemptionOptionsPageState
   }
 
   String _getButtonText() {
+    final isReadyUse =
+        widget.previewSource == CouponPreviewSource.wallet ||
+            widget.userCoupon != null;
+    if (isReadyUse) {
+      return 'Use Coupon';
+    }
+
     if (selectedMethod == null) return 'Select a Method';
 
     switch (selectedMethod!) {
@@ -1039,7 +1495,7 @@ class _CouponRedemptionOptionsPageState
   /// Build loading state for membership option
   Widget _buildLoadingMembershipOption() {
     const color = Color(0xFF6F3FCC);
-    
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -1085,10 +1541,7 @@ class _CouponRedemptionOptionsPageState
                 SizedBox(height: 4),
                 Text(
                   'Please wait',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey,
-                  ),
+                  style: TextStyle(fontSize: 14, color: Colors.grey),
                 ),
               ],
             ),
@@ -1245,6 +1698,65 @@ class _CouponRedemptionOptionsPageState
       ),
     );
   }
+
+  Future<void> _handleUseExisting() async {
+    try {
+      setState(() => isProcessing = true);
+
+      final result = await Navigator.of(context).push<bool>(
+        MaterialPageRoute(
+          builder: (_) => CouponConfirmationPage(
+            userCoupon: widget.userCoupon,
+            confirmationType: CouponConfirmationType.use,
+          ),
+        ),
+      );
+
+      if (result == true && mounted) {
+        Navigator.of(context).pop(true);
+      }
+    } catch (e) {
+      _showErrorDialog(e.toString());
+    } finally {
+      if (mounted) {
+        setState(() => isProcessing = false);
+      }
+    }
+  }
 }
 
 enum RedemptionMethod { existing, razorpay, membership, freeTrial }
+
+enum CouponPreviewSource { vendor, wallet }
+
+class _InlineCutoutPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = const Color(0xFFF5F5F5)
+      ..style = PaintingStyle.fill;
+
+    canvas.drawCircle(Offset(size.width / 2, 0), 8, paint);
+    canvas.drawCircle(Offset(size.width / 2, size.height), 8, paint);
+
+    final linePaint = Paint()
+      ..color = const Color(0xFFE5E7EB)
+      ..strokeWidth = 1.5
+      ..style = PaintingStyle.stroke;
+
+    const dashHeight = 4.0;
+    const dashSpace = 4.0;
+    double startY = 8;
+    while (startY < size.height - 8) {
+      canvas.drawLine(
+        Offset(size.width / 2, startY),
+        Offset(size.width / 2, startY + dashHeight),
+        linePaint,
+      );
+      startY += dashHeight + dashSpace;
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}

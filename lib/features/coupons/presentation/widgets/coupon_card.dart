@@ -3,20 +3,32 @@ import 'package:intl/intl.dart';
 import 'package:savedge/core/constants/categories_constants.dart';
 import 'package:savedge/core/themes/app_theme.dart';
 import 'package:savedge/features/coupons/data/models/coupon_gifting_models.dart';
+import 'package:savedge/features/coupons/presentation/widgets/coupon_hero_tag.dart';
 
 /// Modern ticket-style coupon card with varied colors and category icons
 class CouponCard extends StatelessWidget {
-  const CouponCard({super.key, required this.coupon, required this.onTap});
+  const CouponCard({
+    super.key,
+    required this.coupon,
+    required this.onTap,
+    this.enableHero = true,
+  });
 
   final UserCouponDetailModel coupon;
   final VoidCallback onTap;
+  final bool enableHero;
+
+  String get _heroTag => couponHeroTag(
+    couponId: coupon.couponId,
+    userCouponId: coupon.id,
+    source: 'wallet',
+  );
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
+    final content = Material(
+      color: Colors.transparent,
       child: Container(
-        height: 165,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
@@ -50,6 +62,10 @@ class CouponCard extends StatelessWidget {
         ),
       ),
     );
+
+    final wrapped = enableHero ? Hero(tag: _heroTag, child: content) : content;
+
+    return GestureDetector(onTap: onTap, child: wrapped);
   }
 
   Widget _buildDiscountStub() {
@@ -58,7 +74,6 @@ class CouponCard extends StatelessWidget {
     return Container(
       width: 100,
       decoration: BoxDecoration(
-        color: couponColor,
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(16),
           bottomLeft: Radius.circular(16),
@@ -70,10 +85,10 @@ class CouponCard extends StatelessWidget {
           // Discount value
           Text(
             _getDiscountValue(),
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 32,
               fontWeight: FontWeight.w800,
-              color: Colors.white,
+              color: couponColor,
               height: 1.0,
               letterSpacing: -0.5,
             ),
@@ -88,10 +103,10 @@ class CouponCard extends StatelessWidget {
             ),
             child: Text(
               _getDiscountLabel(),
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w700,
-                color: Colors.white,
+                color: couponColor,
                 letterSpacing: 1.0,
               ),
             ),
@@ -147,24 +162,7 @@ class CouponCard extends StatelessWidget {
               // Status pill
               _buildStatusPill(),
             ],
-          ),
-
-          // Middle: Offer description
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4),
-            child: Text(
-              coupon.description ?? coupon.title,
-              style: const TextStyle(
-                fontSize: 12,
-                color: AppTheme.textSecondary,
-                height: 1.3,
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-
-          // Bottom: Validity & Barcode strip
+          ), // Bottom: Validity & Barcode strip
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
