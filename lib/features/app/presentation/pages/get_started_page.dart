@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:savedge/features/app/presentation/navigation/main_navigation_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:savedge/features/auth/presentation/pages/phone_verification_page.dart';
 
 class GetStartedPage extends StatefulWidget {
   const GetStartedPage({super.key});
@@ -40,7 +40,7 @@ class _GetStartedPageState extends State<GetStartedPage> {
               onPressed: () {
                 Navigator.of(context).pushReplacement(
                   MaterialPageRoute(
-                    builder: (context) => const MainNavigationPage(),
+                    builder: (context) => const PhoneVerificationPage(),
                   ),
                 );
               },
