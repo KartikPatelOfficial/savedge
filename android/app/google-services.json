@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "702662455472",
+    "project_id": "savedge-42c69",
+    "storage_bucket": "savedge-42c69.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:702662455472:android:f70a119b47fb2e24b14b75",
+        "android_client_info": {
+          "package_name": "com.savedge.savedge"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCJuon9-VIMmVaHgm3xJQzNtJvOd2e0a_Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:702662455472:android:9d701341a3ce60fbb14b75",
+        "android_client_info": {
+          "package_name": "com.savedge.savedge_vendors"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCJuon9-VIMmVaHgm3xJQzNtJvOd2e0a_Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -9,6 +9,7 @@ import 'package:savedge/features/auth/domain/repositories/auth_repository.dart';
 import 'package:savedge/features/favorites/presentation/pages/favorites_page.dart';
 import 'package:savedge/features/free_trial/presentation/bloc/free_trial_bloc.dart';
 import 'package:savedge/features/home/presentation/widgets/widgets.dart';
+import 'package:savedge/features/notifications/presentation/bloc/notification_bloc.dart';
 import 'package:savedge/features/stores/presentation/pages/stores_page.dart';
 import 'package:savedge/features/stores/presentation/pages/vendor_detail_page.dart';
 import 'package:savedge/features/subscription/presentation/bloc/subscription_plan_bloc.dart';
@@ -209,6 +210,8 @@ class _HomeContentPageState extends State<HomeContentPage> {
                       ),
                       const Spacer(),
                       // Action buttons
+                      _buildNotificationButton(),
+                      const SizedBox(width: 12),
                       _buildActionButton(
                         icon: Icons.favorite_outline,
                         onTap: _onFavoriteTap,
@@ -274,6 +277,79 @@ class _HomeContentPageState extends State<HomeContentPage> {
     );
   }
 
+  Widget _buildNotificationButton() {
+    return BlocBuilder<NotificationBloc, NotificationState>(
+      builder: (context, state) {
+        final unreadCount = state.unreadCount;
+
+        return Container(
+          width: 44,
+          height: 44,
+          decoration: BoxDecoration(
+            color: const Color(0xFFF8F9FA),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.grey[200]!),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.04),
+                blurRadius: 6,
+                offset: const Offset(0, 1),
+              ),
+            ],
+          ),
+          child: Stack(
+            children: [
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: _onNotificationTap,
+                  borderRadius: BorderRadius.circular(12),
+                  child: const Center(
+                    child: Icon(
+                      Icons.notifications_outlined,
+                      size: 20,
+                      color: Color(0xFF1A202C),
+                    ),
+                  ),
+                ),
+              ),
+              if (unreadCount > 0)
+                Positioned(
+                  right: 4,
+                  top: 4,
+                  child: Container(
+                    padding: const EdgeInsets.all(2),
+                    constraints: const BoxConstraints(
+                      minWidth: 16,
+                      minHeight: 16,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFEF4444),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: Colors.white,
+                        width: 1.5,
+                      ),
+                    ),
+                    child: Center(
+                      child: Text(
+                        unreadCount > 99 ? '99+' : unreadCount.toString(),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: unreadCount > 99 ? 8 : 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildCategoriesSection() {
     return CategoriesSection(onCategoryTap: _onCategoryTap);
   }
@@ -301,7 +377,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
 
   void _onNotificationTap() {
     HapticFeedback.lightImpact();
-    debugPrint('Notification tap');
+    Navigator.pushNamed(context, '/notifications');
   }
 
   void _onMenuTap() {

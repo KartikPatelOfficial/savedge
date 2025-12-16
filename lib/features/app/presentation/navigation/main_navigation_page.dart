@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:savedge/features/auth/data/models/user_profile_models.dart';
 import 'package:savedge/features/auth/domain/repositories/auth_repository.dart';
@@ -6,6 +7,7 @@ import 'package:savedge/features/coupons/presentation/pages/coupons_page.dart';
 import 'package:savedge/features/coupons/presentation/pages/gift_page.dart';
 import 'package:savedge/features/home/presentation/pages/home_content_page.dart';
 import 'package:savedge/features/home/presentation/widgets/widgets.dart';
+import 'package:savedge/features/notifications/presentation/bloc/notification_bloc.dart';
 import 'package:savedge/features/user_profile/presentation/pages/profile_page.dart';
 
 /// Main navigation wrapper that handles bottom navigation
@@ -29,6 +31,17 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
     super.initState();
     _buildPages();
     _loadUserProfile();
+    _initializeNotifications();
+  }
+
+  void _initializeNotifications() {
+    // Register device token and load unread count
+    final notificationBloc = context.read<NotificationBloc>();
+    notificationBloc.add(const RegisterDeviceToken());
+    notificationBloc.add(const LoadUnreadCount());
+
+    // Log app open activity for engagement tracking (AppOpen = 0)
+    notificationBloc.add(const LogUserActivity(activityType: 0));
   }
 
   Future<void> _loadUserProfile() async {

@@ -1,11 +1,14 @@
 import 'dart:io';
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:savedge/core/injection/injection.dart';
+import 'package:savedge/core/services/push_notification_service.dart';
 import 'package:savedge/features/app/presentation/pages/app.dart';
 import 'package:savedge/features/vendors/presentation/bloc/vendors_bloc.dart';
+import 'package:savedge/firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,6 +19,14 @@ void main() async {
   }
 
   try {
+    // Initialize Firebase
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+
+    // Initialize push notifications
+    await PushNotificationService.instance.initialize();
+
     // Configure dependencies
     await configureDependencies();
 

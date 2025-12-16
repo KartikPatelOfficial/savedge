@@ -8,6 +8,8 @@ import 'package:savedge/features/app/presentation/navigation/main_navigation_pag
 import 'package:savedge/features/brand_vouchers/presentation/pages/voucher_purchase_page.dart';
 import 'package:savedge/features/brand_vouchers/presentation/pages/voucher_orders_page.dart';
 import 'package:savedge/features/brand_vouchers/domain/entities/brand_voucher_entity.dart';
+import 'package:savedge/features/notifications/presentation/bloc/notification_bloc.dart';
+import 'package:savedge/features/notifications/presentation/pages/notification_center_page.dart';
 
 /// Main application widget
 class SavedgeApp extends StatelessWidget {
@@ -15,8 +17,11 @@ class SavedgeApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => getIt<OtpAuthCubit>(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => getIt<OtpAuthCubit>()),
+        BlocProvider(create: (context) => getIt<NotificationBloc>()),
+      ],
       child: MaterialApp(
         title: 'Savedge',
         debugShowCheckedModeBanner: false,
@@ -43,6 +48,11 @@ class SavedgeApp extends StatelessWidget {
       case '/voucher-orders':
         return MaterialPageRoute(
           builder: (_) => const VoucherOrdersPage(),
+          settings: settings,
+        );
+      case '/notifications':
+        return MaterialPageRoute(
+          builder: (_) => const NotificationCenterPage(),
           settings: settings,
         );
       default:

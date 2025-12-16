@@ -12,6 +12,7 @@ import 'package:savedge/features/favorites/data/models/favorite_vendor_model.dar
 import 'package:savedge/features/favorites/presentation/bloc/favorites_bloc.dart';
 import 'package:savedge/features/favorites/presentation/bloc/favorites_event.dart';
 import 'package:savedge/features/favorites/presentation/pages/favorites_page.dart';
+import 'package:savedge/features/notifications/presentation/bloc/notification_bloc.dart';
 import 'package:savedge/features/static_pages/presentation/pages/about_us_page.dart';
 import 'package:savedge/features/static_pages/presentation/pages/contact_us_page.dart';
 import 'package:savedge/features/stores/presentation/pages/stores_page.dart';
@@ -772,6 +773,9 @@ class _ProfilePageState extends State<ProfilePage> {
             onPressed: () async {
               Navigator.of(context).pop();
               try {
+                // Remove device token from backend before signing out
+                context.read<NotificationBloc>().add(const RemoveDeviceToken());
+
                 // Clear favorites from local storage
                 if (Hive.isBoxOpen('favorites')) {
                   final favoritesBox = Hive.box<FavoriteVendorModel>(
@@ -818,13 +822,16 @@ class _ProfilePageState extends State<ProfilePage> {
   void _onDeleteAccountTap() {
     showDialog(
       context: context,
-      builder: (context) => _DeleteAccountDialog(
+      builder: (dialogContext) => _DeleteAccountDialog(
         onConfirm: () async {
           // Capture navigator and messenger before async operations
           final navigator = Navigator.of(context, rootNavigator: true);
           final messenger = ScaffoldMessenger.of(context);
 
           try {
+            // Remove device token from backend before deleting account
+            context.read<NotificationBloc>().add(const RemoveDeviceToken());
+
             // Call the API to delete the account
             await _authRepository.deleteAccount();
 

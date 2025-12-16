@@ -86,6 +86,15 @@ import 'package:savedge/features/vendors/presentation/bloc/vendors_bloc.dart';
 // Free trial imports
 import 'package:savedge/features/free_trial/data/repositories/free_trial_repository.dart';
 import 'package:savedge/features/free_trial/presentation/bloc/free_trial_bloc.dart';
+// Notification imports
+import 'package:savedge/features/notifications/data/datasources/notification_remote_data_source.dart';
+import 'package:savedge/features/notifications/data/repositories/notification_repository_impl.dart';
+import 'package:savedge/features/notifications/domain/repositories/notification_repository.dart';
+import 'package:savedge/features/notifications/domain/usecases/get_notifications_usecase.dart';
+import 'package:savedge/features/notifications/domain/usecases/get_unread_count_usecase.dart';
+import 'package:savedge/features/notifications/domain/usecases/mark_notification_read_usecase.dart';
+import 'package:savedge/features/notifications/domain/usecases/register_device_token_usecase.dart';
+import 'package:savedge/features/notifications/presentation/bloc/notification_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final GetIt getIt = GetIt.instance;
@@ -438,6 +447,45 @@ Future<void> configureDependencies() async {
       getIt<SendOtpUseCase>(),
       getIt<VerifyOtpUseCase>(),
       getIt<RegisterIndividualUseCase>(),
+    ),
+  );
+
+  // Notification layer
+  getIt.registerSingleton<NotificationRemoteDataSource>(
+    NotificationRemoteDataSource(getIt<Dio>()),
+  );
+
+  getIt.registerSingleton<NotificationRepository>(
+    NotificationRepositoryImpl(
+      remoteDataSource: getIt<NotificationRemoteDataSource>(),
+    ),
+  );
+
+  // Notification use cases
+  getIt.registerSingleton<RegisterDeviceTokenUseCase>(
+    RegisterDeviceTokenUseCase(getIt<NotificationRepository>()),
+  );
+
+  getIt.registerSingleton<GetNotificationsUseCase>(
+    GetNotificationsUseCase(getIt<NotificationRepository>()),
+  );
+
+  getIt.registerSingleton<GetUnreadCountUseCase>(
+    GetUnreadCountUseCase(getIt<NotificationRepository>()),
+  );
+
+  getIt.registerSingleton<MarkNotificationReadUseCase>(
+    MarkNotificationReadUseCase(getIt<NotificationRepository>()),
+  );
+
+  // Notification BLoC
+  getIt.registerLazySingleton<NotificationBloc>(
+    () => NotificationBloc(
+      registerDeviceTokenUseCase: getIt<RegisterDeviceTokenUseCase>(),
+      getNotificationsUseCase: getIt<GetNotificationsUseCase>(),
+      getUnreadCountUseCase: getIt<GetUnreadCountUseCase>(),
+      markNotificationReadUseCase: getIt<MarkNotificationReadUseCase>(),
+      repository: getIt<NotificationRepository>(),
     ),
   );
 }
