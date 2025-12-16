@@ -835,7 +835,17 @@ class _VendorOfferCardState extends State<VendorOfferCard>
             children: [
               _buildValidityRow(),
               const SizedBox(height: 8),
-              _buildClaimChips(accentColor, hasCash, hasMembership),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildClaimChips(
+                      accentColor,
+                      hasCash,
+                      hasMembership,
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
         ],
@@ -858,7 +868,7 @@ class _VendorOfferCardState extends State<VendorOfferCard>
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
       decoration: BoxDecoration(
         color: accentColor.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(12),
@@ -901,6 +911,8 @@ class _VendorOfferCardState extends State<VendorOfferCard>
     return Wrap(
       spacing: 8,
       runSpacing: 8,
+      alignment: WrapAlignment.end,
+      runAlignment: WrapAlignment.end,
       children: [
         if (hasCash)
           _claimChip(
@@ -910,7 +922,7 @@ class _VendorOfferCardState extends State<VendorOfferCard>
           ),
         if (hasMembership)
           _claimChip(
-            const Color(0xFF6F3FCC),
+            Colors.blueGrey,
             icon: Icons.star_rounded,
             label: _membershipAvailabilityText(),
           ),
@@ -924,7 +936,7 @@ class _VendorOfferCardState extends State<VendorOfferCard>
     required String label,
   }) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(10),
@@ -934,7 +946,7 @@ class _VendorOfferCardState extends State<VendorOfferCard>
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, size: 14, color: color),
-          const SizedBox(width: 6),
+          const SizedBox(width: 2),
           Text(
             label,
             style: TextStyle(

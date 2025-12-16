@@ -239,127 +239,149 @@ class TopVendorCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 150,
-      child: GestureDetector(
-        onTap: onTap,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(20),
-          child: Stack(
-            children: [
-              // Background image
-              _buildBackgroundImage(),
-              // Gradient overlay
-              Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                    colors: [
-                      Colors.black.withOpacity(0.7),
-                      Colors.black.withOpacity(0.3),
-                      Colors.transparent,
-                    ],
-                    stops: const [0.0, 0.5, 1.0],
+    return Container(
+      height: 160,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+            spreadRadius: 0,
+          ),
+          BoxShadow(
+            color: const Color(0xFF6F3FCC).withOpacity(0.05),
+            blurRadius: 40,
+            offset: const Offset(0, 4),
+            spreadRadius: 0,
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(24),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(24),
+            child: Stack(
+              children: [
+                // Background image
+                _buildBackgroundImage(),
+                // Enhanced gradient overlay with better blend
+                Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                      colors: [
+                        Colors.black.withOpacity(0.75),
+                        Colors.black.withOpacity(0.5),
+                        Colors.black.withOpacity(0.25),
+                        Colors.transparent,
+                      ],
+                      stops: const [0.0, 0.35, 0.65, 1.0],
+                    ),
                   ),
                 ),
-              ),
-              // Content
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: Row(
-                  children: [
-                    // Left content
-                    Expanded(
-                      flex: 2,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          // Category badge
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF6F3FCC),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              vendor.category,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
+                // Content with improved spacing
+                Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Row(
+                    children: [
+                      // Left content
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            // Category badge with glassmorphism effect
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 6,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: Colors.white.withOpacity(0.3),
+                                  width: 1,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.1),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Text(
+                                vendor.category.toUpperCase(),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 0.8,
+                                ),
                               ),
                             ),
-                          ),
-                          const SizedBox(height: 8),
-                          // Vendor name
-                          Text(
-                            vendor.businessName,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w700,
-                              shadows: [
-                                Shadow(
-                                  color: Colors.black54,
-                                  blurRadius: 2,
-                                  offset: Offset(0, 1),
-                                ),
-                              ],
+                            Spacer(),
+                            // Vendor name with better typography
+                            Text(
+                              vendor.businessName,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 22,
+                                fontWeight: FontWeight.w800,
+                                height: 1.2,
+                                letterSpacing: -0.5,
+                                shadows: [
+                                  Shadow(
+                                    color: Colors.black45,
+                                    blurRadius: 8,
+                                    offset: Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: 4),
-                          // Description or address
-                          Text(
-                            vendor.description ?? vendor.address ?? '',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w400,
-                              shadows: [
-                                Shadow(
-                                  color: Colors.black54,
-                                  blurRadius: 1,
-                                  offset: Offset(0, 1),
-                                ),
-                              ],
-                            ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
-                      ),
-                    ),
-                    // Right content - Category icon and arrow
-                    const SizedBox(width: 16),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        // Arrow indicator
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.15),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.arrow_forward_ios,
-                            color: Colors.white,
-                            size: 14,
-                          ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ],
+                      ),
+                      const SizedBox(width: 16),
+                      // Right content - Modern arrow with better design
+                      Container(
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.3),
+                            width: 1.5,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.15),
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.arrow_forward_rounded,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -388,6 +410,10 @@ class TopVendorCard extends StatelessWidget {
         child: Image.network(
           primaryImageUrl,
           fit: BoxFit.cover,
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) return child;
+            return _buildDefaultBackground();
+          },
           errorBuilder: (context, error, stackTrace) =>
               _buildDefaultBackground(),
         ),
@@ -398,14 +424,38 @@ class TopVendorCard extends StatelessWidget {
   }
 
   Widget _buildDefaultBackground() {
-    // Generate gradient based on vendor ID
+    // Enhanced gradient palettes with richer colors
     final gradients = [
-      [const Color(0xFF6F3FCC), const Color(0xFF9F7AEA)], // Purple
-      [const Color(0xFF38B2AC), const Color(0xFF4FD1C7)], // Teal
-      [const Color(0xFFED8936), const Color(0xFFF56500)], // Orange
-      [const Color(0xFFE53E3E), const Color(0xFFF56565)], // Red
-      [const Color(0xFF3182CE), const Color(0xFF63B3ED)], // Blue
-      [const Color(0xFF38A169), const Color(0xFF68D391)], // Green
+      [
+        const Color(0xFF6F3FCC),
+        const Color(0xFF9F7AEA),
+        const Color(0xFFB794F6),
+      ], // Purple
+      [
+        const Color(0xFF319795),
+        const Color(0xFF38B2AC),
+        const Color(0xFF4FD1C7),
+      ], // Teal
+      [
+        const Color(0xFFDD6B20),
+        const Color(0xFFED8936),
+        const Color(0xFFF6AD55),
+      ], // Orange
+      [
+        const Color(0xFFC53030),
+        const Color(0xFFE53E3E),
+        const Color(0xFFF56565),
+      ], // Red
+      [
+        const Color(0xFF2C5282),
+        const Color(0xFF3182CE),
+        const Color(0xFF63B3ED),
+      ], // Blue
+      [
+        const Color(0xFF2F855A),
+        const Color(0xFF38A169),
+        const Color(0xFF68D391),
+      ], // Green
     ];
 
     final colors = gradients[vendor.id % gradients.length];
@@ -416,32 +466,57 @@ class TopVendorCard extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: colors,
+          stops: const [0.0, 0.5, 1.0],
         ),
       ),
       child: Stack(
         children: [
-          // Decorative circles
+          // Multiple decorative circles with blur effect
           Positioned(
-            top: -30,
-            right: -30,
+            top: -40,
+            right: -40,
             child: Container(
-              width: 100,
-              height: 100,
+              width: 140,
+              height: 140,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.1),
+                gradient: RadialGradient(
+                  colors: [
+                    Colors.white.withOpacity(0.15),
+                    Colors.white.withOpacity(0.05),
+                    Colors.transparent,
+                  ],
+                ),
               ),
             ),
           ),
           Positioned(
-            bottom: -20,
-            left: -20,
+            bottom: -30,
+            left: -30,
             child: Container(
-              width: 80,
-              height: 80,
+              width: 110,
+              height: 110,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.08),
+                gradient: RadialGradient(
+                  colors: [
+                    Colors.white.withOpacity(0.12),
+                    Colors.white.withOpacity(0.04),
+                    Colors.transparent,
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            top: 30,
+            right: 80,
+            child: Container(
+              width: 60,
+              height: 60,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withOpacity(0.06),
               ),
             ),
           ),

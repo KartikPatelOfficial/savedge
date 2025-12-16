@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:savedge/core/injection/injection.dart';
@@ -174,6 +176,10 @@ class _StackedDealsCardsState extends State<StackedDealsCards>
   late List<Animation<double>> _scaleAnimations;
   late List<Animation<Offset>> _slideAnimations;
 
+  // Auto-scroll fields
+  Timer? _autoScrollTimer;
+  bool _isUserInteracting = false;
+
   @override
   void initState() {
     super.initState();
@@ -212,6 +218,13 @@ class _StackedDealsCardsState extends State<StackedDealsCards>
 
     // Start animations
     _startAnimations();
+
+    // Start auto-scroll after a delay to let animations complete
+    Future.delayed(const Duration(milliseconds: 1500), () {
+      if (mounted) {
+        _startAutoScroll();
+      }
+    });
   }
 
   @override
@@ -273,11 +286,45 @@ class _StackedDealsCardsState extends State<StackedDealsCards>
 
   @override
   void dispose() {
+    _autoScrollTimer?.cancel();
     _pageController.dispose();
     for (var controller in _animationControllers) {
       controller.dispose();
     }
     super.dispose();
+  }
+
+  // Auto-scroll methods
+  void _startAutoScroll() {
+    _autoScrollTimer?.cancel();
+    _autoScrollTimer = Timer.periodic(
+      const Duration(seconds: 4),
+      (_) => _scrollToNextPage(),
+    );
+  }
+
+  void _scrollToNextPage() {
+    if (_isUserInteracting || !mounted || widget.coupons.isEmpty) return;
+    final nextPage = (_currentIndex + 1) % widget.coupons.length;
+    _pageController.animateToPage(
+      nextPage,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  void _pauseAutoScroll() {
+    _isUserInteracting = true;
+    _autoScrollTimer?.cancel();
+  }
+
+  void _resumeAutoScroll() {
+    _isUserInteracting = false;
+    Future.delayed(const Duration(seconds: 5), () {
+      if (mounted && !_isUserInteracting) {
+        _startAutoScroll();
+      }
+    });
   }
 
   @override
@@ -291,28 +338,38 @@ class _StackedDealsCardsState extends State<StackedDealsCards>
         // Main stacked cards
         SizedBox(
           height: 220,
-          child: PageView.builder(
-            controller: _pageController,
-            onPageChanged: (index) {
-              setState(() {
-                _currentIndex = index;
-              });
+          child: NotificationListener<ScrollNotification>(
+            onNotification: (notification) {
+              if (notification is ScrollStartNotification) {
+                _pauseAutoScroll();
+              } else if (notification is ScrollEndNotification) {
+                _resumeAutoScroll();
+              }
+              return false;
             },
-            itemCount: widget.coupons.length,
-            itemBuilder: (context, index) {
-              return AnimatedBuilder(
-                animation: _animationControllers[index],
-                builder: (context, child) {
-                  return SlideTransition(
-                    position: _slideAnimations[index],
-                    child: ScaleTransition(
-                      scale: _scaleAnimations[index],
-                      child: _buildStackCard(widget.coupons[index], index),
-                    ),
-                  );
-                },
-              );
-            },
+            child: PageView.builder(
+              controller: _pageController,
+              onPageChanged: (index) {
+                setState(() {
+                  _currentIndex = index;
+                });
+              },
+              itemCount: widget.coupons.length,
+              itemBuilder: (context, index) {
+                return AnimatedBuilder(
+                  animation: _animationControllers[index],
+                  builder: (context, child) {
+                    return SlideTransition(
+                      position: _slideAnimations[index],
+                      child: ScaleTransition(
+                        scale: _scaleAnimations[index],
+                        child: _buildStackCard(widget.coupons[index], index),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
           ),
         ),
         const SizedBox(height: 16),

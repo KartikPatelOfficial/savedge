@@ -35,7 +35,9 @@ class CouponsRepositoryImpl implements CouponsRepository {
         isExpired: isExpired,
       );
 
-      final coupons = response.items.map(_mapResponseToEntity).toList();
+      final coupons = _sortCouponsByPriority(
+        response.items.map(_mapResponseToEntity).toList(),
+      );
       return Right(coupons);
     } catch (e) {
       return Left(UnexpectedFailure(e.toString()));
@@ -59,7 +61,9 @@ class CouponsRepositoryImpl implements CouponsRepository {
         isExpired: isExpired,
       );
 
-      final coupons = response.items.map(_mapResponseToEntity).toList();
+      final coupons = _sortCouponsByPriority(
+        response.items.map(_mapResponseToEntity).toList(),
+      );
       return Right(coupons);
     } catch (e) {
       return Left(UnexpectedFailure(e.toString()));
@@ -81,7 +85,9 @@ class CouponsRepositoryImpl implements CouponsRepository {
         isExpired: isExpired,
       );
 
-      final coupons = response.items.map(_mapResponseToEntity).toList();
+      final coupons = _sortCouponsByPriority(
+        response.items.map(_mapResponseToEntity).toList(),
+      );
       return Right(coupons);
     } catch (e) {
       return Left(UnexpectedFailure(e.toString()));
@@ -96,10 +102,12 @@ class CouponsRepositoryImpl implements CouponsRepository {
       // Parse the response data
       final data = response.data;
       if (data is List<dynamic>) {
-        final coupons = data
-            .map((item) => CouponResponse.fromJson(item as Map<String, dynamic>))
-            .map(_mapResponseToEntity)
-            .toList();
+        final coupons = _sortCouponsByPriority(
+          data
+              .map((item) => CouponResponse.fromJson(item as Map<String, dynamic>))
+              .map(_mapResponseToEntity)
+              .toList(),
+        );
         return Right(coupons);
       } else {
         return const Left(UnexpectedFailure('Invalid response format'));
@@ -107,6 +115,23 @@ class CouponsRepositoryImpl implements CouponsRepository {
     } catch (e) {
       return Left(UnexpectedFailure(e.toString()));
     }
+  }
+
+  List<Coupon> _sortCouponsByPriority(List<Coupon> coupons) {
+    final indexed = coupons.asMap().entries.toList();
+
+    indexed.sort((a, b) {
+      final priorityCompare = b.value.specialOfferPriority.compareTo(
+        a.value.specialOfferPriority,
+      );
+      if (priorityCompare != 0) {
+        return priorityCompare;
+      }
+      // Preserve original order for equal priorities to avoid reshuffling.
+      return a.key.compareTo(b.key);
+    });
+
+    return indexed.map((entry) => entry.value).toList();
   }
 
   /// Maps API response model to domain entity

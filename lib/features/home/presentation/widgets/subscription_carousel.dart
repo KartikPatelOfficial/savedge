@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -22,6 +24,11 @@ class _SubscriptionCarouselState extends State<SubscriptionCarousel> {
   int _currentPage = 0;
   bool _isLoading = true;
   bool _isVisible = false;
+
+  // Auto-scroll fields
+  Timer? _autoScrollTimer;
+  bool _isUserInteracting = false;
+  int _totalCards = 0;
 
   AuthRepository get _authRepository => GetIt.I<AuthRepository>();
 
@@ -67,8 +74,52 @@ class _SubscriptionCarouselState extends State<SubscriptionCarousel> {
 
   @override
   void dispose() {
+    _autoScrollTimer?.cancel();
     _pageController.dispose();
     super.dispose();
+  }
+
+  // Auto-scroll methods
+  void _startAutoScroll() {
+    _autoScrollTimer?.cancel();
+    if (_totalCards <= 1) return;
+    _autoScrollTimer = Timer.periodic(
+      const Duration(seconds: 4),
+      (_) => _scrollToNextPage(),
+    );
+  }
+
+  void _scrollToNextPage() {
+    if (_isUserInteracting || !mounted || _totalCards <= 1) return;
+    final nextPage = (_currentPage + 1) % _totalCards;
+    _pageController.animateToPage(
+      nextPage,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  void _pauseAutoScroll() {
+    _isUserInteracting = true;
+    _autoScrollTimer?.cancel();
+  }
+
+  void _resumeAutoScroll() {
+    _isUserInteracting = false;
+    Future.delayed(const Duration(seconds: 5), () {
+      if (mounted && !_isUserInteracting) {
+        _startAutoScroll();
+      }
+    });
+  }
+
+  void _updateTotalCards(int count) {
+    if (_totalCards != count) {
+      _totalCards = count;
+      if (_totalCards > 1 && !_isUserInteracting) {
+        _startAutoScroll();
+      }
+    }
   }
 
   @override
@@ -89,6 +140,9 @@ class _SubscriptionCarouselState extends State<SubscriptionCarousel> {
       child: _UnifiedCarousel(
         pageController: _pageController,
         currentPage: _currentPage,
+        onPauseAutoScroll: _pauseAutoScroll,
+        onResumeAutoScroll: _resumeAutoScroll,
+        onCardsCountChanged: _updateTotalCards,
       ),
     );
   }
@@ -98,10 +152,16 @@ class _UnifiedCarousel extends StatelessWidget {
   const _UnifiedCarousel({
     required this.pageController,
     required this.currentPage,
+    required this.onPauseAutoScroll,
+    required this.onResumeAutoScroll,
+    required this.onCardsCountChanged,
   });
 
   final PageController pageController;
   final int currentPage;
+  final VoidCallback onPauseAutoScroll;
+  final VoidCallback onResumeAutoScroll;
+  final ValueChanged<int> onCardsCountChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -118,6 +178,11 @@ class _UnifiedCarousel extends StatelessWidget {
             if (cards.isEmpty) {
               return const SizedBox.shrink();
             }
+
+            // Notify about cards count for auto-scroll
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              onCardsCountChanged(cards.length);
+            });
 
             // Calculate height based on screen width and aspect ratio
             final screenWidth = MediaQuery.of(context).size.width;
@@ -145,18 +210,28 @@ class _UnifiedCarousel extends StatelessWidget {
                   ),
 
                   Expanded(
-                    child: PageView.builder(
-                      controller: pageController,
-                      itemCount: cards.length,
-                      itemBuilder: (context, index) {
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: AspectRatio(
-                            aspectRatio: 4 / 5,
-                            child: cards[index],
-                          ),
-                        );
+                    child: NotificationListener<ScrollNotification>(
+                      onNotification: (notification) {
+                        if (notification is ScrollStartNotification) {
+                          onPauseAutoScroll();
+                        } else if (notification is ScrollEndNotification) {
+                          onResumeAutoScroll();
+                        }
+                        return false;
                       },
+                      child: PageView.builder(
+                        controller: pageController,
+                        itemCount: cards.length,
+                        itemBuilder: (context, index) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: AspectRatio(
+                              aspectRatio: 4 / 5,
+                              child: cards[index],
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ),
                   if (cards.length > 1)
