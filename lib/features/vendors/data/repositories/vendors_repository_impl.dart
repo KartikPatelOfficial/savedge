@@ -23,6 +23,7 @@ class VendorsRepositoryImpl implements VendorsRepository {
     String? businessType,
     bool? isApproved = true,
     bool? isActive = true,
+    int? cityId,
   }) async {
     try {
       final response = await remoteDataSource.getVendors(
@@ -33,6 +34,7 @@ class VendorsRepositoryImpl implements VendorsRepository {
         businessType: businessType,
         isApproved: isApproved,
         isActive: isActive,
+        cityId: cityId,
       );
 
       // Parse the response data
@@ -117,9 +119,9 @@ class VendorsRepositoryImpl implements VendorsRepository {
   }
 
   @override
-  Future<Either<Failure, List<Vendor>>> getTopOfferVendors() async {
+  Future<Either<Failure, List<Vendor>>> getTopOfferVendors({int? cityId}) async {
     try {
-      final response = await remoteDataSource.getTopOfferVendors();
+      final response = await remoteDataSource.getTopOfferVendors(cityId: cityId);
       
       // Parse the response data - expecting a direct list for top offers
       final data = response.data;

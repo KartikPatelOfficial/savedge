@@ -12,11 +12,12 @@ abstract class VendorsRepository {
     String? businessType,
     bool? isApproved = true,
     bool? isActive = true,
+    int? cityId,
   });
 
   Future<Either<Failure, Vendor>> getVendor(int id);
 
   Future<Either<Failure, List<VendorImage>>> getVendorImages(int vendorId);
-  
-  Future<Either<Failure, List<Vendor>>> getTopOfferVendors();
+
+  Future<Either<Failure, List<Vendor>>> getTopOfferVendors({int? cityId});
 }

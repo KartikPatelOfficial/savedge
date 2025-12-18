@@ -14,6 +14,7 @@ class LoadVendors extends VendorsEvent {
     this.searchTerm,
     this.category,
     this.refresh = false,
+    this.cityId,
   });
 
   final int pageNumber;
@@ -21,6 +22,7 @@ class LoadVendors extends VendorsEvent {
   final String? searchTerm;
   final String? category;
   final bool refresh;
+  final int? cityId;
 
   @override
   List<Object?> get props => [
@@ -29,6 +31,7 @@ class LoadVendors extends VendorsEvent {
     searchTerm,
     category,
     refresh,
+    cityId,
   ];
 }
 

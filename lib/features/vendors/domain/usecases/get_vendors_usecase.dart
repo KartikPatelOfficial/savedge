@@ -9,7 +9,7 @@ import 'package:savedge/features/vendors/domain/repositories/vendors_repository.
 /// Use case for retrieving a paginated list of vendors
 ///
 /// This use case handles the business logic for fetching vendors
-/// with optional filtering by search term, category, and business type.
+/// with optional filtering by search term, category, business type, and city.
 class GetVendorsUseCase implements UseCase<List<Vendor>, GetVendorsParams> {
   const GetVendorsUseCase(this.repository);
 
@@ -18,7 +18,7 @@ class GetVendorsUseCase implements UseCase<List<Vendor>, GetVendorsParams> {
   @override
   Future<Either<Failure, List<Vendor>>> call(GetVendorsParams params) async {
     if (params.isTopOffers) {
-      return repository.getTopOfferVendors();
+      return repository.getTopOfferVendors(cityId: params.cityId);
     }
     return repository.getVendors(
       pageNumber: params.pageNumber,
@@ -28,6 +28,7 @@ class GetVendorsUseCase implements UseCase<List<Vendor>, GetVendorsParams> {
       businessType: params.businessType,
       isApproved: params.isApproved,
       isActive: params.isActive,
+      cityId: params.cityId,
     );
   }
 }
@@ -43,6 +44,7 @@ class GetVendorsParams extends Equatable {
     this.isApproved = true,
     this.isActive = true,
     this.isTopOffers = false,
+    this.cityId,
   });
 
   final int pageNumber;
@@ -53,6 +55,7 @@ class GetVendorsParams extends Equatable {
   final bool? isApproved;
   final bool? isActive;
   final bool isTopOffers;
+  final int? cityId;
 
   @override
   List<Object?> get props => [
@@ -64,5 +67,6 @@ class GetVendorsParams extends Equatable {
     isApproved,
     isActive,
     isTopOffers,
+    cityId,
   ];
 }

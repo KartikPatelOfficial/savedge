@@ -36,6 +36,7 @@ class VendorsBloc extends Bloc<VendorsEvent, VendorsState> {
         pageSize: event.pageSize,
         searchTerm: event.searchTerm,
         category: event.category,
+        cityId: event.cityId,
       ),
     );
 

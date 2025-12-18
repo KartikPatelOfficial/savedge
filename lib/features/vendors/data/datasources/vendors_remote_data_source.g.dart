@@ -26,6 +26,7 @@ class _VendorsRemoteDataSource implements VendorsRemoteDataSource {
     String? businessType,
     bool? isApproved = true,
     bool? isActive = true,
+    int? cityId,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{
@@ -36,6 +37,7 @@ class _VendorsRemoteDataSource implements VendorsRemoteDataSource {
       r'businessType': businessType,
       r'isApproved': isApproved,
       r'isActive': isActive,
+      r'cityId': cityId,
     };
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
@@ -119,9 +121,10 @@ class _VendorsRemoteDataSource implements VendorsRemoteDataSource {
   }
 
   @override
-  Future<HttpResponse<dynamic>> getTopOfferVendors() async {
+  Future<HttpResponse<dynamic>> getTopOfferVendors({int? cityId}) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{r'cityId': cityId};
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<HttpResponse<dynamic>>(

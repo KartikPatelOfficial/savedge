@@ -19,6 +19,7 @@ abstract class VendorsRemoteDataSource {
     @Query('businessType') String? businessType,
     @Query('isApproved') bool? isApproved = true,
     @Query('isActive') bool? isActive = true,
+    @Query('cityId') int? cityId,
   });
 
   @GET('/api/vendor-profiles/{id}')
@@ -30,5 +31,7 @@ abstract class VendorsRemoteDataSource {
   );
 
   @GET('/api/vendor-profiles/top-offers')
-  Future<HttpResponse<dynamic>> getTopOfferVendors();
+  Future<HttpResponse<dynamic>> getTopOfferVendors({
+    @Query('cityId') int? cityId,
+  });
 }

@@ -8,6 +8,8 @@ class SecureStorageService {
   static const _tokenExpiresAtKey = 'token_expires_at';
   static const _userIdKey = 'user_id';
   static const _userDataKey = 'user_data';
+  static const _selectedCityIdKey = 'selected_city_id';
+  static const _selectedCityNameKey = 'selected_city_name';
 
   static const FlutterSecureStorage _storage = FlutterSecureStorage(
     aOptions: AndroidOptions(
@@ -85,5 +87,47 @@ class SecureStorageService {
     final accessToken = await getAccessToken();
     final userId = await getUserId();
     return accessToken != null && userId != null;
+  }
+
+  // City Selection Management
+  Future<void> saveSelectedCity({
+    required int cityId,
+    required String cityName,
+  }) async {
+    await Future.wait([
+      _storage.write(key: _selectedCityIdKey, value: cityId.toString()),
+      _storage.write(key: _selectedCityNameKey, value: cityName),
+    ]);
+  }
+
+  Future<int?> getSelectedCityId() async {
+    final cityIdString = await _storage.read(key: _selectedCityIdKey);
+    if (cityIdString != null) {
+      return int.tryParse(cityIdString);
+    }
+    return null;
+  }
+
+  Future<String?> getSelectedCityName() async {
+    return await _storage.read(key: _selectedCityNameKey);
+  }
+
+  Future<void> clearSelectedCity() async {
+    await Future.wait([
+      _storage.delete(key: _selectedCityIdKey),
+      _storage.delete(key: _selectedCityNameKey),
+    ]);
+  }
+
+  /// Check if user has selected a city
+  Future<bool> hasCitySelected() async {
+    final cityId = await getSelectedCityId();
+    return cityId != null;
+  }
+
+  /// Check if user selected "Other" city (not available region)
+  Future<bool> isOtherCitySelected() async {
+    final cityId = await getSelectedCityId();
+    return cityId == -1; // -1 is the special ID for "Other"
   }
 }
