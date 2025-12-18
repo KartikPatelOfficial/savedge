@@ -83,6 +83,12 @@ import 'package:savedge/features/vendors/domain/usecases/get_vendors_usecase.dar
 import 'package:savedge/features/vendors/presentation/bloc/coupons_bloc.dart';
 import 'package:savedge/features/vendors/presentation/bloc/vendor_detail_bloc.dart';
 import 'package:savedge/features/vendors/presentation/bloc/vendors_bloc.dart';
+// City imports
+import 'package:savedge/features/city/data/datasources/city_remote_data_source.dart';
+import 'package:savedge/features/city/data/repositories/city_repository_impl.dart';
+import 'package:savedge/features/city/domain/repositories/city_repository.dart';
+import 'package:savedge/features/city/domain/usecases/get_cities_usecase.dart';
+import 'package:savedge/features/city/presentation/bloc/city_bloc.dart';
 // Free trial imports
 import 'package:savedge/features/free_trial/data/repositories/free_trial_repository.dart';
 import 'package:savedge/features/free_trial/presentation/bloc/free_trial_bloc.dart';
@@ -486,6 +492,27 @@ Future<void> configureDependencies() async {
       getUnreadCountUseCase: getIt<GetUnreadCountUseCase>(),
       markNotificationReadUseCase: getIt<MarkNotificationReadUseCase>(),
       repository: getIt<NotificationRepository>(),
+    ),
+  );
+
+  // City layer
+  getIt.registerSingleton<CityRemoteDataSource>(
+    CityRemoteDataSource(getIt<Dio>()),
+  );
+
+  getIt.registerSingleton<CityRepository>(
+    CityRepositoryImpl(remoteDataSource: getIt<CityRemoteDataSource>()),
+  );
+
+  getIt.registerSingleton<GetCitiesUseCase>(
+    GetCitiesUseCase(getIt<CityRepository>()),
+  );
+
+  // City BLoC - using LazySingleton so city state persists across screens
+  getIt.registerLazySingleton<CityBloc>(
+    () => CityBloc(
+      getCitiesUseCase: getIt<GetCitiesUseCase>(),
+      storageService: getIt<SecureStorageService>(),
     ),
   );
 }

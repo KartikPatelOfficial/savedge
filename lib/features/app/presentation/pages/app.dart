@@ -8,6 +8,8 @@ import 'package:savedge/features/app/presentation/navigation/main_navigation_pag
 import 'package:savedge/features/brand_vouchers/presentation/pages/voucher_purchase_page.dart';
 import 'package:savedge/features/brand_vouchers/presentation/pages/voucher_orders_page.dart';
 import 'package:savedge/features/brand_vouchers/domain/entities/brand_voucher_entity.dart';
+import 'package:savedge/features/city/presentation/bloc/city_bloc.dart';
+import 'package:savedge/features/city/presentation/bloc/city_event.dart';
 import 'package:savedge/features/notifications/presentation/bloc/notification_bloc.dart';
 import 'package:savedge/features/notifications/presentation/pages/notification_center_page.dart';
 
@@ -21,6 +23,10 @@ class SavedgeApp extends StatelessWidget {
       providers: [
         BlocProvider(create: (context) => getIt<OtpAuthCubit>()),
         BlocProvider(create: (context) => getIt<NotificationBloc>()),
+        BlocProvider(
+          create: (context) =>
+              getIt<CityBloc>()..add(const LoadSavedCitySelection()),
+        ),
       ],
       child: MaterialApp(
         title: 'Savedge',

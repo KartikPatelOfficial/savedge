@@ -43,7 +43,7 @@ class CityBloc extends Bloc<CityEvent, CityState> {
 
     result.fold(
       (failure) => emit(
-        CityError(FailureMessageMapper.mapServerFailureToMessage(failure)),
+        CityError(FailureMessageMapper.mapFailureToMessage(failure)),
       ),
       (cities) => emit(
         CitiesLoaded(
