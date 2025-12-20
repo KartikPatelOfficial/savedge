@@ -134,9 +134,10 @@ class VendorsBloc extends Bloc<VendorsEvent, VendorsState> {
 
     // Call the use case with special flag to get top offers
     final result = await getVendorsUseCase(
-      const GetVendorsParams(
+      GetVendorsParams(
         isTopOffers: true,
         pageSize: 10,
+        cityId: event.cityId,
       ),
     );
 

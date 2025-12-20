@@ -6,6 +6,9 @@ import 'package:get_it/get_it.dart';
 import 'package:savedge/core/injection/injection.dart';
 import 'package:savedge/features/auth/data/models/user_profile_models.dart';
 import 'package:savedge/features/auth/domain/repositories/auth_repository.dart';
+import 'package:savedge/features/city/presentation/bloc/city_bloc.dart';
+import 'package:savedge/features/city/presentation/bloc/city_state.dart';
+import 'package:savedge/features/city/presentation/widgets/city_selection_sheet.dart';
 import 'package:savedge/features/favorites/presentation/pages/favorites_page.dart';
 import 'package:savedge/features/free_trial/presentation/bloc/free_trial_bloc.dart';
 import 'package:savedge/features/home/presentation/widgets/widgets.dart';
@@ -52,11 +55,21 @@ class _HomeContentPageState extends State<HomeContentPage> {
   }
 
   void _loadInitialData() {
-    // Load Hot Deals (special offers) instead of generic featured coupons
-    _couponsBloc.add(const LoadSpecialOfferCoupons());
-    // Load Top Offer vendors via the shared VendorsBloc
-    _vendorsBloc.add(const LoadTopOfferVendors());
+    // Get city ID from CityBloc state
+    final cityState = context.read<CityBloc>().state;
+    final cityId = cityState is CitiesLoaded ? cityState.selectedCityId : null;
+
+    // Load Hot Deals (special offers) with city filter
+    _couponsBloc.add(LoadSpecialOfferCoupons(cityId: cityId));
+    // Load Top Offer vendors with city filter
+    _vendorsBloc.add(LoadTopOfferVendors(cityId: cityId));
     _subscriptionBloc.add(const LoadSubscriptionPlans());
+  }
+
+  /// Reload data when city changes
+  void _onCityChanged(int? cityId) {
+    _couponsBloc.add(LoadSpecialOfferCoupons(cityId: cityId));
+    _vendorsBloc.add(LoadTopOfferVendors(cityId: cityId));
   }
 
   Future<void> _loadUserProfile() async {
@@ -106,14 +119,21 @@ class _HomeContentPageState extends State<HomeContentPage> {
         BlocProvider.value(value: _subscriptionBloc),
         BlocProvider.value(value: _freeTrialBloc),
       ],
-      child: Scaffold(
-        key: _scaffoldKey,
-        backgroundColor: Colors.white,
-        drawer: HomeDrawer(
-          userName: _userName,
-          onMenuItemTap: _onDrawerMenuItemTap,
+      child: BlocListener<CityBloc, CityState>(
+        listener: (context, state) {
+          if (state is CitiesLoaded) {
+            _onCityChanged(state.selectedCityId);
+          }
+        },
+        child: Scaffold(
+          key: _scaffoldKey,
+          backgroundColor: Colors.white,
+          drawer: HomeDrawer(
+            userName: _userName,
+            onMenuItemTap: _onDrawerMenuItemTap,
+          ),
+          body: _buildMainContent(),
         ),
-        body: _buildMainContent(),
       ),
     );
   }
@@ -208,6 +228,9 @@ class _HomeContentPageState extends State<HomeContentPage> {
                           ),
                         ),
                       ),
+                      const SizedBox(width: 12),
+                      // City selector button
+                      _buildCityButton(),
                       const Spacer(),
                       // Action buttons
                       _buildNotificationButton(),
@@ -224,6 +247,68 @@ class _HomeContentPageState extends State<HomeContentPage> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildCityButton() {
+    return BlocBuilder<CityBloc, CityState>(
+      builder: (context, state) {
+        String cityName = 'Select City';
+        if (state is CitiesLoaded && state.selectedCityName != null) {
+          cityName = state.selectedCityName!;
+        }
+
+        return GestureDetector(
+          onTap: () {
+            HapticFeedback.lightImpact();
+            CitySelectionSheet.show(context);
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF8F9FA),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.grey[200]!),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.04),
+                  blurRadius: 6,
+                  offset: const Offset(0, 1),
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(
+                  Icons.location_on_outlined,
+                  size: 16,
+                  color: Color(0xFF1A202C),
+                ),
+                const SizedBox(width: 4),
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 80),
+                  child: Text(
+                    cityName,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xFF1A202C),
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                const SizedBox(width: 2),
+                const Icon(
+                  Icons.keyboard_arrow_down,
+                  size: 16,
+                  color: Color(0xFF1A202C),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -414,11 +499,15 @@ class _HomeContentPageState extends State<HomeContentPage> {
   Future<void> _handleRefresh() async {
     HapticFeedback.lightImpact();
 
+    // Get city ID from CityBloc state
+    final cityState = context.read<CityBloc>().state;
+    final cityId = cityState is CitiesLoaded ? cityState.selectedCityId : null;
+
     // Reload all data from BLoCs
-    // Refresh Hot Deals (special offers)
-    _couponsBloc.add(const RefreshSpecialOfferCoupons());
-    // Refresh Top Offer vendors
-    _vendorsBloc.add(const LoadTopOfferVendors());
+    // Refresh Hot Deals (special offers) with city filter
+    _couponsBloc.add(RefreshSpecialOfferCoupons(cityId: cityId));
+    // Refresh Top Offer vendors with city filter
+    _vendorsBloc.add(LoadTopOfferVendors(cityId: cityId));
     _subscriptionBloc.add(const LoadSubscriptionPlans());
     if (!_isEmployee) {
       _freeTrialBloc.add(const FreeTrialEvent.loadStatus());

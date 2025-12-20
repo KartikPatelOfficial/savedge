@@ -62,10 +62,20 @@ class RefreshVendorCoupons extends CouponsEvent {
 
 /// Event to load special offer coupons
 class LoadSpecialOfferCoupons extends CouponsEvent {
-  const LoadSpecialOfferCoupons();
+  const LoadSpecialOfferCoupons({this.cityId});
+
+  final int? cityId;
+
+  @override
+  List<Object?> get props => [cityId];
 }
 
 /// Event to refresh special offer coupons
 class RefreshSpecialOfferCoupons extends CouponsEvent {
-  const RefreshSpecialOfferCoupons();
+  const RefreshSpecialOfferCoupons({this.cityId});
+
+  final int? cityId;
+
+  @override
+  List<Object?> get props => [cityId];
 }

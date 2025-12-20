@@ -2,7 +2,6 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 
-import 'package:savedge/core/usecases/usecase.dart';
 import 'package:savedge/features/vendors/domain/entities/coupon.dart';
 import 'package:savedge/features/vendors/domain/usecases/get_featured_coupons_usecase.dart';
 import 'package:savedge/features/vendors/domain/usecases/get_special_offer_coupons_usecase.dart';
@@ -114,7 +113,9 @@ class CouponsBloc extends Bloc<CouponsEvent, CouponsState> {
   ) async {
     emit(CouponsLoading());
 
-    final result = await getSpecialOfferCouponsUseCase(NoParams());
+    final result = await getSpecialOfferCouponsUseCase(
+      GetSpecialOfferCouponsParams(cityId: event.cityId),
+    );
 
     result.fold(
       (failure) => emit(
@@ -129,7 +130,9 @@ class CouponsBloc extends Bloc<CouponsEvent, CouponsState> {
     Emitter<CouponsState> emit,
   ) async {
     // Don't emit loading state for refresh to avoid UI flickering
-    final result = await getSpecialOfferCouponsUseCase(NoParams());
+    final result = await getSpecialOfferCouponsUseCase(
+      GetSpecialOfferCouponsParams(cityId: event.cityId),
+    );
 
     result.fold(
       (failure) => emit(

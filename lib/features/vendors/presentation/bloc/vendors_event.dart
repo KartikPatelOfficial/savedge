@@ -62,5 +62,10 @@ class RefreshVendors extends VendorsEvent {
 }
 
 class LoadTopOfferVendors extends VendorsEvent {
-  const LoadTopOfferVendors();
+  const LoadTopOfferVendors({this.cityId});
+
+  final int? cityId;
+
+  @override
+  List<Object?> get props => [cityId];
 }

@@ -34,5 +34,5 @@ abstract class CouponsRepository {
   });
 
   /// Gets special offer coupons for hot deals section
-  Future<Either<Failure, List<Coupon>>> getSpecialOfferCoupons();
+  Future<Either<Failure, List<Coupon>>> getSpecialOfferCoupons({int? cityId});
 }

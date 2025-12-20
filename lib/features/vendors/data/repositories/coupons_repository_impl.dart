@@ -95,16 +95,22 @@ class CouponsRepositoryImpl implements CouponsRepository {
   }
 
   @override
-  Future<Either<Failure, List<Coupon>>> getSpecialOfferCoupons() async {
+  Future<Either<Failure, List<Coupon>>> getSpecialOfferCoupons({
+    int? cityId,
+  }) async {
     try {
-      final response = await _remoteDataSource.getSpecialOfferCoupons();
-      
+      final response = await _remoteDataSource.getSpecialOfferCoupons(
+        cityId: cityId,
+      );
+
       // Parse the response data
       final data = response.data;
       if (data is List<dynamic>) {
         final coupons = _sortCouponsByPriority(
           data
-              .map((item) => CouponResponse.fromJson(item as Map<String, dynamic>))
+              .map(
+                (item) => CouponResponse.fromJson(item as Map<String, dynamic>),
+              )
               .map(_mapResponseToEntity)
               .toList(),
         );

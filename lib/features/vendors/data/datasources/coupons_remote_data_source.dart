@@ -44,5 +44,7 @@ abstract class CouponsRemoteDataSource {
 
   /// Gets special offer coupons with images
   @GET('/api/Coupons/special-offers')
-  Future<HttpResponse<dynamic>> getSpecialOfferCoupons();
+  Future<HttpResponse<dynamic>> getSpecialOfferCoupons({
+    @Query('cityId') int? cityId,
+  });
 }
