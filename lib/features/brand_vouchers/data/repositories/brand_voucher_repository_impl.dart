@@ -100,7 +100,7 @@ class BrandVoucherRepositoryImpl implements BrandVoucherRepository {
   }
 
   @override
-  Future<Either<Failure, CreateVoucherPaymentOrderResponse>> createRazorpayOrder({
+  Future<Either<Failure, CreateVoucherPaymentOrderResponse>> createPaymentOrder({
     required int brandVoucherId,
     required double voucherAmount,
   }) async {
@@ -110,7 +110,7 @@ class BrandVoucherRepositoryImpl implements BrandVoucherRepository {
         voucherAmount: voucherAmount,
       );
 
-      final response = await _service.createRazorpayOrder(request);
+      final response = await _service.createPaymentOrder(request);
       return Right(response);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
@@ -118,21 +118,11 @@ class BrandVoucherRepositoryImpl implements BrandVoucherRepository {
   }
 
   @override
-  Future<Either<Failure, VerifyVoucherPaymentResponse>> verifyRazorpayPayment({
+  Future<Either<Failure, VoucherPaymentStatusResponse>> checkPaymentStatus({
     required int voucherOrderId,
-    required String razorpayOrderId,
-    required String razorpayPaymentId,
-    required String razorpaySignature,
   }) async {
     try {
-      final request = VerifyVoucherPaymentRequest(
-        voucherOrderId: voucherOrderId,
-        razorpayOrderId: razorpayOrderId,
-        razorpayPaymentId: razorpayPaymentId,
-        razorpaySignature: razorpaySignature,
-      );
-
-      final response = await _service.verifyRazorpayPayment(request);
+      final response = await _service.checkPaymentStatus(voucherOrderId);
       return Right(response);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
@@ -176,8 +166,8 @@ class BrandVoucherRepositoryImpl implements BrandVoucherRepository {
       notes: model.notes,
       created: model.created,
       paymentMethod: _mapToEntityPaymentMethod(model.paymentMethod),
-      razorpayOrderId: model.razorpayOrderId,
-      razorpayPaymentId: model.razorpayPaymentId,
+      paymentGatewayOrderId: model.paymentGatewayOrderId,
+      paymentGatewayTransactionId: model.paymentGatewayTransactionId,
       amountPaid: model.amountPaid,
     );
   }
@@ -218,8 +208,8 @@ class BrandVoucherRepositoryImpl implements BrandVoucherRepository {
         return VoucherPaymentMethodEntity.none;
       case VoucherPaymentMethod.points:
         return VoucherPaymentMethodEntity.points;
-      case VoucherPaymentMethod.razorpay:
-        return VoucherPaymentMethodEntity.razorpay;
+      case VoucherPaymentMethod.online:
+        return VoucherPaymentMethodEntity.online;
     }
   }
 }

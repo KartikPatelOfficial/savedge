@@ -179,7 +179,7 @@ abstract class PaymentTransactionModel with _$PaymentTransactionModel {
     required String status,
     required double amount,
     @JsonKey(name: 'paymentReference') String? paymentReference,
-    @JsonKey(name: 'razorpayOrderId') String? razorpayOrderId,
+    @JsonKey(name: 'paymentGatewayOrderId') String? paymentGatewayOrderId,
     @JsonKey(name: 'createdAt') required DateTime createdAt,
     @JsonKey(name: 'failureReason') String? failureReason,
     @JsonKey(name: 'planName') String? planName,
@@ -198,7 +198,7 @@ extension PaymentTransactionModelX on PaymentTransactionModel {
       amount: amount,
       createdAt: createdAt,
       paymentReference: paymentReference,
-      razorpayOrderId: razorpayOrderId,
+      paymentGatewayOrderId: paymentGatewayOrderId,
       failureReason: failureReason,
       planName: planName,
     );

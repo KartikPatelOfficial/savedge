@@ -7,8 +7,7 @@ part 'payment_models.g.dart';
 abstract class CreatePaymentOrderRequest with _$CreatePaymentOrderRequest {
   const factory CreatePaymentOrderRequest({
     required int planId,
-    required double amount,
-    required String currency,
+    @Default(false) bool autoRenew,
   }) = _CreatePaymentOrderRequest;
 
   factory CreatePaymentOrderRequest.fromJson(Map<String, dynamic> json) =>
@@ -19,11 +18,12 @@ abstract class CreatePaymentOrderRequest with _$CreatePaymentOrderRequest {
 abstract class CreatePaymentOrderResponse with _$CreatePaymentOrderResponse {
   const factory CreatePaymentOrderResponse({
     required String orderId,
-    required String razorpayOrderId,
-    required double amount,
+    required int amount,
     required String currency,
-    required String key,
+    required String receipt,
     required int transactionId,
+    required String redirectUrl, // PineLabs payment page URL
+    PlanDetailsDto? planDetails,
   }) = _CreatePaymentOrderResponse;
 
   factory CreatePaymentOrderResponse.fromJson(Map<String, dynamic> json) =>
@@ -31,28 +31,36 @@ abstract class CreatePaymentOrderResponse with _$CreatePaymentOrderResponse {
 }
 
 @freezed
-abstract class VerifyPaymentRequest with _$VerifyPaymentRequest {
-  const factory VerifyPaymentRequest({
-    required String razorpayPaymentId,
-    required String razorpayOrderId,
-    required String razorpaySignature,
-    required int transactionId,
-  }) = _VerifyPaymentRequest;
+abstract class PlanDetailsDto with _$PlanDetailsDto {
+  const factory PlanDetailsDto({
+    required int id,
+    required String name,
+    String? description,
+    required double price,
+    required int durationMonths,
+    String? features,
+    String? imageUrl,
+  }) = _PlanDetailsDto;
 
-  factory VerifyPaymentRequest.fromJson(Map<String, dynamic> json) =>
-      _$VerifyPaymentRequestFromJson(json);
+  factory PlanDetailsDto.fromJson(Map<String, dynamic> json) =>
+      _$PlanDetailsDtoFromJson(json);
 }
 
 @freezed
-abstract class PaymentVerificationResponse with _$PaymentVerificationResponse {
-  const factory PaymentVerificationResponse({
-    required bool success,
-    required String message,
-    String? subscriptionId,
-  }) = _PaymentVerificationResponse;
+abstract class PaymentStatusResponse with _$PaymentStatusResponse {
+  const factory PaymentStatusResponse({
+    required int transactionId,
+    required String status,
+    required double amount,
+    String? paymentReference,
+    String? paymentOrderId,
+    required DateTime createdAt,
+    String? failureReason,
+    String? planName,
+  }) = _PaymentStatusResponse;
 
-  factory PaymentVerificationResponse.fromJson(Map<String, dynamic> json) =>
-      _$PaymentVerificationResponseFromJson(json);
+  factory PaymentStatusResponse.fromJson(Map<String, dynamic> json) =>
+      _$PaymentStatusResponseFromJson(json);
 }
 
 @freezed
@@ -60,7 +68,7 @@ abstract class PurchaseSubscriptionRequest with _$PurchaseSubscriptionRequest {
   const factory PurchaseSubscriptionRequest({
     required int planId,
     @Default(false) bool autoRenew,
-    String? paymentMethod, // 'points' or 'razorpay'
+    String? paymentMethod, // 'points' or 'pinelabs'
   }) = _PurchaseSubscriptionRequest;
 
   factory PurchaseSubscriptionRequest.fromJson(Map<String, dynamic> json) =>

@@ -46,9 +46,9 @@ abstract class VoucherOrder with _$VoucherOrder {
     required DateTime created,
     // Payment information
     required VoucherPaymentMethod paymentMethod,
-    String? razorpayOrderId,
-    String? razorpayPaymentId,
-    String? razorpaySignature,
+    String? paymentGatewayOrderId,
+    String? paymentGatewayTransactionId,
+    String? paymentGatewaySignature,
     double? amountPaid,
   }) = _VoucherOrder;
 
@@ -120,7 +120,7 @@ enum VoucherPaymentMethod {
   @JsonValue(1)
   points,
   @JsonValue(2)
-  razorpay,
+  online,
 }
 
 extension VoucherOrderStatusExtension on VoucherOrderStatus {
@@ -162,13 +162,13 @@ extension VoucherPaymentMethodExtension on VoucherPaymentMethod {
         return 'Not Specified';
       case VoucherPaymentMethod.points:
         return 'Points';
-      case VoucherPaymentMethod.razorpay:
-        return 'Razorpay';
+      case VoucherPaymentMethod.online:
+        return 'Online Payment';
     }
   }
 }
 
-// Razorpay payment models
+// Pine Labs payment models
 @freezed
 abstract class CreateVoucherPaymentOrderRequest with _$CreateVoucherPaymentOrderRequest {
   const factory CreateVoucherPaymentOrderRequest({
@@ -192,7 +192,7 @@ abstract class CreateVoucherPaymentOrderResponse with _$CreateVoucherPaymentOrde
     required double voucherAmount,
     required double processingFee,
     required double totalAmount,
-    required String razorpayKey,
+    required String redirectUrl,
   }) = _CreateVoucherPaymentOrderResponse;
 
   factory CreateVoucherPaymentOrderResponse.fromJson(Map<String, dynamic> json) =>
@@ -200,29 +200,18 @@ abstract class CreateVoucherPaymentOrderResponse with _$CreateVoucherPaymentOrde
 }
 
 @freezed
-abstract class VerifyVoucherPaymentRequest with _$VerifyVoucherPaymentRequest {
-  const factory VerifyVoucherPaymentRequest({
+abstract class VoucherPaymentStatusResponse with _$VoucherPaymentStatusResponse {
+  const factory VoucherPaymentStatusResponse({
     required int voucherOrderId,
-    required String razorpayOrderId,
-    required String razorpayPaymentId,
-    required String razorpaySignature,
-  }) = _VerifyVoucherPaymentRequest;
-
-  factory VerifyVoucherPaymentRequest.fromJson(Map<String, dynamic> json) =>
-      _$VerifyVoucherPaymentRequestFromJson(json);
-}
-
-@freezed
-abstract class VerifyVoucherPaymentResponse with _$VerifyVoucherPaymentResponse {
-  const factory VerifyVoucherPaymentResponse({
-    required bool success,
-    required String message,
-    required int voucherOrderId,
+    required String status,
+    String? paymentOrderId,
+    String? paymentTransactionId,
     required String brandName,
     required double voucherAmount,
-    required String status,
-  }) = _VerifyVoucherPaymentResponse;
+    required double totalAmount,
+    String? failureReason,
+  }) = _VoucherPaymentStatusResponse;
 
-  factory VerifyVoucherPaymentResponse.fromJson(Map<String, dynamic> json) =>
-      _$VerifyVoucherPaymentResponseFromJson(json);
+  factory VoucherPaymentStatusResponse.fromJson(Map<String, dynamic> json) =>
+      _$VoucherPaymentStatusResponseFromJson(json);
 }

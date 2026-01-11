@@ -66,9 +66,10 @@ _VoucherOrder _$VoucherOrderFromJson(Map<String, dynamic> json) =>
         _$VoucherPaymentMethodEnumMap,
         json['paymentMethod'],
       ),
-      razorpayOrderId: json['razorpayOrderId'] as String?,
-      razorpayPaymentId: json['razorpayPaymentId'] as String?,
-      razorpaySignature: json['razorpaySignature'] as String?,
+      paymentGatewayOrderId: json['paymentGatewayOrderId'] as String?,
+      paymentGatewayTransactionId:
+          json['paymentGatewayTransactionId'] as String?,
+      paymentGatewaySignature: json['paymentGatewaySignature'] as String?,
       amountPaid: (json['amountPaid'] as num?)?.toDouble(),
     );
 
@@ -92,9 +93,9 @@ Map<String, dynamic> _$VoucherOrderToJson(_VoucherOrder instance) =>
       'notes': instance.notes,
       'created': instance.created.toIso8601String(),
       'paymentMethod': _$VoucherPaymentMethodEnumMap[instance.paymentMethod]!,
-      'razorpayOrderId': instance.razorpayOrderId,
-      'razorpayPaymentId': instance.razorpayPaymentId,
-      'razorpaySignature': instance.razorpaySignature,
+      'paymentGatewayOrderId': instance.paymentGatewayOrderId,
+      'paymentGatewayTransactionId': instance.paymentGatewayTransactionId,
+      'paymentGatewaySignature': instance.paymentGatewaySignature,
       'amountPaid': instance.amountPaid,
     };
 
@@ -109,7 +110,7 @@ const _$VoucherOrderStatusEnumMap = {
 const _$VoucherPaymentMethodEnumMap = {
   VoucherPaymentMethod.none: 0,
   VoucherPaymentMethod.points: 1,
-  VoucherPaymentMethod.razorpay: 2,
+  VoucherPaymentMethod.online: 2,
 };
 
 _CreateVoucherOrderRequest _$CreateVoucherOrderRequestFromJson(
@@ -209,7 +210,7 @@ _CreateVoucherPaymentOrderResponse _$CreateVoucherPaymentOrderResponseFromJson(
   voucherAmount: (json['voucherAmount'] as num).toDouble(),
   processingFee: (json['processingFee'] as num).toDouble(),
   totalAmount: (json['totalAmount'] as num).toDouble(),
-  razorpayKey: json['razorpayKey'] as String,
+  redirectUrl: json['redirectUrl'] as String,
 );
 
 Map<String, dynamic> _$CreateVoucherPaymentOrderResponseToJson(
@@ -224,45 +225,31 @@ Map<String, dynamic> _$CreateVoucherPaymentOrderResponseToJson(
   'voucherAmount': instance.voucherAmount,
   'processingFee': instance.processingFee,
   'totalAmount': instance.totalAmount,
-  'razorpayKey': instance.razorpayKey,
+  'redirectUrl': instance.redirectUrl,
 };
 
-_VerifyVoucherPaymentRequest _$VerifyVoucherPaymentRequestFromJson(
+_VoucherPaymentStatusResponse _$VoucherPaymentStatusResponseFromJson(
   Map<String, dynamic> json,
-) => _VerifyVoucherPaymentRequest(
+) => _VoucherPaymentStatusResponse(
   voucherOrderId: (json['voucherOrderId'] as num).toInt(),
-  razorpayOrderId: json['razorpayOrderId'] as String,
-  razorpayPaymentId: json['razorpayPaymentId'] as String,
-  razorpaySignature: json['razorpaySignature'] as String,
-);
-
-Map<String, dynamic> _$VerifyVoucherPaymentRequestToJson(
-  _VerifyVoucherPaymentRequest instance,
-) => <String, dynamic>{
-  'voucherOrderId': instance.voucherOrderId,
-  'razorpayOrderId': instance.razorpayOrderId,
-  'razorpayPaymentId': instance.razorpayPaymentId,
-  'razorpaySignature': instance.razorpaySignature,
-};
-
-_VerifyVoucherPaymentResponse _$VerifyVoucherPaymentResponseFromJson(
-  Map<String, dynamic> json,
-) => _VerifyVoucherPaymentResponse(
-  success: json['success'] as bool,
-  message: json['message'] as String,
-  voucherOrderId: (json['voucherOrderId'] as num).toInt(),
+  status: json['status'] as String,
+  paymentOrderId: json['paymentOrderId'] as String?,
+  paymentTransactionId: json['paymentTransactionId'] as String?,
   brandName: json['brandName'] as String,
   voucherAmount: (json['voucherAmount'] as num).toDouble(),
-  status: json['status'] as String,
+  totalAmount: (json['totalAmount'] as num).toDouble(),
+  failureReason: json['failureReason'] as String?,
 );
 
-Map<String, dynamic> _$VerifyVoucherPaymentResponseToJson(
-  _VerifyVoucherPaymentResponse instance,
+Map<String, dynamic> _$VoucherPaymentStatusResponseToJson(
+  _VoucherPaymentStatusResponse instance,
 ) => <String, dynamic>{
-  'success': instance.success,
-  'message': instance.message,
   'voucherOrderId': instance.voucherOrderId,
+  'status': instance.status,
+  'paymentOrderId': instance.paymentOrderId,
+  'paymentTransactionId': instance.paymentTransactionId,
   'brandName': instance.brandName,
   'voucherAmount': instance.voucherAmount,
-  'status': instance.status,
+  'totalAmount': instance.totalAmount,
+  'failureReason': instance.failureReason,
 };

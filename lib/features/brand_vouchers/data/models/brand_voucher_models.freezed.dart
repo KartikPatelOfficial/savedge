@@ -312,7 +312,7 @@ as DateTime,
 mixin _$VoucherOrder {
 
  int get id; String get userId; int get brandVoucherId; String get brandName; String get brandImageUrl; double get voucherAmount; double get processingFee; double get totalPointsUsed; VoucherOrderStatus get status; String? get voucherCode; String? get voucherPin; DateTime? get fulfilledAt; String? get fulfilledBy; String? get rejectionReason; DateTime? get expiresAt; String? get notes; DateTime get created;// Payment information
- VoucherPaymentMethod get paymentMethod; String? get razorpayOrderId; String? get razorpayPaymentId; String? get razorpaySignature; double? get amountPaid;
+ VoucherPaymentMethod get paymentMethod; String? get paymentGatewayOrderId; String? get paymentGatewayTransactionId; String? get paymentGatewaySignature; double? get amountPaid;
 /// Create a copy of VoucherOrder
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -325,16 +325,16 @@ $VoucherOrderCopyWith<VoucherOrder> get copyWith => _$VoucherOrderCopyWithImpl<V
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is VoucherOrder&&(identical(other.id, id) || other.id == id)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.brandVoucherId, brandVoucherId) || other.brandVoucherId == brandVoucherId)&&(identical(other.brandName, brandName) || other.brandName == brandName)&&(identical(other.brandImageUrl, brandImageUrl) || other.brandImageUrl == brandImageUrl)&&(identical(other.voucherAmount, voucherAmount) || other.voucherAmount == voucherAmount)&&(identical(other.processingFee, processingFee) || other.processingFee == processingFee)&&(identical(other.totalPointsUsed, totalPointsUsed) || other.totalPointsUsed == totalPointsUsed)&&(identical(other.status, status) || other.status == status)&&(identical(other.voucherCode, voucherCode) || other.voucherCode == voucherCode)&&(identical(other.voucherPin, voucherPin) || other.voucherPin == voucherPin)&&(identical(other.fulfilledAt, fulfilledAt) || other.fulfilledAt == fulfilledAt)&&(identical(other.fulfilledBy, fulfilledBy) || other.fulfilledBy == fulfilledBy)&&(identical(other.rejectionReason, rejectionReason) || other.rejectionReason == rejectionReason)&&(identical(other.expiresAt, expiresAt) || other.expiresAt == expiresAt)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.created, created) || other.created == created)&&(identical(other.paymentMethod, paymentMethod) || other.paymentMethod == paymentMethod)&&(identical(other.razorpayOrderId, razorpayOrderId) || other.razorpayOrderId == razorpayOrderId)&&(identical(other.razorpayPaymentId, razorpayPaymentId) || other.razorpayPaymentId == razorpayPaymentId)&&(identical(other.razorpaySignature, razorpaySignature) || other.razorpaySignature == razorpaySignature)&&(identical(other.amountPaid, amountPaid) || other.amountPaid == amountPaid));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is VoucherOrder&&(identical(other.id, id) || other.id == id)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.brandVoucherId, brandVoucherId) || other.brandVoucherId == brandVoucherId)&&(identical(other.brandName, brandName) || other.brandName == brandName)&&(identical(other.brandImageUrl, brandImageUrl) || other.brandImageUrl == brandImageUrl)&&(identical(other.voucherAmount, voucherAmount) || other.voucherAmount == voucherAmount)&&(identical(other.processingFee, processingFee) || other.processingFee == processingFee)&&(identical(other.totalPointsUsed, totalPointsUsed) || other.totalPointsUsed == totalPointsUsed)&&(identical(other.status, status) || other.status == status)&&(identical(other.voucherCode, voucherCode) || other.voucherCode == voucherCode)&&(identical(other.voucherPin, voucherPin) || other.voucherPin == voucherPin)&&(identical(other.fulfilledAt, fulfilledAt) || other.fulfilledAt == fulfilledAt)&&(identical(other.fulfilledBy, fulfilledBy) || other.fulfilledBy == fulfilledBy)&&(identical(other.rejectionReason, rejectionReason) || other.rejectionReason == rejectionReason)&&(identical(other.expiresAt, expiresAt) || other.expiresAt == expiresAt)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.created, created) || other.created == created)&&(identical(other.paymentMethod, paymentMethod) || other.paymentMethod == paymentMethod)&&(identical(other.paymentGatewayOrderId, paymentGatewayOrderId) || other.paymentGatewayOrderId == paymentGatewayOrderId)&&(identical(other.paymentGatewayTransactionId, paymentGatewayTransactionId) || other.paymentGatewayTransactionId == paymentGatewayTransactionId)&&(identical(other.paymentGatewaySignature, paymentGatewaySignature) || other.paymentGatewaySignature == paymentGatewaySignature)&&(identical(other.amountPaid, amountPaid) || other.amountPaid == amountPaid));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hashAll([runtimeType,id,userId,brandVoucherId,brandName,brandImageUrl,voucherAmount,processingFee,totalPointsUsed,status,voucherCode,voucherPin,fulfilledAt,fulfilledBy,rejectionReason,expiresAt,notes,created,paymentMethod,razorpayOrderId,razorpayPaymentId,razorpaySignature,amountPaid]);
+int get hashCode => Object.hashAll([runtimeType,id,userId,brandVoucherId,brandName,brandImageUrl,voucherAmount,processingFee,totalPointsUsed,status,voucherCode,voucherPin,fulfilledAt,fulfilledBy,rejectionReason,expiresAt,notes,created,paymentMethod,paymentGatewayOrderId,paymentGatewayTransactionId,paymentGatewaySignature,amountPaid]);
 
 @override
 String toString() {
-  return 'VoucherOrder(id: $id, userId: $userId, brandVoucherId: $brandVoucherId, brandName: $brandName, brandImageUrl: $brandImageUrl, voucherAmount: $voucherAmount, processingFee: $processingFee, totalPointsUsed: $totalPointsUsed, status: $status, voucherCode: $voucherCode, voucherPin: $voucherPin, fulfilledAt: $fulfilledAt, fulfilledBy: $fulfilledBy, rejectionReason: $rejectionReason, expiresAt: $expiresAt, notes: $notes, created: $created, paymentMethod: $paymentMethod, razorpayOrderId: $razorpayOrderId, razorpayPaymentId: $razorpayPaymentId, razorpaySignature: $razorpaySignature, amountPaid: $amountPaid)';
+  return 'VoucherOrder(id: $id, userId: $userId, brandVoucherId: $brandVoucherId, brandName: $brandName, brandImageUrl: $brandImageUrl, voucherAmount: $voucherAmount, processingFee: $processingFee, totalPointsUsed: $totalPointsUsed, status: $status, voucherCode: $voucherCode, voucherPin: $voucherPin, fulfilledAt: $fulfilledAt, fulfilledBy: $fulfilledBy, rejectionReason: $rejectionReason, expiresAt: $expiresAt, notes: $notes, created: $created, paymentMethod: $paymentMethod, paymentGatewayOrderId: $paymentGatewayOrderId, paymentGatewayTransactionId: $paymentGatewayTransactionId, paymentGatewaySignature: $paymentGatewaySignature, amountPaid: $amountPaid)';
 }
 
 
@@ -345,7 +345,7 @@ abstract mixin class $VoucherOrderCopyWith<$Res>  {
   factory $VoucherOrderCopyWith(VoucherOrder value, $Res Function(VoucherOrder) _then) = _$VoucherOrderCopyWithImpl;
 @useResult
 $Res call({
- int id, String userId, int brandVoucherId, String brandName, String brandImageUrl, double voucherAmount, double processingFee, double totalPointsUsed, VoucherOrderStatus status, String? voucherCode, String? voucherPin, DateTime? fulfilledAt, String? fulfilledBy, String? rejectionReason, DateTime? expiresAt, String? notes, DateTime created, VoucherPaymentMethod paymentMethod, String? razorpayOrderId, String? razorpayPaymentId, String? razorpaySignature, double? amountPaid
+ int id, String userId, int brandVoucherId, String brandName, String brandImageUrl, double voucherAmount, double processingFee, double totalPointsUsed, VoucherOrderStatus status, String? voucherCode, String? voucherPin, DateTime? fulfilledAt, String? fulfilledBy, String? rejectionReason, DateTime? expiresAt, String? notes, DateTime created, VoucherPaymentMethod paymentMethod, String? paymentGatewayOrderId, String? paymentGatewayTransactionId, String? paymentGatewaySignature, double? amountPaid
 });
 
 
@@ -362,7 +362,7 @@ class _$VoucherOrderCopyWithImpl<$Res>
 
 /// Create a copy of VoucherOrder
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? userId = null,Object? brandVoucherId = null,Object? brandName = null,Object? brandImageUrl = null,Object? voucherAmount = null,Object? processingFee = null,Object? totalPointsUsed = null,Object? status = null,Object? voucherCode = freezed,Object? voucherPin = freezed,Object? fulfilledAt = freezed,Object? fulfilledBy = freezed,Object? rejectionReason = freezed,Object? expiresAt = freezed,Object? notes = freezed,Object? created = null,Object? paymentMethod = null,Object? razorpayOrderId = freezed,Object? razorpayPaymentId = freezed,Object? razorpaySignature = freezed,Object? amountPaid = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? userId = null,Object? brandVoucherId = null,Object? brandName = null,Object? brandImageUrl = null,Object? voucherAmount = null,Object? processingFee = null,Object? totalPointsUsed = null,Object? status = null,Object? voucherCode = freezed,Object? voucherPin = freezed,Object? fulfilledAt = freezed,Object? fulfilledBy = freezed,Object? rejectionReason = freezed,Object? expiresAt = freezed,Object? notes = freezed,Object? created = null,Object? paymentMethod = null,Object? paymentGatewayOrderId = freezed,Object? paymentGatewayTransactionId = freezed,Object? paymentGatewaySignature = freezed,Object? amountPaid = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
@@ -382,9 +382,9 @@ as String?,expiresAt: freezed == expiresAt ? _self.expiresAt : expiresAt // igno
 as DateTime?,notes: freezed == notes ? _self.notes : notes // ignore: cast_nullable_to_non_nullable
 as String?,created: null == created ? _self.created : created // ignore: cast_nullable_to_non_nullable
 as DateTime,paymentMethod: null == paymentMethod ? _self.paymentMethod : paymentMethod // ignore: cast_nullable_to_non_nullable
-as VoucherPaymentMethod,razorpayOrderId: freezed == razorpayOrderId ? _self.razorpayOrderId : razorpayOrderId // ignore: cast_nullable_to_non_nullable
-as String?,razorpayPaymentId: freezed == razorpayPaymentId ? _self.razorpayPaymentId : razorpayPaymentId // ignore: cast_nullable_to_non_nullable
-as String?,razorpaySignature: freezed == razorpaySignature ? _self.razorpaySignature : razorpaySignature // ignore: cast_nullable_to_non_nullable
+as VoucherPaymentMethod,paymentGatewayOrderId: freezed == paymentGatewayOrderId ? _self.paymentGatewayOrderId : paymentGatewayOrderId // ignore: cast_nullable_to_non_nullable
+as String?,paymentGatewayTransactionId: freezed == paymentGatewayTransactionId ? _self.paymentGatewayTransactionId : paymentGatewayTransactionId // ignore: cast_nullable_to_non_nullable
+as String?,paymentGatewaySignature: freezed == paymentGatewaySignature ? _self.paymentGatewaySignature : paymentGatewaySignature // ignore: cast_nullable_to_non_nullable
 as String?,amountPaid: freezed == amountPaid ? _self.amountPaid : amountPaid // ignore: cast_nullable_to_non_nullable
 as double?,
   ));
@@ -471,10 +471,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String userId,  int brandVoucherId,  String brandName,  String brandImageUrl,  double voucherAmount,  double processingFee,  double totalPointsUsed,  VoucherOrderStatus status,  String? voucherCode,  String? voucherPin,  DateTime? fulfilledAt,  String? fulfilledBy,  String? rejectionReason,  DateTime? expiresAt,  String? notes,  DateTime created,  VoucherPaymentMethod paymentMethod,  String? razorpayOrderId,  String? razorpayPaymentId,  String? razorpaySignature,  double? amountPaid)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String userId,  int brandVoucherId,  String brandName,  String brandImageUrl,  double voucherAmount,  double processingFee,  double totalPointsUsed,  VoucherOrderStatus status,  String? voucherCode,  String? voucherPin,  DateTime? fulfilledAt,  String? fulfilledBy,  String? rejectionReason,  DateTime? expiresAt,  String? notes,  DateTime created,  VoucherPaymentMethod paymentMethod,  String? paymentGatewayOrderId,  String? paymentGatewayTransactionId,  String? paymentGatewaySignature,  double? amountPaid)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _VoucherOrder() when $default != null:
-return $default(_that.id,_that.userId,_that.brandVoucherId,_that.brandName,_that.brandImageUrl,_that.voucherAmount,_that.processingFee,_that.totalPointsUsed,_that.status,_that.voucherCode,_that.voucherPin,_that.fulfilledAt,_that.fulfilledBy,_that.rejectionReason,_that.expiresAt,_that.notes,_that.created,_that.paymentMethod,_that.razorpayOrderId,_that.razorpayPaymentId,_that.razorpaySignature,_that.amountPaid);case _:
+return $default(_that.id,_that.userId,_that.brandVoucherId,_that.brandName,_that.brandImageUrl,_that.voucherAmount,_that.processingFee,_that.totalPointsUsed,_that.status,_that.voucherCode,_that.voucherPin,_that.fulfilledAt,_that.fulfilledBy,_that.rejectionReason,_that.expiresAt,_that.notes,_that.created,_that.paymentMethod,_that.paymentGatewayOrderId,_that.paymentGatewayTransactionId,_that.paymentGatewaySignature,_that.amountPaid);case _:
   return orElse();
 
 }
@@ -492,10 +492,10 @@ return $default(_that.id,_that.userId,_that.brandVoucherId,_that.brandName,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String userId,  int brandVoucherId,  String brandName,  String brandImageUrl,  double voucherAmount,  double processingFee,  double totalPointsUsed,  VoucherOrderStatus status,  String? voucherCode,  String? voucherPin,  DateTime? fulfilledAt,  String? fulfilledBy,  String? rejectionReason,  DateTime? expiresAt,  String? notes,  DateTime created,  VoucherPaymentMethod paymentMethod,  String? razorpayOrderId,  String? razorpayPaymentId,  String? razorpaySignature,  double? amountPaid)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String userId,  int brandVoucherId,  String brandName,  String brandImageUrl,  double voucherAmount,  double processingFee,  double totalPointsUsed,  VoucherOrderStatus status,  String? voucherCode,  String? voucherPin,  DateTime? fulfilledAt,  String? fulfilledBy,  String? rejectionReason,  DateTime? expiresAt,  String? notes,  DateTime created,  VoucherPaymentMethod paymentMethod,  String? paymentGatewayOrderId,  String? paymentGatewayTransactionId,  String? paymentGatewaySignature,  double? amountPaid)  $default,) {final _that = this;
 switch (_that) {
 case _VoucherOrder():
-return $default(_that.id,_that.userId,_that.brandVoucherId,_that.brandName,_that.brandImageUrl,_that.voucherAmount,_that.processingFee,_that.totalPointsUsed,_that.status,_that.voucherCode,_that.voucherPin,_that.fulfilledAt,_that.fulfilledBy,_that.rejectionReason,_that.expiresAt,_that.notes,_that.created,_that.paymentMethod,_that.razorpayOrderId,_that.razorpayPaymentId,_that.razorpaySignature,_that.amountPaid);case _:
+return $default(_that.id,_that.userId,_that.brandVoucherId,_that.brandName,_that.brandImageUrl,_that.voucherAmount,_that.processingFee,_that.totalPointsUsed,_that.status,_that.voucherCode,_that.voucherPin,_that.fulfilledAt,_that.fulfilledBy,_that.rejectionReason,_that.expiresAt,_that.notes,_that.created,_that.paymentMethod,_that.paymentGatewayOrderId,_that.paymentGatewayTransactionId,_that.paymentGatewaySignature,_that.amountPaid);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -512,10 +512,10 @@ return $default(_that.id,_that.userId,_that.brandVoucherId,_that.brandName,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String userId,  int brandVoucherId,  String brandName,  String brandImageUrl,  double voucherAmount,  double processingFee,  double totalPointsUsed,  VoucherOrderStatus status,  String? voucherCode,  String? voucherPin,  DateTime? fulfilledAt,  String? fulfilledBy,  String? rejectionReason,  DateTime? expiresAt,  String? notes,  DateTime created,  VoucherPaymentMethod paymentMethod,  String? razorpayOrderId,  String? razorpayPaymentId,  String? razorpaySignature,  double? amountPaid)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String userId,  int brandVoucherId,  String brandName,  String brandImageUrl,  double voucherAmount,  double processingFee,  double totalPointsUsed,  VoucherOrderStatus status,  String? voucherCode,  String? voucherPin,  DateTime? fulfilledAt,  String? fulfilledBy,  String? rejectionReason,  DateTime? expiresAt,  String? notes,  DateTime created,  VoucherPaymentMethod paymentMethod,  String? paymentGatewayOrderId,  String? paymentGatewayTransactionId,  String? paymentGatewaySignature,  double? amountPaid)?  $default,) {final _that = this;
 switch (_that) {
 case _VoucherOrder() when $default != null:
-return $default(_that.id,_that.userId,_that.brandVoucherId,_that.brandName,_that.brandImageUrl,_that.voucherAmount,_that.processingFee,_that.totalPointsUsed,_that.status,_that.voucherCode,_that.voucherPin,_that.fulfilledAt,_that.fulfilledBy,_that.rejectionReason,_that.expiresAt,_that.notes,_that.created,_that.paymentMethod,_that.razorpayOrderId,_that.razorpayPaymentId,_that.razorpaySignature,_that.amountPaid);case _:
+return $default(_that.id,_that.userId,_that.brandVoucherId,_that.brandName,_that.brandImageUrl,_that.voucherAmount,_that.processingFee,_that.totalPointsUsed,_that.status,_that.voucherCode,_that.voucherPin,_that.fulfilledAt,_that.fulfilledBy,_that.rejectionReason,_that.expiresAt,_that.notes,_that.created,_that.paymentMethod,_that.paymentGatewayOrderId,_that.paymentGatewayTransactionId,_that.paymentGatewaySignature,_that.amountPaid);case _:
   return null;
 
 }
@@ -527,7 +527,7 @@ return $default(_that.id,_that.userId,_that.brandVoucherId,_that.brandName,_that
 @JsonSerializable()
 
 class _VoucherOrder implements VoucherOrder {
-  const _VoucherOrder({required this.id, required this.userId, required this.brandVoucherId, required this.brandName, required this.brandImageUrl, required this.voucherAmount, required this.processingFee, required this.totalPointsUsed, required this.status, this.voucherCode, this.voucherPin, this.fulfilledAt, this.fulfilledBy, this.rejectionReason, this.expiresAt, this.notes, required this.created, required this.paymentMethod, this.razorpayOrderId, this.razorpayPaymentId, this.razorpaySignature, this.amountPaid});
+  const _VoucherOrder({required this.id, required this.userId, required this.brandVoucherId, required this.brandName, required this.brandImageUrl, required this.voucherAmount, required this.processingFee, required this.totalPointsUsed, required this.status, this.voucherCode, this.voucherPin, this.fulfilledAt, this.fulfilledBy, this.rejectionReason, this.expiresAt, this.notes, required this.created, required this.paymentMethod, this.paymentGatewayOrderId, this.paymentGatewayTransactionId, this.paymentGatewaySignature, this.amountPaid});
   factory _VoucherOrder.fromJson(Map<String, dynamic> json) => _$VoucherOrderFromJson(json);
 
 @override final  int id;
@@ -549,9 +549,9 @@ class _VoucherOrder implements VoucherOrder {
 @override final  DateTime created;
 // Payment information
 @override final  VoucherPaymentMethod paymentMethod;
-@override final  String? razorpayOrderId;
-@override final  String? razorpayPaymentId;
-@override final  String? razorpaySignature;
+@override final  String? paymentGatewayOrderId;
+@override final  String? paymentGatewayTransactionId;
+@override final  String? paymentGatewaySignature;
 @override final  double? amountPaid;
 
 /// Create a copy of VoucherOrder
@@ -567,16 +567,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _VoucherOrder&&(identical(other.id, id) || other.id == id)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.brandVoucherId, brandVoucherId) || other.brandVoucherId == brandVoucherId)&&(identical(other.brandName, brandName) || other.brandName == brandName)&&(identical(other.brandImageUrl, brandImageUrl) || other.brandImageUrl == brandImageUrl)&&(identical(other.voucherAmount, voucherAmount) || other.voucherAmount == voucherAmount)&&(identical(other.processingFee, processingFee) || other.processingFee == processingFee)&&(identical(other.totalPointsUsed, totalPointsUsed) || other.totalPointsUsed == totalPointsUsed)&&(identical(other.status, status) || other.status == status)&&(identical(other.voucherCode, voucherCode) || other.voucherCode == voucherCode)&&(identical(other.voucherPin, voucherPin) || other.voucherPin == voucherPin)&&(identical(other.fulfilledAt, fulfilledAt) || other.fulfilledAt == fulfilledAt)&&(identical(other.fulfilledBy, fulfilledBy) || other.fulfilledBy == fulfilledBy)&&(identical(other.rejectionReason, rejectionReason) || other.rejectionReason == rejectionReason)&&(identical(other.expiresAt, expiresAt) || other.expiresAt == expiresAt)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.created, created) || other.created == created)&&(identical(other.paymentMethod, paymentMethod) || other.paymentMethod == paymentMethod)&&(identical(other.razorpayOrderId, razorpayOrderId) || other.razorpayOrderId == razorpayOrderId)&&(identical(other.razorpayPaymentId, razorpayPaymentId) || other.razorpayPaymentId == razorpayPaymentId)&&(identical(other.razorpaySignature, razorpaySignature) || other.razorpaySignature == razorpaySignature)&&(identical(other.amountPaid, amountPaid) || other.amountPaid == amountPaid));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _VoucherOrder&&(identical(other.id, id) || other.id == id)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.brandVoucherId, brandVoucherId) || other.brandVoucherId == brandVoucherId)&&(identical(other.brandName, brandName) || other.brandName == brandName)&&(identical(other.brandImageUrl, brandImageUrl) || other.brandImageUrl == brandImageUrl)&&(identical(other.voucherAmount, voucherAmount) || other.voucherAmount == voucherAmount)&&(identical(other.processingFee, processingFee) || other.processingFee == processingFee)&&(identical(other.totalPointsUsed, totalPointsUsed) || other.totalPointsUsed == totalPointsUsed)&&(identical(other.status, status) || other.status == status)&&(identical(other.voucherCode, voucherCode) || other.voucherCode == voucherCode)&&(identical(other.voucherPin, voucherPin) || other.voucherPin == voucherPin)&&(identical(other.fulfilledAt, fulfilledAt) || other.fulfilledAt == fulfilledAt)&&(identical(other.fulfilledBy, fulfilledBy) || other.fulfilledBy == fulfilledBy)&&(identical(other.rejectionReason, rejectionReason) || other.rejectionReason == rejectionReason)&&(identical(other.expiresAt, expiresAt) || other.expiresAt == expiresAt)&&(identical(other.notes, notes) || other.notes == notes)&&(identical(other.created, created) || other.created == created)&&(identical(other.paymentMethod, paymentMethod) || other.paymentMethod == paymentMethod)&&(identical(other.paymentGatewayOrderId, paymentGatewayOrderId) || other.paymentGatewayOrderId == paymentGatewayOrderId)&&(identical(other.paymentGatewayTransactionId, paymentGatewayTransactionId) || other.paymentGatewayTransactionId == paymentGatewayTransactionId)&&(identical(other.paymentGatewaySignature, paymentGatewaySignature) || other.paymentGatewaySignature == paymentGatewaySignature)&&(identical(other.amountPaid, amountPaid) || other.amountPaid == amountPaid));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hashAll([runtimeType,id,userId,brandVoucherId,brandName,brandImageUrl,voucherAmount,processingFee,totalPointsUsed,status,voucherCode,voucherPin,fulfilledAt,fulfilledBy,rejectionReason,expiresAt,notes,created,paymentMethod,razorpayOrderId,razorpayPaymentId,razorpaySignature,amountPaid]);
+int get hashCode => Object.hashAll([runtimeType,id,userId,brandVoucherId,brandName,brandImageUrl,voucherAmount,processingFee,totalPointsUsed,status,voucherCode,voucherPin,fulfilledAt,fulfilledBy,rejectionReason,expiresAt,notes,created,paymentMethod,paymentGatewayOrderId,paymentGatewayTransactionId,paymentGatewaySignature,amountPaid]);
 
 @override
 String toString() {
-  return 'VoucherOrder(id: $id, userId: $userId, brandVoucherId: $brandVoucherId, brandName: $brandName, brandImageUrl: $brandImageUrl, voucherAmount: $voucherAmount, processingFee: $processingFee, totalPointsUsed: $totalPointsUsed, status: $status, voucherCode: $voucherCode, voucherPin: $voucherPin, fulfilledAt: $fulfilledAt, fulfilledBy: $fulfilledBy, rejectionReason: $rejectionReason, expiresAt: $expiresAt, notes: $notes, created: $created, paymentMethod: $paymentMethod, razorpayOrderId: $razorpayOrderId, razorpayPaymentId: $razorpayPaymentId, razorpaySignature: $razorpaySignature, amountPaid: $amountPaid)';
+  return 'VoucherOrder(id: $id, userId: $userId, brandVoucherId: $brandVoucherId, brandName: $brandName, brandImageUrl: $brandImageUrl, voucherAmount: $voucherAmount, processingFee: $processingFee, totalPointsUsed: $totalPointsUsed, status: $status, voucherCode: $voucherCode, voucherPin: $voucherPin, fulfilledAt: $fulfilledAt, fulfilledBy: $fulfilledBy, rejectionReason: $rejectionReason, expiresAt: $expiresAt, notes: $notes, created: $created, paymentMethod: $paymentMethod, paymentGatewayOrderId: $paymentGatewayOrderId, paymentGatewayTransactionId: $paymentGatewayTransactionId, paymentGatewaySignature: $paymentGatewaySignature, amountPaid: $amountPaid)';
 }
 
 
@@ -587,7 +587,7 @@ abstract mixin class _$VoucherOrderCopyWith<$Res> implements $VoucherOrderCopyWi
   factory _$VoucherOrderCopyWith(_VoucherOrder value, $Res Function(_VoucherOrder) _then) = __$VoucherOrderCopyWithImpl;
 @override @useResult
 $Res call({
- int id, String userId, int brandVoucherId, String brandName, String brandImageUrl, double voucherAmount, double processingFee, double totalPointsUsed, VoucherOrderStatus status, String? voucherCode, String? voucherPin, DateTime? fulfilledAt, String? fulfilledBy, String? rejectionReason, DateTime? expiresAt, String? notes, DateTime created, VoucherPaymentMethod paymentMethod, String? razorpayOrderId, String? razorpayPaymentId, String? razorpaySignature, double? amountPaid
+ int id, String userId, int brandVoucherId, String brandName, String brandImageUrl, double voucherAmount, double processingFee, double totalPointsUsed, VoucherOrderStatus status, String? voucherCode, String? voucherPin, DateTime? fulfilledAt, String? fulfilledBy, String? rejectionReason, DateTime? expiresAt, String? notes, DateTime created, VoucherPaymentMethod paymentMethod, String? paymentGatewayOrderId, String? paymentGatewayTransactionId, String? paymentGatewaySignature, double? amountPaid
 });
 
 
@@ -604,7 +604,7 @@ class __$VoucherOrderCopyWithImpl<$Res>
 
 /// Create a copy of VoucherOrder
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? userId = null,Object? brandVoucherId = null,Object? brandName = null,Object? brandImageUrl = null,Object? voucherAmount = null,Object? processingFee = null,Object? totalPointsUsed = null,Object? status = null,Object? voucherCode = freezed,Object? voucherPin = freezed,Object? fulfilledAt = freezed,Object? fulfilledBy = freezed,Object? rejectionReason = freezed,Object? expiresAt = freezed,Object? notes = freezed,Object? created = null,Object? paymentMethod = null,Object? razorpayOrderId = freezed,Object? razorpayPaymentId = freezed,Object? razorpaySignature = freezed,Object? amountPaid = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? userId = null,Object? brandVoucherId = null,Object? brandName = null,Object? brandImageUrl = null,Object? voucherAmount = null,Object? processingFee = null,Object? totalPointsUsed = null,Object? status = null,Object? voucherCode = freezed,Object? voucherPin = freezed,Object? fulfilledAt = freezed,Object? fulfilledBy = freezed,Object? rejectionReason = freezed,Object? expiresAt = freezed,Object? notes = freezed,Object? created = null,Object? paymentMethod = null,Object? paymentGatewayOrderId = freezed,Object? paymentGatewayTransactionId = freezed,Object? paymentGatewaySignature = freezed,Object? amountPaid = freezed,}) {
   return _then(_VoucherOrder(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
@@ -624,9 +624,9 @@ as String?,expiresAt: freezed == expiresAt ? _self.expiresAt : expiresAt // igno
 as DateTime?,notes: freezed == notes ? _self.notes : notes // ignore: cast_nullable_to_non_nullable
 as String?,created: null == created ? _self.created : created // ignore: cast_nullable_to_non_nullable
 as DateTime,paymentMethod: null == paymentMethod ? _self.paymentMethod : paymentMethod // ignore: cast_nullable_to_non_nullable
-as VoucherPaymentMethod,razorpayOrderId: freezed == razorpayOrderId ? _self.razorpayOrderId : razorpayOrderId // ignore: cast_nullable_to_non_nullable
-as String?,razorpayPaymentId: freezed == razorpayPaymentId ? _self.razorpayPaymentId : razorpayPaymentId // ignore: cast_nullable_to_non_nullable
-as String?,razorpaySignature: freezed == razorpaySignature ? _self.razorpaySignature : razorpaySignature // ignore: cast_nullable_to_non_nullable
+as VoucherPaymentMethod,paymentGatewayOrderId: freezed == paymentGatewayOrderId ? _self.paymentGatewayOrderId : paymentGatewayOrderId // ignore: cast_nullable_to_non_nullable
+as String?,paymentGatewayTransactionId: freezed == paymentGatewayTransactionId ? _self.paymentGatewayTransactionId : paymentGatewayTransactionId // ignore: cast_nullable_to_non_nullable
+as String?,paymentGatewaySignature: freezed == paymentGatewaySignature ? _self.paymentGatewaySignature : paymentGatewaySignature // ignore: cast_nullable_to_non_nullable
 as String?,amountPaid: freezed == amountPaid ? _self.amountPaid : amountPaid // ignore: cast_nullable_to_non_nullable
 as double?,
   ));
@@ -1745,7 +1745,7 @@ as double,
 /// @nodoc
 mixin _$CreateVoucherPaymentOrderResponse {
 
- String get orderId; int get amount; String get currency; String get receipt; int get voucherOrderId; String get brandName; double get voucherAmount; double get processingFee; double get totalAmount; String get razorpayKey;
+ String get orderId; int get amount; String get currency; String get receipt; int get voucherOrderId; String get brandName; double get voucherAmount; double get processingFee; double get totalAmount; String get redirectUrl;
 /// Create a copy of CreateVoucherPaymentOrderResponse
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1758,16 +1758,16 @@ $CreateVoucherPaymentOrderResponseCopyWith<CreateVoucherPaymentOrderResponse> ge
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CreateVoucherPaymentOrderResponse&&(identical(other.orderId, orderId) || other.orderId == orderId)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.currency, currency) || other.currency == currency)&&(identical(other.receipt, receipt) || other.receipt == receipt)&&(identical(other.voucherOrderId, voucherOrderId) || other.voucherOrderId == voucherOrderId)&&(identical(other.brandName, brandName) || other.brandName == brandName)&&(identical(other.voucherAmount, voucherAmount) || other.voucherAmount == voucherAmount)&&(identical(other.processingFee, processingFee) || other.processingFee == processingFee)&&(identical(other.totalAmount, totalAmount) || other.totalAmount == totalAmount)&&(identical(other.razorpayKey, razorpayKey) || other.razorpayKey == razorpayKey));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CreateVoucherPaymentOrderResponse&&(identical(other.orderId, orderId) || other.orderId == orderId)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.currency, currency) || other.currency == currency)&&(identical(other.receipt, receipt) || other.receipt == receipt)&&(identical(other.voucherOrderId, voucherOrderId) || other.voucherOrderId == voucherOrderId)&&(identical(other.brandName, brandName) || other.brandName == brandName)&&(identical(other.voucherAmount, voucherAmount) || other.voucherAmount == voucherAmount)&&(identical(other.processingFee, processingFee) || other.processingFee == processingFee)&&(identical(other.totalAmount, totalAmount) || other.totalAmount == totalAmount)&&(identical(other.redirectUrl, redirectUrl) || other.redirectUrl == redirectUrl));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,orderId,amount,currency,receipt,voucherOrderId,brandName,voucherAmount,processingFee,totalAmount,razorpayKey);
+int get hashCode => Object.hash(runtimeType,orderId,amount,currency,receipt,voucherOrderId,brandName,voucherAmount,processingFee,totalAmount,redirectUrl);
 
 @override
 String toString() {
-  return 'CreateVoucherPaymentOrderResponse(orderId: $orderId, amount: $amount, currency: $currency, receipt: $receipt, voucherOrderId: $voucherOrderId, brandName: $brandName, voucherAmount: $voucherAmount, processingFee: $processingFee, totalAmount: $totalAmount, razorpayKey: $razorpayKey)';
+  return 'CreateVoucherPaymentOrderResponse(orderId: $orderId, amount: $amount, currency: $currency, receipt: $receipt, voucherOrderId: $voucherOrderId, brandName: $brandName, voucherAmount: $voucherAmount, processingFee: $processingFee, totalAmount: $totalAmount, redirectUrl: $redirectUrl)';
 }
 
 
@@ -1778,7 +1778,7 @@ abstract mixin class $CreateVoucherPaymentOrderResponseCopyWith<$Res>  {
   factory $CreateVoucherPaymentOrderResponseCopyWith(CreateVoucherPaymentOrderResponse value, $Res Function(CreateVoucherPaymentOrderResponse) _then) = _$CreateVoucherPaymentOrderResponseCopyWithImpl;
 @useResult
 $Res call({
- String orderId, int amount, String currency, String receipt, int voucherOrderId, String brandName, double voucherAmount, double processingFee, double totalAmount, String razorpayKey
+ String orderId, int amount, String currency, String receipt, int voucherOrderId, String brandName, double voucherAmount, double processingFee, double totalAmount, String redirectUrl
 });
 
 
@@ -1795,7 +1795,7 @@ class _$CreateVoucherPaymentOrderResponseCopyWithImpl<$Res>
 
 /// Create a copy of CreateVoucherPaymentOrderResponse
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? orderId = null,Object? amount = null,Object? currency = null,Object? receipt = null,Object? voucherOrderId = null,Object? brandName = null,Object? voucherAmount = null,Object? processingFee = null,Object? totalAmount = null,Object? razorpayKey = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? orderId = null,Object? amount = null,Object? currency = null,Object? receipt = null,Object? voucherOrderId = null,Object? brandName = null,Object? voucherAmount = null,Object? processingFee = null,Object? totalAmount = null,Object? redirectUrl = null,}) {
   return _then(_self.copyWith(
 orderId: null == orderId ? _self.orderId : orderId // ignore: cast_nullable_to_non_nullable
 as String,amount: null == amount ? _self.amount : amount // ignore: cast_nullable_to_non_nullable
@@ -1806,7 +1806,7 @@ as int,brandName: null == brandName ? _self.brandName : brandName // ignore: cas
 as String,voucherAmount: null == voucherAmount ? _self.voucherAmount : voucherAmount // ignore: cast_nullable_to_non_nullable
 as double,processingFee: null == processingFee ? _self.processingFee : processingFee // ignore: cast_nullable_to_non_nullable
 as double,totalAmount: null == totalAmount ? _self.totalAmount : totalAmount // ignore: cast_nullable_to_non_nullable
-as double,razorpayKey: null == razorpayKey ? _self.razorpayKey : razorpayKey // ignore: cast_nullable_to_non_nullable
+as double,redirectUrl: null == redirectUrl ? _self.redirectUrl : redirectUrl // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }
@@ -1892,10 +1892,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String orderId,  int amount,  String currency,  String receipt,  int voucherOrderId,  String brandName,  double voucherAmount,  double processingFee,  double totalAmount,  String razorpayKey)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String orderId,  int amount,  String currency,  String receipt,  int voucherOrderId,  String brandName,  double voucherAmount,  double processingFee,  double totalAmount,  String redirectUrl)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _CreateVoucherPaymentOrderResponse() when $default != null:
-return $default(_that.orderId,_that.amount,_that.currency,_that.receipt,_that.voucherOrderId,_that.brandName,_that.voucherAmount,_that.processingFee,_that.totalAmount,_that.razorpayKey);case _:
+return $default(_that.orderId,_that.amount,_that.currency,_that.receipt,_that.voucherOrderId,_that.brandName,_that.voucherAmount,_that.processingFee,_that.totalAmount,_that.redirectUrl);case _:
   return orElse();
 
 }
@@ -1913,10 +1913,10 @@ return $default(_that.orderId,_that.amount,_that.currency,_that.receipt,_that.vo
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String orderId,  int amount,  String currency,  String receipt,  int voucherOrderId,  String brandName,  double voucherAmount,  double processingFee,  double totalAmount,  String razorpayKey)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String orderId,  int amount,  String currency,  String receipt,  int voucherOrderId,  String brandName,  double voucherAmount,  double processingFee,  double totalAmount,  String redirectUrl)  $default,) {final _that = this;
 switch (_that) {
 case _CreateVoucherPaymentOrderResponse():
-return $default(_that.orderId,_that.amount,_that.currency,_that.receipt,_that.voucherOrderId,_that.brandName,_that.voucherAmount,_that.processingFee,_that.totalAmount,_that.razorpayKey);case _:
+return $default(_that.orderId,_that.amount,_that.currency,_that.receipt,_that.voucherOrderId,_that.brandName,_that.voucherAmount,_that.processingFee,_that.totalAmount,_that.redirectUrl);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -1933,10 +1933,10 @@ return $default(_that.orderId,_that.amount,_that.currency,_that.receipt,_that.vo
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String orderId,  int amount,  String currency,  String receipt,  int voucherOrderId,  String brandName,  double voucherAmount,  double processingFee,  double totalAmount,  String razorpayKey)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String orderId,  int amount,  String currency,  String receipt,  int voucherOrderId,  String brandName,  double voucherAmount,  double processingFee,  double totalAmount,  String redirectUrl)?  $default,) {final _that = this;
 switch (_that) {
 case _CreateVoucherPaymentOrderResponse() when $default != null:
-return $default(_that.orderId,_that.amount,_that.currency,_that.receipt,_that.voucherOrderId,_that.brandName,_that.voucherAmount,_that.processingFee,_that.totalAmount,_that.razorpayKey);case _:
+return $default(_that.orderId,_that.amount,_that.currency,_that.receipt,_that.voucherOrderId,_that.brandName,_that.voucherAmount,_that.processingFee,_that.totalAmount,_that.redirectUrl);case _:
   return null;
 
 }
@@ -1948,7 +1948,7 @@ return $default(_that.orderId,_that.amount,_that.currency,_that.receipt,_that.vo
 @JsonSerializable()
 
 class _CreateVoucherPaymentOrderResponse implements CreateVoucherPaymentOrderResponse {
-  const _CreateVoucherPaymentOrderResponse({required this.orderId, required this.amount, required this.currency, required this.receipt, required this.voucherOrderId, required this.brandName, required this.voucherAmount, required this.processingFee, required this.totalAmount, required this.razorpayKey});
+  const _CreateVoucherPaymentOrderResponse({required this.orderId, required this.amount, required this.currency, required this.receipt, required this.voucherOrderId, required this.brandName, required this.voucherAmount, required this.processingFee, required this.totalAmount, required this.redirectUrl});
   factory _CreateVoucherPaymentOrderResponse.fromJson(Map<String, dynamic> json) => _$CreateVoucherPaymentOrderResponseFromJson(json);
 
 @override final  String orderId;
@@ -1960,7 +1960,7 @@ class _CreateVoucherPaymentOrderResponse implements CreateVoucherPaymentOrderRes
 @override final  double voucherAmount;
 @override final  double processingFee;
 @override final  double totalAmount;
-@override final  String razorpayKey;
+@override final  String redirectUrl;
 
 /// Create a copy of CreateVoucherPaymentOrderResponse
 /// with the given fields replaced by the non-null parameter values.
@@ -1975,16 +1975,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CreateVoucherPaymentOrderResponse&&(identical(other.orderId, orderId) || other.orderId == orderId)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.currency, currency) || other.currency == currency)&&(identical(other.receipt, receipt) || other.receipt == receipt)&&(identical(other.voucherOrderId, voucherOrderId) || other.voucherOrderId == voucherOrderId)&&(identical(other.brandName, brandName) || other.brandName == brandName)&&(identical(other.voucherAmount, voucherAmount) || other.voucherAmount == voucherAmount)&&(identical(other.processingFee, processingFee) || other.processingFee == processingFee)&&(identical(other.totalAmount, totalAmount) || other.totalAmount == totalAmount)&&(identical(other.razorpayKey, razorpayKey) || other.razorpayKey == razorpayKey));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CreateVoucherPaymentOrderResponse&&(identical(other.orderId, orderId) || other.orderId == orderId)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.currency, currency) || other.currency == currency)&&(identical(other.receipt, receipt) || other.receipt == receipt)&&(identical(other.voucherOrderId, voucherOrderId) || other.voucherOrderId == voucherOrderId)&&(identical(other.brandName, brandName) || other.brandName == brandName)&&(identical(other.voucherAmount, voucherAmount) || other.voucherAmount == voucherAmount)&&(identical(other.processingFee, processingFee) || other.processingFee == processingFee)&&(identical(other.totalAmount, totalAmount) || other.totalAmount == totalAmount)&&(identical(other.redirectUrl, redirectUrl) || other.redirectUrl == redirectUrl));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,orderId,amount,currency,receipt,voucherOrderId,brandName,voucherAmount,processingFee,totalAmount,razorpayKey);
+int get hashCode => Object.hash(runtimeType,orderId,amount,currency,receipt,voucherOrderId,brandName,voucherAmount,processingFee,totalAmount,redirectUrl);
 
 @override
 String toString() {
-  return 'CreateVoucherPaymentOrderResponse(orderId: $orderId, amount: $amount, currency: $currency, receipt: $receipt, voucherOrderId: $voucherOrderId, brandName: $brandName, voucherAmount: $voucherAmount, processingFee: $processingFee, totalAmount: $totalAmount, razorpayKey: $razorpayKey)';
+  return 'CreateVoucherPaymentOrderResponse(orderId: $orderId, amount: $amount, currency: $currency, receipt: $receipt, voucherOrderId: $voucherOrderId, brandName: $brandName, voucherAmount: $voucherAmount, processingFee: $processingFee, totalAmount: $totalAmount, redirectUrl: $redirectUrl)';
 }
 
 
@@ -1995,7 +1995,7 @@ abstract mixin class _$CreateVoucherPaymentOrderResponseCopyWith<$Res> implement
   factory _$CreateVoucherPaymentOrderResponseCopyWith(_CreateVoucherPaymentOrderResponse value, $Res Function(_CreateVoucherPaymentOrderResponse) _then) = __$CreateVoucherPaymentOrderResponseCopyWithImpl;
 @override @useResult
 $Res call({
- String orderId, int amount, String currency, String receipt, int voucherOrderId, String brandName, double voucherAmount, double processingFee, double totalAmount, String razorpayKey
+ String orderId, int amount, String currency, String receipt, int voucherOrderId, String brandName, double voucherAmount, double processingFee, double totalAmount, String redirectUrl
 });
 
 
@@ -2012,7 +2012,7 @@ class __$CreateVoucherPaymentOrderResponseCopyWithImpl<$Res>
 
 /// Create a copy of CreateVoucherPaymentOrderResponse
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? orderId = null,Object? amount = null,Object? currency = null,Object? receipt = null,Object? voucherOrderId = null,Object? brandName = null,Object? voucherAmount = null,Object? processingFee = null,Object? totalAmount = null,Object? razorpayKey = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? orderId = null,Object? amount = null,Object? currency = null,Object? receipt = null,Object? voucherOrderId = null,Object? brandName = null,Object? voucherAmount = null,Object? processingFee = null,Object? totalAmount = null,Object? redirectUrl = null,}) {
   return _then(_CreateVoucherPaymentOrderResponse(
 orderId: null == orderId ? _self.orderId : orderId // ignore: cast_nullable_to_non_nullable
 as String,amount: null == amount ? _self.amount : amount // ignore: cast_nullable_to_non_nullable
@@ -2023,7 +2023,7 @@ as int,brandName: null == brandName ? _self.brandName : brandName // ignore: cas
 as String,voucherAmount: null == voucherAmount ? _self.voucherAmount : voucherAmount // ignore: cast_nullable_to_non_nullable
 as double,processingFee: null == processingFee ? _self.processingFee : processingFee // ignore: cast_nullable_to_non_nullable
 as double,totalAmount: null == totalAmount ? _self.totalAmount : totalAmount // ignore: cast_nullable_to_non_nullable
-as double,razorpayKey: null == razorpayKey ? _self.razorpayKey : razorpayKey // ignore: cast_nullable_to_non_nullable
+as double,redirectUrl: null == redirectUrl ? _self.redirectUrl : redirectUrl // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }
@@ -2033,42 +2033,42 @@ as String,
 
 
 /// @nodoc
-mixin _$VerifyVoucherPaymentRequest {
+mixin _$VoucherPaymentStatusResponse {
 
- int get voucherOrderId; String get razorpayOrderId; String get razorpayPaymentId; String get razorpaySignature;
-/// Create a copy of VerifyVoucherPaymentRequest
+ int get voucherOrderId; String get status; String? get paymentOrderId; String? get paymentTransactionId; String get brandName; double get voucherAmount; double get totalAmount; String? get failureReason;
+/// Create a copy of VoucherPaymentStatusResponse
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-$VerifyVoucherPaymentRequestCopyWith<VerifyVoucherPaymentRequest> get copyWith => _$VerifyVoucherPaymentRequestCopyWithImpl<VerifyVoucherPaymentRequest>(this as VerifyVoucherPaymentRequest, _$identity);
+$VoucherPaymentStatusResponseCopyWith<VoucherPaymentStatusResponse> get copyWith => _$VoucherPaymentStatusResponseCopyWithImpl<VoucherPaymentStatusResponse>(this as VoucherPaymentStatusResponse, _$identity);
 
-  /// Serializes this VerifyVoucherPaymentRequest to a JSON map.
+  /// Serializes this VoucherPaymentStatusResponse to a JSON map.
   Map<String, dynamic> toJson();
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is VerifyVoucherPaymentRequest&&(identical(other.voucherOrderId, voucherOrderId) || other.voucherOrderId == voucherOrderId)&&(identical(other.razorpayOrderId, razorpayOrderId) || other.razorpayOrderId == razorpayOrderId)&&(identical(other.razorpayPaymentId, razorpayPaymentId) || other.razorpayPaymentId == razorpayPaymentId)&&(identical(other.razorpaySignature, razorpaySignature) || other.razorpaySignature == razorpaySignature));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is VoucherPaymentStatusResponse&&(identical(other.voucherOrderId, voucherOrderId) || other.voucherOrderId == voucherOrderId)&&(identical(other.status, status) || other.status == status)&&(identical(other.paymentOrderId, paymentOrderId) || other.paymentOrderId == paymentOrderId)&&(identical(other.paymentTransactionId, paymentTransactionId) || other.paymentTransactionId == paymentTransactionId)&&(identical(other.brandName, brandName) || other.brandName == brandName)&&(identical(other.voucherAmount, voucherAmount) || other.voucherAmount == voucherAmount)&&(identical(other.totalAmount, totalAmount) || other.totalAmount == totalAmount)&&(identical(other.failureReason, failureReason) || other.failureReason == failureReason));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,voucherOrderId,razorpayOrderId,razorpayPaymentId,razorpaySignature);
+int get hashCode => Object.hash(runtimeType,voucherOrderId,status,paymentOrderId,paymentTransactionId,brandName,voucherAmount,totalAmount,failureReason);
 
 @override
 String toString() {
-  return 'VerifyVoucherPaymentRequest(voucherOrderId: $voucherOrderId, razorpayOrderId: $razorpayOrderId, razorpayPaymentId: $razorpayPaymentId, razorpaySignature: $razorpaySignature)';
+  return 'VoucherPaymentStatusResponse(voucherOrderId: $voucherOrderId, status: $status, paymentOrderId: $paymentOrderId, paymentTransactionId: $paymentTransactionId, brandName: $brandName, voucherAmount: $voucherAmount, totalAmount: $totalAmount, failureReason: $failureReason)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class $VerifyVoucherPaymentRequestCopyWith<$Res>  {
-  factory $VerifyVoucherPaymentRequestCopyWith(VerifyVoucherPaymentRequest value, $Res Function(VerifyVoucherPaymentRequest) _then) = _$VerifyVoucherPaymentRequestCopyWithImpl;
+abstract mixin class $VoucherPaymentStatusResponseCopyWith<$Res>  {
+  factory $VoucherPaymentStatusResponseCopyWith(VoucherPaymentStatusResponse value, $Res Function(VoucherPaymentStatusResponse) _then) = _$VoucherPaymentStatusResponseCopyWithImpl;
 @useResult
 $Res call({
- int voucherOrderId, String razorpayOrderId, String razorpayPaymentId, String razorpaySignature
+ int voucherOrderId, String status, String? paymentOrderId, String? paymentTransactionId, String brandName, double voucherAmount, double totalAmount, String? failureReason
 });
 
 
@@ -2076,304 +2076,34 @@ $Res call({
 
 }
 /// @nodoc
-class _$VerifyVoucherPaymentRequestCopyWithImpl<$Res>
-    implements $VerifyVoucherPaymentRequestCopyWith<$Res> {
-  _$VerifyVoucherPaymentRequestCopyWithImpl(this._self, this._then);
+class _$VoucherPaymentStatusResponseCopyWithImpl<$Res>
+    implements $VoucherPaymentStatusResponseCopyWith<$Res> {
+  _$VoucherPaymentStatusResponseCopyWithImpl(this._self, this._then);
 
-  final VerifyVoucherPaymentRequest _self;
-  final $Res Function(VerifyVoucherPaymentRequest) _then;
+  final VoucherPaymentStatusResponse _self;
+  final $Res Function(VoucherPaymentStatusResponse) _then;
 
-/// Create a copy of VerifyVoucherPaymentRequest
+/// Create a copy of VoucherPaymentStatusResponse
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? voucherOrderId = null,Object? razorpayOrderId = null,Object? razorpayPaymentId = null,Object? razorpaySignature = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? voucherOrderId = null,Object? status = null,Object? paymentOrderId = freezed,Object? paymentTransactionId = freezed,Object? brandName = null,Object? voucherAmount = null,Object? totalAmount = null,Object? failureReason = freezed,}) {
   return _then(_self.copyWith(
 voucherOrderId: null == voucherOrderId ? _self.voucherOrderId : voucherOrderId // ignore: cast_nullable_to_non_nullable
-as int,razorpayOrderId: null == razorpayOrderId ? _self.razorpayOrderId : razorpayOrderId // ignore: cast_nullable_to_non_nullable
-as String,razorpayPaymentId: null == razorpayPaymentId ? _self.razorpayPaymentId : razorpayPaymentId // ignore: cast_nullable_to_non_nullable
-as String,razorpaySignature: null == razorpaySignature ? _self.razorpaySignature : razorpaySignature // ignore: cast_nullable_to_non_nullable
-as String,
-  ));
-}
-
-}
-
-
-/// Adds pattern-matching-related methods to [VerifyVoucherPaymentRequest].
-extension VerifyVoucherPaymentRequestPatterns on VerifyVoucherPaymentRequest {
-/// A variant of `map` that fallback to returning `orElse`.
-///
-/// It is equivalent to doing:
-/// ```dart
-/// switch (sealedClass) {
-///   case final Subclass value:
-///     return ...;
-///   case _:
-///     return orElse();
-/// }
-/// ```
-
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _VerifyVoucherPaymentRequest value)?  $default,{required TResult orElse(),}){
-final _that = this;
-switch (_that) {
-case _VerifyVoucherPaymentRequest() when $default != null:
-return $default(_that);case _:
-  return orElse();
-
-}
-}
-/// A `switch`-like method, using callbacks.
-///
-/// Callbacks receives the raw object, upcasted.
-/// It is equivalent to doing:
-/// ```dart
-/// switch (sealedClass) {
-///   case final Subclass value:
-///     return ...;
-///   case final Subclass2 value:
-///     return ...;
-/// }
-/// ```
-
-@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _VerifyVoucherPaymentRequest value)  $default,){
-final _that = this;
-switch (_that) {
-case _VerifyVoucherPaymentRequest():
-return $default(_that);case _:
-  throw StateError('Unexpected subclass');
-
-}
-}
-/// A variant of `map` that fallback to returning `null`.
-///
-/// It is equivalent to doing:
-/// ```dart
-/// switch (sealedClass) {
-///   case final Subclass value:
-///     return ...;
-///   case _:
-///     return null;
-/// }
-/// ```
-
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _VerifyVoucherPaymentRequest value)?  $default,){
-final _that = this;
-switch (_that) {
-case _VerifyVoucherPaymentRequest() when $default != null:
-return $default(_that);case _:
-  return null;
-
-}
-}
-/// A variant of `when` that fallback to an `orElse` callback.
-///
-/// It is equivalent to doing:
-/// ```dart
-/// switch (sealedClass) {
-///   case Subclass(:final field):
-///     return ...;
-///   case _:
-///     return orElse();
-/// }
-/// ```
-
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int voucherOrderId,  String razorpayOrderId,  String razorpayPaymentId,  String razorpaySignature)?  $default,{required TResult orElse(),}) {final _that = this;
-switch (_that) {
-case _VerifyVoucherPaymentRequest() when $default != null:
-return $default(_that.voucherOrderId,_that.razorpayOrderId,_that.razorpayPaymentId,_that.razorpaySignature);case _:
-  return orElse();
-
-}
-}
-/// A `switch`-like method, using callbacks.
-///
-/// As opposed to `map`, this offers destructuring.
-/// It is equivalent to doing:
-/// ```dart
-/// switch (sealedClass) {
-///   case Subclass(:final field):
-///     return ...;
-///   case Subclass2(:final field2):
-///     return ...;
-/// }
-/// ```
-
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int voucherOrderId,  String razorpayOrderId,  String razorpayPaymentId,  String razorpaySignature)  $default,) {final _that = this;
-switch (_that) {
-case _VerifyVoucherPaymentRequest():
-return $default(_that.voucherOrderId,_that.razorpayOrderId,_that.razorpayPaymentId,_that.razorpaySignature);case _:
-  throw StateError('Unexpected subclass');
-
-}
-}
-/// A variant of `when` that fallback to returning `null`
-///
-/// It is equivalent to doing:
-/// ```dart
-/// switch (sealedClass) {
-///   case Subclass(:final field):
-///     return ...;
-///   case _:
-///     return null;
-/// }
-/// ```
-
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int voucherOrderId,  String razorpayOrderId,  String razorpayPaymentId,  String razorpaySignature)?  $default,) {final _that = this;
-switch (_that) {
-case _VerifyVoucherPaymentRequest() when $default != null:
-return $default(_that.voucherOrderId,_that.razorpayOrderId,_that.razorpayPaymentId,_that.razorpaySignature);case _:
-  return null;
-
-}
-}
-
-}
-
-/// @nodoc
-@JsonSerializable()
-
-class _VerifyVoucherPaymentRequest implements VerifyVoucherPaymentRequest {
-  const _VerifyVoucherPaymentRequest({required this.voucherOrderId, required this.razorpayOrderId, required this.razorpayPaymentId, required this.razorpaySignature});
-  factory _VerifyVoucherPaymentRequest.fromJson(Map<String, dynamic> json) => _$VerifyVoucherPaymentRequestFromJson(json);
-
-@override final  int voucherOrderId;
-@override final  String razorpayOrderId;
-@override final  String razorpayPaymentId;
-@override final  String razorpaySignature;
-
-/// Create a copy of VerifyVoucherPaymentRequest
-/// with the given fields replaced by the non-null parameter values.
-@override @JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-_$VerifyVoucherPaymentRequestCopyWith<_VerifyVoucherPaymentRequest> get copyWith => __$VerifyVoucherPaymentRequestCopyWithImpl<_VerifyVoucherPaymentRequest>(this, _$identity);
-
-@override
-Map<String, dynamic> toJson() {
-  return _$VerifyVoucherPaymentRequestToJson(this, );
-}
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _VerifyVoucherPaymentRequest&&(identical(other.voucherOrderId, voucherOrderId) || other.voucherOrderId == voucherOrderId)&&(identical(other.razorpayOrderId, razorpayOrderId) || other.razorpayOrderId == razorpayOrderId)&&(identical(other.razorpayPaymentId, razorpayPaymentId) || other.razorpayPaymentId == razorpayPaymentId)&&(identical(other.razorpaySignature, razorpaySignature) || other.razorpaySignature == razorpaySignature));
-}
-
-@JsonKey(includeFromJson: false, includeToJson: false)
-@override
-int get hashCode => Object.hash(runtimeType,voucherOrderId,razorpayOrderId,razorpayPaymentId,razorpaySignature);
-
-@override
-String toString() {
-  return 'VerifyVoucherPaymentRequest(voucherOrderId: $voucherOrderId, razorpayOrderId: $razorpayOrderId, razorpayPaymentId: $razorpayPaymentId, razorpaySignature: $razorpaySignature)';
-}
-
-
-}
-
-/// @nodoc
-abstract mixin class _$VerifyVoucherPaymentRequestCopyWith<$Res> implements $VerifyVoucherPaymentRequestCopyWith<$Res> {
-  factory _$VerifyVoucherPaymentRequestCopyWith(_VerifyVoucherPaymentRequest value, $Res Function(_VerifyVoucherPaymentRequest) _then) = __$VerifyVoucherPaymentRequestCopyWithImpl;
-@override @useResult
-$Res call({
- int voucherOrderId, String razorpayOrderId, String razorpayPaymentId, String razorpaySignature
-});
-
-
-
-
-}
-/// @nodoc
-class __$VerifyVoucherPaymentRequestCopyWithImpl<$Res>
-    implements _$VerifyVoucherPaymentRequestCopyWith<$Res> {
-  __$VerifyVoucherPaymentRequestCopyWithImpl(this._self, this._then);
-
-  final _VerifyVoucherPaymentRequest _self;
-  final $Res Function(_VerifyVoucherPaymentRequest) _then;
-
-/// Create a copy of VerifyVoucherPaymentRequest
-/// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? voucherOrderId = null,Object? razorpayOrderId = null,Object? razorpayPaymentId = null,Object? razorpaySignature = null,}) {
-  return _then(_VerifyVoucherPaymentRequest(
-voucherOrderId: null == voucherOrderId ? _self.voucherOrderId : voucherOrderId // ignore: cast_nullable_to_non_nullable
-as int,razorpayOrderId: null == razorpayOrderId ? _self.razorpayOrderId : razorpayOrderId // ignore: cast_nullable_to_non_nullable
-as String,razorpayPaymentId: null == razorpayPaymentId ? _self.razorpayPaymentId : razorpayPaymentId // ignore: cast_nullable_to_non_nullable
-as String,razorpaySignature: null == razorpaySignature ? _self.razorpaySignature : razorpaySignature // ignore: cast_nullable_to_non_nullable
-as String,
-  ));
-}
-
-
-}
-
-
-/// @nodoc
-mixin _$VerifyVoucherPaymentResponse {
-
- bool get success; String get message; int get voucherOrderId; String get brandName; double get voucherAmount; String get status;
-/// Create a copy of VerifyVoucherPaymentResponse
-/// with the given fields replaced by the non-null parameter values.
-@JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-$VerifyVoucherPaymentResponseCopyWith<VerifyVoucherPaymentResponse> get copyWith => _$VerifyVoucherPaymentResponseCopyWithImpl<VerifyVoucherPaymentResponse>(this as VerifyVoucherPaymentResponse, _$identity);
-
-  /// Serializes this VerifyVoucherPaymentResponse to a JSON map.
-  Map<String, dynamic> toJson();
-
-
-@override
-bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is VerifyVoucherPaymentResponse&&(identical(other.success, success) || other.success == success)&&(identical(other.message, message) || other.message == message)&&(identical(other.voucherOrderId, voucherOrderId) || other.voucherOrderId == voucherOrderId)&&(identical(other.brandName, brandName) || other.brandName == brandName)&&(identical(other.voucherAmount, voucherAmount) || other.voucherAmount == voucherAmount)&&(identical(other.status, status) || other.status == status));
-}
-
-@JsonKey(includeFromJson: false, includeToJson: false)
-@override
-int get hashCode => Object.hash(runtimeType,success,message,voucherOrderId,brandName,voucherAmount,status);
-
-@override
-String toString() {
-  return 'VerifyVoucherPaymentResponse(success: $success, message: $message, voucherOrderId: $voucherOrderId, brandName: $brandName, voucherAmount: $voucherAmount, status: $status)';
-}
-
-
-}
-
-/// @nodoc
-abstract mixin class $VerifyVoucherPaymentResponseCopyWith<$Res>  {
-  factory $VerifyVoucherPaymentResponseCopyWith(VerifyVoucherPaymentResponse value, $Res Function(VerifyVoucherPaymentResponse) _then) = _$VerifyVoucherPaymentResponseCopyWithImpl;
-@useResult
-$Res call({
- bool success, String message, int voucherOrderId, String brandName, double voucherAmount, String status
-});
-
-
-
-
-}
-/// @nodoc
-class _$VerifyVoucherPaymentResponseCopyWithImpl<$Res>
-    implements $VerifyVoucherPaymentResponseCopyWith<$Res> {
-  _$VerifyVoucherPaymentResponseCopyWithImpl(this._self, this._then);
-
-  final VerifyVoucherPaymentResponse _self;
-  final $Res Function(VerifyVoucherPaymentResponse) _then;
-
-/// Create a copy of VerifyVoucherPaymentResponse
-/// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? success = null,Object? message = null,Object? voucherOrderId = null,Object? brandName = null,Object? voucherAmount = null,Object? status = null,}) {
-  return _then(_self.copyWith(
-success: null == success ? _self.success : success // ignore: cast_nullable_to_non_nullable
-as bool,message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
-as String,voucherOrderId: null == voucherOrderId ? _self.voucherOrderId : voucherOrderId // ignore: cast_nullable_to_non_nullable
-as int,brandName: null == brandName ? _self.brandName : brandName // ignore: cast_nullable_to_non_nullable
+as int,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as String,paymentOrderId: freezed == paymentOrderId ? _self.paymentOrderId : paymentOrderId // ignore: cast_nullable_to_non_nullable
+as String?,paymentTransactionId: freezed == paymentTransactionId ? _self.paymentTransactionId : paymentTransactionId // ignore: cast_nullable_to_non_nullable
+as String?,brandName: null == brandName ? _self.brandName : brandName // ignore: cast_nullable_to_non_nullable
 as String,voucherAmount: null == voucherAmount ? _self.voucherAmount : voucherAmount // ignore: cast_nullable_to_non_nullable
-as double,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as String,
+as double,totalAmount: null == totalAmount ? _self.totalAmount : totalAmount // ignore: cast_nullable_to_non_nullable
+as double,failureReason: freezed == failureReason ? _self.failureReason : failureReason // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
 }
 
 
-/// Adds pattern-matching-related methods to [VerifyVoucherPaymentResponse].
-extension VerifyVoucherPaymentResponsePatterns on VerifyVoucherPaymentResponse {
+/// Adds pattern-matching-related methods to [VoucherPaymentStatusResponse].
+extension VoucherPaymentStatusResponsePatterns on VoucherPaymentStatusResponse {
 /// A variant of `map` that fallback to returning `orElse`.
 ///
 /// It is equivalent to doing:
@@ -2386,10 +2116,10 @@ extension VerifyVoucherPaymentResponsePatterns on VerifyVoucherPaymentResponse {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _VerifyVoucherPaymentResponse value)?  $default,{required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _VoucherPaymentStatusResponse value)?  $default,{required TResult orElse(),}){
 final _that = this;
 switch (_that) {
-case _VerifyVoucherPaymentResponse() when $default != null:
+case _VoucherPaymentStatusResponse() when $default != null:
 return $default(_that);case _:
   return orElse();
 
@@ -2408,10 +2138,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _VerifyVoucherPaymentResponse value)  $default,){
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _VoucherPaymentStatusResponse value)  $default,){
 final _that = this;
 switch (_that) {
-case _VerifyVoucherPaymentResponse():
+case _VoucherPaymentStatusResponse():
 return $default(_that);case _:
   throw StateError('Unexpected subclass');
 
@@ -2429,10 +2159,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _VerifyVoucherPaymentResponse value)?  $default,){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _VoucherPaymentStatusResponse value)?  $default,){
 final _that = this;
 switch (_that) {
-case _VerifyVoucherPaymentResponse() when $default != null:
+case _VoucherPaymentStatusResponse() when $default != null:
 return $default(_that);case _:
   return null;
 
@@ -2450,10 +2180,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool success,  String message,  int voucherOrderId,  String brandName,  double voucherAmount,  String status)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int voucherOrderId,  String status,  String? paymentOrderId,  String? paymentTransactionId,  String brandName,  double voucherAmount,  double totalAmount,  String? failureReason)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
-case _VerifyVoucherPaymentResponse() when $default != null:
-return $default(_that.success,_that.message,_that.voucherOrderId,_that.brandName,_that.voucherAmount,_that.status);case _:
+case _VoucherPaymentStatusResponse() when $default != null:
+return $default(_that.voucherOrderId,_that.status,_that.paymentOrderId,_that.paymentTransactionId,_that.brandName,_that.voucherAmount,_that.totalAmount,_that.failureReason);case _:
   return orElse();
 
 }
@@ -2471,10 +2201,10 @@ return $default(_that.success,_that.message,_that.voucherOrderId,_that.brandName
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool success,  String message,  int voucherOrderId,  String brandName,  double voucherAmount,  String status)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int voucherOrderId,  String status,  String? paymentOrderId,  String? paymentTransactionId,  String brandName,  double voucherAmount,  double totalAmount,  String? failureReason)  $default,) {final _that = this;
 switch (_that) {
-case _VerifyVoucherPaymentResponse():
-return $default(_that.success,_that.message,_that.voucherOrderId,_that.brandName,_that.voucherAmount,_that.status);case _:
+case _VoucherPaymentStatusResponse():
+return $default(_that.voucherOrderId,_that.status,_that.paymentOrderId,_that.paymentTransactionId,_that.brandName,_that.voucherAmount,_that.totalAmount,_that.failureReason);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -2491,10 +2221,10 @@ return $default(_that.success,_that.message,_that.voucherOrderId,_that.brandName
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool success,  String message,  int voucherOrderId,  String brandName,  double voucherAmount,  String status)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int voucherOrderId,  String status,  String? paymentOrderId,  String? paymentTransactionId,  String brandName,  double voucherAmount,  double totalAmount,  String? failureReason)?  $default,) {final _that = this;
 switch (_that) {
-case _VerifyVoucherPaymentResponse() when $default != null:
-return $default(_that.success,_that.message,_that.voucherOrderId,_that.brandName,_that.voucherAmount,_that.status);case _:
+case _VoucherPaymentStatusResponse() when $default != null:
+return $default(_that.voucherOrderId,_that.status,_that.paymentOrderId,_that.paymentTransactionId,_that.brandName,_that.voucherAmount,_that.totalAmount,_that.failureReason);case _:
   return null;
 
 }
@@ -2505,51 +2235,53 @@ return $default(_that.success,_that.message,_that.voucherOrderId,_that.brandName
 /// @nodoc
 @JsonSerializable()
 
-class _VerifyVoucherPaymentResponse implements VerifyVoucherPaymentResponse {
-  const _VerifyVoucherPaymentResponse({required this.success, required this.message, required this.voucherOrderId, required this.brandName, required this.voucherAmount, required this.status});
-  factory _VerifyVoucherPaymentResponse.fromJson(Map<String, dynamic> json) => _$VerifyVoucherPaymentResponseFromJson(json);
+class _VoucherPaymentStatusResponse implements VoucherPaymentStatusResponse {
+  const _VoucherPaymentStatusResponse({required this.voucherOrderId, required this.status, this.paymentOrderId, this.paymentTransactionId, required this.brandName, required this.voucherAmount, required this.totalAmount, this.failureReason});
+  factory _VoucherPaymentStatusResponse.fromJson(Map<String, dynamic> json) => _$VoucherPaymentStatusResponseFromJson(json);
 
-@override final  bool success;
-@override final  String message;
 @override final  int voucherOrderId;
+@override final  String status;
+@override final  String? paymentOrderId;
+@override final  String? paymentTransactionId;
 @override final  String brandName;
 @override final  double voucherAmount;
-@override final  String status;
+@override final  double totalAmount;
+@override final  String? failureReason;
 
-/// Create a copy of VerifyVoucherPaymentResponse
+/// Create a copy of VoucherPaymentStatusResponse
 /// with the given fields replaced by the non-null parameter values.
 @override @JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
-_$VerifyVoucherPaymentResponseCopyWith<_VerifyVoucherPaymentResponse> get copyWith => __$VerifyVoucherPaymentResponseCopyWithImpl<_VerifyVoucherPaymentResponse>(this, _$identity);
+_$VoucherPaymentStatusResponseCopyWith<_VoucherPaymentStatusResponse> get copyWith => __$VoucherPaymentStatusResponseCopyWithImpl<_VoucherPaymentStatusResponse>(this, _$identity);
 
 @override
 Map<String, dynamic> toJson() {
-  return _$VerifyVoucherPaymentResponseToJson(this, );
+  return _$VoucherPaymentStatusResponseToJson(this, );
 }
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _VerifyVoucherPaymentResponse&&(identical(other.success, success) || other.success == success)&&(identical(other.message, message) || other.message == message)&&(identical(other.voucherOrderId, voucherOrderId) || other.voucherOrderId == voucherOrderId)&&(identical(other.brandName, brandName) || other.brandName == brandName)&&(identical(other.voucherAmount, voucherAmount) || other.voucherAmount == voucherAmount)&&(identical(other.status, status) || other.status == status));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _VoucherPaymentStatusResponse&&(identical(other.voucherOrderId, voucherOrderId) || other.voucherOrderId == voucherOrderId)&&(identical(other.status, status) || other.status == status)&&(identical(other.paymentOrderId, paymentOrderId) || other.paymentOrderId == paymentOrderId)&&(identical(other.paymentTransactionId, paymentTransactionId) || other.paymentTransactionId == paymentTransactionId)&&(identical(other.brandName, brandName) || other.brandName == brandName)&&(identical(other.voucherAmount, voucherAmount) || other.voucherAmount == voucherAmount)&&(identical(other.totalAmount, totalAmount) || other.totalAmount == totalAmount)&&(identical(other.failureReason, failureReason) || other.failureReason == failureReason));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,success,message,voucherOrderId,brandName,voucherAmount,status);
+int get hashCode => Object.hash(runtimeType,voucherOrderId,status,paymentOrderId,paymentTransactionId,brandName,voucherAmount,totalAmount,failureReason);
 
 @override
 String toString() {
-  return 'VerifyVoucherPaymentResponse(success: $success, message: $message, voucherOrderId: $voucherOrderId, brandName: $brandName, voucherAmount: $voucherAmount, status: $status)';
+  return 'VoucherPaymentStatusResponse(voucherOrderId: $voucherOrderId, status: $status, paymentOrderId: $paymentOrderId, paymentTransactionId: $paymentTransactionId, brandName: $brandName, voucherAmount: $voucherAmount, totalAmount: $totalAmount, failureReason: $failureReason)';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class _$VerifyVoucherPaymentResponseCopyWith<$Res> implements $VerifyVoucherPaymentResponseCopyWith<$Res> {
-  factory _$VerifyVoucherPaymentResponseCopyWith(_VerifyVoucherPaymentResponse value, $Res Function(_VerifyVoucherPaymentResponse) _then) = __$VerifyVoucherPaymentResponseCopyWithImpl;
+abstract mixin class _$VoucherPaymentStatusResponseCopyWith<$Res> implements $VoucherPaymentStatusResponseCopyWith<$Res> {
+  factory _$VoucherPaymentStatusResponseCopyWith(_VoucherPaymentStatusResponse value, $Res Function(_VoucherPaymentStatusResponse) _then) = __$VoucherPaymentStatusResponseCopyWithImpl;
 @override @useResult
 $Res call({
- bool success, String message, int voucherOrderId, String brandName, double voucherAmount, String status
+ int voucherOrderId, String status, String? paymentOrderId, String? paymentTransactionId, String brandName, double voucherAmount, double totalAmount, String? failureReason
 });
 
 
@@ -2557,24 +2289,26 @@ $Res call({
 
 }
 /// @nodoc
-class __$VerifyVoucherPaymentResponseCopyWithImpl<$Res>
-    implements _$VerifyVoucherPaymentResponseCopyWith<$Res> {
-  __$VerifyVoucherPaymentResponseCopyWithImpl(this._self, this._then);
+class __$VoucherPaymentStatusResponseCopyWithImpl<$Res>
+    implements _$VoucherPaymentStatusResponseCopyWith<$Res> {
+  __$VoucherPaymentStatusResponseCopyWithImpl(this._self, this._then);
 
-  final _VerifyVoucherPaymentResponse _self;
-  final $Res Function(_VerifyVoucherPaymentResponse) _then;
+  final _VoucherPaymentStatusResponse _self;
+  final $Res Function(_VoucherPaymentStatusResponse) _then;
 
-/// Create a copy of VerifyVoucherPaymentResponse
+/// Create a copy of VoucherPaymentStatusResponse
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? success = null,Object? message = null,Object? voucherOrderId = null,Object? brandName = null,Object? voucherAmount = null,Object? status = null,}) {
-  return _then(_VerifyVoucherPaymentResponse(
-success: null == success ? _self.success : success // ignore: cast_nullable_to_non_nullable
-as bool,message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
-as String,voucherOrderId: null == voucherOrderId ? _self.voucherOrderId : voucherOrderId // ignore: cast_nullable_to_non_nullable
-as int,brandName: null == brandName ? _self.brandName : brandName // ignore: cast_nullable_to_non_nullable
+@override @pragma('vm:prefer-inline') $Res call({Object? voucherOrderId = null,Object? status = null,Object? paymentOrderId = freezed,Object? paymentTransactionId = freezed,Object? brandName = null,Object? voucherAmount = null,Object? totalAmount = null,Object? failureReason = freezed,}) {
+  return _then(_VoucherPaymentStatusResponse(
+voucherOrderId: null == voucherOrderId ? _self.voucherOrderId : voucherOrderId // ignore: cast_nullable_to_non_nullable
+as int,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as String,paymentOrderId: freezed == paymentOrderId ? _self.paymentOrderId : paymentOrderId // ignore: cast_nullable_to_non_nullable
+as String?,paymentTransactionId: freezed == paymentTransactionId ? _self.paymentTransactionId : paymentTransactionId // ignore: cast_nullable_to_non_nullable
+as String?,brandName: null == brandName ? _self.brandName : brandName // ignore: cast_nullable_to_non_nullable
 as String,voucherAmount: null == voucherAmount ? _self.voucherAmount : voucherAmount // ignore: cast_nullable_to_non_nullable
-as double,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as String,
+as double,totalAmount: null == totalAmount ? _self.totalAmount : totalAmount // ignore: cast_nullable_to_non_nullable
+as double,failureReason: freezed == failureReason ? _self.failureReason : failureReason // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 

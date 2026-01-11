@@ -182,12 +182,12 @@ class CouponService {
   }
 
   /// Purchase a coupon with payment (DEPRECATED - kept for backward compatibility)
-  @Deprecated('Use CouponPaymentService for proper Razorpay integration')
+  @Deprecated('Use CouponPaymentService for proper payment integration')
   Future<ClaimCouponResponse> purchaseCouponWithPayment(int couponId) async {
     // This method now calls the deprecated endpoint which will return an error
-    // directing users to use the new Razorpay payment flow
+    // directing users to use the new payment flow
     try {
-      final request = {'couponId': couponId, 'paymentMethod': 'razorpay'};
+      final request = {'couponId': couponId, 'paymentMethod': 'online'};
 
       final response = await _httpClient.post(
         '/api/user/coupons/purchase',
@@ -200,12 +200,12 @@ class CouponService {
     } catch (e) {
       // Enhanced error message to guide users to new flow
       throw Exception(
-        'Failed to purchase coupon. Please use the new Razorpay payment flow with CouponPaymentService. Error: $e'
+        'Failed to purchase coupon. Please use the new payment flow with CouponPaymentService. Error: $e'
       );
     }
   }
 
-  /// Create a Razorpay payment order for coupon purchase
+  /// Create a payment order for coupon purchase
   Future<Map<String, dynamic>> createCouponPaymentOrder(int couponId) async {
     try {
       final response = await _httpClient.post(
@@ -219,18 +219,13 @@ class CouponService {
     }
   }
 
-  /// Verify Razorpay payment for coupon purchase
+  /// Verify payment for coupon purchase (deprecated - use CouponPaymentService)
+  @Deprecated('Use CouponPaymentService.checkPaymentStatus for payment verification')
   Future<Map<String, dynamic>> verifyCouponPayment({
-    required String razorpayPaymentId,
-    required String razorpayOrderId,
-    required String razorpaySignature,
     required int transactionId,
   }) async {
     try {
       final requestData = {
-        'razorpayPaymentId': razorpayPaymentId,
-        'razorpayOrderId': razorpayOrderId,
-        'razorpaySignature': razorpaySignature,
         'transactionId': transactionId,
       };
 

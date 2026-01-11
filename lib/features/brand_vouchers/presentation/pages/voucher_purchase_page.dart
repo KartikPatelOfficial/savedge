@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/injection/injection.dart';
 import '../../../auth/domain/repositories/auth_repository.dart';
@@ -46,13 +46,14 @@ class _VoucherPurchaseViewState extends State<VoucherPurchaseView> {
   bool _isAmountValid = false;
 
   // Payment method selection
-  VoucherPaymentMethod _selectedPaymentMethod = VoucherPaymentMethod.razorpay;
+  VoucherPaymentMethod _selectedPaymentMethod = VoucherPaymentMethod.online;
   bool _isEmployee = false;
   bool _isLoadingProfile = true;
   UserProfileResponse3? _userProfile;
 
-  // Razorpay instance
-  late Razorpay _razorpay;
+  // Payment state
+  int? _currentVoucherOrderId;
+  bool _isPollingPayment = false;
 
   @override
   void initState() {
@@ -61,13 +62,11 @@ class _VoucherPurchaseViewState extends State<VoucherPurchaseView> {
     _amountController.text = widget.voucher.minimumAmount.toStringAsFixed(0);
     _validateAmount();
     _loadUserProfile();
-    _initializeRazorpay();
   }
 
   @override
   void dispose() {
     _amountController.dispose();
-    _razorpay.clear();
     super.dispose();
   }
 
@@ -81,7 +80,7 @@ class _VoucherPurchaseViewState extends State<VoucherPurchaseView> {
         // Set default payment method based on user type
         _selectedPaymentMethod = _isEmployee
             ? VoucherPaymentMethod.points
-            : VoucherPaymentMethod.razorpay;
+            : VoucherPaymentMethod.online;
         _isLoadingProfile = false;
       });
     } catch (e) {
@@ -89,44 +88,6 @@ class _VoucherPurchaseViewState extends State<VoucherPurchaseView> {
         _isLoadingProfile = false;
       });
     }
-  }
-
-  void _initializeRazorpay() {
-    _razorpay = Razorpay();
-    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
-    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
-    _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
-  }
-
-  void _handlePaymentSuccess(PaymentSuccessResponse response) {
-    // Extract voucherOrderId from the receipt/notes field
-    final voucherOrderId = int.tryParse(
-      response.data?['voucherOrderId']?.toString() ?? '0',
-    ) ?? 0;
-
-    // Verify payment with backend
-    context.read<BrandVouchersBloc>().add(
-      VerifyRazorpayPayment(
-        voucherOrderId: voucherOrderId,
-        razorpayOrderId: response.orderId ?? '',
-        razorpayPaymentId: response.paymentId ?? '',
-        razorpaySignature: response.signature ?? '',
-      ),
-    );
-  }
-
-  void _handlePaymentError(PaymentFailureResponse response) {
-    _showErrorSnackBar(
-      context,
-      response.message ?? 'Payment failed. Please try again.',
-    );
-  }
-
-  void _handleExternalWallet(ExternalWalletResponse response) {
-    _showErrorSnackBar(
-      context,
-      'External wallet payment not supported yet',
-    );
   }
 
   void _validateAmount() {
@@ -176,13 +137,13 @@ class _VoucherPurchaseViewState extends State<VoucherPurchaseView> {
             _showSuccessDialog(context, state.orderId);
           } else if (state is VoucherOrderError) {
             _showErrorSnackBar(context, state.message);
-          } else if (state is RazorpayOrderCreated) {
-            _openRazorpayCheckout(state);
-          } else if (state is RazorpayOrderError) {
+          } else if (state is PineLabsOrderCreated) {
+            _handlePineLabsOrderCreated(state);
+          } else if (state is PineLabsOrderError) {
             _showErrorSnackBar(context, state.message);
-          } else if (state is RazorpayPaymentVerified) {
+          } else if (state is PineLabsPaymentVerified) {
             _showSuccessDialog(context, state.voucherOrderId);
-          } else if (state is RazorpayPaymentError) {
+          } else if (state is PineLabsPaymentError) {
             _showErrorSnackBar(context, state.message);
           }
         },
@@ -207,6 +168,109 @@ class _VoucherPurchaseViewState extends State<VoucherPurchaseView> {
                 ),
               ),
       ),
+    );
+  }
+
+  void _handlePineLabsOrderCreated(PineLabsOrderCreated state) async {
+    _currentVoucherOrderId = state.voucherOrderId;
+
+    // Open payment URL in browser
+    final uri = Uri.parse(state.redirectUrl);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+
+      // Show polling dialog
+      if (mounted) {
+        _showPaymentPollingDialog(state.voucherOrderId);
+      }
+    } else {
+      _showErrorSnackBar(context, 'Could not open payment page');
+    }
+  }
+
+  void _showPaymentPollingDialog(int voucherOrderId) {
+    setState(() => _isPollingPayment = true);
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const CircularProgressIndicator(color: Color(0xFF6F3FCC)),
+              const SizedBox(height: 24),
+              const Text(
+                'Waiting for Payment',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF1A202C),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Complete the payment in your browser.\nThis page will update automatically.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.grey[600],
+                  fontSize: 14,
+                  height: 1.5,
+                ),
+              ),
+              const SizedBox(height: 24),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(dialogContext).pop();
+                  _checkPaymentStatus(voucherOrderId);
+                },
+                child: const Text('Check Status'),
+              ),
+              const SizedBox(height: 8),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(dialogContext).pop();
+                  setState(() => _isPollingPayment = false);
+                },
+                child: Text(
+                  'Cancel',
+                  style: TextStyle(color: Colors.grey[600]),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    // Start polling
+    _pollPaymentStatus(voucherOrderId);
+  }
+
+  void _pollPaymentStatus(int voucherOrderId) async {
+    const maxAttempts = 100; // 5 minutes with 3 second intervals
+    var attempts = 0;
+
+    while (_isPollingPayment && attempts < maxAttempts) {
+      await Future.delayed(const Duration(seconds: 3));
+      if (!mounted || !_isPollingPayment) return;
+
+      context.read<BrandVouchersBloc>().add(
+        CheckPineLabsPaymentStatus(voucherOrderId: voucherOrderId),
+      );
+
+      attempts++;
+    }
+  }
+
+  void _checkPaymentStatus(int voucherOrderId) {
+    context.read<BrandVouchersBloc>().add(
+      CheckPineLabsPaymentStatus(voucherOrderId: voucherOrderId),
     );
   }
 
@@ -304,16 +368,16 @@ class _VoucherPurchaseViewState extends State<VoucherPurchaseView> {
             ),
           ),
           const SizedBox(height: 16),
-          
+
           // Quick amount buttons
           Wrap(
             spacing: 12,
             runSpacing: 12,
             children: _buildQuickAmountButtons(),
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // Custom amount input
           Container(
             padding: const EdgeInsets.all(16),
@@ -452,9 +516,9 @@ class _VoucherPurchaseViewState extends State<VoucherPurchaseView> {
               const SizedBox(width: 12),
               Expanded(
                 child: _buildPaymentMethodCard(
-                  method: VoucherPaymentMethod.razorpay,
+                  method: VoucherPaymentMethod.online,
                   icon: Icons.payment_rounded,
-                  title: 'Razorpay',
+                  title: 'Pay Online',
                   subtitle: 'Credit/Debit card',
                 ),
               ),
@@ -654,8 +718,9 @@ class _VoucherPurchaseViewState extends State<VoucherPurchaseView> {
       child: BlocBuilder<BrandVouchersBloc, BrandVouchersState>(
         builder: (context, state) {
           final isLoading = state is VoucherOrderCreating ||
-                           state is RazorpayOrderCreating ||
-                           state is RazorpayPaymentVerifying;
+                           state is PineLabsOrderCreating ||
+                           state is PineLabsPaymentVerifying ||
+                           _isPollingPayment;
 
           final isPointsPayment = _selectedPaymentMethod == VoucherPaymentMethod.points;
           final totalCost = widget.voucher.calculateTotalCost(_selectedAmount);
@@ -713,9 +778,9 @@ class _VoucherPurchaseViewState extends State<VoucherPurchaseView> {
         ),
       );
     } else {
-      // Use Razorpay payment method
+      // Use Pine Labs payment method
       context.read<BrandVouchersBloc>().add(
-        CreateRazorpayOrder(
+        CreatePineLabsOrder(
           brandVoucherId: widget.voucher.id,
           voucherAmount: _selectedAmount,
         ),
@@ -723,34 +788,9 @@ class _VoucherPurchaseViewState extends State<VoucherPurchaseView> {
     }
   }
 
-  void _openRazorpayCheckout(RazorpayOrderCreated state) {
-    final options = {
-      'key': state.razorpayKey,
-      'amount': state.amount,
-      'currency': state.currency,
-      'order_id': state.orderId,
-      'name': 'SavEdge',
-      'description': '${state.brandName} - ₹${state.voucherAmount}',
-      'prefill': {
-        'email': _userProfile?.email ?? '',
-        'contact': _userProfile?.phoneNumber ?? '',
-      },
-      'notes': {
-        'voucherOrderId': state.voucherOrderId.toString(),
-      },
-      'theme': {
-        'color': '#6F3FCC',
-      },
-    };
-
-    try {
-      _razorpay.open(options);
-    } catch (e) {
-      _showErrorSnackBar(context, 'Error opening payment: $e');
-    }
-  }
-
   void _showSuccessDialog(BuildContext context, int orderId) {
+    setState(() => _isPollingPayment = false);
+
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -806,6 +846,8 @@ class _VoucherPurchaseViewState extends State<VoucherPurchaseView> {
   }
 
   void _showErrorSnackBar(BuildContext context, String message) {
+    setState(() => _isPollingPayment = false);
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),

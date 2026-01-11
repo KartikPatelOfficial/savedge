@@ -2508,7 +2508,7 @@ $UserSubscriptionModelCopyWith<$Res> get subscription {
 /// @nodoc
 mixin _$PaymentTransactionModel {
 
-@JsonKey(name: 'transactionId') int get transactionId; String get status; double get amount;@JsonKey(name: 'paymentReference') String? get paymentReference;@JsonKey(name: 'razorpayOrderId') String? get razorpayOrderId;@JsonKey(name: 'createdAt') DateTime get createdAt;@JsonKey(name: 'failureReason') String? get failureReason;@JsonKey(name: 'planName') String? get planName;
+@JsonKey(name: 'transactionId') int get transactionId; String get status; double get amount;@JsonKey(name: 'paymentReference') String? get paymentReference;@JsonKey(name: 'paymentGatewayOrderId') String? get paymentGatewayOrderId;@JsonKey(name: 'createdAt') DateTime get createdAt;@JsonKey(name: 'failureReason') String? get failureReason;@JsonKey(name: 'planName') String? get planName;
 /// Create a copy of PaymentTransactionModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -2521,16 +2521,16 @@ $PaymentTransactionModelCopyWith<PaymentTransactionModel> get copyWith => _$Paym
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is PaymentTransactionModel&&(identical(other.transactionId, transactionId) || other.transactionId == transactionId)&&(identical(other.status, status) || other.status == status)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.paymentReference, paymentReference) || other.paymentReference == paymentReference)&&(identical(other.razorpayOrderId, razorpayOrderId) || other.razorpayOrderId == razorpayOrderId)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.failureReason, failureReason) || other.failureReason == failureReason)&&(identical(other.planName, planName) || other.planName == planName));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PaymentTransactionModel&&(identical(other.transactionId, transactionId) || other.transactionId == transactionId)&&(identical(other.status, status) || other.status == status)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.paymentReference, paymentReference) || other.paymentReference == paymentReference)&&(identical(other.paymentGatewayOrderId, paymentGatewayOrderId) || other.paymentGatewayOrderId == paymentGatewayOrderId)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.failureReason, failureReason) || other.failureReason == failureReason)&&(identical(other.planName, planName) || other.planName == planName));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,transactionId,status,amount,paymentReference,razorpayOrderId,createdAt,failureReason,planName);
+int get hashCode => Object.hash(runtimeType,transactionId,status,amount,paymentReference,paymentGatewayOrderId,createdAt,failureReason,planName);
 
 @override
 String toString() {
-  return 'PaymentTransactionModel(transactionId: $transactionId, status: $status, amount: $amount, paymentReference: $paymentReference, razorpayOrderId: $razorpayOrderId, createdAt: $createdAt, failureReason: $failureReason, planName: $planName)';
+  return 'PaymentTransactionModel(transactionId: $transactionId, status: $status, amount: $amount, paymentReference: $paymentReference, paymentGatewayOrderId: $paymentGatewayOrderId, createdAt: $createdAt, failureReason: $failureReason, planName: $planName)';
 }
 
 
@@ -2541,7 +2541,7 @@ abstract mixin class $PaymentTransactionModelCopyWith<$Res>  {
   factory $PaymentTransactionModelCopyWith(PaymentTransactionModel value, $Res Function(PaymentTransactionModel) _then) = _$PaymentTransactionModelCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(name: 'transactionId') int transactionId, String status, double amount,@JsonKey(name: 'paymentReference') String? paymentReference,@JsonKey(name: 'razorpayOrderId') String? razorpayOrderId,@JsonKey(name: 'createdAt') DateTime createdAt,@JsonKey(name: 'failureReason') String? failureReason,@JsonKey(name: 'planName') String? planName
+@JsonKey(name: 'transactionId') int transactionId, String status, double amount,@JsonKey(name: 'paymentReference') String? paymentReference,@JsonKey(name: 'paymentGatewayOrderId') String? paymentGatewayOrderId,@JsonKey(name: 'createdAt') DateTime createdAt,@JsonKey(name: 'failureReason') String? failureReason,@JsonKey(name: 'planName') String? planName
 });
 
 
@@ -2558,13 +2558,13 @@ class _$PaymentTransactionModelCopyWithImpl<$Res>
 
 /// Create a copy of PaymentTransactionModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? transactionId = null,Object? status = null,Object? amount = null,Object? paymentReference = freezed,Object? razorpayOrderId = freezed,Object? createdAt = null,Object? failureReason = freezed,Object? planName = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? transactionId = null,Object? status = null,Object? amount = null,Object? paymentReference = freezed,Object? paymentGatewayOrderId = freezed,Object? createdAt = null,Object? failureReason = freezed,Object? planName = freezed,}) {
   return _then(_self.copyWith(
 transactionId: null == transactionId ? _self.transactionId : transactionId // ignore: cast_nullable_to_non_nullable
 as int,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as String,amount: null == amount ? _self.amount : amount // ignore: cast_nullable_to_non_nullable
 as double,paymentReference: freezed == paymentReference ? _self.paymentReference : paymentReference // ignore: cast_nullable_to_non_nullable
-as String?,razorpayOrderId: freezed == razorpayOrderId ? _self.razorpayOrderId : razorpayOrderId // ignore: cast_nullable_to_non_nullable
+as String?,paymentGatewayOrderId: freezed == paymentGatewayOrderId ? _self.paymentGatewayOrderId : paymentGatewayOrderId // ignore: cast_nullable_to_non_nullable
 as String?,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime,failureReason: freezed == failureReason ? _self.failureReason : failureReason // ignore: cast_nullable_to_non_nullable
 as String?,planName: freezed == planName ? _self.planName : planName // ignore: cast_nullable_to_non_nullable
@@ -2653,10 +2653,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'transactionId')  int transactionId,  String status,  double amount, @JsonKey(name: 'paymentReference')  String? paymentReference, @JsonKey(name: 'razorpayOrderId')  String? razorpayOrderId, @JsonKey(name: 'createdAt')  DateTime createdAt, @JsonKey(name: 'failureReason')  String? failureReason, @JsonKey(name: 'planName')  String? planName)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'transactionId')  int transactionId,  String status,  double amount, @JsonKey(name: 'paymentReference')  String? paymentReference, @JsonKey(name: 'paymentGatewayOrderId')  String? paymentGatewayOrderId, @JsonKey(name: 'createdAt')  DateTime createdAt, @JsonKey(name: 'failureReason')  String? failureReason, @JsonKey(name: 'planName')  String? planName)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _PaymentTransactionModel() when $default != null:
-return $default(_that.transactionId,_that.status,_that.amount,_that.paymentReference,_that.razorpayOrderId,_that.createdAt,_that.failureReason,_that.planName);case _:
+return $default(_that.transactionId,_that.status,_that.amount,_that.paymentReference,_that.paymentGatewayOrderId,_that.createdAt,_that.failureReason,_that.planName);case _:
   return orElse();
 
 }
@@ -2674,10 +2674,10 @@ return $default(_that.transactionId,_that.status,_that.amount,_that.paymentRefer
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'transactionId')  int transactionId,  String status,  double amount, @JsonKey(name: 'paymentReference')  String? paymentReference, @JsonKey(name: 'razorpayOrderId')  String? razorpayOrderId, @JsonKey(name: 'createdAt')  DateTime createdAt, @JsonKey(name: 'failureReason')  String? failureReason, @JsonKey(name: 'planName')  String? planName)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'transactionId')  int transactionId,  String status,  double amount, @JsonKey(name: 'paymentReference')  String? paymentReference, @JsonKey(name: 'paymentGatewayOrderId')  String? paymentGatewayOrderId, @JsonKey(name: 'createdAt')  DateTime createdAt, @JsonKey(name: 'failureReason')  String? failureReason, @JsonKey(name: 'planName')  String? planName)  $default,) {final _that = this;
 switch (_that) {
 case _PaymentTransactionModel():
-return $default(_that.transactionId,_that.status,_that.amount,_that.paymentReference,_that.razorpayOrderId,_that.createdAt,_that.failureReason,_that.planName);case _:
+return $default(_that.transactionId,_that.status,_that.amount,_that.paymentReference,_that.paymentGatewayOrderId,_that.createdAt,_that.failureReason,_that.planName);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -2694,10 +2694,10 @@ return $default(_that.transactionId,_that.status,_that.amount,_that.paymentRefer
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'transactionId')  int transactionId,  String status,  double amount, @JsonKey(name: 'paymentReference')  String? paymentReference, @JsonKey(name: 'razorpayOrderId')  String? razorpayOrderId, @JsonKey(name: 'createdAt')  DateTime createdAt, @JsonKey(name: 'failureReason')  String? failureReason, @JsonKey(name: 'planName')  String? planName)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'transactionId')  int transactionId,  String status,  double amount, @JsonKey(name: 'paymentReference')  String? paymentReference, @JsonKey(name: 'paymentGatewayOrderId')  String? paymentGatewayOrderId, @JsonKey(name: 'createdAt')  DateTime createdAt, @JsonKey(name: 'failureReason')  String? failureReason, @JsonKey(name: 'planName')  String? planName)?  $default,) {final _that = this;
 switch (_that) {
 case _PaymentTransactionModel() when $default != null:
-return $default(_that.transactionId,_that.status,_that.amount,_that.paymentReference,_that.razorpayOrderId,_that.createdAt,_that.failureReason,_that.planName);case _:
+return $default(_that.transactionId,_that.status,_that.amount,_that.paymentReference,_that.paymentGatewayOrderId,_that.createdAt,_that.failureReason,_that.planName);case _:
   return null;
 
 }
@@ -2709,14 +2709,14 @@ return $default(_that.transactionId,_that.status,_that.amount,_that.paymentRefer
 @JsonSerializable()
 
 class _PaymentTransactionModel implements PaymentTransactionModel {
-  const _PaymentTransactionModel({@JsonKey(name: 'transactionId') required this.transactionId, required this.status, required this.amount, @JsonKey(name: 'paymentReference') this.paymentReference, @JsonKey(name: 'razorpayOrderId') this.razorpayOrderId, @JsonKey(name: 'createdAt') required this.createdAt, @JsonKey(name: 'failureReason') this.failureReason, @JsonKey(name: 'planName') this.planName});
+  const _PaymentTransactionModel({@JsonKey(name: 'transactionId') required this.transactionId, required this.status, required this.amount, @JsonKey(name: 'paymentReference') this.paymentReference, @JsonKey(name: 'paymentGatewayOrderId') this.paymentGatewayOrderId, @JsonKey(name: 'createdAt') required this.createdAt, @JsonKey(name: 'failureReason') this.failureReason, @JsonKey(name: 'planName') this.planName});
   factory _PaymentTransactionModel.fromJson(Map<String, dynamic> json) => _$PaymentTransactionModelFromJson(json);
 
 @override@JsonKey(name: 'transactionId') final  int transactionId;
 @override final  String status;
 @override final  double amount;
 @override@JsonKey(name: 'paymentReference') final  String? paymentReference;
-@override@JsonKey(name: 'razorpayOrderId') final  String? razorpayOrderId;
+@override@JsonKey(name: 'paymentGatewayOrderId') final  String? paymentGatewayOrderId;
 @override@JsonKey(name: 'createdAt') final  DateTime createdAt;
 @override@JsonKey(name: 'failureReason') final  String? failureReason;
 @override@JsonKey(name: 'planName') final  String? planName;
@@ -2734,16 +2734,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PaymentTransactionModel&&(identical(other.transactionId, transactionId) || other.transactionId == transactionId)&&(identical(other.status, status) || other.status == status)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.paymentReference, paymentReference) || other.paymentReference == paymentReference)&&(identical(other.razorpayOrderId, razorpayOrderId) || other.razorpayOrderId == razorpayOrderId)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.failureReason, failureReason) || other.failureReason == failureReason)&&(identical(other.planName, planName) || other.planName == planName));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PaymentTransactionModel&&(identical(other.transactionId, transactionId) || other.transactionId == transactionId)&&(identical(other.status, status) || other.status == status)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.paymentReference, paymentReference) || other.paymentReference == paymentReference)&&(identical(other.paymentGatewayOrderId, paymentGatewayOrderId) || other.paymentGatewayOrderId == paymentGatewayOrderId)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.failureReason, failureReason) || other.failureReason == failureReason)&&(identical(other.planName, planName) || other.planName == planName));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,transactionId,status,amount,paymentReference,razorpayOrderId,createdAt,failureReason,planName);
+int get hashCode => Object.hash(runtimeType,transactionId,status,amount,paymentReference,paymentGatewayOrderId,createdAt,failureReason,planName);
 
 @override
 String toString() {
-  return 'PaymentTransactionModel(transactionId: $transactionId, status: $status, amount: $amount, paymentReference: $paymentReference, razorpayOrderId: $razorpayOrderId, createdAt: $createdAt, failureReason: $failureReason, planName: $planName)';
+  return 'PaymentTransactionModel(transactionId: $transactionId, status: $status, amount: $amount, paymentReference: $paymentReference, paymentGatewayOrderId: $paymentGatewayOrderId, createdAt: $createdAt, failureReason: $failureReason, planName: $planName)';
 }
 
 
@@ -2754,7 +2754,7 @@ abstract mixin class _$PaymentTransactionModelCopyWith<$Res> implements $Payment
   factory _$PaymentTransactionModelCopyWith(_PaymentTransactionModel value, $Res Function(_PaymentTransactionModel) _then) = __$PaymentTransactionModelCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(name: 'transactionId') int transactionId, String status, double amount,@JsonKey(name: 'paymentReference') String? paymentReference,@JsonKey(name: 'razorpayOrderId') String? razorpayOrderId,@JsonKey(name: 'createdAt') DateTime createdAt,@JsonKey(name: 'failureReason') String? failureReason,@JsonKey(name: 'planName') String? planName
+@JsonKey(name: 'transactionId') int transactionId, String status, double amount,@JsonKey(name: 'paymentReference') String? paymentReference,@JsonKey(name: 'paymentGatewayOrderId') String? paymentGatewayOrderId,@JsonKey(name: 'createdAt') DateTime createdAt,@JsonKey(name: 'failureReason') String? failureReason,@JsonKey(name: 'planName') String? planName
 });
 
 
@@ -2771,13 +2771,13 @@ class __$PaymentTransactionModelCopyWithImpl<$Res>
 
 /// Create a copy of PaymentTransactionModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? transactionId = null,Object? status = null,Object? amount = null,Object? paymentReference = freezed,Object? razorpayOrderId = freezed,Object? createdAt = null,Object? failureReason = freezed,Object? planName = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? transactionId = null,Object? status = null,Object? amount = null,Object? paymentReference = freezed,Object? paymentGatewayOrderId = freezed,Object? createdAt = null,Object? failureReason = freezed,Object? planName = freezed,}) {
   return _then(_PaymentTransactionModel(
 transactionId: null == transactionId ? _self.transactionId : transactionId // ignore: cast_nullable_to_non_nullable
 as int,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as String,amount: null == amount ? _self.amount : amount // ignore: cast_nullable_to_non_nullable
 as double,paymentReference: freezed == paymentReference ? _self.paymentReference : paymentReference // ignore: cast_nullable_to_non_nullable
-as String?,razorpayOrderId: freezed == razorpayOrderId ? _self.razorpayOrderId : razorpayOrderId // ignore: cast_nullable_to_non_nullable
+as String?,paymentGatewayOrderId: freezed == paymentGatewayOrderId ? _self.paymentGatewayOrderId : paymentGatewayOrderId // ignore: cast_nullable_to_non_nullable
 as String?,createdAt: null == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as DateTime,failureReason: freezed == failureReason ? _self.failureReason : failureReason // ignore: cast_nullable_to_non_nullable
 as String?,planName: freezed == planName ? _self.planName : planName // ignore: cast_nullable_to_non_nullable

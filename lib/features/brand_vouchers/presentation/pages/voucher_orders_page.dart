@@ -441,7 +441,7 @@ class VoucherOrderDetailsSheet extends StatelessWidget {
           _buildDetailRow('Processing Fee', '₹${order.processingFee.toStringAsFixed(2)}'),
           if (order.paymentMethod == VoucherPaymentMethodEntity.points)
             _buildDetailRow('Total Points Used', '${order.totalPointsUsed.toStringAsFixed(0)} Points'),
-          if (order.paymentMethod == VoucherPaymentMethodEntity.razorpay && order.amountPaid != null)
+          if (order.paymentMethod == VoucherPaymentMethodEntity.online && order.amountPaid != null)
             _buildDetailRow('Amount Paid', '₹${order.amountPaid!.toStringAsFixed(2)}'),
           _buildDetailRow('Payment Method', '${order.paymentMethod.icon} ${order.paymentMethod.displayName}'),
           _buildDetailRow('Order Date', _formatDate(order.created)),

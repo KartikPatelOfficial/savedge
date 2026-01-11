@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:get_it/get_it.dart';
 import '../../../../core/injection/injection.dart';
 import '../../../../shared/widgets/common_widgets.dart';
 import '../../../../shared/domain/entities/subscription.dart';
 import '../bloc/subscription_bloc.dart';
 import '../widgets/payment_summary_card.dart';
-import '../../data/services/razorpay_service.dart';
+import '../../data/services/pinelabs_payment_service.dart';
 
 /// Page for handling the complete payment flow for subscriptions
 class PaymentFlowPage extends StatelessWidget {
@@ -41,212 +41,247 @@ class _PaymentFlowView extends StatefulWidget {
 }
 
 class _PaymentFlowViewState extends State<_PaymentFlowView> {
-  late RazorpayService _razorpayService;
   bool _isProcessingPayment = false;
+  bool _isPollingStatus = false;
+  int? _currentTransactionId;
+
+  PineLabsPaymentService get _paymentService =>
+      GetIt.I<PineLabsPaymentService>();
 
   @override
   void initState() {
     super.initState();
-    _razorpayService = RazorpayService();
 
     // Create payment order when page loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<SubscriptionBloc>().add(
-        CreatePaymentOrderEvent(
-          planId: widget.plan.id,
-          autoRenew: widget.autoRenew,
-        ),
-      );
+      _initiatePayment();
     });
   }
 
   @override
   void dispose() {
-    _razorpayService.dispose();
+    _paymentService.dispose();
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Complete Payment'), elevation: 0),
-      body: BlocConsumer<SubscriptionBloc, SubscriptionState>(
-        listener: (context, state) {
-          if (state is SubscriptionLoaded) {
-            // Handle payment order creation success
-            if (state.paymentOrderData != null && !_isProcessingPayment) {
-              _initiateRazorpayPayment(state.paymentOrderData!);
-            }
-
-            // Handle verification success
-            if (state.verificationSuccess) {
-              _showPaymentSuccessDialog();
-            }
-
-            // Handle errors
-            if (state.paymentOrderError != null) {
-              _showErrorDialog(
-                'Payment Setup Failed',
-                state.paymentOrderError!,
-              );
-            }
-
-            if (state.verificationError != null) {
-              _showErrorDialog(
-                'Payment Verification Failed',
-                state.verificationError!,
-              );
-            }
-          }
-        },
-        builder: (context, state) {
-          if (state is SubscriptionLoading ||
-              (state is SubscriptionLoaded && state.isCreatingPaymentOrder)) {
-            return const LoadingWidget(message: 'Setting up payment...');
-          }
-
-          if (state is SubscriptionError) {
-            return AppErrorWidget(
-              message: state.message,
-              onRetry: () => Navigator.of(context).pop(),
-            );
-          }
-
-          if (state is SubscriptionLoaded) {
-            return SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Payment Summary
-                  PaymentSummaryCard(
-                    plan: widget.plan,
-                    autoRenew: widget.autoRenew,
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // Payment Status
-                  if (_isProcessingPayment) ...[
-                    const LoadingWidget(message: 'Processing payment...'),
-                  ] else if (state.paymentOrderError != null) ...[
-                    _buildErrorCard(state.paymentOrderError!),
-                  ] else if (state.paymentOrderData != null) ...[
-                    _buildPaymentReadyCard(),
-                  ],
-
-                  const SizedBox(height: 24),
-
-                  // Payment Information
-                  _buildPaymentInfoCard(),
-
-                  const SizedBox(height: 24),
-
-                  // Security Information
-                  _buildSecurityInfoCard(),
-                ],
-              ),
-            );
-          }
-
-          return const SizedBox.shrink();
-        },
-      ),
-    );
-  }
-
-  void _initiateRazorpayPayment(Map<String, dynamic> orderData) {
+  Future<void> _initiatePayment() async {
     if (_isProcessingPayment) return;
 
     setState(() {
       _isProcessingPayment = true;
     });
 
-    // TODO: Get user data from auth service
-    const userEmail = 'user@example.com';
-    const userPhone = '+919876543210';
-    const userName = 'User Name';
-
-    _razorpayService.openCheckout(
-      orderId: orderData['orderId'],
-      amount: orderData['amount'],
-      receipt: orderData['receipt'],
-      plan: widget.plan,
-      userEmail: userEmail,
-      userPhone: userPhone,
-      userName: userName,
-      onSuccess: _handlePaymentSuccess,
-      onError: _handlePaymentError,
-      onExternalWallet: _handleExternalWallet,
-    );
-  }
-
-  void _handlePaymentSuccess(PaymentSuccessResponse response) {
-    setState(() {
-      _isProcessingPayment = false;
-    });
-
-    // Verify payment with backend
-    final state = context.read<SubscriptionBloc>().state;
-    if (state is SubscriptionLoaded && state.paymentOrderData != null) {
-      context.read<SubscriptionBloc>().add(
-        VerifyPaymentEvent(
-          transactionId: state.paymentOrderData!['transactionId'],
-          razorpayOrderId: response.orderId ?? '',
-          razorpayPaymentId: response.paymentId ?? '',
-          razorpaySignature: response.signature ?? '',
-          autoRenew: widget.autoRenew,
-        ),
+    try {
+      // Create payment order and get redirect URL
+      final result = await _paymentService.processSubscriptionPayment(
+        planId: widget.plan.id,
+        autoRenew: widget.autoRenew,
       );
+
+      if (!mounted) return;
+
+      if (result.success && result.transactionId != null) {
+        _currentTransactionId = result.transactionId;
+        setState(() {
+          _isPollingStatus = true;
+        });
+        _pollPaymentStatus(result.transactionId!);
+      } else {
+        setState(() {
+          _isProcessingPayment = false;
+        });
+        _showErrorDialog('Payment Setup Failed', result.message);
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isProcessingPayment = false;
+        });
+        _showErrorDialog('Payment Error', e.toString());
+      }
     }
   }
 
-  void _handlePaymentError(PaymentFailureResponse response) {
-    setState(() {
-      _isProcessingPayment = false;
-    });
+  void _pollPaymentStatus(int transactionId) async {
+    await for (final status in _paymentService.pollPaymentStatus(
+      transactionId: transactionId,
+      interval: const Duration(seconds: 3),
+      timeout: const Duration(minutes: 5),
+    )) {
+      if (!mounted) return;
 
-    _showErrorDialog(
-      'Payment Failed',
-      response.message ?? 'Payment was cancelled or failed',
-    );
+      if (status.status == 'Success') {
+        setState(() {
+          _isProcessingPayment = false;
+          _isPollingStatus = false;
+        });
+        _showPaymentSuccessDialog();
+        return;
+      } else if (status.status == 'Failed') {
+        setState(() {
+          _isProcessingPayment = false;
+          _isPollingStatus = false;
+        });
+        _showErrorDialog(
+          'Payment Failed',
+          status.failureReason ?? 'Payment was cancelled or failed',
+        );
+        return;
+      }
+    }
+
+    // Timeout reached
+    if (mounted) {
+      setState(() {
+        _isProcessingPayment = false;
+        _isPollingStatus = false;
+      });
+    }
   }
 
-  void _handleExternalWallet(ExternalWalletResponse response) {
+  Future<void> _checkPaymentStatus() async {
+    if (_currentTransactionId == null) return;
+
     setState(() {
-      _isProcessingPayment = false;
+      _isProcessingPayment = true;
     });
 
-    // Handle external wallet (like Paytm, etc.)
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('External wallet selected: ${response.walletName}'),
+    try {
+      final status =
+          await _paymentService.checkPaymentStatus(_currentTransactionId!);
+
+      if (!mounted) return;
+
+      setState(() {
+        _isProcessingPayment = false;
+      });
+
+      if (status.status == 'Success') {
+        _showPaymentSuccessDialog();
+      } else if (status.status == 'Failed') {
+        _showErrorDialog(
+          'Payment Failed',
+          status.failureReason ?? 'Payment was cancelled or failed',
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Payment is still pending. Please complete the payment in your browser.'),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isProcessingPayment = false;
+        });
+        _showErrorDialog('Error', e.toString());
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Complete Payment'), elevation: 0),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Payment Summary
+            PaymentSummaryCard(
+              plan: widget.plan,
+              autoRenew: widget.autoRenew,
+            ),
+
+            const SizedBox(height: 24),
+
+            // Payment Status
+            if (_isProcessingPayment || _isPollingStatus) ...[
+              _buildPollingCard(),
+            ] else if (_currentTransactionId != null) ...[
+              _buildPaymentPendingCard(),
+            ] else ...[
+              _buildInitiatingCard(),
+            ],
+
+            const SizedBox(height: 24),
+
+            // Payment Information
+            _buildPaymentInfoCard(),
+
+            const SizedBox(height: 24),
+
+            // Security Information
+            _buildSecurityInfoCard(),
+
+            const SizedBox(height: 24),
+
+            // Action Buttons
+            if (!_isProcessingPayment && _currentTransactionId != null) ...[
+              _buildActionButtons(),
+            ],
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildErrorCard(String error) {
+  Widget _buildPollingCard() {
     return Card(
-      color: Colors.red[50],
+      color: Colors.blue[50],
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            const CircularProgressIndicator(),
+            const SizedBox(height: 16),
+            Text(
+              'Waiting for Payment',
+              style: TextStyle(
+                color: Colors.blue[900],
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Complete the payment in your browser.\nThis page will update automatically.',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.blue[800]),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPaymentPendingCard() {
+    return Card(
+      color: Colors.orange[50],
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Row(
           children: [
-            Icon(Icons.error, color: Colors.red[700]),
+            Icon(Icons.pending, color: Colors.orange[700]),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Payment Setup Failed',
+                    'Payment Pending',
                     style: TextStyle(
-                      color: Colors.red[900],
+                      color: Colors.orange[900],
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 4),
-                  Text(error, style: TextStyle(color: Colors.red[800])),
+                  Text(
+                    'Complete the payment in your browser or check status',
+                    style: TextStyle(color: Colors.orange[800]),
+                  ),
                 ],
               ),
             ),
@@ -256,30 +291,34 @@ class _PaymentFlowViewState extends State<_PaymentFlowView> {
     );
   }
 
-  Widget _buildPaymentReadyCard() {
+  Widget _buildInitiatingCard() {
     return Card(
-      color: Colors.green[50],
+      color: Colors.grey[100],
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Row(
           children: [
-            Icon(Icons.check_circle, color: Colors.green[700]),
+            const SizedBox(
+              width: 24,
+              height: 24,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Payment Ready',
+                    'Setting Up Payment',
                     style: TextStyle(
-                      color: Colors.green[900],
+                      color: Colors.grey[900],
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Your payment is being processed securely',
-                    style: TextStyle(color: Colors.green[800]),
+                    'Please wait while we prepare your payment...',
+                    style: TextStyle(color: Colors.grey[700]),
                   ),
                 ],
               ),
@@ -305,7 +344,7 @@ class _PaymentFlowViewState extends State<_PaymentFlowView> {
             _buildInfoRow(
               Icons.payment,
               'Secure Payment',
-              'Powered by Razorpay - India\'s most trusted payment gateway',
+              'Secure online payment processing',
             ),
             _buildInfoRow(
               Icons.credit_card,
@@ -353,6 +392,35 @@ class _PaymentFlowViewState extends State<_PaymentFlowView> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildActionButtons() {
+    return Column(
+      children: [
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton.icon(
+            onPressed: _checkPaymentStatus,
+            icon: const Icon(Icons.refresh),
+            label: const Text('Check Payment Status'),
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 14),
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          width: double.infinity,
+          child: OutlinedButton(
+            onPressed: _initiatePayment,
+            child: const Text('Retry Payment'),
+            style: OutlinedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 14),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -415,7 +483,6 @@ class _PaymentFlowViewState extends State<_PaymentFlowView> {
             onPressed: () {
               Navigator.of(context).pop(); // Close dialog
               Navigator.of(context).pop(); // Close payment page
-              Navigator.pushReplacementNamed(context, '/subscription-plans');
             },
             child: const Text('Continue'),
           ),

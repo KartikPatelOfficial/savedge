@@ -28,8 +28,8 @@ class BrandVouchersBloc extends Bloc<BrandVouchersEvent, BrandVouchersState> {
     on<RefreshBrandVouchers>(_onRefreshBrandVouchers);
     on<CreateVoucherOrder>(_onCreateVoucherOrder);
     on<LoadVoucherOrders>(_onLoadVoucherOrders);
-    on<CreateRazorpayOrder>(_onCreateRazorpayOrder);
-    on<VerifyRazorpayPayment>(_onVerifyRazorpayPayment);
+    on<CreatePineLabsOrder>(_onCreatePineLabsOrder);
+    on<CheckPineLabsPaymentStatus>(_onCheckPineLabsPaymentStatus);
   }
 
   Future<void> _onLoadBrandVouchers(
@@ -106,21 +106,21 @@ class BrandVouchersBloc extends Bloc<BrandVouchersEvent, BrandVouchersState> {
     );
   }
 
-  Future<void> _onCreateRazorpayOrder(
-    CreateRazorpayOrder event,
+  Future<void> _onCreatePineLabsOrder(
+    CreatePineLabsOrder event,
     Emitter<BrandVouchersState> emit,
   ) async {
-    emit(RazorpayOrderCreating());
+    emit(PineLabsOrderCreating());
 
-    final result = await brandVoucherRepository.createRazorpayOrder(
+    final result = await brandVoucherRepository.createPaymentOrder(
       brandVoucherId: event.brandVoucherId,
       voucherAmount: event.voucherAmount,
     );
 
     result.fold(
-      (failure) => emit(RazorpayOrderError(failure.toString())),
+      (failure) => emit(PineLabsOrderError(failure.toString())),
       (response) => emit(
-        RazorpayOrderCreated(
+        PineLabsOrderCreated(
           orderId: response.orderId,
           amount: response.amount,
           currency: response.currency,
@@ -129,33 +129,41 @@ class BrandVouchersBloc extends Bloc<BrandVouchersEvent, BrandVouchersState> {
           voucherAmount: response.voucherAmount,
           processingFee: response.processingFee,
           totalAmount: response.totalAmount,
-          razorpayKey: response.razorpayKey,
+          redirectUrl: response.redirectUrl,
         ),
       ),
     );
   }
 
-  Future<void> _onVerifyRazorpayPayment(
-    VerifyRazorpayPayment event,
+  Future<void> _onCheckPineLabsPaymentStatus(
+    CheckPineLabsPaymentStatus event,
     Emitter<BrandVouchersState> emit,
   ) async {
-    emit(RazorpayPaymentVerifying());
+    emit(PineLabsPaymentVerifying());
 
-    final result = await brandVoucherRepository.verifyRazorpayPayment(
+    final result = await brandVoucherRepository.checkPaymentStatus(
       voucherOrderId: event.voucherOrderId,
-      razorpayOrderId: event.razorpayOrderId,
-      razorpayPaymentId: event.razorpayPaymentId,
-      razorpaySignature: event.razorpaySignature,
     );
 
     result.fold(
-      (failure) => emit(RazorpayPaymentError(failure.toString())),
-      (response) => emit(
-        RazorpayPaymentVerified(
-          voucherOrderId: response.voucherOrderId,
-          message: response.message,
-        ),
-      ),
+      (failure) => emit(PineLabsPaymentError(failure.toString())),
+      (response) {
+        if (response.status == 'Success') {
+          emit(
+            PineLabsPaymentVerified(
+              voucherOrderId: response.voucherOrderId,
+              message: 'Payment successful',
+            ),
+          );
+        } else if (response.status == 'Failed') {
+          emit(PineLabsPaymentError(
+            response.failureReason ?? 'Payment failed',
+          ));
+        } else {
+          // Still pending - emit verifying state with the current status
+          emit(PineLabsPaymentVerifying());
+        }
+      },
     );
   }
 }

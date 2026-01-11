@@ -73,8 +73,8 @@ class VoucherOrderEntity extends Equatable {
   final String? notes;
   final DateTime created;
   final VoucherPaymentMethodEntity paymentMethod;
-  final String? razorpayOrderId;
-  final String? razorpayPaymentId;
+  final String? paymentGatewayOrderId;
+  final String? paymentGatewayTransactionId;
   final double? amountPaid;
 
   const VoucherOrderEntity({
@@ -96,8 +96,8 @@ class VoucherOrderEntity extends Equatable {
     this.notes,
     required this.created,
     required this.paymentMethod,
-    this.razorpayOrderId,
-    this.razorpayPaymentId,
+    this.paymentGatewayOrderId,
+    this.paymentGatewayTransactionId,
     this.amountPaid,
   });
 
@@ -126,8 +126,8 @@ class VoucherOrderEntity extends Equatable {
         notes,
         created,
         paymentMethod,
-        razorpayOrderId,
-        razorpayPaymentId,
+        paymentGatewayOrderId,
+        paymentGatewayTransactionId,
         amountPaid,
       ];
 }
@@ -175,7 +175,7 @@ extension VoucherOrderStatusEntityExtension on VoucherOrderStatusEntity {
 enum VoucherPaymentMethodEntity {
   none,
   points,
-  razorpay,
+  online,
 }
 
 extension VoucherPaymentMethodEntityExtension on VoucherPaymentMethodEntity {
@@ -185,8 +185,8 @@ extension VoucherPaymentMethodEntityExtension on VoucherPaymentMethodEntity {
         return 'Not Specified';
       case VoucherPaymentMethodEntity.points:
         return 'Points';
-      case VoucherPaymentMethodEntity.razorpay:
-        return 'Razorpay';
+      case VoucherPaymentMethodEntity.online:
+        return 'Online Payment';
     }
   }
 
@@ -196,7 +196,7 @@ extension VoucherPaymentMethodEntityExtension on VoucherPaymentMethodEntity {
         return '❓';
       case VoucherPaymentMethodEntity.points:
         return '⭐';
-      case VoucherPaymentMethodEntity.razorpay:
+      case VoucherPaymentMethodEntity.online:
         return '💳';
     }
   }

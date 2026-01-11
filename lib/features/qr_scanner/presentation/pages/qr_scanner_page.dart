@@ -29,7 +29,7 @@ class QRScannerPage extends StatefulWidget {
   final String expectedVendorUid;
   final String expectedVendorName;
   final bool claimAndUse; // If true, claim the coupon first then immediately use it
-  final String? redemptionMethod; // Required if claimAndUse is true (membership, razorpay)
+  final String? redemptionMethod; // Required if claimAndUse is true (membership, online)
   final int? userCouponId; // If provided, use this specific user coupon ID for redemption
   final bool verifyOnly; // If true, only verify the vendor QR and return success
 
@@ -51,7 +51,7 @@ class _QRScannerPageState extends State<QRScannerPage>
     switch (redemptionMethod) {
       case 'membership':
         return await _couponService.claimCouponFromSubscription(widget.couponId!);
-      case 'razorpay':
+      case 'online':
         return await _couponService.purchaseCouponWithPayment(widget.couponId!);
       default:
         throw Exception('Invalid redemption method: $redemptionMethod');

@@ -54,11 +54,11 @@ class LoadVoucherOrders extends BrandVouchersEvent {
   List<Object?> get props => [status, pageNumber, pageSize];
 }
 
-class CreateRazorpayOrder extends BrandVouchersEvent {
+class CreatePineLabsOrder extends BrandVouchersEvent {
   final int brandVoucherId;
   final double voucherAmount;
 
-  const CreateRazorpayOrder({
+  const CreatePineLabsOrder({
     required this.brandVoucherId,
     required this.voucherAmount,
   });
@@ -67,24 +67,13 @@ class CreateRazorpayOrder extends BrandVouchersEvent {
   List<Object> get props => [brandVoucherId, voucherAmount];
 }
 
-class VerifyRazorpayPayment extends BrandVouchersEvent {
+class CheckPineLabsPaymentStatus extends BrandVouchersEvent {
   final int voucherOrderId;
-  final String razorpayOrderId;
-  final String razorpayPaymentId;
-  final String razorpaySignature;
 
-  const VerifyRazorpayPayment({
+  const CheckPineLabsPaymentStatus({
     required this.voucherOrderId,
-    required this.razorpayOrderId,
-    required this.razorpayPaymentId,
-    required this.razorpaySignature,
   });
 
   @override
-  List<Object> get props => [
-        voucherOrderId,
-        razorpayOrderId,
-        razorpayPaymentId,
-        razorpaySignature,
-      ];
+  List<Object> get props => [voucherOrderId];
 }

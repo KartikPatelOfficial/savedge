@@ -904,11 +904,11 @@ class _CouponRedemptionOptionsPageState
           const SizedBox(height: 16),
         ],
 
-        // Razorpay Option (only show if cash price is set)
+        // Online Payment Option (only show if cash price is set)
         if (widget.couponData.cashPrice != null &&
             widget.couponData.cashPrice! > 0)
           _buildModernRedemptionOption(
-            method: RedemptionMethod.razorpay,
+            method: RedemptionMethod.online,
             icon: Icons.credit_card,
             title: 'Pay & Claim',
             subtitle: '₹${widget.couponData.cashPrice}',
@@ -1459,7 +1459,7 @@ class _CouponRedemptionOptionsPageState
     switch (selectedMethod!) {
       case RedemptionMethod.existing:
         return 'Use Existing Coupon';
-      case RedemptionMethod.razorpay:
+      case RedemptionMethod.online:
         return 'Pay & Get Coupon';
       case RedemptionMethod.membership:
         return 'Claim for FREE';
@@ -1656,8 +1656,8 @@ class _CouponRedemptionOptionsPageState
     switch (selectedMethod!) {
       case RedemptionMethod.existing:
         return 'existing';
-      case RedemptionMethod.razorpay:
-        return 'razorpay';
+      case RedemptionMethod.online:
+        return 'online';
       case RedemptionMethod.membership:
         return 'membership';
       case RedemptionMethod.freeTrial:
@@ -1725,7 +1725,7 @@ class _CouponRedemptionOptionsPageState
   }
 }
 
-enum RedemptionMethod { existing, razorpay, membership, freeTrial }
+enum RedemptionMethod { existing, online, membership, freeTrial }
 
 enum CouponPreviewSource { vendor, wallet }
 

@@ -123,7 +123,7 @@ class PaymentTransaction extends Equatable {
     required this.amount,
     required this.createdAt,
     this.paymentReference,
-    this.razorpayOrderId,
+    this.paymentGatewayOrderId,
     this.failureReason,
     this.planName,
   });
@@ -133,7 +133,7 @@ class PaymentTransaction extends Equatable {
   final double amount;
   final DateTime createdAt;
   final String? paymentReference;
-  final String? razorpayOrderId;
+  final String? paymentGatewayOrderId;
   final String? failureReason;
   final String? planName;
 
@@ -153,7 +153,7 @@ class PaymentTransaction extends Equatable {
     amount,
     createdAt,
     paymentReference,
-    razorpayOrderId,
+    paymentGatewayOrderId,
     failureReason,
     planName,
   ];

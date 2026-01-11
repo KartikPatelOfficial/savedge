@@ -10,72 +10,88 @@ _CreatePaymentOrderRequest _$CreatePaymentOrderRequestFromJson(
   Map<String, dynamic> json,
 ) => _CreatePaymentOrderRequest(
   planId: (json['planId'] as num).toInt(),
-  amount: (json['amount'] as num).toDouble(),
-  currency: json['currency'] as String,
+  autoRenew: json['autoRenew'] as bool? ?? false,
 );
 
 Map<String, dynamic> _$CreatePaymentOrderRequestToJson(
   _CreatePaymentOrderRequest instance,
 ) => <String, dynamic>{
   'planId': instance.planId,
-  'amount': instance.amount,
-  'currency': instance.currency,
+  'autoRenew': instance.autoRenew,
 };
 
 _CreatePaymentOrderResponse _$CreatePaymentOrderResponseFromJson(
   Map<String, dynamic> json,
 ) => _CreatePaymentOrderResponse(
   orderId: json['orderId'] as String,
-  razorpayOrderId: json['razorpayOrderId'] as String,
-  amount: (json['amount'] as num).toDouble(),
+  amount: (json['amount'] as num).toInt(),
   currency: json['currency'] as String,
-  key: json['key'] as String,
+  receipt: json['receipt'] as String,
   transactionId: (json['transactionId'] as num).toInt(),
+  redirectUrl: json['redirectUrl'] as String,
+  planDetails: json['planDetails'] == null
+      ? null
+      : PlanDetailsDto.fromJson(json['planDetails'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$CreatePaymentOrderResponseToJson(
   _CreatePaymentOrderResponse instance,
 ) => <String, dynamic>{
   'orderId': instance.orderId,
-  'razorpayOrderId': instance.razorpayOrderId,
   'amount': instance.amount,
   'currency': instance.currency,
-  'key': instance.key,
+  'receipt': instance.receipt,
   'transactionId': instance.transactionId,
+  'redirectUrl': instance.redirectUrl,
+  'planDetails': instance.planDetails,
 };
 
-_VerifyPaymentRequest _$VerifyPaymentRequestFromJson(
+_PlanDetailsDto _$PlanDetailsDtoFromJson(Map<String, dynamic> json) =>
+    _PlanDetailsDto(
+      id: (json['id'] as num).toInt(),
+      name: json['name'] as String,
+      description: json['description'] as String?,
+      price: (json['price'] as num).toDouble(),
+      durationMonths: (json['durationMonths'] as num).toInt(),
+      features: json['features'] as String?,
+      imageUrl: json['imageUrl'] as String?,
+    );
+
+Map<String, dynamic> _$PlanDetailsDtoToJson(_PlanDetailsDto instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'name': instance.name,
+      'description': instance.description,
+      'price': instance.price,
+      'durationMonths': instance.durationMonths,
+      'features': instance.features,
+      'imageUrl': instance.imageUrl,
+    };
+
+_PaymentStatusResponse _$PaymentStatusResponseFromJson(
   Map<String, dynamic> json,
-) => _VerifyPaymentRequest(
-  razorpayPaymentId: json['razorpayPaymentId'] as String,
-  razorpayOrderId: json['razorpayOrderId'] as String,
-  razorpaySignature: json['razorpaySignature'] as String,
+) => _PaymentStatusResponse(
   transactionId: (json['transactionId'] as num).toInt(),
+  status: json['status'] as String,
+  amount: (json['amount'] as num).toDouble(),
+  paymentReference: json['paymentReference'] as String?,
+  paymentOrderId: json['paymentOrderId'] as String?,
+  createdAt: DateTime.parse(json['createdAt'] as String),
+  failureReason: json['failureReason'] as String?,
+  planName: json['planName'] as String?,
 );
 
-Map<String, dynamic> _$VerifyPaymentRequestToJson(
-  _VerifyPaymentRequest instance,
+Map<String, dynamic> _$PaymentStatusResponseToJson(
+  _PaymentStatusResponse instance,
 ) => <String, dynamic>{
-  'razorpayPaymentId': instance.razorpayPaymentId,
-  'razorpayOrderId': instance.razorpayOrderId,
-  'razorpaySignature': instance.razorpaySignature,
   'transactionId': instance.transactionId,
-};
-
-_PaymentVerificationResponse _$PaymentVerificationResponseFromJson(
-  Map<String, dynamic> json,
-) => _PaymentVerificationResponse(
-  success: json['success'] as bool,
-  message: json['message'] as String,
-  subscriptionId: json['subscriptionId'] as String?,
-);
-
-Map<String, dynamic> _$PaymentVerificationResponseToJson(
-  _PaymentVerificationResponse instance,
-) => <String, dynamic>{
-  'success': instance.success,
-  'message': instance.message,
-  'subscriptionId': instance.subscriptionId,
+  'status': instance.status,
+  'amount': instance.amount,
+  'paymentReference': instance.paymentReference,
+  'paymentOrderId': instance.paymentOrderId,
+  'createdAt': instance.createdAt.toIso8601String(),
+  'failureReason': instance.failureReason,
+  'planName': instance.planName,
 };
 
 _PurchaseSubscriptionRequest _$PurchaseSubscriptionRequestFromJson(

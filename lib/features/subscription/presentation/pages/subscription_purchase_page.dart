@@ -3,20 +3,20 @@ import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
 import 'package:savedge/features/auth/domain/entities/extended_user_profile.dart';
 import 'package:savedge/features/auth/domain/repositories/auth_repository.dart';
-import 'package:savedge/features/subscription/data/services/razorpay_payment_service.dart';
+import 'package:savedge/features/subscription/data/services/pinelabs_payment_service.dart';
 import 'package:savedge/features/subscription/domain/entities/subscription_plan.dart';
 
 /// Payment methods available for subscription purchase
 enum PaymentMethod {
   points('Pay with Points'),
-  razorpay('Pay with Razorpay');
+  online('Pay Online');
 
   const PaymentMethod(this.displayName);
 
   final String displayName;
 }
 
-/// Page to purchase subscription plan with points or Razorpay
+/// Page to purchase subscription plan with points or online payment
 class SubscriptionPurchasePage extends StatefulWidget {
   const SubscriptionPurchasePage({super.key, required this.plan});
 
@@ -38,25 +38,25 @@ class _SubscriptionPurchasePageState extends State<SubscriptionPurchasePage> {
   bool _isLoading = true;
   bool _isProcessingPayment = false;
   String? _error;
-  PaymentMethod _selectedPaymentMethod = PaymentMethod.razorpay;
+  PaymentMethod _selectedPaymentMethod = PaymentMethod.online;
+  int? _currentTransactionId;
 
   AuthRepository get _authRepository => GetIt.I<AuthRepository>();
 
-  RazorpayPaymentService get _razorpayService =>
-      GetIt.I<RazorpayPaymentService>();
+  PineLabsPaymentService get _paymentService =>
+      GetIt.I<PineLabsPaymentService>();
 
   SubscriptionPlan get plan => widget.plan;
 
   @override
   void initState() {
     super.initState();
-    _razorpayService.initialize();
     _loadUserProfile();
   }
 
   @override
   void dispose() {
-    _razorpayService.dispose();
+    _paymentService.dispose();
     super.dispose();
   }
 
@@ -527,11 +527,11 @@ class _SubscriptionPurchasePageState extends State<SubscriptionPurchasePage> {
             const SizedBox(height: 12),
           ],
 
-          // Razorpay Payment (for all users)
+          // Online Payment (for all users)
           _buildPaymentOption(
-            method: PaymentMethod.razorpay,
+            method: PaymentMethod.online,
             title: 'Card / UPI / Net Banking',
-            subtitle: 'Powered by Razorpay',
+            subtitle: 'Secure online payment',
             icon: Icons.credit_card,
             color: Colors.blue,
             enabled: true,
@@ -868,7 +868,7 @@ class _SubscriptionPurchasePageState extends State<SubscriptionPurchasePage> {
     if (_selectedPaymentMethod == PaymentMethod.points) {
       _showPointsConfirmation();
     } else {
-      _handleRazorpayPayment();
+      _handleOnlinePayment();
     }
   }
 
@@ -1046,7 +1046,7 @@ class _SubscriptionPurchasePageState extends State<SubscriptionPurchasePage> {
     });
 
     try {
-      final result = await _razorpayService.purchaseWithPoints(
+      final result = await _paymentService.purchaseWithPoints(
         planId: plan.id,
         autoRenew: false,
       );
@@ -1056,15 +1056,13 @@ class _SubscriptionPurchasePageState extends State<SubscriptionPurchasePage> {
           _isProcessingPayment = false;
         });
 
-        // Check if the response contains a success message
-        final message = result['message'] ?? '';
-        if (message.toLowerCase().contains('successfully')) {
+        if (result.success) {
           _showSuccessDialog(
             'Subscription purchased successfully with points!',
           );
         } else {
           _showErrorDialog(
-            result['message'] ?? 'Failed to purchase subscription',
+            result.message,
           );
         }
       }
@@ -1078,7 +1076,7 @@ class _SubscriptionPurchasePageState extends State<SubscriptionPurchasePage> {
     }
   }
 
-  void _handleRazorpayPayment() async {
+  void _handleOnlinePayment() async {
     if (_isProcessingPayment) return;
 
     setState(() {
@@ -1086,35 +1084,165 @@ class _SubscriptionPurchasePageState extends State<SubscriptionPurchasePage> {
     });
 
     try {
-      await _razorpayService.processSubscriptionPayment(
+      // Create payment order and get redirect URL
+      final result = await _paymentService.processSubscriptionPayment(
         planId: plan.id,
-        amount: plan.price,
-        context: context,
-        onSuccess: () {
-          if (mounted) {
-            setState(() {
-              _isProcessingPayment = false;
-            });
-            _showSuccessDialog(
-              'Payment completed! Your subscription is now active.',
-            );
-          }
-        },
-        onError: (error) {
-          if (mounted) {
-            setState(() {
-              _isProcessingPayment = false;
-            });
-            _showErrorDialog(error);
-          }
-        },
+        autoRenew: false,
       );
+
+      if (!result.success) {
+        if (mounted) {
+          setState(() {
+            _isProcessingPayment = false;
+          });
+          _showErrorDialog(result.message);
+        }
+        return;
+      }
+
+      // Store transaction ID for polling
+      _currentTransactionId = result.transactionId;
+
+      // Show polling dialog while waiting for payment completion
+      if (mounted) {
+        _showPaymentPollingDialog(result.transactionId!);
+      }
     } catch (e) {
       if (mounted) {
         setState(() {
           _isProcessingPayment = false;
         });
         _showErrorDialog('Failed to initiate payment: $e');
+      }
+    }
+  }
+
+  void _showPaymentPollingDialog(int transactionId) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const CircularProgressIndicator(),
+              const SizedBox(height: 24),
+              const Text(
+                'Waiting for Payment',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Complete the payment in your browser.\nThis page will update automatically.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.grey[600],
+                  fontSize: 14,
+                  height: 1.5,
+                ),
+              ),
+              const SizedBox(height: 24),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  _checkPaymentStatus(transactionId);
+                },
+                child: const Text('Check Status'),
+              ),
+              const SizedBox(height: 8),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  setState(() {
+                    _isProcessingPayment = false;
+                  });
+                },
+                child: Text(
+                  'Cancel',
+                  style: TextStyle(color: Colors.grey[600]),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    // Start polling for payment status
+    _pollPaymentStatus(transactionId);
+  }
+
+  void _pollPaymentStatus(int transactionId) async {
+    await for (final status in _paymentService.pollPaymentStatus(
+      transactionId: transactionId,
+      interval: const Duration(seconds: 3),
+      timeout: const Duration(minutes: 5),
+    )) {
+      if (!mounted) return;
+
+      if (status.status == 'Success') {
+        Navigator.of(context).pop(); // Close polling dialog
+        setState(() {
+          _isProcessingPayment = false;
+        });
+        _showSuccessDialog(
+          'Payment completed! Your subscription is now active.',
+        );
+        return;
+      } else if (status.status == 'Failed') {
+        Navigator.of(context).pop(); // Close polling dialog
+        setState(() {
+          _isProcessingPayment = false;
+        });
+        _showErrorDialog(
+          status.failureReason ?? 'Payment failed. Please try again.',
+        );
+        return;
+      }
+    }
+  }
+
+  void _checkPaymentStatus(int transactionId) async {
+    setState(() {
+      _isProcessingPayment = true;
+    });
+
+    try {
+      final status = await _paymentService.checkPaymentStatus(transactionId);
+
+      if (mounted) {
+        setState(() {
+          _isProcessingPayment = false;
+        });
+
+        if (status.status == 'Success') {
+          _showSuccessDialog(
+            'Payment completed! Your subscription is now active.',
+          );
+        } else if (status.status == 'Failed') {
+          _showErrorDialog(
+            status.failureReason ?? 'Payment failed. Please try again.',
+          );
+        } else {
+          _showErrorDialog(
+            'Payment is still pending. Please try again later.',
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isProcessingPayment = false;
+        });
+        _showErrorDialog('Failed to check payment status: $e');
       }
     }
   }

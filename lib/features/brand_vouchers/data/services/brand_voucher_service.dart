@@ -36,14 +36,14 @@ abstract class BrandVoucherService {
   @GET('/api/VoucherOrders/{id}')
   Future<VoucherOrder> getVoucherOrder(@Path('id') int id);
 
-  // Razorpay payment endpoints
-  @POST('/api/VoucherOrders/create-razorpay-order')
-  Future<CreateVoucherPaymentOrderResponse> createRazorpayOrder(
+  // Pine Labs payment endpoints
+  @POST('/api/VoucherOrders/create-payment-order')
+  Future<CreateVoucherPaymentOrderResponse> createPaymentOrder(
     @Body() CreateVoucherPaymentOrderRequest request,
   );
 
-  @POST('/api/VoucherOrders/verify-razorpay-payment')
-  Future<VerifyVoucherPaymentResponse> verifyRazorpayPayment(
-    @Body() VerifyVoucherPaymentRequest request,
+  @GET('/api/VoucherOrders/payment-status/{voucherOrderId}')
+  Future<VoucherPaymentStatusResponse> checkPaymentStatus(
+    @Path('voucherOrderId') int voucherOrderId,
   );
 }

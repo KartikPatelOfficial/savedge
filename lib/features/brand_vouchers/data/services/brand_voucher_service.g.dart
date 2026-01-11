@@ -173,7 +173,7 @@ class _BrandVoucherService implements BrandVoucherService {
   }
 
   @override
-  Future<CreateVoucherPaymentOrderResponse> createRazorpayOrder(
+  Future<CreateVoucherPaymentOrderResponse> createPaymentOrder(
     CreateVoucherPaymentOrderRequest request,
   ) async {
     final _extra = <String, dynamic>{};
@@ -184,7 +184,7 @@ class _BrandVoucherService implements BrandVoucherService {
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/api/VoucherOrders/create-razorpay-order',
+            '/api/VoucherOrders/create-payment-order',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -202,27 +202,27 @@ class _BrandVoucherService implements BrandVoucherService {
   }
 
   @override
-  Future<VerifyVoucherPaymentResponse> verifyRazorpayPayment(
-    VerifyVoucherPaymentRequest request,
+  Future<VoucherPaymentStatusResponse> checkPaymentStatus(
+    int voucherOrderId,
   ) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
-    final _data = request;
-    final _options = _setStreamType<VerifyVoucherPaymentResponse>(
-      Options(method: 'POST', headers: _headers, extra: _extra)
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<VoucherPaymentStatusResponse>(
+      Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/api/VoucherOrders/verify-razorpay-payment',
+            '/api/VoucherOrders/payment-status/${voucherOrderId}',
             queryParameters: queryParameters,
             data: _data,
           )
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    late VerifyVoucherPaymentResponse _value;
+    late VoucherPaymentStatusResponse _value;
     try {
-      _value = VerifyVoucherPaymentResponse.fromJson(_result.data!);
+      _value = VoucherPaymentStatusResponse.fromJson(_result.data!);
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;
