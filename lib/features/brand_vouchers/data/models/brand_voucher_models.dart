@@ -192,7 +192,7 @@ abstract class CreateVoucherPaymentOrderResponse with _$CreateVoucherPaymentOrde
     required double voucherAmount,
     required double processingFee,
     required double totalAmount,
-    required String redirectUrl,
+    required String razorpayKeyId,
   }) = _CreateVoucherPaymentOrderResponse;
 
   factory CreateVoucherPaymentOrderResponse.fromJson(Map<String, dynamic> json) =>

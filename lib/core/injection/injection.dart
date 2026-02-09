@@ -57,7 +57,7 @@ import 'package:savedge/features/subscription/data/datasources/subscription_plan
 import 'package:savedge/features/subscription/data/datasources/subscription_remote_data_source.dart';
 import 'package:savedge/features/subscription/data/repositories/subscription_plan_repository_impl.dart';
 import 'package:savedge/features/subscription/data/repositories/subscription_repository_impl.dart';
-import 'package:savedge/features/subscription/data/services/pinelabs_payment_service.dart';
+import 'package:savedge/features/subscription/data/services/razorpay_payment_service.dart';
 import 'package:savedge/features/subscription/domain/repositories/subscription_plan_repository.dart';
 import 'package:savedge/features/subscription/domain/repositories/subscription_repository.dart';
 import 'package:savedge/features/subscription/domain/usecases/subscription_usecases.dart';
@@ -417,8 +417,8 @@ Future<void> configureDependencies() async {
   );
 
   // Payment services
-  getIt.registerLazySingleton<PineLabsPaymentService>(
-    () => PineLabsPaymentService(getIt<Dio>()),
+  getIt.registerLazySingleton<RazorpayPaymentService>(
+    () => RazorpayPaymentService(getIt<Dio>()),
   );
 
   // Coupon services

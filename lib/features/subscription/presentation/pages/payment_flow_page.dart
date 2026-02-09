@@ -6,7 +6,7 @@ import '../../../../shared/widgets/common_widgets.dart';
 import '../../../../shared/domain/entities/subscription.dart';
 import '../bloc/subscription_bloc.dart';
 import '../widgets/payment_summary_card.dart';
-import '../../data/services/pinelabs_payment_service.dart';
+import '../../data/services/razorpay_payment_service.dart';
 
 /// Page for handling the complete payment flow for subscriptions
 class PaymentFlowPage extends StatelessWidget {
@@ -42,17 +42,17 @@ class _PaymentFlowView extends StatefulWidget {
 
 class _PaymentFlowViewState extends State<_PaymentFlowView> {
   bool _isProcessingPayment = false;
-  bool _isPollingStatus = false;
-  int? _currentTransactionId;
+  bool _paymentCompleted = false;
+  String? _paymentError;
 
-  PineLabsPaymentService get _paymentService =>
-      GetIt.I<PineLabsPaymentService>();
+  RazorpayPaymentService get _paymentService =>
+      GetIt.I<RazorpayPaymentService>();
 
   @override
   void initState() {
     super.initState();
 
-    // Create payment order when page loads
+    // Initiate payment when page loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initiatePayment();
     });
@@ -69,10 +69,15 @@ class _PaymentFlowViewState extends State<_PaymentFlowView> {
 
     setState(() {
       _isProcessingPayment = true;
+      _paymentError = null;
+      _paymentCompleted = false;
     });
 
     try {
-      // Create payment order and get redirect URL
+      // processSubscriptionPayment handles the full flow:
+      // 1. Create payment order on backend
+      // 2. Open Razorpay native checkout
+      // 3. On success callback, verify payment with backend
       final result = await _paymentService.processSubscriptionPayment(
         planId: widget.plan.id,
         autoRenew: widget.autoRenew,
@@ -80,102 +85,28 @@ class _PaymentFlowViewState extends State<_PaymentFlowView> {
 
       if (!mounted) return;
 
-      if (result.success && result.transactionId != null) {
-        _currentTransactionId = result.transactionId;
+      setState(() {
+        _isProcessingPayment = false;
+      });
+
+      if (result.success) {
         setState(() {
-          _isPollingStatus = true;
+          _paymentCompleted = true;
         });
-        _pollPaymentStatus(result.transactionId!);
+        _showPaymentSuccessDialog();
       } else {
         setState(() {
-          _isProcessingPayment = false;
+          _paymentError = result.message;
         });
-        _showErrorDialog('Payment Setup Failed', result.message);
+        _showErrorDialog('Payment Failed', result.message);
       }
     } catch (e) {
       if (mounted) {
         setState(() {
           _isProcessingPayment = false;
+          _paymentError = e.toString();
         });
         _showErrorDialog('Payment Error', e.toString());
-      }
-    }
-  }
-
-  void _pollPaymentStatus(int transactionId) async {
-    await for (final status in _paymentService.pollPaymentStatus(
-      transactionId: transactionId,
-      interval: const Duration(seconds: 3),
-      timeout: const Duration(minutes: 5),
-    )) {
-      if (!mounted) return;
-
-      if (status.status == 'Success') {
-        setState(() {
-          _isProcessingPayment = false;
-          _isPollingStatus = false;
-        });
-        _showPaymentSuccessDialog();
-        return;
-      } else if (status.status == 'Failed') {
-        setState(() {
-          _isProcessingPayment = false;
-          _isPollingStatus = false;
-        });
-        _showErrorDialog(
-          'Payment Failed',
-          status.failureReason ?? 'Payment was cancelled or failed',
-        );
-        return;
-      }
-    }
-
-    // Timeout reached
-    if (mounted) {
-      setState(() {
-        _isProcessingPayment = false;
-        _isPollingStatus = false;
-      });
-    }
-  }
-
-  Future<void> _checkPaymentStatus() async {
-    if (_currentTransactionId == null) return;
-
-    setState(() {
-      _isProcessingPayment = true;
-    });
-
-    try {
-      final status =
-          await _paymentService.checkPaymentStatus(_currentTransactionId!);
-
-      if (!mounted) return;
-
-      setState(() {
-        _isProcessingPayment = false;
-      });
-
-      if (status.status == 'Success') {
-        _showPaymentSuccessDialog();
-      } else if (status.status == 'Failed') {
-        _showErrorDialog(
-          'Payment Failed',
-          status.failureReason ?? 'Payment was cancelled or failed',
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Payment is still pending. Please complete the payment in your browser.'),
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _isProcessingPayment = false;
-        });
-        _showErrorDialog('Error', e.toString());
       }
     }
   }
@@ -198,10 +129,12 @@ class _PaymentFlowViewState extends State<_PaymentFlowView> {
             const SizedBox(height: 24),
 
             // Payment Status
-            if (_isProcessingPayment || _isPollingStatus) ...[
-              _buildPollingCard(),
-            ] else if (_currentTransactionId != null) ...[
-              _buildPaymentPendingCard(),
+            if (_isProcessingPayment) ...[
+              _buildProcessingCard(),
+            ] else if (_paymentCompleted) ...[
+              _buildPaymentSuccessCard(),
+            ] else if (_paymentError != null) ...[
+              _buildPaymentErrorCard(),
             ] else ...[
               _buildInitiatingCard(),
             ],
@@ -219,7 +152,7 @@ class _PaymentFlowViewState extends State<_PaymentFlowView> {
             const SizedBox(height: 24),
 
             // Action Buttons
-            if (!_isProcessingPayment && _currentTransactionId != null) ...[
+            if (!_isProcessingPayment && _paymentError != null) ...[
               _buildActionButtons(),
             ],
           ],
@@ -228,7 +161,7 @@ class _PaymentFlowViewState extends State<_PaymentFlowView> {
     );
   }
 
-  Widget _buildPollingCard() {
+  Widget _buildProcessingCard() {
     return Card(
       color: Colors.blue[50],
       child: Padding(
@@ -238,7 +171,7 @@ class _PaymentFlowViewState extends State<_PaymentFlowView> {
             const CircularProgressIndicator(),
             const SizedBox(height: 16),
             Text(
-              'Waiting for Payment',
+              'Processing Payment',
               style: TextStyle(
                 color: Colors.blue[900],
                 fontWeight: FontWeight.bold,
@@ -247,7 +180,7 @@ class _PaymentFlowViewState extends State<_PaymentFlowView> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Complete the payment in your browser.\nThis page will update automatically.',
+              'Please complete the payment in the Razorpay checkout.\nDo not close or go back.',
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.blue[800]),
             ),
@@ -257,30 +190,64 @@ class _PaymentFlowViewState extends State<_PaymentFlowView> {
     );
   }
 
-  Widget _buildPaymentPendingCard() {
+  Widget _buildPaymentSuccessCard() {
     return Card(
-      color: Colors.orange[50],
+      color: Colors.green[50],
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Row(
           children: [
-            Icon(Icons.pending, color: Colors.orange[700]),
+            Icon(Icons.check_circle, color: Colors.green[700]),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Payment Pending',
+                    'Payment Successful',
                     style: TextStyle(
-                      color: Colors.orange[900],
+                      color: Colors.green[900],
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Complete the payment in your browser or check status',
-                    style: TextStyle(color: Colors.orange[800]),
+                    'Your subscription is now active.',
+                    style: TextStyle(color: Colors.green[800]),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPaymentErrorCard() {
+    return Card(
+      color: Colors.red[50],
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            Icon(Icons.error_outline, color: Colors.red[700]),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Payment Failed',
+                    style: TextStyle(
+                      color: Colors.red[900],
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    _paymentError ?? 'Payment was cancelled or failed',
+                    style: TextStyle(color: Colors.red[800]),
                   ),
                 ],
               ),
@@ -344,7 +311,7 @@ class _PaymentFlowViewState extends State<_PaymentFlowView> {
             _buildInfoRow(
               Icons.payment,
               'Secure Payment',
-              'Secure online payment processing',
+              'Powered by Razorpay secure payment gateway',
             ),
             _buildInfoRow(
               Icons.credit_card,
@@ -401,21 +368,10 @@ class _PaymentFlowViewState extends State<_PaymentFlowView> {
         SizedBox(
           width: double.infinity,
           child: ElevatedButton.icon(
-            onPressed: _checkPaymentStatus,
-            icon: const Icon(Icons.refresh),
-            label: const Text('Check Payment Status'),
-            style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 14),
-            ),
-          ),
-        ),
-        const SizedBox(height: 12),
-        SizedBox(
-          width: double.infinity,
-          child: OutlinedButton(
             onPressed: _initiatePayment,
-            child: const Text('Retry Payment'),
-            style: OutlinedButton.styleFrom(
+            icon: const Icon(Icons.refresh),
+            label: const Text('Retry Payment'),
+            style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 14),
             ),
           ),

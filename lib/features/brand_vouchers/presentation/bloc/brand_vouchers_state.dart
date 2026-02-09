@@ -69,10 +69,10 @@ class VoucherOrdersError extends BrandVouchersState {
   List<Object> get props => [message];
 }
 
-// Pine Labs payment states
-class PineLabsOrderCreating extends BrandVouchersState {}
+// Razorpay payment states
+class RazorpayOrderCreating extends BrandVouchersState {}
 
-class PineLabsOrderCreated extends BrandVouchersState {
+class RazorpayOrderCreated extends BrandVouchersState {
   final String orderId;
   final int amount;
   final String currency;
@@ -81,9 +81,9 @@ class PineLabsOrderCreated extends BrandVouchersState {
   final double voucherAmount;
   final double processingFee;
   final double totalAmount;
-  final String redirectUrl;
+  final String razorpayKeyId;
 
-  const PineLabsOrderCreated({
+  const RazorpayOrderCreated({
     required this.orderId,
     required this.amount,
     required this.currency,
@@ -92,7 +92,7 @@ class PineLabsOrderCreated extends BrandVouchersState {
     required this.voucherAmount,
     required this.processingFee,
     required this.totalAmount,
-    required this.redirectUrl,
+    required this.razorpayKeyId,
   });
 
   @override
@@ -105,26 +105,26 @@ class PineLabsOrderCreated extends BrandVouchersState {
         voucherAmount,
         processingFee,
         totalAmount,
-        redirectUrl,
+        razorpayKeyId,
       ];
 }
 
-class PineLabsOrderError extends BrandVouchersState {
+class RazorpayOrderError extends BrandVouchersState {
   final String message;
 
-  const PineLabsOrderError(this.message);
+  const RazorpayOrderError(this.message);
 
   @override
   List<Object> get props => [message];
 }
 
-class PineLabsPaymentVerifying extends BrandVouchersState {}
+class RazorpayPaymentVerifying extends BrandVouchersState {}
 
-class PineLabsPaymentVerified extends BrandVouchersState {
+class RazorpayPaymentVerified extends BrandVouchersState {
   final int voucherOrderId;
   final String message;
 
-  const PineLabsPaymentVerified({
+  const RazorpayPaymentVerified({
     required this.voucherOrderId,
     required this.message,
   });
@@ -133,10 +133,10 @@ class PineLabsPaymentVerified extends BrandVouchersState {
   List<Object> get props => [voucherOrderId, message];
 }
 
-class PineLabsPaymentError extends BrandVouchersState {
+class RazorpayPaymentError extends BrandVouchersState {
   final String message;
 
-  const PineLabsPaymentError(this.message);
+  const RazorpayPaymentError(this.message);
 
   @override
   List<Object> get props => [message];

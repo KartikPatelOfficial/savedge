@@ -54,11 +54,11 @@ class LoadVoucherOrders extends BrandVouchersEvent {
   List<Object?> get props => [status, pageNumber, pageSize];
 }
 
-class CreatePineLabsOrder extends BrandVouchersEvent {
+class CreateRazorpayOrder extends BrandVouchersEvent {
   final int brandVoucherId;
   final double voucherAmount;
 
-  const CreatePineLabsOrder({
+  const CreateRazorpayOrder({
     required this.brandVoucherId,
     required this.voucherAmount,
   });
@@ -67,10 +67,10 @@ class CreatePineLabsOrder extends BrandVouchersEvent {
   List<Object> get props => [brandVoucherId, voucherAmount];
 }
 
-class CheckPineLabsPaymentStatus extends BrandVouchersEvent {
+class CheckRazorpayPaymentStatus extends BrandVouchersEvent {
   final int voucherOrderId;
 
-  const CheckPineLabsPaymentStatus({
+  const CheckRazorpayPaymentStatus({
     required this.voucherOrderId,
   });
 

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:savedge/features/brand_vouchers/presentation/pages/brand_vouchers_page.dart';
+import 'package:savedge/features/coupons/presentation/pages/redemption_history_page.dart';
 import 'package:savedge/features/static_pages/presentation/pages/about_us_page.dart';
 import 'package:savedge/features/static_pages/presentation/pages/contact_us_page.dart';
 import 'package:savedge/features/static_pages/presentation/pages/follow_us_page.dart';
 import 'package:savedge/features/stores/presentation/pages/stores_page.dart';
-import 'package:savedge/features/brand_vouchers/presentation/pages/brand_vouchers_page.dart';
-import 'package:savedge/features/coupons/presentation/pages/redemption_history_page.dart';
 
 /// Model class for drawer menu items
 class DrawerMenuItem {
@@ -19,7 +19,7 @@ class DrawerMenuItem {
 class HomeDrawer extends StatelessWidget {
   const HomeDrawer({
     super.key,
-    this.userName = 'Jacob David',
+    this.userName = '',
     this.userAvatar,
     this.onMenuItemTap,
   });
@@ -63,11 +63,12 @@ class HomeDrawer extends StatelessWidget {
         title: 'Stores',
         onTap: () => _navigateToStores(context),
       ),
-      DrawerMenuItem(
-        icon: Icons.card_giftcard_outlined,
-        title: 'Brand Vouchers',
-        onTap: () => _navigateToBrandVouchers(context),
-      ),
+      // TODO: Hidden temporary
+      // DrawerMenuItem(
+      //   icon: Icons.card_giftcard_outlined,
+      //   title: 'Brand Vouchers',
+      //   onTap: () => _navigateToBrandVouchers(context),
+      // ),
       DrawerMenuItem(
         icon: Icons.info_outline,
         title: 'About Us',

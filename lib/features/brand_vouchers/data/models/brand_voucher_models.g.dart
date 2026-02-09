@@ -210,7 +210,7 @@ _CreateVoucherPaymentOrderResponse _$CreateVoucherPaymentOrderResponseFromJson(
   voucherAmount: (json['voucherAmount'] as num).toDouble(),
   processingFee: (json['processingFee'] as num).toDouble(),
   totalAmount: (json['totalAmount'] as num).toDouble(),
-  redirectUrl: json['redirectUrl'] as String,
+  razorpayKeyId: json['razorpayKeyId'] as String,
 );
 
 Map<String, dynamic> _$CreateVoucherPaymentOrderResponseToJson(
@@ -225,7 +225,7 @@ Map<String, dynamic> _$CreateVoucherPaymentOrderResponseToJson(
   'voucherAmount': instance.voucherAmount,
   'processingFee': instance.processingFee,
   'totalAmount': instance.totalAmount,
-  'redirectUrl': instance.redirectUrl,
+  'razorpayKeyId': instance.razorpayKeyId,
 };
 
 _VoucherPaymentStatusResponse _$VoucherPaymentStatusResponseFromJson(
