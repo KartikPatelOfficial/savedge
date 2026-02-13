@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:savedge/features/coupons/data/models/user_coupon_model.dart';
+import 'package:savedge/features/subscription/data/services/razorpay_payment_service.dart';
 
 import '../../../coupons/data/models/coupon_claim_models.dart';
 import '../../../coupons/data/models/coupon_gifting_models.dart';
-import '../../../coupons/data/services/coupon_payment_service.dart';
 import '../../../coupons/data/services/coupon_service.dart';
 import '../../../qr_scanner/presentation/pages/qr_scanner_page.dart';
 import 'redeemed_coupon_page.dart';
@@ -39,11 +38,6 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
   bool _isConfirming = false;
   int? _claimedCouponId; // Store the claimed coupon ID for direct redemption
   final CouponService _couponService = GetIt.I<CouponService>();
-  final CouponPaymentService _couponPaymentService =
-      GetIt.I<CouponPaymentService>();
-
-  // Pine Labs payment tracking
-  int? _currentTransactionId;
 
   @override
   void initState() {
@@ -76,7 +70,6 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
   void dispose() {
     _slideController.dispose();
     _fadeController.dispose();
-    _couponPaymentService.dispose();
     super.dispose();
   }
 
@@ -829,100 +822,51 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
     }
 
     try {
-      // Start payment flow - creates order and opens payment URL
-      final result = await _couponPaymentService.startPayment(
+      final razorpayService = GetIt.I<RazorpayPaymentService>();
+
+      // 1. Create coupon payment order
+      final orderData = await razorpayService.createCouponPaymentOrder(
         couponId: widget.claimCoupon!.couponId,
       );
 
-      if (!result.success) {
-        throw Exception(result.errorMessage ?? 'Failed to start payment');
-      }
+      final orderId = orderData['orderId'] as String;
+      final amount = orderData['amount'] as int;
+      final razorpayKeyId = orderData['razorpayKeyId'] as String;
+      final transactionId = orderData['transactionId'] as int;
+      final couponTitle =
+          (orderData['couponDetails'] as Map<String, dynamic>?)?['title'] as String? ??
+              'Coupon Purchase';
 
-      _currentTransactionId = result.transactionId;
-
-      if (!mounted) return;
-
-      // Show dialog informing user about payment redirect
-      _showPaymentPendingDialog();
-    } catch (e) {
-      throw Exception('Failed to initialize payment: $e');
-    }
-  }
-
-  void _showPaymentPendingDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Row(
-          children: [
-            Icon(Icons.open_in_browser, color: Color(0xFF6F3FCC), size: 24),
-            SizedBox(width: 8),
-            Text('Payment Started'),
-          ],
-        ),
-        content: const Text(
-          'You\'ve been redirected to the payment page. After completing payment, return to the app to check your coupon status.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () async {
-              Navigator.of(context).pop();
-              // Check payment status
-              await _checkPaymentStatus();
-            },
-            child: const Text('Check Status'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              Navigator.of(context).pop(); // Go back
-            },
-            child: const Text('Cancel'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _checkPaymentStatus() async {
-    if (_currentTransactionId == null) {
-      _showErrorDialog('Transaction ID not found');
-      return;
-    }
-
-    setState(() => _isConfirming = true);
-
-    try {
-      final status = await _couponPaymentService.checkPaymentStatus(
-        _currentTransactionId!,
+      // 2. Open Razorpay native checkout
+      final checkoutResult = await razorpayService.openCheckout(
+        orderId: orderId,
+        amount: amount,
+        keyId: razorpayKeyId,
+        description: couponTitle,
       );
 
-      final statusStr = status['status']?.toString() ?? '';
+      if (!checkoutResult.success) {
+        throw Exception(checkoutResult.message);
+      }
 
-      if (statusStr == 'Success') {
-        int? userCouponId =
-            status['userCouponId'] as int? ??
-            status['data']?['userCouponId'] as int?;
-        if (userCouponId != null) {
-          _claimedCouponId = userCouponId;
-        }
+      // 3. Verify payment with backend
+      final verifyResult = await razorpayService.verifyCouponPayment(
+        transactionId: transactionId,
+        razorpayOrderId: checkoutResult.razorpayOrderId!,
+        razorpayPaymentId: checkoutResult.razorpayPaymentId!,
+        razorpaySignature: checkoutResult.razorpaySignature!,
+      );
 
-        setState(() => _isConfirming = false);
+      if (verifyResult['success'] == true) {
+        _claimedCouponId = verifyResult['userCouponId'] as int?;
+        if (!mounted) return;
         _showSuccessDialog();
-      } else if (statusStr == 'Failed') {
-        final errorMsg = status['failureReason']?.toString() ?? 'Payment failed';
-        setState(() => _isConfirming = false);
-        _showErrorDialog(errorMsg);
       } else {
-        // Still pending
-        setState(() => _isConfirming = false);
-        _showPaymentPendingDialog();
+        throw Exception(
+            verifyResult['message'] as String? ?? 'Payment verification failed');
       }
     } catch (e) {
-      setState(() => _isConfirming = false);
-      _showErrorDialog('Failed to check payment status: $e');
+      throw Exception('Failed to initialize payment: $e');
     }
   }
 
