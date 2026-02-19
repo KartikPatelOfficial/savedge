@@ -814,6 +814,10 @@ class _VendorOfferCardState extends State<VendorOfferCard>
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
+                    if (widget.coupon.description.isNotEmpty) ...[
+                      const SizedBox(height: 4),
+                      _buildDescriptionPreview(accentColor),
+                    ],
                   ],
                 ),
               ),
@@ -850,6 +854,19 @@ class _VendorOfferCardState extends State<VendorOfferCard>
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildDescriptionPreview(Color accentColor) {
+    return Text(
+      widget.coupon.description,
+      style: const TextStyle(
+        fontSize: 12,
+        color: Color(0xFF6B7280),
+        height: 1.4,
+      ),
+      maxLines: 3,
+      overflow: TextOverflow.ellipsis,
     );
   }
 
