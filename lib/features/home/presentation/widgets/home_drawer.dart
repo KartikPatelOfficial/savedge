@@ -5,6 +5,7 @@ import 'package:savedge/features/static_pages/presentation/pages/about_us_page.d
 import 'package:savedge/features/static_pages/presentation/pages/contact_us_page.dart';
 import 'package:savedge/features/static_pages/presentation/pages/follow_us_page.dart';
 import 'package:savedge/features/stores/presentation/pages/stores_page.dart';
+import 'dart:ui';
 
 /// Model class for drawer menu items
 class DrawerMenuItem {
@@ -15,7 +16,7 @@ class DrawerMenuItem {
   final VoidCallback? onTap;
 }
 
-/// Custom drawer widget matching the screenshot design
+/// Premium custom drawer widget
 class HomeDrawer extends StatelessWidget {
   const HomeDrawer({
     super.key,
@@ -30,22 +31,44 @@ class HomeDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Drawer(
-      backgroundColor: Colors.white,
+    return Container(
+      width: double.infinity,
+      height: double.infinity,
+      decoration: const BoxDecoration(
+        color: Color(0xFF1A202C), // Deep premium dark background
+      ),
       child: SafeArea(
-        child: Column(
-          children: [
-            // User Profile Section
-            _UserProfileSection(userName: userName, userAvatar: userAvatar),
-            const SizedBox(height: 20),
-            // Menu Items
-            Expanded(
-              child: _MenuItemsList(
-                items: _getMenuItems(context),
-                onItemTap: onMenuItemTap,
+        child: Padding(
+          padding: const EdgeInsets.only(left: 24.0, top: 40.0, bottom: 24.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Premium Header
+              _PremiumUserProfileSection(
+                  userName: userName, userAvatar: userAvatar),
+              const SizedBox(height: 40),
+              // Menu Items List - left aligned
+              Expanded(
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.65, // Constrain menu width
+                  child: _PremiumMenuItemsList(
+                    items: _getMenuItems(context),
+                    onItemTap: onMenuItemTap,
+                  ),
+                ),
               ),
-            ),
-          ],
+              // Footer element
+              Text(
+                'Savedge App v1.0.0',
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.4),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  letterSpacing: 1.0,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -54,12 +77,12 @@ class HomeDrawer extends StatelessWidget {
   List<DrawerMenuItem> _getMenuItems(BuildContext context) {
     return [
       DrawerMenuItem(
-        icon: Icons.history_outlined,
+        icon: Icons.history_rounded,
         title: 'Redemption History',
         onTap: () => _navigateToRedemptionHistory(context),
       ),
       DrawerMenuItem(
-        icon: Icons.store_outlined,
+        icon: Icons.storefront_rounded,
         title: 'Stores',
         onTap: () => _navigateToStores(context),
       ),
@@ -70,17 +93,17 @@ class HomeDrawer extends StatelessWidget {
       //   onTap: () => _navigateToBrandVouchers(context),
       // ),
       DrawerMenuItem(
-        icon: Icons.info_outline,
+        icon: Icons.info_outline_rounded,
         title: 'About Us',
         onTap: () => _navigateToAboutUs(context),
       ),
       DrawerMenuItem(
-        icon: Icons.phone_outlined,
+        icon: Icons.support_agent_rounded,
         title: 'Contact Us',
         onTap: () => _navigateToContactUs(context),
       ),
       DrawerMenuItem(
-        icon: Icons.group_outlined,
+        icon: Icons.handshake_rounded,
         title: 'Follow Us',
         onTap: () => _navigateToFollowUs(context),
       ),
@@ -88,7 +111,7 @@ class HomeDrawer extends StatelessWidget {
   }
 
   void _navigateToRedemptionHistory(BuildContext context) {
-    Navigator.pop(context); // Close drawer first
+    onMenuItemTap?.call('Redemption History');
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const RedemptionHistoryPage()),
@@ -96,7 +119,7 @@ class HomeDrawer extends StatelessWidget {
   }
 
   void _navigateToStores(BuildContext context) {
-    Navigator.pop(context); // Close drawer first
+    onMenuItemTap?.call('Stores');
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const StoresPage()),
@@ -104,7 +127,7 @@ class HomeDrawer extends StatelessWidget {
   }
 
   void _navigateToAboutUs(BuildContext context) {
-    Navigator.pop(context); // Close drawer first
+    onMenuItemTap?.call('About Us');
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const AboutUsPage()),
@@ -112,7 +135,7 @@ class HomeDrawer extends StatelessWidget {
   }
 
   void _navigateToContactUs(BuildContext context) {
-    Navigator.pop(context); // Close drawer first
+    onMenuItemTap?.call('Contact Us');
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const ContactUsPage()),
@@ -120,7 +143,7 @@ class HomeDrawer extends StatelessWidget {
   }
 
   void _navigateToFollowUs(BuildContext context) {
-    Navigator.pop(context); // Close drawer first
+    onMenuItemTap?.call('Follow Us');
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const FollowUsPage()),
@@ -128,7 +151,7 @@ class HomeDrawer extends StatelessWidget {
   }
 
   void _navigateToBrandVouchers(BuildContext context) {
-    Navigator.pop(context); // Close drawer first
+    onMenuItemTap?.call('Brand Vouchers');
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const BrandVouchersPage()),
@@ -136,8 +159,8 @@ class HomeDrawer extends StatelessWidget {
   }
 }
 
-class _UserProfileSection extends StatelessWidget {
-  const _UserProfileSection({required this.userName, this.userAvatar});
+class _PremiumUserProfileSection extends StatelessWidget {
+  const _PremiumUserProfileSection({required this.userName, this.userAvatar});
 
   final String userName;
   final String? userAvatar;
@@ -145,40 +168,59 @@ class _UserProfileSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(20),
-      child: Row(
+      width: double.infinity,
+      color: Colors.transparent,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // User Avatar
           Container(
-            width: 50,
-            height: 50,
+            width: 80,
+            height: 80,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: const Color(0xFF6F3FCC).withOpacity(0.1),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF6F3FCC).withOpacity(0.4),
+                  blurRadius: 24,
+                  offset: const Offset(0, 12),
+                ),
+              ],
             ),
             child: userAvatar != null
                 ? ClipRRect(
-                    borderRadius: BorderRadius.circular(25),
+                    borderRadius: BorderRadius.circular(40),
                     child: Image.network(
                       userAvatar!,
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) =>
-                          _DefaultAvatar(),
+                          _PremiumDefaultAvatar(),
                     ),
                   )
-                : _DefaultAvatar(),
+                : _PremiumDefaultAvatar(),
           ),
-          const SizedBox(width: 16),
-          // User Name
-          Expanded(
-            child: Text(
-              userName,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
-              ),
+          const SizedBox(height: 24),
+          // Greeting & Name
+          Text(
+            'Welcome back,',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.white.withOpacity(0.6),
+              fontWeight: FontWeight.w500,
             ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            userName,
+            style: const TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.w800,
+              color: Colors.white,
+              letterSpacing: -0.5,
+              height: 1.1,
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
@@ -186,26 +228,28 @@ class _UserProfileSection extends StatelessWidget {
   }
 }
 
-class _DefaultAvatar extends StatelessWidget {
+class _PremiumDefaultAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         shape: BoxShape.circle,
         gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
           colors: [
-            const Color(0xFF6F3FCC).withOpacity(0.8),
-            const Color(0xFF9C4DFF).withOpacity(0.8),
+            Color(0xFF6F3FCC),
+            Color(0xFF9C4DFF),
           ],
         ),
       ),
-      child: const Icon(Icons.person, color: Colors.white, size: 28),
+      child: const Icon(Icons.person_rounded, color: Colors.white, size: 36),
     );
   }
 }
 
-class _MenuItemsList extends StatelessWidget {
-  const _MenuItemsList({required this.items, this.onItemTap});
+class _PremiumMenuItemsList extends StatelessWidget {
+  const _PremiumMenuItemsList({required this.items, this.onItemTap});
 
   final List<DrawerMenuItem> items;
   final Function(String)? onItemTap;
@@ -213,10 +257,11 @@ class _MenuItemsList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
+      padding: const EdgeInsets.symmetric(vertical: 8),
       itemCount: items.length,
       itemBuilder: (context, index) {
         final item = items[index];
-        return _DrawerMenuItemTile(
+        return _PremiumDrawerMenuItemTile(
           item: item,
           onTap: () {
             // First try the item's specific onTap, then fall back to the general onItemTap
@@ -224,7 +269,6 @@ class _MenuItemsList extends StatelessWidget {
               item.onTap!();
             } else {
               onItemTap?.call(item.title);
-              Navigator.pop(context);
             }
           },
         );
@@ -233,34 +277,55 @@ class _MenuItemsList extends StatelessWidget {
   }
 }
 
-class _DrawerMenuItemTile extends StatelessWidget {
-  const _DrawerMenuItemTile({required this.item, this.onTap});
+class _PremiumDrawerMenuItemTile extends StatelessWidget {
+  const _PremiumDrawerMenuItemTile({required this.item, this.onTap});
 
   final DrawerMenuItem item;
   final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          color: Colors.grey[100],
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Icon(item.icon, color: Colors.grey[700], size: 20),
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
       ),
-      title: Text(
-        item.title,
-        style: const TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w500,
-          color: Colors.black87,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(16),
+          highlightColor: Colors.white.withOpacity(0.05),
+          splashColor: Colors.white.withOpacity(0.1),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(item.icon,
+                      color: Colors.white, size: 22),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Text(
+                    item.title,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
-      onTap: onTap,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
     );
   }
 }

@@ -268,6 +268,7 @@ class _GiftPageState extends State<GiftPage> with TickerProviderStateMixin {
                       ),
                     ),
                   ],
+                  const SizedBox(height: 100), // Bottom padding for Nav Bar
                 ],
               ),
             );
@@ -333,6 +334,7 @@ class _GiftPageState extends State<GiftPage> with TickerProviderStateMixin {
                       ),
                     ),
                   ],
+                  const SizedBox(height: 100), // Bottom padding for Nav Bar
                 ],
               ),
             );

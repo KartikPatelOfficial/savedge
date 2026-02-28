@@ -541,9 +541,6 @@ class _ProfilePageState extends State<ProfilePage> {
 
                   // Sign Out Button
                   _buildSignOutSection(),
-
-                  const SizedBox(height: 100),
-                  // Bottom padding for nav bar
                 ],
               ),
             ),

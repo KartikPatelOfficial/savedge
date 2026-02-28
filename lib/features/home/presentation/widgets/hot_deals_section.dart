@@ -509,7 +509,7 @@ class _StackedDealsCardsState extends State<StackedDealsCards>
     }
 
     return Padding(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -517,22 +517,23 @@ class _StackedDealsCardsState extends State<StackedDealsCards>
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
+              color: Colors.white.withOpacity(0.95),
+              borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
+                  color: Colors.black.withOpacity(0.15),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
                 ),
               ],
             ),
             child: Text(
               discountText,
               style: const TextStyle(
-                fontSize: 16,
+                fontSize: 14,
                 fontWeight: FontWeight.w800,
                 color: Color(0xFF1A202C),
+                letterSpacing: 0.5,
               ),
             ),
           ),
@@ -542,13 +543,15 @@ class _StackedDealsCardsState extends State<StackedDealsCards>
             coupon.title,
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 22,
-              fontWeight: FontWeight.w700,
+              fontSize: 26,
+              fontWeight: FontWeight.w800,
+              letterSpacing: -0.5,
+              height: 1.1,
               shadows: [
                 Shadow(
-                  color: Colors.black26,
-                  blurRadius: 2,
-                  offset: Offset(0, 1),
+                  color: Colors.black45,
+                  blurRadius: 8,
+                  offset: Offset(0, 2),
                 ),
               ],
             ),
@@ -560,14 +563,14 @@ class _StackedDealsCardsState extends State<StackedDealsCards>
           if (coupon.description.isNotEmpty)
             Text(
               coupon.description,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: Colors.white.withOpacity(0.9),
                 fontSize: 14,
-                fontWeight: FontWeight.w400,
-                shadows: [
+                fontWeight: FontWeight.w500,
+                shadows: const [
                   Shadow(
                     color: Colors.black26,
-                    blurRadius: 1,
+                    blurRadius: 4,
                     offset: Offset(0, 1),
                   ),
                 ],
@@ -575,29 +578,29 @@ class _StackedDealsCardsState extends State<StackedDealsCards>
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           // Minimum amount info
           Row(
             children: [
               Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
+                  horizontal: 14,
+                  vertical: 8,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.white.withOpacity(0.3)),
+                  color: Colors.white.withOpacity(0.25),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.white.withOpacity(0.4)),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     const Icon(
-                      Icons.shopping_cart_outlined,
+                      Icons.shopping_bag_outlined,
                       color: Colors.white,
                       size: 16,
                     ),
-                    const SizedBox(width: 6),
+                    const SizedBox(width: 8),
                     Text(
                       coupon.minimumAmountDisplay.isEmpty
                           ? 'No minimum'
@@ -605,7 +608,7 @@ class _StackedDealsCardsState extends State<StackedDealsCards>
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 13,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   ],
@@ -614,15 +617,17 @@ class _StackedDealsCardsState extends State<StackedDealsCards>
               const Spacer(),
               // Arrow indicator
               Container(
-                padding: const EdgeInsets.all(8),
+                width: 40,
+                height: 40,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withOpacity(0.25),
                   shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white.withOpacity(0.4)),
                 ),
                 child: const Icon(
-                  Icons.arrow_forward_ios,
+                  Icons.arrow_forward_rounded,
                   color: Colors.white,
-                  size: 14,
+                  size: 20,
                 ),
               ),
             ],
@@ -645,7 +650,7 @@ class _StackedDealsCardsState extends State<StackedDealsCards>
           decoration: BoxDecoration(
             color: index == _currentIndex
                 ? const Color(0xFF6F3FCC)
-                : const Color(0xFF6F3FCC).withOpacity(0.3),
+                : const Color(0xFF6F3FCC).withOpacity(0.2),
             borderRadius: BorderRadius.circular(4),
           ),
         ),

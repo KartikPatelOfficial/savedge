@@ -23,7 +23,8 @@ import 'package:savedge/features/vendors/presentation/bloc/vendors_event.dart';
 
 /// Beautiful home content page with modern design and real data integration
 class HomeContentPage extends StatefulWidget {
-  const HomeContentPage({super.key});
+  final VoidCallback? onMenuTap;
+  const HomeContentPage({super.key, this.onMenuTap});
 
   @override
   State<HomeContentPage> createState() => _HomeContentPageState();
@@ -128,10 +129,6 @@ class _HomeContentPageState extends State<HomeContentPage> {
         child: Scaffold(
           key: _scaffoldKey,
           backgroundColor: Colors.white,
-          drawer: HomeDrawer(
-            userName: _userName,
-            onMenuItemTap: _onDrawerMenuItemTap,
-          ),
           body: _buildMainContent(),
         ),
       ),
@@ -168,7 +165,6 @@ class _HomeContentPageState extends State<HomeContentPage> {
                       child: const SubscriptionCarousel(),
                     ),
                     _buildTopOffersSection(),
-                    const SizedBox(height: 40),
                   ],
                 ),
               ),
@@ -181,18 +177,22 @@ class _HomeContentPageState extends State<HomeContentPage> {
 
   Widget _buildModernAppBar() {
     return SliverAppBar(
-      expandedHeight: 80,
+      expandedHeight: 90,
       elevation: 0,
-      backgroundColor: Colors.white,
-      surfaceTintColor: Colors.white,
+      backgroundColor: Colors.transparent,
+      surfaceTintColor: Colors.transparent,
       systemOverlayStyle: SystemUiOverlayStyle.dark,
       automaticallyImplyLeading: false,
+      floating: true,
+      pinned: true,
       flexibleSpace: FlexibleSpaceBar(
         background: Container(
-          color: Colors.white,
+          decoration: BoxDecoration(
+             color: Colors.white.withOpacity(0.95),
+          ),
           child: SafeArea(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
+              padding: const EdgeInsets.fromLTRB(24, 12, 24, 16),
               child: Column(
                 children: [
                   // Top row with menu and action buttons
@@ -200,16 +200,16 @@ class _HomeContentPageState extends State<HomeContentPage> {
                     children: [
                       // Menu button
                       Container(
-                        width: 44,
-                        height: 44,
+                        width: 48,
+                        height: 48,
                         decoration: BoxDecoration(
                           color: const Color(0xFF1A202C),
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(16),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.06),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
+                              color: const Color(0xFF1A202C).withOpacity(0.2),
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
                             ),
                           ],
                         ),
@@ -217,26 +217,26 @@ class _HomeContentPageState extends State<HomeContentPage> {
                           color: Colors.transparent,
                           child: InkWell(
                             onTap: _onMenuTap,
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(16),
                             child: const Center(
                               child: Icon(
-                                Icons.menu_rounded,
+                                Icons.segment_rounded,
                                 color: Colors.white,
-                                size: 20,
+                                size: 24,
                               ),
                             ),
                           ),
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 16),
                       // City selector button
-                      _buildCityButton(),
-                      const Spacer(),
+                      Expanded(child: _buildCityButton()),
+                      const SizedBox(width: 16),
                       // Action buttons
                       _buildNotificationButton(),
                       const SizedBox(width: 12),
                       _buildActionButton(
-                        icon: Icons.favorite_outline,
+                        icon: Icons.favorite_border_rounded,
                         onTap: _onFavoriteTap,
                       ),
                     ],
@@ -467,7 +467,11 @@ class _HomeContentPageState extends State<HomeContentPage> {
 
   void _onMenuTap() {
     HapticFeedback.lightImpact();
-    _scaffoldKey.currentState?.openDrawer();
+    if (widget.onMenuTap != null) {
+      widget.onMenuTap!();
+    } else {
+      _scaffoldKey.currentState?.openDrawer();
+    }
   }
 
   void _onCategoryTap(String category) {

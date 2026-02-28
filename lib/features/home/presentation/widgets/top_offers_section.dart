@@ -63,22 +63,23 @@ class TopOffersView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16.0),
+      padding: const EdgeInsets.symmetric(vertical: 24.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Section header
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            padding: const EdgeInsets.symmetric(horizontal: 24.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   title,
                   style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
                     color: Color(0xFF1A202C),
+                    letterSpacing: -0.5,
                   ),
                 ),
               ],
@@ -172,7 +173,7 @@ class TopOffersView extends StatelessWidget {
     return Column(
       children: vendors.take(5).map((vendor) {
         return Padding(
-          padding: const EdgeInsets.only(bottom: 12, left: 20, right: 20),
+          padding: const EdgeInsets.only(bottom: 16, left: 24, right: 24),
           child: TopVendorCard(
             vendor: vendor,
             onTap: () => _onVendorTap(vendor),
@@ -240,20 +241,15 @@ class TopVendorCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 160,
+      height: 180, // Increased height slightly for better proportions
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.08),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-            spreadRadius: 0,
-          ),
-          BoxShadow(
-            color: const Color(0xFF6F3FCC).withOpacity(0.05),
-            blurRadius: 40,
-            offset: const Offset(0, 4),
+            blurRadius: 24,
+            offset: const Offset(0, 12),
             spreadRadius: 0,
           ),
         ],
@@ -262,9 +258,9 @@ class TopVendorCard extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(28),
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(28),
             child: Stack(
               children: [
                 // Background image
@@ -273,110 +269,94 @@ class TopVendorCard extends StatelessWidget {
                 Container(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
                       colors: [
-                        Colors.black.withOpacity(0.75),
-                        Colors.black.withOpacity(0.5),
-                        Colors.black.withOpacity(0.25),
+                        Colors.black.withOpacity(0.85),
+                        Colors.black.withOpacity(0.4),
                         Colors.transparent,
                       ],
-                      stops: const [0.0, 0.35, 0.65, 1.0],
+                      stops: const [0.0, 0.45, 1.0],
                     ),
                   ),
                 ),
                 // Content with improved spacing
                 Padding(
                   padding: const EdgeInsets.all(24),
-                  child: Row(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Left content
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            // Category badge with glassmorphism effect
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 6,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.2),
-                                borderRadius: BorderRadius.circular(16),
-                                border: Border.all(
-                                  color: Colors.white.withOpacity(0.3),
-                                  width: 1,
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.1),
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 2),
+                       Row(
+                         crossAxisAlignment: CrossAxisAlignment.end,
+                         children: [
+                           Expanded(
+                             child: Column(
+                               crossAxisAlignment: CrossAxisAlignment.start,
+                               mainAxisSize: MainAxisSize.min,
+                               children: [
+                                  // Category badge with glassmorphism effect
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 4,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withOpacity(0.2),
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(
+                                        color: Colors.white.withOpacity(0.3),
+                                        width: 1,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      vendor.category.toUpperCase(),
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w800,
+                                        letterSpacing: 1.0,
+                                      ),
+                                    ),
                                   ),
-                                ],
-                              ),
-                              child: Text(
-                                vendor.category.toUpperCase(),
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w700,
-                                  letterSpacing: 0.8,
-                                ),
-                              ),
-                            ),
-                            Spacer(),
-                            // Vendor name with better typography
-                            Text(
-                              vendor.businessName,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 22,
-                                fontWeight: FontWeight.w800,
-                                height: 1.2,
-                                letterSpacing: -0.5,
-                                shadows: [
-                                  Shadow(
-                                    color: Colors.black45,
-                                    blurRadius: 8,
-                                    offset: Offset(0, 2),
+                                  const SizedBox(height: 8),
+                                  // Vendor name with better typography
+                                  Text(
+                                    vendor.businessName,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.w800,
+                                      height: 1.2,
+                                      letterSpacing: -0.5,
+                                    ),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
-                                ],
-                              ),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      // Right content - Modern arrow with better design
-                      Container(
-                        width: 48,
-                        height: 48,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Colors.white.withOpacity(0.3),
-                            width: 1.5,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.15),
-                              blurRadius: 12,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: const Icon(
-                          Icons.arrow_forward_rounded,
-                          color: Colors.white,
-                          size: 20,
-                        ),
-                      ),
+                               ],
+                             ),
+                           ),
+                           const SizedBox(width: 16),
+                           // Right content - Modern arrow with better design
+                           Container(
+                             width: 44,
+                             height: 44,
+                             decoration: BoxDecoration(
+                               color: Colors.white.withOpacity(0.25),
+                               shape: BoxShape.circle,
+                               border: Border.all(
+                                 color: Colors.white.withOpacity(0.4),
+                                 width: 1,
+                               ),
+                             ),
+                             child: const Icon(
+                               Icons.arrow_forward_rounded,
+                               color: Colors.white,
+                               size: 20,
+                             ),
+                           ),
+                         ],
+                       ),
                     ],
                   ),
                 ),

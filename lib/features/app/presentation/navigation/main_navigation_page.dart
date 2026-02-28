@@ -24,21 +24,50 @@ class MainNavigationPage extends StatefulWidget {
   State<MainNavigationPage> createState() => _MainNavigationPageState();
 }
 
-class _MainNavigationPageState extends State<MainNavigationPage> {
+class _MainNavigationPageState extends State<MainNavigationPage> with SingleTickerProviderStateMixin {
   int _currentIndex = 0;
   bool _isEmployee = false;
   bool _isLoadingProfile = true;
   bool _citySelectionShown = false;
   late List<Widget> _pages;
+  
+  bool _isDrawerOpen = false;
+  late AnimationController _animationController;
+  late Animation<double> _scaleAnimation;
+  late Animation<double> _slideAnimation;
 
   AuthRepository get _authRepository => GetIt.I<AuthRepository>();
 
   @override
   void initState() {
     super.initState();
+    
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.85).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.easeOutCubic,
+      ),
+    );
+    _slideAnimation = Tween<double>(begin: 0.0, end: 260.0).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.easeOutCubic,
+      ),
+    );
+
     _buildPages();
     _loadUserProfile();
     _initializeNotifications();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
   }
 
   /// Show city selection sheet if no city is selected yet
@@ -106,7 +135,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
 
   void _buildPages() {
     _pages = <Widget>[
-      const HomeContentPage(), // Home page content without bottom nav
+      HomeContentPage(onMenuTap: _toggleDrawer), // Home page content without bottom nav
     ];
 
     // Only add Gift page for employees
@@ -168,11 +197,61 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
 
         // Show normal navigation for valid city selection
         return Scaffold(
-          body: IndexedStack(index: _currentIndex, children: _pages),
-          bottomNavigationBar: HomeBottomNavBar(
-            currentIndex: _currentIndex,
-            onTap: _onBottomNavTap,
-            isEmployee: _isEmployee,
+          extendBody: true,
+          backgroundColor: const Color(0xFF1A202C), // Dark background for the beautiful drawer
+          body: Stack(
+            children: [
+              // Bottom Layer: The beautiful full screen background menu
+              HomeDrawer(
+                userName: 'Welcome',
+                onMenuItemTap: (title) {
+                  _toggleDrawer();
+                  // Additional navigation logic based on title
+                },
+              ),
+              
+              // Top Layer: The actual app scaling and sliding
+              AnimatedBuilder(
+                animation: _animationController,
+                builder: (context, child) {
+                  return Transform.translate(
+                    offset: Offset(_slideAnimation.value, 0),
+                    child: Transform.scale(
+                      scale: _scaleAnimation.value,
+                      alignment: Alignment.centerLeft, // Scale from the left edge
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(_isDrawerOpen ? 40 : 0),
+                        child: Stack(
+                          children: [
+                            Scaffold(
+                              backgroundColor: Colors.white,
+                              extendBody: true,
+                              body: IndexedStack(index: _currentIndex, children: _pages),
+                              bottomNavigationBar: HomeBottomNavBar(
+                                currentIndex: _currentIndex,
+                                onTap: _onBottomNavTap,
+                                isEmployee: _isEmployee,
+                              ),
+                            ),
+                            
+                            // Semi-transparent overlay to tap to close menu when open
+                            if (_isDrawerOpen)
+                              Positioned.fill(
+                                child: GestureDetector(
+                                  onTap: _toggleDrawer,
+                                  child: Container(
+                                    color: Colors.transparent,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ],
           ),
         );
       },
@@ -180,8 +259,23 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
   }
 
   void _onBottomNavTap(int index) {
+    if (_isDrawerOpen) {
+      _toggleDrawer();
+    }
     setState(() {
       _currentIndex = index;
     });
   }
+
+  void _toggleDrawer() {
+    if (_isDrawerOpen) {
+      _animationController.reverse();
+    } else {
+      _animationController.forward();
+    }
+    setState(() {
+      _isDrawerOpen = !_isDrawerOpen;
+    });
+  }
 }
+

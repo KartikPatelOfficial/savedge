@@ -11,11 +11,11 @@ class CategoryItem {
   final VoidCallback? onTap;
 }
 
-/// Categories section widget with grid layout
+/// Modern Categories section widget with grid layout
 class CategoriesSection extends StatelessWidget {
   const CategoriesSection({
     super.key,
-    this.title = 'Our Categories',
+    this.title = 'Explore Categories',
     this.onCategoryTap,
   });
 
@@ -28,7 +28,7 @@ class CategoriesSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: _SectionHeader(
             title: title,
             onSeeAllTap: () {
@@ -39,7 +39,7 @@ class CategoriesSection extends StatelessWidget {
             },
           ),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 16),
         _CategoriesGrid(onCategoryTap: onCategoryTap),
       ],
     );
@@ -56,23 +56,32 @@ class _SectionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         Text(
           title,
           style: const TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w700,
+            fontSize: 22,
+            fontWeight: FontWeight.w800,
             color: Color(0xFF1A202C),
+            letterSpacing: -0.5,
           ),
         ),
         GestureDetector(
           onTap: onSeeAllTap,
-          child: const Text(
-            'See all',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF6F3FCC),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: const Color(0xFF6F3FCC).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: const Text(
+              'See All',
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF6F3FCC),
+              ),
             ),
           ),
         ),
@@ -92,9 +101,9 @@ class _CategoriesGrid extends StatelessWidget {
     final displayCategories = CategoriesConstants.categories.take(6).toList();
 
     return SizedBox(
-      height: 100,
+      height: 110,
       child: ListView.builder(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
         scrollDirection: Axis.horizontal,
         itemCount: displayCategories.length,
         itemBuilder: (context, index) {
@@ -104,7 +113,7 @@ class _CategoriesGrid extends StatelessWidget {
           return Container(
             width: 76,
             margin: EdgeInsets.only(
-              right: index == displayCategories.length - 1 ? 0 : 16,
+              right: index == displayCategories.length - 1 ? 0 : 20,
             ),
             child: CategoryItemWidget(
               category: CategoryItem(
@@ -120,7 +129,7 @@ class _CategoriesGrid extends StatelessWidget {
   }
 }
 
-/// Individual category item widget
+/// Premium individual category item widget
 class CategoryItemWidget extends StatelessWidget {
   const CategoryItemWidget({super.key, required this.category});
 
@@ -130,45 +139,59 @@ class CategoryItemWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: category.onTap,
+      behavior: HitTestBehavior.opaque,
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          // Category icon from assets
+          // Category icon with squircle shape and shadow
           Container(
-            width: 64,
-            height: 64,
-            decoration: BoxDecoration(borderRadius: BorderRadius.circular(20)),
+            width: 72,
+            height: 72,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(24),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.04),
+                  blurRadius: 16,
+                  offset: const Offset(0, 8),
+                ),
+                BoxShadow(
+                  color: const Color(0xFF6F3FCC).withOpacity(0.08),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(24),
               child: Image.asset(
                 category.iconPath,
-                width: 64,
-                height: 64,
+                width: 48,
+                height: 48,
                 fit: BoxFit.contain,
                 errorBuilder: (context, error, stackTrace) => Container(
-                  width: 64,
-                  height: 64,
                   decoration: BoxDecoration(
                     color: const Color(0xFF6F3FCC).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(16),
                   ),
                   child: const Icon(
-                    Icons.category_outlined,
+                    Icons.category_rounded,
                     color: Color(0xFF6F3FCC),
-                    size: 32,
+                    size: 28,
                   ),
                 ),
               ),
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
           // Category title
           Text(
             category.title,
             style: const TextStyle(
-              fontSize: 13,
+              fontSize: 12,
               fontWeight: FontWeight.w600,
-              color: Color(0xFF2D3748),
+              color: Color(0xFF4A5568),
             ),
             textAlign: TextAlign.center,
             maxLines: 1,
