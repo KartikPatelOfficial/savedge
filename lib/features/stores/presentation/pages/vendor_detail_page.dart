@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -516,35 +516,40 @@ class _VendorDetailViewState extends State<_VendorDetailView> {
         : widget.vendor.images.take(3).toList(); // Show up to 3 images
 
     return SliverAppBar(
-      expandedHeight: 320,
+      expandedHeight: 280,
       pinned: true,
       backgroundColor: Colors.white,
       foregroundColor: const Color(0xFF1A202C),
       elevation: 0,
       scrolledUnderElevation: 0,
       surfaceTintColor: Colors.transparent,
-      leading: Container(
-        margin: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.9),
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
+      leading: Padding(
+        padding: const EdgeInsets.only(left: 12, top: 4, bottom: 4),
+        child: ClipOval(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.3),
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white.withOpacity(0.2)),
+              ),
+              child: IconButton(
+                icon: const Padding(
+                  padding: EdgeInsets.only(left: 6.0),
+                  child: Icon(
+                    Icons.arrow_back_ios,
+                    color: Colors.white,
+                    size: 18,
+                  ),
+                ),
+                onPressed: () => Navigator.pop(context),
+              ),
             ),
-          ],
-        ),
-        child: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios_new,
-            color: Color(0xFF1A202C),
-            size: 18,
           ),
-          onPressed: () => Navigator.pop(context),
         ),
       ),
+      actions: const [],
       flexibleSpace: FlexibleSpaceBar(
         background: Stack(
           children: [
@@ -650,7 +655,7 @@ class _VendorDetailViewState extends State<_VendorDetailView> {
             // Page indicators (only show if multiple images)
             if (imagesToShow.length > 1)
               Positioned(
-                bottom: 16,
+                bottom: 40,
                 left: 0,
                 right: 0,
                 child: Row(
@@ -678,18 +683,18 @@ class _VendorDetailViewState extends State<_VendorDetailView> {
                   ),
                 ),
               ),
-            // Modern overlay at bottom
+            // Bottom overlay curve
             Positioned(
-              bottom: 0,
+              bottom: -1,
               left: 0,
               right: 0,
-              height: 80,
+              height: 24,
               child: Container(
                 decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [Colors.transparent, Colors.black54],
+                  color: Color(0xFFFAFBFC),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(24),
+                    topRight: Radius.circular(24),
                   ),
                 ),
               ),
@@ -702,614 +707,311 @@ class _VendorDetailViewState extends State<_VendorDetailView> {
 
   Widget _buildVendorInfo(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.all(20),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Business name with enhanced styling
-          Text(
-            widget.vendor.businessName,
-            style: const TextStyle(
-              fontSize: 32,
-              fontWeight: FontWeight.w900,
-              color: Color(0xFF1A202C),
-              letterSpacing: -0.5,
-              height: 1.2,
+          // Title Row with Layout
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.vendor.businessName,
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF1A202C),
+                        letterSpacing: -0.5,
+                        height: 1.2,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF6F3FCC).withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        widget.vendor.category,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF6F3FCC),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 12),
+              // Favorite Button inline
+              BlocBuilder<FavoritesBloc, FavoritesState>(
+                builder: (context, favState) {
+                  final isFavorite =
+                      favState is FavoritesLoaded &&
+                      favState.isFavorite(widget.vendor.id);
+                  return IconButton(
+                    onPressed: () {
+                      HapticFeedback.lightImpact();
+                      context.read<FavoritesBloc>().add(ToggleFavorite(widget.vendor));
+                    },
+                    style: IconButton.styleFrom(
+                      backgroundColor: isFavorite
+                          ? const Color(0xFFEF4444).withOpacity(0.1)
+                          : const Color(0xFFF3F4F6),
+                      padding: const EdgeInsets.all(12),
+                    ),
+                    icon: Icon(
+                      isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                      color: isFavorite ? const Color(0xFFEF4444) : const Color(0xFF6B7280),
+                      size: 24,
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+
+          // Quick Action Pills Row
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            clipBehavior: Clip.none,
+            child: Row(
+              children: [
+                if (widget.vendor.contactPhone != null &&
+                    widget.vendor.contactPhone!.trim().isNotEmpty) ...[
+                  _buildActionPill(
+                    icon: Icons.call_rounded,
+                    label: 'Call',
+                    color: const Color(0xFF10B981),
+                    onTap: () {
+                      HapticFeedback.lightImpact();
+                      final raw = widget.vendor.contactPhone!.trim();
+                      final phone = raw.replaceAll(RegExp(r'[^0-9+]'), '');
+                      if (phone.isNotEmpty) launchUrlString('tel:$phone');
+                    },
+                  ),
+                  const SizedBox(width: 8),
+                ],
+                if (_googleMapsUrl != null) ...[
+                  _buildActionPill(
+                    icon: Icons.directions_rounded,
+                    label: 'Map',
+                    color: const Color(0xFFF59E0B),
+                    onTap: () {
+                      HapticFeedback.lightImpact();
+                      launchUrlString(_googleMapsUrl!);
+                    },
+                  ),
+                  const SizedBox(width: 8),
+                ],
+                if (widget.vendor.website != null &&
+                    widget.vendor.website!.trim().isNotEmpty) ...[
+                  _buildActionPill(
+                    icon: Icons.language_rounded,
+                    label: 'Website',
+                    color: const Color(0xFF3B82F6),
+                    onTap: () {
+                      HapticFeedback.lightImpact();
+                      String url = widget.vendor.website!.trim();
+                      if (!url.startsWith('http')) url = 'https://$url';
+                      launchUrlString(url);
+                    },
+                  ),
+                ],
+              ],
             ),
           ),
-          const SizedBox(height: 8),
-
-          // Category badge
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: const Color(0xFF6F3FCC).withOpacity(0.1),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: const Color(0xFF6F3FCC).withOpacity(0.2),
-              ),
-            ),
-            child: Text(
-              widget.vendor.category,
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF6F3FCC),
-                letterSpacing: 0.5,
-              ),
-            ),
-          ),
-
           const SizedBox(height: 20),
 
-          // Business description section
-          if (widget.vendor.description != null &&
-              widget.vendor.description!.trim().isNotEmpty) ...[
-            _buildDescriptionSection(),
-            const SizedBox(height: 24),
-          ],
-
-          // Address with improved styling
+          // Unified Info Section (Location & About)
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: const Color(0xFFF8F9FA),
+              color: Colors.white,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0xFFE2E8F0)),
+              border: Border.all(color: const Color(0xFFE5E7EB)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.02),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
-            child: Row(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF6F3FCC).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(
-                    Icons.location_on_rounded,
-                    color: Color(0xFF6F3FCC),
-                    size: 20,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Location',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF6B7280),
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
+                // Location Row
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Icon(Icons.location_on_rounded, color: Color(0xFF6B7280), size: 20),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
                         _fullAddress,
                         style: const TextStyle(
-                          fontSize: 15,
+                          fontSize: 14,
                           fontWeight: FontWeight.w500,
                           color: Color(0xFF374151),
                           height: 1.4,
                         ),
                       ),
+                    ),
+                  ],
+                ),
+
+                if (widget.vendor.description != null &&
+                    widget.vendor.description!.trim().isNotEmpty) ...[
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 12),
+                    child: Divider(color: Color(0xFFE5E7EB), height: 1),
+                  ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(Icons.info_outline_rounded, color: Color(0xFF6B7280), size: 20),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          widget.vendor.description!,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                            color: Color(0xFF4B5563),
+                            height: 1.5,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
-                ),
+                ],
               ],
             ),
           ),
 
-          // Website link if available
-          if (widget.vendor.website != null &&
-              widget.vendor.website!.trim().isNotEmpty) ...[
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF8F9FA),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFFE2E8F0)),
-              ),
-              child: InkWell(
-                onTap: () {
-                  HapticFeedback.lightImpact();
-                  String url = widget.vendor.website!.trim();
-                  // Add https:// if not present
-                  if (!url.startsWith('http://') &&
-                      !url.startsWith('https://')) {
-                    url = 'https://$url';
-                  }
-                  launchUrlString(url);
-                },
-                borderRadius: BorderRadius.circular(16),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF6F3FCC).withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Icon(
-                        Icons.language_rounded,
-                        color: Color(0xFF6F3FCC),
-                        size: 20,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Website',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFF6B7280),
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            widget.vendor.website!.trim(),
-                            style: const TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xFF374151),
-                              height: 1.4,
-                              decoration: TextDecoration.underline,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const Icon(
-                      Icons.open_in_new_rounded,
-                      color: Color(0xFF6B7280),
-                      size: 18,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-
-          const SizedBox(height: 24),
-
-          // Action buttons row with improved styling
-          Row(
-            children: [
-              Expanded(
-                child: BlocBuilder<FavoritesBloc, FavoritesState>(
-                  builder: (context, favState) {
-                    final isFavorite =
-                        favState is FavoritesLoaded &&
-                        favState.isFavorite(widget.vendor.id);
-
-                    return Container(
-                      height: 56,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: isFavorite
-                              ? [
-                                  const Color(0xFFEF4444),
-                                  const Color(0xFFDC2626),
-                                ]
-                              : [
-                                  const Color(0xFF6F3FCC),
-                                  const Color(0xFF9F7AEA),
-                                ],
-                        ),
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color:
-                                (isFavorite
-                                        ? const Color(0xFFEF4444)
-                                        : const Color(0xFF6F3FCC))
-                                    .withOpacity(0.25),
-                            blurRadius: 12,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: () {
-                            HapticFeedback.lightImpact();
-                            context.read<FavoritesBloc>().add(
-                              ToggleFavorite(widget.vendor),
-                            );
-                          },
-                          borderRadius: BorderRadius.circular(16),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                isFavorite
-                                    ? Icons.favorite_rounded
-                                    : Icons.favorite_border_rounded,
-                                color: Colors.white,
-                                size: 20,
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                isFavorite ? 'Favorited' : 'Add to Favorites',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w600,
-                                  letterSpacing: 0.1,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-              const SizedBox(width: 12),
-              if (widget.vendor.contactPhone != null &&
-                  widget.vendor.contactPhone!.trim().isNotEmpty)
-                _buildActionButton(
-                  onTap: () {
-                    HapticFeedback.lightImpact();
-                    final raw = widget.vendor.contactPhone!.trim();
-                    final phone = raw.replaceAll(RegExp(r'[^0-9+]'), '');
-                    if (phone.isNotEmpty) {
-                      launchUrlString('tel:$phone');
-                    }
-                  },
-                  icon: Icons.call_rounded,
-                  color: const Color(0xFF10B981),
-                  tooltip: 'Call',
-                ),
-              if (widget.vendor.contactPhone != null &&
-                  widget.vendor.contactPhone!.trim().isNotEmpty)
-                const SizedBox(width: 12),
-              if (_googleMapsUrl != null)
-                _buildActionButton(
-                  onTap: () {
-                    HapticFeedback.lightImpact();
-                    launchUrlString(_googleMapsUrl!);
-                  },
-                  icon: Icons.directions_rounded,
-                  color: const Color(0xFFF59E0B),
-                  tooltip: 'Directions',
-                ),
-            ],
-          ),
-
           // Social Media Links
           if (widget.vendor.socialMediaLinks.isNotEmpty) ...[
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
             _buildSocialMediaSection(),
           ],
 
-          // Points Payment Card
-          const SizedBox(height: 24),
+          // Points Payment Banner
+          const SizedBox(height: 20),
           _buildPointsPaymentCard(context),
         ],
       ),
     );
   }
 
-  /// Build points payment card
+  /// Horizontal points payment banner
   Widget _buildPointsPaymentCard(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 0),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF6366F1).withOpacity(0.35),
-            blurRadius: 25,
-            offset: const Offset(0, 10),
-          ),
-        ],
+        color: const Color(0xFF1E293B),
+        borderRadius: BorderRadius.circular(16),
       ),
-      child: Stack(
+      child: Row(
         children: [
-          // Decorative pattern
-          Positioned.fill(
-            child: CustomPaint(painter: PaymentCardPatternPainter()),
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.account_balance_wallet_rounded, color: Colors.white, size: 22),
           ),
-
-          // Card content
-          Padding(
-            padding: const EdgeInsets.all(28),
+          const SizedBox(width: 16),
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: const Icon(
-                        Icons.account_balance_wallet_rounded,
-                        color: Colors.white,
-                        size: 24,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Pay with Points',
-                            style: TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.w800,
-                              color: Colors.white,
-                              height: 1.1,
-                              letterSpacing: -0.5,
-                            ),
-                          ),
-                          const SizedBox(height: 6),
-                          Text(
-                            'Use your reward points to pay bills',
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white.withOpacity(0.9),
-                              height: 1.3,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 20),
-
-                // Points info row
-                Row(
-                  children: [
-                    Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withAlpha(55),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: Colors.white.withAlpha(86),
-                            width: 1,
-                          ),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Available Points',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white.withOpacity(0.8),
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            BlocBuilder<PointsBloc, PointsState>(
-                              builder: (context, pointsState) {
-                                final pointsText = pointsState is PointsLoaded
-                                    ? pointsState.points.balance.toString()
-                                    : '--';
-                                return Text(
-                                  pointsText,
-                                  style: const TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w800,
-                                    color: Colors.white,
-                                    letterSpacing: -0.5,
-                                  ),
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(width: 12),
-
-                    Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.15),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: Colors.white.withOpacity(0.2),
-                            width: 1,
-                          ),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Exchange Rate',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white.withOpacity(0.8),
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            const Text(
-                              '1 pt = ₹1',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w800,
-                                color: Colors.white,
-                                letterSpacing: -0.3,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 20),
-
-                // Action button
-                Container(
-                  width: double.infinity,
-                  height: 52,
-                  decoration: BoxDecoration(
+                const Text(
+                  'Pay with Points',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
                   ),
-                  child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      onTap: () => _openPointsPaymentDialog(context),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.account_balance_wallet_rounded,
-                            color: const Color(0xFF6366F1),
-                            size: 20,
-                          ),
-                          const SizedBox(width: 8),
-                          const Text(
-                            'Pay Bill with Points',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                              color: Color(0xFF6366F1),
-                            ),
-                          ),
-                        ],
+                ),
+                const SizedBox(height: 2),
+                BlocBuilder<PointsBloc, PointsState>(
+                  builder: (context, pointsState) {
+                    final balance = pointsState is PointsLoaded ? pointsState.points.balance : 0;
+                    return Text(
+                      'Balance: $balance pts',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.white.withOpacity(0.8),
                       ),
-                    ),
-                  ),
+                    );
+                  },
                 ),
               ],
             ),
           ),
+          const SizedBox(width: 12),
+          ElevatedButton(
+            onPressed: () => _openPointsPaymentDialog(context),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF3B82F6),
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              elevation: 0,
+            ),
+            child: const Text('Pay Bill', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+          ),
         ],
       ),
     );
   }
 
-  /// Build action button helper
-  Widget _buildActionButton({
-    required VoidCallback onTap,
+  /// Compact Action Pill helper
+  Widget _buildActionPill({
     required IconData icon,
+    required String label,
     required Color color,
-    required String tooltip,
+    required VoidCallback onTap,
   }) {
-    return Tooltip(
-      message: tooltip,
-      child: Container(
-        height: 56,
-        width: 56,
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: color.withOpacity(0.25),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            borderRadius: BorderRadius.circular(16),
-            onTap: onTap,
-            child: Icon(icon, color: Colors.white, size: 22),
-          ),
-        ),
-      ),
-    );
-  }
-
-  /// Build business description section
-  Widget _buildDescriptionSection() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            const Color(0xFF6F3FCC).withOpacity(0.05),
-            const Color(0xFF9F7AEA).withOpacity(0.05),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFF6F3FCC).withOpacity(0.1)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.08),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: color.withOpacity(0.15)),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF6F3FCC).withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(
-                  Icons.business_rounded,
-                  color: Color(0xFF6F3FCC),
-                  size: 20,
-                ),
-              ),
-              const SizedBox(width: 12),
-              const Text(
-                'About This Business',
+              Icon(icon, color: color, size: 16),
+              const SizedBox(width: 6),
+              Text(
+                label,
                 style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: Color(0xFF1A202C),
-                  letterSpacing: -0.3,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: color,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
-          Text(
-            widget.vendor.description!,
-            style: const TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w400,
-              color: Color(0xFF4A5568),
-              height: 1.6,
-              letterSpacing: 0.1,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -1317,45 +1019,32 @@ class _VendorDetailViewState extends State<_VendorDetailView> {
   /// Build social media links section
   Widget _buildSocialMediaSection() {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE5E7EB)),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF6F3FCC).withOpacity(0.08),
-            blurRadius: 20,
-            offset: const Offset(0, 4),
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
         ],
-        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF6F3FCC).withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(
-                  Icons.share_rounded,
-                  color: Color(0xFF6F3FCC),
-                  size: 20,
-                ),
-              ),
+              const Icon(Icons.share_rounded, color: Color(0xFF6B7280), size: 20),
               const SizedBox(width: 12),
               const Text(
                 'Connect With Us',
                 style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: Color(0xFF1A202C),
-                  letterSpacing: -0.3,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF374151),
                 ),
               ),
             ],
