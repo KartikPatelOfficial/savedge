@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:savedge/features/auth/data/models/user_profile_models.dart';
@@ -30,6 +31,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> with SingleTick
   bool _isLoadingProfile = true;
   bool _citySelectionShown = false;
   late List<Widget> _pages;
+  bool _isNavBarVisible = true;
   
   bool _isDrawerOpen = false;
   late AnimationController _animationController;
@@ -226,11 +228,35 @@ class _MainNavigationPageState extends State<MainNavigationPage> with SingleTick
                             Scaffold(
                               backgroundColor: Colors.white,
                               extendBody: true,
-                              body: IndexedStack(index: _currentIndex, children: _pages),
-                              bottomNavigationBar: HomeBottomNavBar(
-                                currentIndex: _currentIndex,
-                                onTap: _onBottomNavTap,
-                                isEmployee: _isEmployee,
+                              body: Stack(
+                                children: [
+                                  NotificationListener<UserScrollNotification>(
+                                    onNotification: (notification) {
+                                      if (notification.direction == ScrollDirection.forward) {
+                                        if (!_isNavBarVisible) setState(() => _isNavBarVisible = true);
+                                      } else if (notification.direction == ScrollDirection.reverse) {
+                                        if (_isNavBarVisible) setState(() => _isNavBarVisible = false);
+                                      }
+                                      return false;
+                                    },
+                                    child: IndexedStack(index: _currentIndex, children: _pages),
+                                  ),
+                                  Positioned(
+                                    left: 0,
+                                    right: 0,
+                                    bottom: 0,
+                                    child: AnimatedSlide(
+                                      duration: const Duration(milliseconds: 300),
+                                      curve: Curves.easeOutCubic,
+                                      offset: _isNavBarVisible ? Offset.zero : const Offset(0, 1.5),
+                                      child: HomeBottomNavBar(
+                                        currentIndex: _currentIndex,
+                                        onTap: _onBottomNavTap,
+                                        isEmployee: _isEmployee,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                             
