@@ -111,13 +111,18 @@ class _OtpVerificationPageState extends State<OtpVerificationPage>
   }
 
   String get _formatPhoneNumber {
-    if (widget.phoneNumber.length <= 4) return widget.phoneNumber;
-    final start = widget.phoneNumber.substring(
-      0,
-      widget.phoneNumber.length - 4,
-    );
-    final end = widget.phoneNumber.substring(widget.phoneNumber.length - 4);
-    return '$start****$end';
+    final phone = widget.phoneNumber;
+    if (phone.length < 9) return phone;
+    
+    if (phone.startsWith('+')) {
+      final start = phone.substring(0, 5);
+      final end = phone.substring(phone.length - 3);
+      return '$start****$end';
+    } else {
+      final start = phone.substring(0, 2);
+      final end = phone.substring(phone.length - 3);
+      return '$start****$end';
+    }
   }
 
   @override
