@@ -1,4 +1,5 @@
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
 /// Model class for bottom navigation items
@@ -53,7 +54,8 @@ class HomeBottomNavBar extends StatelessWidget {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF6F3FCC).withOpacity(0.15), // Brand color shadow
+                    color: const Color(0xFF6F3FCC).withOpacity(0.15),
+                    // Brand color shadow
                     blurRadius: 24,
                     offset: const Offset(0, 8),
                     spreadRadius: 2,
@@ -138,14 +140,7 @@ class _NavBarItem extends StatelessWidget {
         curve: Curves.easeOutCubic,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          gradient: isSelected
-              ? const LinearGradient(
-                  colors: [Color(0xFF6F3FCC), Color(0xFF9F7AEA)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                )
-              : null,
-          color: isSelected ? null : Colors.transparent,
+          color: isSelected ? Color(0xFF6F3FCC) : Colors.transparent,
           borderRadius: BorderRadius.circular(24),
           boxShadow: isSelected
               ? [
