@@ -30,6 +30,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> with SingleTick
   bool _isEmployee = false;
   bool _isLoadingProfile = true;
   bool _citySelectionShown = false;
+  UserProfileResponse3? _userProfile;
   late List<Widget> _pages;
   bool _isNavBarVisible = true;
   
@@ -106,6 +107,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> with SingleTick
           await _authRepository.getCurrentUserProfile();
       if (!mounted) return;
       setState(() {
+        _userProfile = profile;
         final bool wasEmployee = _isEmployee;
         _isEmployee = profile.isEmployee;
 
@@ -245,7 +247,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> with SingleTick
                       child: Transform.translate(
                         offset: Offset(-80 * (1 - animValue), 0),
                         child: HomeDrawer(
-                          userName: 'Welcome',
+                          userName: _userProfile?.displayName ?? '',
                           onMenuItemTap: (title) {
                             _toggleDrawer();
                           },

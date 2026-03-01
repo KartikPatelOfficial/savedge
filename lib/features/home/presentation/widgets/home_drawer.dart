@@ -194,10 +194,10 @@ class _PremiumUserProfileSection extends StatelessWidget {
                       userAvatar!,
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) =>
-                          _PremiumDefaultAvatar(),
+                          _PremiumInitialsAvatar(name: userName),
                     ),
                   )
-                : _PremiumDefaultAvatar(),
+                : _PremiumInitialsAvatar(name: userName),
           ),
           const SizedBox(height: 24),
           // Greeting & Name
@@ -228,7 +228,21 @@ class _PremiumUserProfileSection extends StatelessWidget {
   }
 }
 
-class _PremiumDefaultAvatar extends StatelessWidget {
+class _PremiumInitialsAvatar extends StatelessWidget {
+  const _PremiumInitialsAvatar({required this.name});
+
+  final String name;
+
+  String _getInitials() {
+    final trimmed = name.trim();
+    if (trimmed.isEmpty) return '?';
+    final parts = trimmed.split(RegExp(r'\s+'));
+    if (parts.length >= 2) {
+      return '${parts.first[0]}${parts.last[0]}'.toUpperCase();
+    }
+    return parts.first[0].toUpperCase();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -243,7 +257,16 @@ class _PremiumDefaultAvatar extends StatelessWidget {
           ],
         ),
       ),
-      child: const Icon(Icons.person_rounded, color: Colors.white, size: 36),
+      alignment: Alignment.center,
+      child: Text(
+        _getInitials(),
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 28,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 1,
+        ),
+      ),
     );
   }
 }
