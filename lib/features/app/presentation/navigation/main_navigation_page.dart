@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -235,53 +234,52 @@ class _MainNavigationPageState extends State<MainNavigationPage> with SingleTick
               ],
             ),
             builder: (context, child) {
+              final animValue = _animationController.value;
               return Stack(
                 children: [
-                  // Bottom Layer: The beautiful full screen background menu
-                  if (_animationController.value > 0)
-                    Transform.translate(
-                      offset: Offset(-80 * (1 - _animationController.value), 0),
-                      child: Opacity(
-                        opacity: _animationController.value,
+                  // Bottom Layer: The drawer (always in tree to preserve indices)
+                  IgnorePointer(
+                    ignoring: animValue == 0,
+                    child: Opacity(
+                      opacity: animValue,
+                      child: Transform.translate(
+                        offset: Offset(-80 * (1 - animValue), 0),
                         child: HomeDrawer(
                           userName: 'Welcome',
                           onMenuItemTap: (title) {
                             _toggleDrawer();
-                            // Additional navigation logic based on title
                           },
                         ),
                       ),
                     ),
-                  
+                  ),
+
                   // Top Layer: The actual app scaling and sliding
                   Transform.translate(
                     offset: Offset(_slideAnimation.value, 0),
                     child: Transform.scale(
                       scale: _scaleAnimation.value,
-                      alignment: Alignment.centerLeft, // Scale from the left edge
+                      alignment: Alignment.centerLeft,
                       child: ClipRRect(
-                        borderRadius: BorderRadius.circular(_animationController.value * 32),
+                        borderRadius: BorderRadius.circular(animValue * 32),
                         child: Stack(
                           children: [
-                            Scaffold(
-                              backgroundColor: Colors.transparent,
-                              extendBody: true,
-                              body: child,
+                            // Opaque background that fades in during drawer animation
+                            // so content doesn't show through to dark drawer
+                            Opacity(
+                              opacity: animValue,
+                              child: Container(color: const Color(0xFFF6F8FB)),
                             ),
-                            
-                            // Semi-transparent overlay to tap to close menu when open
-                            if (_animationController.value > 0)
+                            child!,
+
+                            // Overlay to tap to close menu when open
+                            if (animValue > 0)
                               Positioned.fill(
                                 child: GestureDetector(
                                   onTap: _toggleDrawer,
-                                  child: BackdropFilter(
-                                    filter: ImageFilter.blur(
-                                        sigmaX: 5 * _animationController.value,
-                                        sigmaY: 5 * _animationController.value),
-                                    child: Container(
-                                      color: Colors.black.withOpacity(
-                                          0.3 * _animationController.value), // Progressive frost effect
-                                    ),
+                                  behavior: HitTestBehavior.opaque,
+                                  child: Container(
+                                    color: Colors.transparent,
                                   ),
                                 ),
                               ),
@@ -309,9 +307,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> with SingleTick
   }
 
   void _toggleDrawer() {
-    setState(() {
-      _isDrawerOpen = !_isDrawerOpen;
-    });
+    _isDrawerOpen = !_isDrawerOpen;
     if (_isDrawerOpen) {
       _animationController.forward();
     } else {

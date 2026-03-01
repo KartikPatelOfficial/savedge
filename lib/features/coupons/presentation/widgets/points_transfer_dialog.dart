@@ -62,6 +62,7 @@ class _PointsTransferDialogState extends State<PointsTransferDialog> {
         },
         builder: (context, state) {
           return Dialog(
+            backgroundColor: Colors.white,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
             ),

@@ -48,47 +48,51 @@ class _GiftPageState extends State<GiftPage> with TickerProviderStateMixin {
       ],
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          scrolledUnderElevation: 0,
-          surfaceTintColor: Colors.transparent,
-          title: const Text(
-            'Send & Receive Gifts',
-            style: TextStyle(
-              color: Color(0xFF1A202C),
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          bottom: TabBar(
-            controller: _tabController,
-            labelColor: const Color(0xFF6F3FCC),
-            unselectedLabelColor: const Color(0xFF718096),
-            indicatorColor: const Color(0xFF6F3FCC),
-            indicatorWeight: 3,
-            labelStyle: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
-            unselectedLabelStyle: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-            ),
-            tabs: const [
-              Tab(icon: Icon(Icons.card_giftcard), text: 'Send Gifts'),
-              Tab(icon: Icon(Icons.inbox), text: 'Received'),
-              Tab(icon: Icon(Icons.history), text: 'Sent History'),
+        body: SafeArea(
+          child: NestedScrollView(
+            headerSliverBuilder: (context, innerBoxIsScrolled) => [
+              SliverAppBar(
+                expandedHeight: 120,
+                floating: false,
+                pinned: true,
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                scrolledUnderElevation: 0,
+                surfaceTintColor: Colors.transparent,
+                flexibleSpace: FlexibleSpaceBar(
+                  title: const Text(
+                    'Send & Receive Gifts',
+                    style: TextStyle(
+                      color: Color(0xFF1A202C),
+                      fontSize: 24,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  titlePadding: const EdgeInsets.only(left: 16, bottom: 16),
+                ),
+              ),
+              SliverPersistentHeader(
+                pinned: true,
+                delegate: _PillTabBarDelegate(
+                  tabController: _tabController,
+                  labels: const ['Send', 'Received', 'History'],
+                  icons: const [
+                    Icons.card_giftcard_rounded,
+                    Icons.move_to_inbox_rounded,
+                    Icons.history_rounded,
+                  ],
+                ),
+              ),
             ],
+            body: TabBarView(
+              controller: _tabController,
+              children: [
+                _buildSendGiftsTab(),
+                _buildReceivedGiftsTab(),
+                _buildSentHistoryTab(),
+              ],
+            ),
           ),
-        ),
-        body: TabBarView(
-          controller: _tabController,
-          children: [
-            _buildSendGiftsTab(),
-            _buildReceivedGiftsTab(),
-            _buildSentHistoryTab(),
-          ],
         ),
       ),
     );
@@ -96,108 +100,89 @@ class _GiftPageState extends State<GiftPage> with TickerProviderStateMixin {
 
   Widget _buildSendGiftsTab() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header with info
-          Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [Color(0xFF8A4FFF), Color(0xFFC084FC)],
-              ),
-              borderRadius: BorderRadius.circular(24),
-            ),
-            child: Stack(
-              children: [
-                Positioned(
-                  right: -20,
-                  top: -20,
-                  child: Icon(
-                    Icons.card_giftcard,
-                    size: 100,
-                    color: Colors.white.withOpacity(0.15),
-                  ),
+          const SizedBox(height: 8),
+
+          // Compact Transfer Points card
+          GestureDetector(
+            onTap: () => _showPointsTransferDialog(),
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: const Color(0xFFE2E8F0),
+                  width: 1,
                 ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFD69E2E).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(
+                      Icons.stars_rounded,
+                      color: Color(0xFFD69E2E),
+                      size: 24,
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: const Icon(
-                            Icons.volunteer_activism,
-                            color: Color(0xFF8A4FFF),
-                            size: 28,
+                        Text(
+                          'Transfer Points',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF1A202C),
                           ),
                         ),
-                        const SizedBox(width: 16),
-                        const Expanded(
-                          child: Text(
-                            'Share the Joy!',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 24,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: -0.5,
-                            ),
+                        SizedBox(height: 2),
+                        Text(
+                          'Send points to a phone number',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Color(0xFF718096),
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 20),
-                    Text(
-                      'Gift your available coupons or transfer points to colleagues within your organization.',
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.95),
-                        fontSize: 15,
-                        height: 1.5,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+                  ),
+                  const Icon(
+                    Icons.chevron_right_rounded,
+                    color: Color(0xFFA0AEC0),
+                    size: 24,
+                  ),
+                ],
+              ),
             ),
           ),
 
-          const SizedBox(height: 32),
-
-          // Gift Options
-          Row(
-            children: [
-              Expanded(
-                child: _buildGiftOption(
-                  icon: Icons.stars,
-                  title: 'Transfer Points',
-                  subtitle: 'Send points to a phone number',
-                  color: const Color(0xFFD69E2E),
-                  onTap: () => _showPointsTransferDialog(),
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 32),
+          const SizedBox(height: 24),
 
           // Available Coupons Section
-          const Text(
-            'Your Available Coupons',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-              color: Color(0xFF1A202C),
+          const Padding(
+            padding: EdgeInsets.only(left: 4, bottom: 12),
+            child: Text(
+              'Your Available Coupons',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF1A202C),
+              ),
             ),
           ),
-          const SizedBox(height: 16),
 
           BlocBuilder<UserCouponsBloc, UserCouponsState>(
             builder: (context, state) {
@@ -362,87 +347,33 @@ class _GiftPageState extends State<GiftPage> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildGiftOption({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.05),
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: color.withOpacity(0.3), width: 2),
-        ),
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: color.withOpacity(0.1)),
-              ),
-              child: Icon(icon, color: color, size: 36),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.w700,
-                color: Color(0xFF1A202C),
-                letterSpacing: -0.3,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 6),
-            Text(
-              subtitle,
-              style: const TextStyle(
-                fontSize: 13, 
-                color: Color(0xFF718096),
-                fontWeight: FontWeight.w500,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
   Widget _buildCouponGiftCard(dynamic coupon) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFFF7FAFC),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFEDF2F7), width: 2),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
       ),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
-              color: const Color(0xFF8A4FFF).withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFF8A4FFF).withOpacity(0.2)),
+              color: const Color(0xFF6F3FCC).withOpacity(0.08),
+              borderRadius: BorderRadius.circular(10),
             ),
             child: Text(
               coupon.discountDisplay ?? '${coupon.discountValue}%',
               style: const TextStyle(
-                color: Color(0xFF8A4FFF),
-                fontSize: 15,
+                color: Color(0xFF6F3FCC),
+                fontSize: 14,
                 fontWeight: FontWeight.w800,
               ),
             ),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -450,19 +381,18 @@ class _GiftPageState extends State<GiftPage> with TickerProviderStateMixin {
                 Text(
                   coupon.title ?? coupon.couponTitle ?? 'Coupon',
                   style: const TextStyle(
-                    fontSize: 16,
+                    fontSize: 15,
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFF2D3748),
-                    letterSpacing: -0.3,
+                    color: Color(0xFF1A202C),
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 2),
                 Text(
                   coupon.vendorName ?? 'Vendor',
                   style: const TextStyle(
-                    fontSize: 14,
+                    fontSize: 13,
                     color: Color(0xFF718096),
                     fontWeight: FontWeight.w500,
                   ),
@@ -474,30 +404,23 @@ class _GiftPageState extends State<GiftPage> with TickerProviderStateMixin {
           ),
           Container(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              color: const Color(0xFF8A4FFF),
+              borderRadius: BorderRadius.circular(10),
+              color: const Color(0xFF6F3FCC),
             ),
             child: Material(
               color: Colors.transparent,
               child: InkWell(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(10),
                 onTap: () => _showGiftCouponDialog(coupon),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.volunteer_activism, size: 18, color: Colors.white),
-                      const SizedBox(width: 6),
-                      const Text(
-                        'Gift',
-                        style: TextStyle(
-                          fontSize: 14, 
-                          fontWeight: FontWeight.w700, 
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  child: Text(
+                    'Gift',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
@@ -522,9 +445,9 @@ class _GiftPageState extends State<GiftPage> with TickerProviderStateMixin {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF38A169).withOpacity(0.04),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFF38A169).withOpacity(0.2), width: 2),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -532,19 +455,19 @@ class _GiftPageState extends State<GiftPage> with TickerProviderStateMixin {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(10),
+                width: 40,
+                height: 40,
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: const Color(0xFF38A169).withOpacity(0.1)),
+                  color: const Color(0xFF38A169).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Icon(
                   Icons.favorite,
                   color: Color(0xFF38A169),
-                  size: 22,
+                  size: 20,
                 ),
               ),
-              const SizedBox(width: 14),
+              const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -554,12 +477,74 @@ class _GiftPageState extends State<GiftPage> with TickerProviderStateMixin {
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF38A169),
-                        letterSpacing: -0.3,
+                        color: Color(0xFF1A202C),
                       ),
                     ),
                     Text(
                       when,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: Color(0xFF718096),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF38A169).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Text(
+                  'Received',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF38A169),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          const Divider(color: Color(0xFFEDF2F7), height: 1),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF6F3FCC).withOpacity(0.08),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Text(
+                  'GIFT',
+                  style: TextStyle(
+                    color: Color(0xFF6F3FCC),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF1A202C),
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Text(
+                      vendor,
                       style: const TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
@@ -571,92 +556,6 @@ class _GiftPageState extends State<GiftPage> with TickerProviderStateMixin {
               ),
             ],
           ),
-          const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0xFFEDF2F7)),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF8A4FFF).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Text(
-                    'GIFT',
-                    style: TextStyle(
-                      color: Color(0xFF8A4FFF),
-                      fontSize: 14,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFF2D3748),
-                          letterSpacing: -0.3,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      Text(
-                        vendor,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: Color(0xFF718096),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          if (coupon.message != null && coupon.message!.isNotEmpty) ...[
-            const SizedBox(height: 12),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFE2E8F0), width: 1, style: BorderStyle.solid),
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Icon(Icons.format_quote_rounded, color: Color(0xFFA0AEC0), size: 18),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      coupon.message!,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontStyle: FontStyle.italic,
-                        fontWeight: FontWeight.w500,
-                        color: Color(0xFF4A5568),
-                        height: 1.4,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
         ],
       ),
     );
@@ -676,101 +575,65 @@ class _GiftPageState extends State<GiftPage> with TickerProviderStateMixin {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFFD69E2E).withOpacity(0.04),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFD69E2E).withOpacity(0.2), width: 2),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: const Color(0xFFD69E2E).withOpacity(0.1)),
-                ),
-                child: const Icon(
-                  Icons.stars_rounded,
-                  color: Color(0xFFD69E2E),
-                  size: 24,
-                ),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Points from $sender',
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFFD69E2E),
-                        letterSpacing: -0.3,
-                      ),
-                    ),
-                    Text(
-                      when,
-                      style: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                        color: Color(0xFF718096),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFD69E2E).withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  '+$amount pts',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w800,
-                    color: Color(0xFFD69E2E),
-                  ),
-                ),
-              ),
-            ],
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: const Color(0xFFD69E2E).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: const Icon(
+              Icons.stars_rounded,
+              color: Color(0xFFD69E2E),
+              size: 22,
+            ),
           ),
-          if (points.message != null && points.message!.isNotEmpty) ...[
-            const SizedBox(height: 16),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Icon(Icons.format_quote_rounded, color: Color(0xFFA0AEC0), size: 18),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      points.message!,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontStyle: FontStyle.italic,
-                        fontWeight: FontWeight.w500,
-                        color: Color(0xFF4A5568),
-                        height: 1.4,
-                      ),
-                    ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Points from $sender',
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF1A202C),
                   ),
-                ],
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  when,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF718096),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: const Color(0xFF38A169).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              '+$amount pts',
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF38A169),
               ),
             ),
-          ],
+          ),
         ],
       ),
     );
@@ -790,108 +653,67 @@ class _GiftPageState extends State<GiftPage> with TickerProviderStateMixin {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFFF7FAFC),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFEDF2F7), width: 2),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: const Color(0xFFE2E8F0)),
-                ),
-                child: const Icon(
-                  Icons.send_rounded,
-                  color: Color(0xFF718096),
-                  size: 20,
-                ),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Sent to Colleague',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF4A5568),
-                        letterSpacing: -0.3,
-                      ),
-                    ),
-                    Text(
-                      when,
-                      style: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                        color: Color(0xFFA0AEC0),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
           Container(
-            padding: const EdgeInsets.all(16),
+            width: 40,
+            height: 40,
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0xFFEDF2F7)),
+              color: const Color(0xFF6F3FCC).withOpacity(0.08),
+              borderRadius: BorderRadius.circular(10),
             ),
-            child: Row(
+            child: const Icon(
+              Icons.send_rounded,
+              color: Color(0xFF6F3FCC),
+              size: 18,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF718096).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF1A202C),
                   ),
-                  child: const Text(
-                    'GIFT',
-                    style: TextStyle(
-                      color: Color(0xFF4A5568),
-                      fontSize: 14,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFF2D3748),
-                          letterSpacing: -0.3,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      Text(
-                        vendor,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: Color(0xFF718096),
-                        ),
-                      ),
-                    ],
+                const SizedBox(height: 2),
+                Text(
+                  '$vendor  •  $when',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF718096),
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(
+              color: const Color(0xFF718096).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: const Text(
+              'Sent',
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF718096),
+              ),
             ),
           ),
         ],
@@ -934,102 +756,65 @@ class _GiftPageState extends State<GiftPage> with TickerProviderStateMixin {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFFF7FAFC),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFEDF2F7), width: 2),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: const Color(0xFFE2E8F0)),
-                ),
-                child: const Icon(
-                  Icons.stars_rounded,
-                  color: Color(0xFF718096),
-                  size: 24,
-                ),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Points to $recipient',
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF4A5568),
-                        letterSpacing: -0.3,
-                      ),
-                    ),
-                    Text(
-                      when,
-                      style: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                        color: Color(0xFFA0AEC0),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: const Color(0xFFE2E8F0)),
-                ),
-                child: Text(
-                  '-$amount pts',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w800,
-                    color: Color(0xFF4A5568),
-                  ),
-                ),
-              ),
-            ],
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: const Color(0xFFD69E2E).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: const Icon(
+              Icons.stars_rounded,
+              color: Color(0xFFD69E2E),
+              size: 22,
+            ),
           ),
-          if (points.message != null && points.message!.isNotEmpty) ...[
-            const SizedBox(height: 16),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Icon(Icons.format_quote_rounded, color: Color(0xFFA0AEC0), size: 18),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      points.message!,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontStyle: FontStyle.italic,
-                        fontWeight: FontWeight.w500,
-                        color: Color(0xFF4A5568),
-                        height: 1.4,
-                      ),
-                    ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Points to $recipient',
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF1A202C),
                   ),
-                ],
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  when,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF718096),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: const Color(0xFFEF4444).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              '-$amount pts',
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFFEF4444),
               ),
             ),
-          ],
+          ),
         ],
       ),
     );
@@ -1294,6 +1079,7 @@ class _GiftToPhoneDialogState extends State<_GiftToPhoneDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
+      backgroundColor: Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -1875,6 +1661,177 @@ class _GiftToPhoneDialogState extends State<_GiftToPhoneDialog> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Modern pill-style segmented tab bar delegate
+class _PillTabBarDelegate extends SliverPersistentHeaderDelegate {
+  final TabController tabController;
+  final List<String> labels;
+  final List<IconData> icons;
+
+  _PillTabBarDelegate({
+    required this.tabController,
+    required this.labels,
+    required this.icons,
+  });
+
+  @override
+  double get minExtent => 72;
+
+  @override
+  double get maxExtent => 72;
+
+  @override
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
+    return _PillTabBar(
+      tabController: tabController,
+      labels: labels,
+      icons: icons,
+    );
+  }
+
+  @override
+  bool shouldRebuild(_PillTabBarDelegate oldDelegate) => false;
+}
+
+/// Animated pill-style segmented tab bar widget
+class _PillTabBar extends StatefulWidget {
+  final TabController tabController;
+  final List<String> labels;
+  final List<IconData> icons;
+
+  const _PillTabBar({
+    required this.tabController,
+    required this.labels,
+    required this.icons,
+  });
+
+  @override
+  State<_PillTabBar> createState() => _PillTabBarState();
+}
+
+class _PillTabBarState extends State<_PillTabBar> {
+  late int _currentIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentIndex = widget.tabController.index;
+    widget.tabController.addListener(_onTabChanged);
+  }
+
+  @override
+  void dispose() {
+    widget.tabController.removeListener(_onTabChanged);
+    super.dispose();
+  }
+
+  void _onTabChanged() {
+    if (widget.tabController.indexIsChanging || widget.tabController.index != _currentIndex) {
+      setState(() => _currentIndex = widget.tabController.index);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Container(
+        height: 48,
+        decoration: BoxDecoration(
+          color: const Color(0xFFF1F0F5),
+          borderRadius: BorderRadius.circular(14),
+        ),
+        padding: const EdgeInsets.all(4),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final tabWidth = constraints.maxWidth / widget.labels.length;
+            return Stack(
+              children: [
+                // Animated sliding indicator
+                AnimatedPositioned(
+                  duration: const Duration(milliseconds: 250),
+                  curve: Curves.easeOutCubic,
+                  left: _currentIndex * tabWidth,
+                  top: 0,
+                  bottom: 0,
+                  width: tabWidth,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(11),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF6F3FCC).withValues(alpha: 0.10),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.04),
+                          blurRadius: 2,
+                          offset: const Offset(0, 1),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                // Tab buttons
+                Row(
+                  children: List.generate(widget.labels.length, (index) {
+                    final isSelected = _currentIndex == index;
+                    return Expanded(
+                      child: GestureDetector(
+                        onTap: () => widget.tabController.animateTo(index),
+                        behavior: HitTestBehavior.opaque,
+                        child: Center(
+                          child: AnimatedDefaultTextStyle(
+                            duration: const Duration(milliseconds: 200),
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                              color: isSelected
+                                  ? const Color(0xFF6F3FCC)
+                                  : const Color(0xFF8E8EA0),
+                              letterSpacing: -0.1,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                AnimatedSwitcher(
+                                  duration: const Duration(milliseconds: 200),
+                                  transitionBuilder: (child, animation) =>
+                                      FadeTransition(opacity: animation, child: child),
+                                  child: Icon(
+                                    widget.icons[index],
+                                    key: ValueKey('${index}_$isSelected'),
+                                    size: 16,
+                                    color: isSelected
+                                        ? const Color(0xFF6F3FCC)
+                                        : const Color(0xFF8E8EA0),
+                                  ),
+                                ),
+                                const SizedBox(width: 5),
+                                Text(widget.labels[index]),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }),
+                ),
+              ],
+            );
+          },
+        ),
       ),
     );
   }
