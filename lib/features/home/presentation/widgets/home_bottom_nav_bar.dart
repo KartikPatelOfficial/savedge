@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 
 /// Model class for bottom navigation items
@@ -17,7 +15,7 @@ class BottomNavItem {
   final VoidCallback? onTap;
 }
 
-/// Custom bottom navigation bar widget with modern floating aesthetic
+/// Fluid bottom navigation bar — sliding pill indicator, icon + label
 class HomeBottomNavBar extends StatelessWidget {
   const HomeBottomNavBar({
     super.key,
@@ -35,51 +33,72 @@ class HomeBottomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final defaultItems = items.isEmpty ? _getDefaultItems() : items;
+    final itemCount = defaultItems.length;
 
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.only(bottom: 24, left: 20, right: 20),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(32),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.95), // Increased opacity
-                borderRadius: BorderRadius.circular(32),
-                border: Border.all(
-                  color: Colors.grey.withOpacity(0.1),
-                  width: 1.0,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF6F3FCC).withOpacity(0.15),
-                    // Brand color shadow
-                    blurRadius: 24,
-                    offset: const Offset(0, 8),
-                    spreadRadius: 2,
+        padding: const EdgeInsets.fromLTRB(20, 0, 20, 18),
+        child: Container(
+          height: 70,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(26),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF6F3FCC).withOpacity(0.14),
+                blurRadius: 32,
+                offset: const Offset(0, 10),
+                spreadRadius: -2,
+              ),
+              BoxShadow(
+                color: Colors.black.withOpacity(0.07),
+                blurRadius: 12,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final totalWidth = constraints.maxWidth;
+              final itemWidth = totalWidth / itemCount;
+              final indicatorW = itemWidth - 20;
+              final indicatorLeft =
+                  currentIndex * itemWidth + (itemWidth - indicatorW) / 2;
+
+              return Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  // ── Fluid sliding indicator ──────────────────────────────
+                  AnimatedPositioned(
+                    duration: const Duration(milliseconds: 350),
+                    curve: Curves.easeInOutCubic,
+                    left: indicatorLeft,
+                    top: 10,
+                    child: Container(
+                      width: indicatorW,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFEDE9FE),
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                    ),
                   ),
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
+
+                  // ── Nav items ────────────────────────────────────────────
+                  Row(
+                    children: defaultItems.asMap().entries.map((entry) {
+                      final index = entry.key;
+                      final item = entry.value;
+                      return _NavItem(
+                        item: item,
+                        isSelected: index == currentIndex,
+                        onTap: () => onTap?.call(index),
+                      );
+                    }).toList(),
                   ),
                 ],
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: defaultItems.asMap().entries.map((entry) {
-                  final index = entry.key;
-                  final item = entry.value;
-                  return _NavBarItem(
-                    item: item,
-                    isSelected: index == currentIndex,
-                    onTap: () => onTap?.call(index),
-                  );
-                }).toList(),
-              ),
-            ),
+              );
+            },
           ),
         ),
       ),
@@ -89,13 +108,12 @@ class HomeBottomNavBar extends StatelessWidget {
   List<BottomNavItem> _getDefaultItems() {
     final List<BottomNavItem> navItems = [
       const BottomNavItem(
-        icon: Icons.home_outlined,
-        selectedIcon: Icons.home_rounded,
+        icon: Icons.explore_outlined,
+        selectedIcon: Icons.explore_rounded,
         label: 'Home',
       ),
     ];
 
-    // Only show Gift tab for employees
     if (isEmployee) {
       navItems.add(
         const BottomNavItem(
@@ -113,8 +131,8 @@ class HomeBottomNavBar extends StatelessWidget {
         label: 'Coupons',
       ),
       const BottomNavItem(
-        icon: Icons.person_outline,
-        selectedIcon: Icons.person_rounded,
+        icon: Icons.account_circle_outlined,
+        selectedIcon: Icons.account_circle_rounded,
         label: 'Profile',
       ),
     ]);
@@ -123,66 +141,65 @@ class HomeBottomNavBar extends StatelessWidget {
   }
 }
 
-class _NavBarItem extends StatelessWidget {
-  const _NavBarItem({required this.item, required this.isSelected, this.onTap});
+class _NavItem extends StatelessWidget {
+  const _NavItem({
+    required this.item,
+    required this.isSelected,
+    this.onTap,
+  });
 
   final BottomNavItem item;
   final bool isSelected;
   final VoidCallback? onTap;
 
+  static const _activeColor = Color(0xFF6F3FCC);
+  static const _inactiveColor = Color(0xFFB8C1CC);
+
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOutCubic,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: isSelected ? Color(0xFF6F3FCC) : Colors.transparent,
-          borderRadius: BorderRadius.circular(24),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: const Color(0xFF6F3FCC).withOpacity(0.3),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: SizedBox(
+          height: 70,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              AnimatedScale(
+                scale: isSelected ? 1.15 : 1.0,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeOutBack,
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 200),
+                  transitionBuilder: (child, anim) => ScaleTransition(
+                    scale: anim,
+                    child: child,
                   ),
-                ]
-              : [],
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              isSelected ? (item.selectedIcon ?? item.icon) : item.icon,
-              color: isSelected ? Colors.white : const Color(0xFFA0AEC0),
-              size: 24,
-            ),
-            AnimatedSize(
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeOutCubic,
-              alignment: Alignment.centerLeft,
-              child: SizedBox(
-                width: isSelected ? null : 0,
-                child: Padding(
-                  padding: EdgeInsets.only(left: isSelected ? 8 : 0),
-                  child: Text(
-                    item.label,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Colors.white,
-                      fontWeight: FontWeight.w700,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.clip,
+                  child: Icon(
+                    isSelected
+                        ? (item.selectedIcon ?? item.icon)
+                        : item.icon,
+                    key: ValueKey(isSelected),
+                    color: isSelected ? _activeColor : _inactiveColor,
+                    size: 24,
                   ),
                 ),
               ),
-            ),
-          ],
+              const SizedBox(height: 5),
+              AnimatedDefaultTextStyle(
+                duration: const Duration(milliseconds: 200),
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight:
+                      isSelected ? FontWeight.w700 : FontWeight.w500,
+                  color: isSelected ? _activeColor : _inactiveColor,
+                  letterSpacing: isSelected ? 0.1 : 0,
+                ),
+                child: Text(item.label, maxLines: 1),
+              ),
+            ],
+          ),
         ),
       ),
     );

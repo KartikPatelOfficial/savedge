@@ -12,6 +12,7 @@ import 'package:savedge/features/city/presentation/bloc/city_bloc.dart';
 import 'package:savedge/features/city/presentation/bloc/city_event.dart';
 import 'package:savedge/features/notifications/presentation/bloc/notification_bloc.dart';
 import 'package:savedge/features/notifications/presentation/pages/notification_center_page.dart';
+import 'package:savedge/core/widgets/animated_blur_background.dart';
 
 /// Main application widget
 class SavedgeApp extends StatelessWidget {
@@ -35,6 +36,23 @@ class SavedgeApp extends StatelessWidget {
         themeMode: ThemeMode.light,
         home: const AuthWrapper(),
         onGenerateRoute: _generateRoute,
+        builder: (context, child) {
+          return Scaffold(
+            backgroundColor: Colors.transparent,
+            body: Stack(
+              children: [
+                const AnimatedBlurBackground(),
+                if (child != null)
+                  Theme(
+                    data: Theme.of(context).copyWith(
+                      scaffoldBackgroundColor: Colors.transparent,
+                    ),
+                    child: child,
+                  ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }

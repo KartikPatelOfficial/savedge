@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -200,73 +201,87 @@ class _MainNavigationPageState extends State<MainNavigationPage> with SingleTick
         // Show normal navigation for valid city selection
         return Scaffold(
           extendBody: true,
-          backgroundColor: const Color(0xFF1A202C), // Dark background for the beautiful drawer
-          body: Stack(
-            children: [
-              // Bottom Layer: The beautiful full screen background menu
-              HomeDrawer(
-                userName: 'Welcome',
-                onMenuItemTap: (title) {
-                  _toggleDrawer();
-                  // Additional navigation logic based on title
-                },
-              ),
-              
-              // Top Layer: The actual app scaling and sliding
-              AnimatedBuilder(
-                animation: _animationController,
-                builder: (context, child) {
-                  return Transform.translate(
+          backgroundColor: Colors.transparent, // Transparent to show global aurora backdrop
+          body: AnimatedBuilder(
+            animation: _animationController,
+            child: Stack(
+              children: [
+                NotificationListener<UserScrollNotification>(
+                  onNotification: (notification) {
+                    if (notification.direction == ScrollDirection.forward) {
+                      if (!_isNavBarVisible) setState(() => _isNavBarVisible = true);
+                    } else if (notification.direction == ScrollDirection.reverse) {
+                      if (_isNavBarVisible) setState(() => _isNavBarVisible = false);
+                    }
+                    return false;
+                  },
+                  child: IndexedStack(index: _currentIndex, children: _pages),
+                ),
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: AnimatedSlide(
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeOutCubic,
+                    offset: _isNavBarVisible ? Offset.zero : const Offset(0, 1.5),
+                    child: HomeBottomNavBar(
+                      currentIndex: _currentIndex,
+                      onTap: _onBottomNavTap,
+                      isEmployee: _isEmployee,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            builder: (context, child) {
+              return Stack(
+                children: [
+                  // Bottom Layer: The beautiful full screen background menu
+                  if (_animationController.value > 0)
+                    Transform.translate(
+                      offset: Offset(-80 * (1 - _animationController.value), 0),
+                      child: Opacity(
+                        opacity: _animationController.value,
+                        child: HomeDrawer(
+                          userName: 'Welcome',
+                          onMenuItemTap: (title) {
+                            _toggleDrawer();
+                            // Additional navigation logic based on title
+                          },
+                        ),
+                      ),
+                    ),
+                  
+                  // Top Layer: The actual app scaling and sliding
+                  Transform.translate(
                     offset: Offset(_slideAnimation.value, 0),
                     child: Transform.scale(
                       scale: _scaleAnimation.value,
                       alignment: Alignment.centerLeft, // Scale from the left edge
                       child: ClipRRect(
-                        borderRadius: BorderRadius.circular(_isDrawerOpen ? 40 : 0),
+                        borderRadius: BorderRadius.circular(_animationController.value * 32),
                         child: Stack(
                           children: [
                             Scaffold(
-                              backgroundColor: Colors.white,
+                              backgroundColor: Colors.transparent,
                               extendBody: true,
-                              body: Stack(
-                                children: [
-                                  NotificationListener<UserScrollNotification>(
-                                    onNotification: (notification) {
-                                      if (notification.direction == ScrollDirection.forward) {
-                                        if (!_isNavBarVisible) setState(() => _isNavBarVisible = true);
-                                      } else if (notification.direction == ScrollDirection.reverse) {
-                                        if (_isNavBarVisible) setState(() => _isNavBarVisible = false);
-                                      }
-                                      return false;
-                                    },
-                                    child: IndexedStack(index: _currentIndex, children: _pages),
-                                  ),
-                                  Positioned(
-                                    left: 0,
-                                    right: 0,
-                                    bottom: 0,
-                                    child: AnimatedSlide(
-                                      duration: const Duration(milliseconds: 300),
-                                      curve: Curves.easeOutCubic,
-                                      offset: _isNavBarVisible ? Offset.zero : const Offset(0, 1.5),
-                                      child: HomeBottomNavBar(
-                                        currentIndex: _currentIndex,
-                                        onTap: _onBottomNavTap,
-                                        isEmployee: _isEmployee,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
+                              body: child,
                             ),
                             
                             // Semi-transparent overlay to tap to close menu when open
-                            if (_isDrawerOpen)
+                            if (_animationController.value > 0)
                               Positioned.fill(
                                 child: GestureDetector(
                                   onTap: _toggleDrawer,
-                                  child: Container(
-                                    color: Colors.transparent,
+                                  child: BackdropFilter(
+                                    filter: ImageFilter.blur(
+                                        sigmaX: 5 * _animationController.value,
+                                        sigmaY: 5 * _animationController.value),
+                                    child: Container(
+                                      color: Colors.black.withOpacity(
+                                          0.3 * _animationController.value), // Progressive frost effect
+                                    ),
                                   ),
                                 ),
                               ),
@@ -274,10 +289,10 @@ class _MainNavigationPageState extends State<MainNavigationPage> with SingleTick
                         ),
                       ),
                     ),
-                  );
-                },
-              ),
-            ],
+                  ),
+                ],
+              );
+            },
           ),
         );
       },
@@ -294,14 +309,14 @@ class _MainNavigationPageState extends State<MainNavigationPage> with SingleTick
   }
 
   void _toggleDrawer() {
-    if (_isDrawerOpen) {
-      _animationController.reverse();
-    } else {
-      _animationController.forward();
-    }
     setState(() {
       _isDrawerOpen = !_isDrawerOpen;
     });
+    if (_isDrawerOpen) {
+      _animationController.forward();
+    } else {
+      _animationController.reverse();
+    }
   }
 }
 

@@ -47,12 +47,12 @@ class _GiftPageState extends State<GiftPage> with TickerProviderStateMixin {
         BlocProvider(create: (_) => getIt<GiftingBloc>()),
       ],
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.transparent,
         appBar: AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor: Colors.transparent,
           elevation: 0,
           scrolledUnderElevation: 0,
-          surfaceTintColor: Colors.white,
+          surfaceTintColor: Colors.transparent,
           title: const Text(
             'Send & Receive Gifts',
             style: TextStyle(

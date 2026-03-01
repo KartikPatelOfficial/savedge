@@ -8,7 +8,6 @@ import 'package:savedge/features/coupons/data/services/coupon_service.dart';
 import 'package:savedge/features/coupons/presentation/bloc/coupon_manager_bloc.dart';
 import 'package:savedge/features/coupons/presentation/bloc/coupon_manager_event.dart';
 import 'package:savedge/features/coupons/presentation/bloc/coupon_manager_state.dart';
-import 'package:savedge/features/coupons/presentation/pages/coupon_confirmation_page.dart';
 import 'package:savedge/features/coupons/presentation/pages/coupon_redemption_options_page.dart';
 import 'package:savedge/features/coupons/presentation/pages/redeemed_coupon_page.dart';
 import 'package:savedge/features/coupons/presentation/widgets/coupon_card.dart';
@@ -62,6 +61,7 @@ class _CouponsViewState extends State<CouponsView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.transparent,
       extendBodyBehindAppBar: true,
       body: SafeArea(
         child: BlocBuilder<CouponManagerBloc, CouponManagerState>(
@@ -203,6 +203,7 @@ class _CouponsViewState extends State<CouponsView> {
       expandedHeight: 120,
       floating: false,
       pinned: true,
+      backgroundColor: Colors.transparent,
       elevation: _isScrolled ? 2 : 0,
       shadowColor: Colors.black.withValues(alpha: 0.1),
       flexibleSpace: LayoutBuilder(
@@ -473,11 +474,7 @@ class _CouponsViewState extends State<CouponsView> {
     );
 
     // Disable nested hero inside the preview; redemption page wraps it.
-    final preview = CouponCard(
-      coupon: coupon,
-      onTap: () {},
-      enableHero: false,
-    );
+    final preview = CouponCard(coupon: coupon, onTap: () {}, enableHero: false);
 
     final couponService = getIt<CouponService>();
     final couponCheck = await couponService.checkCoupon(coupon.couponId);

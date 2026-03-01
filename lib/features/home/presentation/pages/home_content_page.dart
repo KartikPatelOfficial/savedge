@@ -128,7 +128,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
         },
         child: Scaffold(
           key: _scaffoldKey,
-          backgroundColor: Colors.white,
+          backgroundColor: Colors.transparent,
           body: _buildMainContent(),
         ),
       ),
@@ -139,7 +139,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
     return RefreshIndicator(
       onRefresh: _handleRefresh,
       color: const Color(0xFF1A202C),
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.transparent,
       displacement: 80,
       child: CustomScrollView(
         controller: _scrollController,
@@ -187,8 +187,8 @@ class _HomeContentPageState extends State<HomeContentPage> {
       pinned: true,
       flexibleSpace: FlexibleSpaceBar(
         background: Container(
-          decoration: BoxDecoration(
-             color: Colors.white.withOpacity(0.95),
+          decoration: const BoxDecoration(
+             color: Colors.transparent,
           ),
           child: SafeArea(
             child: Padding(

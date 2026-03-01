@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:savedge/features/coupons/data/models/user_coupon_model.dart';
@@ -30,144 +32,164 @@ class CouponConfirmationPage extends StatefulWidget {
 
 class _CouponConfirmationPageState extends State<CouponConfirmationPage>
     with TickerProviderStateMixin {
-  late AnimationController _slideController;
-  late AnimationController _fadeController;
-  late Animation<Offset> _slideAnimation;
-  late Animation<double> _fadeAnimation;
+  late AnimationController _entryController;
+  late AnimationController _iconController;
+  late Animation<double> _entryFade;
+  late Animation<double> _iconScale;
 
   bool _isConfirming = false;
-  int? _claimedCouponId; // Store the claimed coupon ID for direct redemption
+  int? _claimedCouponId;
   final CouponService _couponService = GetIt.I<CouponService>();
 
   @override
   void initState() {
     super.initState();
-    _slideController = AnimationController(
-      duration: const Duration(milliseconds: 600),
+    _entryController = AnimationController(
+      duration: const Duration(milliseconds: 500),
       vsync: this,
-    );
-    _fadeController = AnimationController(
-      duration: const Duration(milliseconds: 800),
+    )..forward();
+    _iconController = AnimationController(
+      duration: const Duration(milliseconds: 900),
       vsync: this,
+    )..forward();
+
+    _entryFade = CurvedAnimation(parent: _entryController, curve: Curves.easeOut);
+    _iconScale = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _iconController, curve: Curves.elasticOut),
     );
-
-    _slideAnimation =
-        Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero).animate(
-          CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
-        );
-
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(parent: _fadeController, curve: Curves.easeOut));
-
-    // Start animations
-    _slideController.forward();
-    _fadeController.forward();
   }
 
   @override
   void dispose() {
-    _slideController.dispose();
-    _fadeController.dispose();
+    _entryController.dispose();
+    _iconController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final isUse = widget.confirmationType == CouponConfirmationType.use;
+    final accentColor =
+        isUse ? const Color(0xFF10B981) : const Color(0xFF6F3FCC);
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFD),
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: Container(
-          margin: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xFFE1E5E9), width: 1),
-          ),
-          child: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.black87),
-            onPressed: () => Navigator.of(context).pop(),
+      backgroundColor: const Color(0xFFF7F8FA),
+      body: FadeTransition(
+        opacity: _entryFade,
+        child: SafeArea(
+          child: Column(
+            children: [
+              _buildTopBar(context),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 20),
+                      _buildStatusIcon(accentColor),
+                      const SizedBox(height: 20),
+                      _buildTitleSection(isUse),
+                      const SizedBox(height: 28),
+                      _buildTicketCard(accentColor),
+                      const SizedBox(height: 20),
+                      _buildInfoSection(),
+                      const SizedBox(height: 16),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
-      body: FadeTransition(
-        opacity: _fadeAnimation,
-        child: SlideTransition(
-          position: _slideAnimation,
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(20, 100, 20, 40),
-            child: Column(
-              children: [
-                _buildHeader(),
-                const SizedBox(height: 24),
-                _buildModernCouponCard(),
-                const SizedBox(height: 32),
-                _buildModernConfirmationDetails(),
-                const SizedBox(height: 32),
-                _buildModernActionButtons(),
-              ],
+      bottomNavigationBar: _buildBottomBar(accentColor),
+    );
+  }
+
+  Widget _buildTopBar(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      child: Row(
+        children: [
+          GestureDetector(
+            onTap: () => Navigator.of(context).pop(),
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFFE2E8F0)),
+              ),
+              child: const Icon(
+                Icons.arrow_back_ios_new_rounded,
+                size: 15,
+                color: Color(0xFF1A202C),
+              ),
             ),
+          ),
+          const Expanded(
+            child: Text(
+              'Confirm',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF1A202C),
+              ),
+            ),
+          ),
+          const SizedBox(width: 40),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatusIcon(Color color) {
+    return AnimatedBuilder(
+      animation: _iconScale,
+      builder: (context, _) => Transform.scale(
+        scale: _iconScale.value,
+        child: Container(
+          width: 84,
+          height: 84,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+          child: Icon(
+            widget.confirmationType == CouponConfirmationType.use
+                ? Icons.qr_code_scanner_rounded
+                : Icons.redeem_rounded,
+            color: Colors.white,
+            size: 40,
           ),
         ),
       ),
     );
   }
 
-  Widget _buildHeader() {
-    final isUse = widget.confirmationType == CouponConfirmationType.use;
+  Widget _buildTitleSection(bool isUse) {
     return Column(
       children: [
-        Container(
-          width: 80,
-          height: 80,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: isUse
-                  ? [const Color(0xFF4CAF50), const Color(0xFF45A049)]
-                  : [const Color(0xFF6F3FCC), const Color(0xFF8E44AD)],
-            ),
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color:
-                    (isUse ? const Color(0xFF4CAF50) : const Color(0xFF6F3FCC))
-                        .withOpacity(0.3),
-                blurRadius: 20,
-                offset: const Offset(0, 8),
-              ),
-            ],
-          ),
-          child: Icon(
-            isUse ? Icons.check_circle_outline : Icons.redeem,
-            color: Colors.white,
-            size: 40,
-          ),
-        ),
-        const SizedBox(height: 16),
         Text(
           isUse ? 'Ready to Use!' : 'Almost There!',
           style: const TextStyle(
-            fontSize: 28,
+            fontSize: 26,
             fontWeight: FontWeight.w800,
-            color: Colors.black87,
+            color: Color(0xFF1A202C),
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 6),
         Text(
           isUse
-              ? 'Scan vendor QR code to verify and redeem your coupon'
+              ? 'Scan the vendor QR code to verify'
               : 'Review and confirm your purchase',
-          style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+          style: TextStyle(fontSize: 15, color: Colors.grey[500]),
+          textAlign: TextAlign.center,
         ),
       ],
     );
   }
 
-  Widget _buildModernCouponCard() {
+  Widget _buildTicketCard(Color accentColor) {
     final title = widget.userCoupon?.title ?? widget.claimCoupon?.title ?? '';
     final vendorName =
         widget.userCoupon?.vendorName ?? widget.claimCoupon?.vendorName ?? '';
@@ -178,462 +200,406 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
     final description =
         widget.userCoupon?.description ?? widget.claimCoupon?.description ?? '';
     final minCartValue =
-        widget.userCoupon?.minCartValue ??
-        widget.claimCoupon?.minCartValue ??
-        0;
+        widget.userCoupon?.minCartValue ?? widget.claimCoupon?.minCartValue ?? 0;
+
+    final split = _splitDisplay(discountDisplay);
 
     return Container(
       width: double.infinity,
-      decoration: BoxDecoration(borderRadius: BorderRadius.circular(24)),
-      child: Stack(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF667eea), Color(0xFF764ba2)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(24),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Colored discount tab
+              Container(
+                width: 92,
+                color: accentColor,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            title,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 24,
-                              fontWeight: FontWeight.w800,
-                              height: 1.2,
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 6,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(
-                                  Icons.store_outlined,
-                                  color: Colors.white,
-                                  size: 14,
-                                ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  vendorName,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+                    Text(
+                      split.$1,
+                      style: const TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w900,
+                        color: Colors.white,
+                        height: 1.0,
+                        letterSpacing: -0.5,
                       ),
                     ),
+                    const SizedBox(height: 5),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 12,
-                      ),
+                          horizontal: 10, vertical: 3),
                       decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: const Color(0xFFE1E5E9),
-                          width: 1,
-                        ),
+                        color: Colors.white.withOpacity(0.22),
+                        borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(
-                        discountDisplay,
+                        split.$2,
                         style: const TextStyle(
-                          color: Color(0xFF6F3FCC),
-                          fontSize: 18,
-                          fontWeight: FontWeight.w900,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                          letterSpacing: 1.0,
                         ),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
-                Text(
-                  description,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    height: 1.5,
-                    fontWeight: FontWeight.w400,
-                  ),
+              ),
+
+              // Dashed separator line
+              SizedBox(
+                width: 12,
+                child: CustomPaint(
+                  painter: _DashedLinePainter(accentColor),
                 ),
-                if (minCartValue > 0) ...[
-                  const SizedBox(height: 16),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: Colors.white.withOpacity(0.3),
-                        width: 1,
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(
-                          Icons.shopping_cart_outlined,
-                          color: Colors.white,
-                          size: 16,
+              ),
+
+              // Content
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 16, 16, 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF1A202C),
+                          height: 1.25,
                         ),
-                        const SizedBox(width: 8),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 6),
+                      Row(
+                        children: [
+                          Icon(Icons.store_outlined,
+                              size: 12, color: Colors.grey[500]),
+                          const SizedBox(width: 4),
+                          Flexible(
+                            child: Text(
+                              vendorName,
+                              style: TextStyle(
+                                  fontSize: 12, color: Colors.grey[500]),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                      if (description.isNotEmpty) ...[
+                        const SizedBox(height: 8),
                         Text(
-                          'Minimum order: ₹${minCartValue.toStringAsFixed(0)}',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
+                          description,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey[500],
+                            height: 1.4,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                      if (minCartValue > 0) ...[
+                        const SizedBox(height: 10),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 5),
+                          decoration: BoxDecoration(
+                            color:
+                                const Color(0xFFF59E0B).withOpacity(0.08),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.shopping_cart_outlined,
+                                  size: 12, color: Color(0xFFF59E0B)),
+                              const SizedBox(width: 5),
+                              Text(
+                                'Min. ₹${minCartValue.toStringAsFixed(0)}',
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF92400E),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
-                    ),
+                    ],
                   ),
-                ],
-              ],
-            ),
-          ),
-          // Decorative elements
-          Positioned(
-            right: -30,
-            top: -30,
-            child: Container(
-              width: 120,
-              height: 120,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.1),
-              ),
-            ),
-          ),
-          Positioned(
-            left: -20,
-            bottom: -20,
-            child: Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.05),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildModernConfirmationDetails() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFE1E5E9), width: 1),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF6F3FCC), Color(0xFF8E44AD)],
-                  ),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: const Icon(
-                  Icons.assignment_turned_in,
-                  color: Colors.white,
-                  size: 24,
-                ),
-              ),
-              const SizedBox(width: 16),
-              const Text(
-                'Confirmation Details',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.black87,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 24),
-          ..._buildModernConfirmationItems(),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoSection() {
+    final items = _getInfoItems();
+    if (items.isEmpty) return const SizedBox.shrink();
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'DETAILS',
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+              color: Colors.grey[400],
+              letterSpacing: 1.2,
+            ),
+          ),
+          const SizedBox(height: 16),
+          ...items.asMap().entries.map((e) {
+            final isLast = e.key == items.length - 1;
+            return Column(
+              children: [
+                e.value,
+                if (!isLast) ...[
+                  const SizedBox(height: 14),
+                  Divider(height: 1, color: Colors.grey.shade100),
+                  const SizedBox(height: 14),
+                ],
+              ],
+            );
+          }),
         ],
       ),
     );
   }
 
-  List<Widget> _buildModernConfirmationItems() {
+  List<Widget> _getInfoItems() {
     final items = <Widget>[];
 
     switch (widget.confirmationType) {
       case CouponConfirmationType.use:
-        items.add(
-          _buildModernConfirmationItem(
-            icon: Icons.check_circle_outline,
-            title: 'Action',
-            subtitle: _getCouponTypeText(),
-            color: const Color(0xFF4CAF50),
-          ),
-        );
-
+        items.add(_infoRow(
+          icon: Icons.check_circle_outline,
+          color: const Color(0xFF4CAF50),
+          label: 'Action',
+          value: _getCouponTypeText(),
+        ));
         if (widget.userCoupon?.isGifted == true) {
-          items.add(
-            _buildModernConfirmationItem(
-              icon: Icons.card_giftcard,
-              title: 'Special Gift',
-              subtitle: 'Shared by a colleague',
-              color: const Color(0xFFFF6B35),
-            ),
-          );
+          items.add(_infoRow(
+            icon: Icons.card_giftcard,
+            color: const Color(0xFFFF6B35),
+            label: 'Type',
+            value: 'Shared by a colleague',
+          ));
         }
-
-        // Show remaining uses for subscription coupons
         if (_isSubscriptionCoupon()) {
-          items.add(
-            _buildModernConfirmationItem(
-              icon: Icons.repeat,
-              title: 'What\'s Next',
-              subtitle: _getAfterUseText(),
-              color: const Color(0xFF6F3FCC),
-            ),
-          );
+          items.add(_infoRow(
+            icon: Icons.repeat,
+            color: const Color(0xFF6F3FCC),
+            label: "What's Next",
+            value: _getAfterUseText(),
+          ));
         }
         break;
 
       case CouponConfirmationType.claim:
-        items.add(
-          _buildModernConfirmationItem(
-            icon: _getPaymentIcon(),
-            title: 'Payment Method',
-            subtitle: _getPaymentMethodText(),
-            color: _getPaymentColor(),
-          ),
-        );
-
+        items.add(_infoRow(
+          icon: _getPaymentIcon(),
+          color: _getPaymentColor(),
+          label: 'Payment',
+          value: _getPaymentMethodText(),
+        ));
         if (widget.redemptionMethod == 'membership') {
-          // Remaining claims should be based on total subscription claims (not used count)
-          // Prefer server-computed remaining claims if available
           final remaining =
               widget.claimCoupon?.remainingSubscriptionClaims ??
               ((widget.claimCoupon?.userMaxRedemptions ?? 1) -
                   (widget.claimCoupon?.userUsedRedemptions ?? 0));
-          items.add(
-            _buildModernConfirmationItem(
-              icon: Icons.workspace_premium,
-              title: 'Membership Status',
-              subtitle: 'You\'ll have ${remaining - 1} claims remaining',
-              color: const Color(0xFF6F3FCC),
-            ),
-          );
+          items.add(_infoRow(
+            icon: Icons.workspace_premium,
+            color: const Color(0xFF6F3FCC),
+            label: 'After This',
+            value: '${remaining - 1} membership claims remaining',
+          ));
         }
-
         if (widget.redemptionMethod == 'freeTrial') {
-          // Remaining claims should be based on total subscription claims (not used count)
-          // Prefer server-computed remaining claims if available
           final remaining =
               widget.claimCoupon?.remainingSubscriptionClaims ??
               ((widget.claimCoupon?.userMaxRedemptions ?? 1) -
                   (widget.claimCoupon?.userUsedRedemptions ?? 0));
-          items.add(
-            _buildModernConfirmationItem(
-              icon: Icons.celebration,
-              title: 'Free Trial Status',
-              subtitle: 'You\'ll have ${remaining - 1} claims remaining',
-              color: const Color(0xFFFF6B35),
-            ),
-          );
+          items.add(_infoRow(
+            icon: Icons.celebration,
+            color: const Color(0xFFFF6B35),
+            label: 'After This',
+            value: '${remaining - 1} trial claims remaining',
+          ));
         }
         break;
     }
 
-    return items.asMap().entries.map((entry) {
-      final index = entry.key;
-      final item = entry.value;
-      return Padding(
-        padding: EdgeInsets.only(bottom: index < items.length - 1 ? 20 : 0),
-        child: item,
-      );
-    }).toList();
+    return items;
   }
 
-  Widget _buildModernConfirmationItem({
+  Widget _infoRow({
     required IconData icon,
-    required String title,
-    required String subtitle,
     required Color color,
+    required String label,
+    required String value,
   }) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withOpacity(0.2), width: 1),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: Icon(icon, color: Colors.white, size: 24),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.black87,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  subtitle,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[600],
-                    height: 1.4,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Icon(Icons.check_circle, color: color, size: 20),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildModernActionButtons() {
-    final buttonColor = widget.confirmationType == CouponConfirmationType.use
-        ? const Color(0xFF4CAF50)
-        : const Color(0xFF6F3FCC);
-
-    return Column(
+    return Row(
       children: [
         Container(
-          width: double.infinity,
-          height: 64,
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(20)),
-          child: ElevatedButton(
-            onPressed: _isConfirming ? null : _handleConfirm,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: buttonColor,
-              foregroundColor: Colors.white,
-              disabledBackgroundColor: Colors.grey[300],
-              disabledForegroundColor: Colors.grey[500],
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+          width: 38,
+          height: 38,
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(icon, color: color, size: 18),
+        ),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: TextStyle(fontSize: 11, color: Colors.grey[400]),
               ),
-              elevation: 0,
-            ),
-            child: _isConfirming
-                ? Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            Colors.white,
-                          ),
-                          strokeWidth: 2,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Text(
-                        widget.confirmationType == CouponConfirmationType.use
-                            ? 'Opening Scanner...'
-                            : 'Processing...',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ],
-                  )
-                : Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(_getConfirmIcon(), size: 22),
-                      const SizedBox(width: 10),
-                      Text(
-                        _getConfirmButtonText(),
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                    ],
-                  ),
+              const SizedBox(height: 2),
+              Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF1A202C),
+                ),
+              ),
+            ],
           ),
         ),
-        const SizedBox(height: 16),
-        SizedBox(
-          width: double.infinity,
-          height: 48,
-          child: TextButton(
-            onPressed: _isConfirming ? null : () => Navigator.of(context).pop(),
-            style: TextButton.styleFrom(
-              foregroundColor: Colors.grey[600],
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-            ),
-            child: const Text(
-              'Go Back',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-            ),
-          ),
-        ),
+        Icon(Icons.check_circle, color: color, size: 18),
       ],
     );
   }
+
+  Widget _buildBottomBar(Color accentColor) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(top: BorderSide(color: Color(0xFFF0F0F0))),
+      ),
+      child: SafeArea(
+        top: false,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              width: double.infinity,
+              height: 56,
+              child: ElevatedButton(
+                onPressed: _isConfirming ? null : _handleConfirm,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: accentColor,
+                  foregroundColor: Colors.white,
+                  disabledBackgroundColor: Colors.grey.shade200,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16)),
+                  elevation: 0,
+                ),
+                child: _isConfirming
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(Colors.white),
+                              strokeWidth: 2,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Text(
+                            widget.confirmationType ==
+                                    CouponConfirmationType.use
+                                ? 'Opening Scanner...'
+                                : 'Processing...',
+                            style: const TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.w700),
+                          ),
+                        ],
+                      )
+                    : Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(_getConfirmIcon(), size: 20),
+                          const SizedBox(width: 8),
+                          Text(
+                            _getConfirmButtonText(),
+                            style: const TextStyle(
+                                fontSize: 17, fontWeight: FontWeight.w800),
+                          ),
+                        ],
+                      ),
+              ),
+            ),
+            const SizedBox(height: 6),
+            SizedBox(
+              width: double.infinity,
+              height: 44,
+              child: TextButton(
+                onPressed:
+                    _isConfirming ? null : () => Navigator.of(context).pop(),
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.grey[500],
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
+                ),
+                child: const Text('Go Back',
+                    style: TextStyle(fontSize: 15)),
+              ),
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
+
+  (String, String) _splitDisplay(String display) {
+    final parts = display.split(' ');
+    if (parts.length >= 2) {
+      return (
+        parts.take(parts.length - 1).join(' '),
+        parts.last.toUpperCase()
+      );
+    }
+    return (display, 'OFF');
+  }
+
+  // ─── Logic methods (unchanged from original) ──────────────────────────────
 
   String _getCouponTypeText() {
     if (widget.userCoupon?.isGifted == true) {
@@ -643,13 +609,6 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
   }
 
   bool _isSubscriptionCoupon() {
-    // Check if this is a subscription-based coupon
-    // This could be determined by:
-    // 1. Coupon type/category
-    // 2. If user has subscription and this coupon is part of subscription benefits
-    // 3. If coupon has multiple uses per period
-
-    // For demonstration, let's say subscription coupons have specific patterns
     final title = widget.userCoupon?.title.toLowerCase() ?? '';
     return title.contains('subscription') ||
         title.contains('membership') ||
@@ -658,10 +617,8 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
 
   String _getAfterUseText() {
     if (_isSubscriptionCoupon()) {
-      // For subscription coupons, show remaining uses
       return 'You can use this coupon 2 more times this month';
     } else {
-      // For regular coupons, they're usually one-time use
       return 'This coupon will be marked as used';
     }
   }
@@ -729,7 +686,6 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
 
     try {
       if (widget.confirmationType == CouponConfirmationType.use) {
-        // For using existing coupon, open QR scanner for vendor verification first
         if (widget.userCoupon == null) {
           throw Exception(
             'Error: Owned coupon data is missing. Cannot proceed with redemption.',
@@ -737,21 +693,18 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
         }
         await _navigateToQRScanner();
       } else {
-        // Claim new coupon
         if (widget.claimCoupon == null) {
           throw Exception(
             'Error: Coupon data is missing. Cannot proceed with claiming.',
           );
         }
-
-        // Route based on redemption method. For online payment, redirect to payment page.
-        if (widget.redemptionMethod == 'membership' || widget.redemptionMethod == 'freeTrial') {
+        if (widget.redemptionMethod == 'membership' ||
+            widget.redemptionMethod == 'freeTrial') {
           await _claimNewCoupon();
           if (!mounted) return;
           _showSuccessDialog();
         } else if (widget.redemptionMethod == 'online') {
           await _handleOnlinePayment();
-          // User will be redirected to payment page, then back to app
         } else {
           throw Exception('Invalid redemption method');
         }
@@ -771,7 +724,6 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
       throw Exception('User coupon not found');
     }
 
-    // Navigate to QR scanner for vendor verification
     final result = await Navigator.push<bool>(
       context,
       MaterialPageRoute(
@@ -783,14 +735,9 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
       ),
     );
 
-    // Handle the result from QR scanner
     if (result == true) {
-      // QR verification and redemption was successful
       if (!mounted) return;
       _showSuccessDialog();
-    } else {
-      // QR verification failed or was cancelled
-      // Do nothing - user remains on confirmation page
     }
   }
 
@@ -805,11 +752,9 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
         final response = await _couponService.claimCouponFromSubscription(
           widget.claimCoupon!.couponId,
         );
-        // Store the claimed coupon ID for potential direct redemption
         _claimedCouponId = response.userCouponId;
         break;
       case 'online':
-        // Handled separately in _handleConfirm to ensure proper flow
         break;
       default:
         throw Exception('Invalid redemption method');
@@ -824,7 +769,6 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
     try {
       final razorpayService = GetIt.I<RazorpayPaymentService>();
 
-      // 1. Create coupon payment order
       final orderData = await razorpayService.createCouponPaymentOrder(
         couponId: widget.claimCoupon!.couponId,
       );
@@ -834,10 +778,10 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
       final razorpayKeyId = orderData['razorpayKeyId'] as String;
       final transactionId = orderData['transactionId'] as int;
       final couponTitle =
-          (orderData['couponDetails'] as Map<String, dynamic>?)?['title'] as String? ??
+          (orderData['couponDetails'] as Map<String, dynamic>?)?['title']
+                  as String? ??
               'Coupon Purchase';
 
-      // 2. Open Razorpay native checkout
       final checkoutResult = await razorpayService.openCheckout(
         orderId: orderId,
         amount: amount,
@@ -849,7 +793,6 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
         throw Exception(checkoutResult.message);
       }
 
-      // 3. Verify payment with backend
       final verifyResult = await razorpayService.verifyCouponPayment(
         transactionId: transactionId,
         razorpayOrderId: checkoutResult.razorpayOrderId!,
@@ -872,156 +815,159 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
 
   void _showSuccessDialog() {
     final isUse = widget.confirmationType == CouponConfirmationType.use;
-    final successColor = isUse
-        ? const Color(0xFF4CAF50)
-        : const Color(0xFF6F3FCC);
+    final successColor =
+        isUse ? const Color(0xFF10B981) : const Color(0xFF6F3FCC);
 
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        child: Container(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(24),
+          child: Stack(
             children: [
               Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: isUse
-                        ? [const Color(0xFF4CAF50), const Color(0xFF45A049)]
-                        : [const Color(0xFF6F3FCC), const Color(0xFF8E44AD)],
-                  ),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  isUse ? Icons.check_circle : Icons.celebration,
-                  color: Colors.white,
-                  size: 40,
-                ),
-              ),
-              const SizedBox(height: 24),
-              Text(
-                isUse ? 'Used Successfully! 🎉' : 'Claimed Successfully! 🎉',
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.black87,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                isUse
-                    ? 'Show this to the vendor for your discount'
-                    : 'Your coupon is ready to use!',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey[600],
-                  height: 1.4,
-                ),
-              ),
-              const SizedBox(height: 32),
-              // Show different actions based on type
-              if (isUse) ...[
-                // For used coupons - navigate to redeemed coupon page
-                SizedBox(
-                  width: double.infinity,
-                  height: 56,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).pop(); // Close dialog
-                      Navigator.of(context).pop(); // Close confirmation page
-                      // Navigate to redeemed coupon page
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => RedeemedCouponPage(
-                            userCoupon: _convertToUserCouponModel(),
-                          ),
-                        ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: successColor,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      elevation: 0,
-                    ),
-                    child: const Text(
-                      'View Details',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                ),
-              ] else ...[
-                // For claimed coupons - show Use Now option
-                Column(
+                padding: const EdgeInsets.all(32),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    SizedBox(
-                      width: double.infinity,
-                      height: 56,
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          // Close the dialog and open QR scanner like "Verify & Use"
-                          Navigator.of(context).pop();
-                          _navigateToUseNow();
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: successColor,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
+                    TweenAnimationBuilder<double>(
+                      tween: Tween(begin: 0.0, end: 1.0),
+                      duration: const Duration(milliseconds: 900),
+                      curve: Curves.elasticOut,
+                      builder: (context, v, _) => Transform.scale(
+                        scale: v,
+                        child: Container(
+                          width: 80,
+                          height: 80,
+                          decoration: BoxDecoration(
+                            color: successColor,
+                            shape: BoxShape.circle,
                           ),
-                          elevation: 0,
+                          child: Icon(
+                            isUse ? Icons.check_circle : Icons.celebration,
+                            color: Colors.white,
+                            size: 40,
+                          ),
                         ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(Icons.redeem, size: 20),
-                            const SizedBox(width: 8),
-                            const Text(
-                              'Use Now',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    Text(
+                      isUse
+                          ? 'Used Successfully! 🎉'
+                          : 'Claimed Successfully! 🎉',
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      isUse
+                          ? 'Show this to the vendor for your discount'
+                          : 'Your coupon is ready to use!',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey[600],
+                        height: 1.4,
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                    if (isUse) ...[
+                      SizedBox(
+                        width: double.infinity,
+                        height: 56,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            Navigator.of(context).pop();
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => RedeemedCouponPage(
+                                  userCoupon: _convertToUserCouponModel(),
+                                ),
+                              ),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: successColor,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16)),
+                            elevation: 0,
+                          ),
+                          child: const Text(
+                            'View Details',
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.w700),
+                          ),
+                        ),
+                      ),
+                    ] else ...[
+                      Column(
+                        children: [
+                          SizedBox(
+                            width: double.infinity,
+                            height: 56,
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                Navigator.of(context).pop();
+                                _navigateToUseNow();
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: successColor,
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16)),
+                                elevation: 0,
+                              ),
+                              child: const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.redeem, size: 20),
+                                  SizedBox(width: 8),
+                                  Text(
+                                    'Use Now',
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w700),
+                                  ),
+                                ],
                               ),
                             ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 48,
-                      child: TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop(); // Close dialog
-                          Navigator.of(
-                            context,
-                          ).pop(true); // Return to previous screen
-                        },
-                        child: Text(
-                          'Go to Wallet',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.grey[600],
                           ),
-                        ),
+                          const SizedBox(height: 12),
+                          SizedBox(
+                            width: double.infinity,
+                            height: 48,
+                            child: TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                                Navigator.of(context).pop(true);
+                              },
+                              child: Text(
+                                'Go to Wallet',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
+                    ],
                   ],
                 ),
-              ],
+              ),
+              // Confetti overlay clipped to dialog bounds
+              IgnorePointer(child: _ConfettiWidget()),
             ],
           ),
         ),
@@ -1030,7 +976,6 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
   }
 
   void _navigateToUseNow() async {
-    // For newly claimed coupons, navigate to QR scanner for verification before use
     if (_claimedCouponId == null || widget.claimCoupon == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -1042,7 +987,6 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
     }
 
     try {
-      // Navigate to QR scanner for newly claimed coupon
       final result = await Navigator.push<bool>(
         context,
         MaterialPageRoute(
@@ -1050,22 +994,17 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
             couponId: widget.claimCoupon!.couponId,
             expectedVendorUid: widget.claimCoupon!.vendorUserId,
             expectedVendorName: widget.claimCoupon!.vendorName,
-            userCouponId: _claimedCouponId, // Use the already claimed coupon
+            userCouponId: _claimedCouponId,
           ),
         ),
       );
 
       if (result == true) {
-        // QR verification and redemption was successful
-        // Return to previous screen (close confirmation page)
         if (mounted) {
           Navigator.of(context).pop(true);
         }
       }
-      // If result is false or null (cancelled/failed), just stay on the success dialog
-      // User can choose "Go to Wallet" if they want to leave
     } catch (e) {
-      // Show error message
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -1100,7 +1039,6 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
     );
   }
 
-  /// Convert UserCouponDetailModel to UserCouponModel for RedeemedCouponPage
   UserCouponModel _convertToUserCouponModel() {
     final userCoupon = widget.userCoupon!;
     return UserCouponModel(
@@ -1116,19 +1054,15 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
       ),
       minCartValue: userCoupon.minCartValue ?? 0.0,
       maxDiscountAmount: 0.0,
-      // Not available in UserCouponDetailModel
       vendorId: userCoupon.vendorId,
       vendorUserId: userCoupon.vendorUserId,
       vendorName: userCoupon.vendorName,
       expiryDate: userCoupon.expiryDate.toIso8601String(),
       isUsed: true,
-      // Since this is called after successful redemption
       usedAt: DateTime.now().toIso8601String(),
-      // Current time as redemption time
       claimedAt: userCoupon.acquiredDate.toIso8601String(),
       isGifted: userCoupon.isGifted,
       terms: null,
-      // Not available in UserCouponDetailModel
       imageUrl: userCoupon.imageUrl,
       redemptionCode: userCoupon.uniqueCode,
     );
@@ -1147,3 +1081,156 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
 }
 
 enum CouponConfirmationType { use, claim }
+
+// ─── Dashed separator painter ──────────────────────────────────────────────
+
+class _DashedLinePainter extends CustomPainter {
+  final Color color;
+  _DashedLinePainter(this.color);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    // Colored left + white right background
+    canvas.drawRect(
+        Rect.fromLTWH(0, 0, size.width / 2, size.height),
+        Paint()..color = color);
+    canvas.drawRect(
+        Rect.fromLTWH(size.width / 2, 0, size.width / 2, size.height),
+        Paint()..color = Colors.white);
+
+    // Semicircle notches
+    final notch = Paint()
+      ..color = const Color(0xFFF7F8FA)
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(Offset(size.width / 2, 0), 7, notch);
+    canvas.drawCircle(Offset(size.width / 2, size.height), 7, notch);
+
+    // Dashed line
+    final dash = Paint()
+      ..color = color.withOpacity(0.35)
+      ..strokeWidth = 1.2
+      ..style = PaintingStyle.stroke;
+
+    const dashH = 5.0;
+    const gapH = 4.0;
+    double y = 10.0;
+    while (y < size.height - 10) {
+      canvas.drawLine(
+          Offset(size.width / 2, y), Offset(size.width / 2, y + dashH), dash);
+      y += dashH + gapH;
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+// ─── Confetti widget (dialog success celebration) ─────────────────────────────
+
+class _ConfettiWidget extends StatefulWidget {
+  @override
+  State<_ConfettiWidget> createState() => _ConfettiWidgetState();
+}
+
+class _ConfettiWidgetState extends State<_ConfettiWidget>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+  late final List<_CParticle> _particles;
+
+  static const _colors = [
+    Color(0xFF6F3FCC),
+    Color(0xFF10B981),
+    Color(0xFFF59E0B),
+    Color(0xFFEF4444),
+    Color(0xFF3B82F6),
+    Color(0xFFEC4899),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    final rng = Random();
+    _particles = List.generate(
+        50,
+        (i) => _CParticle(
+              x: rng.nextDouble(),
+              startFraction: -rng.nextDouble() * 0.4,
+              speed: 0.3 + rng.nextDouble() * 0.4,
+              size: 5.0 + rng.nextDouble() * 7.0,
+              color: _colors[i % _colors.length],
+              rotationSpeed: (rng.nextDouble() - 0.5) * 12,
+              amplitude: 12 + rng.nextDouble() * 30,
+              phase: rng.nextDouble() * 2 * pi,
+            ));
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 3200),
+    )..forward();
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _ctrl,
+      builder: (context, _) => CustomPaint(
+        painter: _CPainter(_ctrl.value, _particles),
+        child: const SizedBox.expand(),
+      ),
+    );
+  }
+}
+
+class _CParticle {
+  final double x, startFraction, speed, size, rotationSpeed, amplitude, phase;
+  final Color color;
+  const _CParticle({
+    required this.x,
+    required this.startFraction,
+    required this.speed,
+    required this.size,
+    required this.color,
+    required this.rotationSpeed,
+    required this.amplitude,
+    required this.phase,
+  });
+}
+
+class _CPainter extends CustomPainter {
+  final double progress;
+  final List<_CParticle> particles;
+  _CPainter(this.progress, this.particles);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    for (final p in particles) {
+      final traveled = progress * p.speed;
+      final y = (p.startFraction + traveled) * size.height;
+      final x =
+          p.x * size.width + sin(traveled * 7 + p.phase) * p.amplitude;
+      if (y > size.height + 10 || y < -20) continue;
+      final opacity = (1.0 - progress * 0.65).clamp(0.0, 1.0);
+      final paint = Paint()..color = p.color.withOpacity(opacity);
+      canvas.save();
+      canvas.translate(x, y);
+      canvas.rotate(traveled * p.rotationSpeed);
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromCenter(
+              center: Offset.zero, width: p.size, height: p.size * 0.45),
+          const Radius.circular(2),
+        ),
+        paint,
+      );
+      canvas.restore();
+    }
+  }
+
+  @override
+  bool shouldRepaint(_CPainter old) => old.progress != progress;
+}

@@ -34,8 +34,8 @@ class HomeDrawer extends StatelessWidget {
     return Container(
       width: double.infinity,
       height: double.infinity,
-      decoration: const BoxDecoration(
-        color: Color(0xFF1A202C), // Deep premium dark background
+      decoration: BoxDecoration(
+        color: const Color(0xFF1A202C).withOpacity(0.85), // Deep premium dark glass background
       ),
       child: SafeArea(
         child: Padding(

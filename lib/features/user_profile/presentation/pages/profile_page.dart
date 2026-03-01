@@ -69,7 +69,7 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.transparent,
       body: _isLoading
           ? const Center(
               child: CircularProgressIndicator(color: Color(0xFF6F3FCC)),
@@ -84,7 +84,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return RefreshIndicator(
       onRefresh: _loadUserProfile,
       color: const Color(0xFF6F3FCC),
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.transparent,
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         child: SizedBox(
@@ -162,20 +162,20 @@ class _ProfilePageState extends State<ProfilePage> {
     return RefreshIndicator(
       onRefresh: _loadUserProfile,
       color: const Color(0xFF6F3FCC),
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.transparent,
       child: CustomScrollView(
         slivers: [
           // Custom App Bar
           SliverAppBar(
             expandedHeight: 140,
-            backgroundColor: Colors.white,
+            backgroundColor: Colors.transparent,
             pinned: true,
             elevation: 0,
             centerTitle: false,
             scrolledUnderElevation: 0,
             surfaceTintColor: Colors.transparent,
             flexibleSpace: FlexibleSpaceBar(
-              background: Container(color: Colors.white),
+              background: Container(color: Colors.transparent),
               title: const Text(
                 'Profile',
                 style: TextStyle(

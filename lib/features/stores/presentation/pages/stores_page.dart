@@ -125,7 +125,7 @@ class _StoresViewState extends State<StoresView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F8FA),
+      backgroundColor: Colors.transparent,
       body: BlocConsumer<VendorsBloc, VendorsState>(
         listener: (context, state) {
           if (state is VendorsLoaded || state is VendorsError) {
@@ -176,7 +176,7 @@ class _StoresViewState extends State<StoresView> {
   SliverAppBar _buildSliverHeader() {
     return SliverAppBar(
       expandedHeight: 150,
-      backgroundColor: const Color(0xFFF7F8FA),
+      backgroundColor: Colors.transparent,
       pinned: true,
       elevation: 0,
       scrolledUnderElevation: 0,

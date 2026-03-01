@@ -11,8 +11,8 @@ class AppTheme {
   static const Color errorColor = Color(0xFFE53E3E);
   static const Color successColor = Color(0xFF38A169);
   static const Color warningColor = Color(0xFFD69E2E);
-  static const Color backgroundColor = Colors.white;
-  static const Color surfaceColor = Colors.white;
+  static const Color backgroundColor = Colors.transparent;
+  static const Color surfaceColor = Colors.transparent;
   static const Color cardColor = Colors.white;
   static const Color onPrimaryColor = Colors.white;
   static const Color onSecondaryColor = Colors.white;
@@ -42,7 +42,7 @@ class AppTheme {
         onBackground: onBackgroundColor,
         onError: onErrorColor,
       ),
-      scaffoldBackgroundColor: backgroundColor,
+      scaffoldBackgroundColor: Colors.transparent,
       appBarTheme: const AppBarTheme(
         elevation: 0,
         scrolledUnderElevation: 0,
