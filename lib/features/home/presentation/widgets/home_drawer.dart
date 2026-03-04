@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:savedge/features/brand_vouchers/presentation/pages/brand_vouchers_page.dart';
 import 'package:savedge/features/coupons/presentation/pages/redemption_history_page.dart';
 import 'package:savedge/features/static_pages/presentation/pages/about_us_page.dart';
 import 'package:savedge/features/static_pages/presentation/pages/contact_us_page.dart';
@@ -86,12 +85,11 @@ class HomeDrawer extends StatelessWidget {
         title: 'Stores',
         onTap: () => _navigateToStores(context),
       ),
-      // TODO: Hidden temporary
-      // DrawerMenuItem(
-      //   icon: Icons.card_giftcard_outlined,
-      //   title: 'Brand Vouchers',
-      //   onTap: () => _navigateToBrandVouchers(context),
-      // ),
+      DrawerMenuItem(
+        icon: Icons.card_giftcard_rounded,
+        title: 'Gift Cards',
+        onTap: () => _navigateToGiftCards(context),
+      ),
       DrawerMenuItem(
         icon: Icons.info_outline_rounded,
         title: 'About Us',
@@ -150,12 +148,9 @@ class HomeDrawer extends StatelessWidget {
     );
   }
 
-  void _navigateToBrandVouchers(BuildContext context) {
-    onMenuItemTap?.call('Brand Vouchers');
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const BrandVouchersPage()),
-    );
+  void _navigateToGiftCards(BuildContext context) {
+    onMenuItemTap?.call('Gift Cards');
+    Navigator.pushNamed(context, '/gift-cards');
   }
 }
 

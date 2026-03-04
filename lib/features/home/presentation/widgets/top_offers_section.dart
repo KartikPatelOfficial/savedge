@@ -97,8 +97,6 @@ class TopOffersView extends StatelessWidget {
                   child: const Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text('🔥', style: TextStyle(fontSize: 10)),
-                      SizedBox(width: 2),
                       Text(
                         'HOT',
                         style: TextStyle(
@@ -175,8 +173,6 @@ class TopOffersView extends StatelessWidget {
       ),
       child: const Row(
         children: [
-          Text('😕', style: TextStyle(fontSize: 24)),
-          SizedBox(width: 12),
           Text(
             'Could not load offers',
             style: TextStyle(

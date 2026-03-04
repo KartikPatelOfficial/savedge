@@ -31,6 +31,14 @@ import 'package:savedge/features/brand_vouchers/domain/usecases/create_voucher_o
 import 'package:savedge/features/brand_vouchers/domain/usecases/get_brand_vouchers_usecase.dart';
 import 'package:savedge/features/brand_vouchers/domain/usecases/get_voucher_orders_usecase.dart';
 import 'package:savedge/features/brand_vouchers/presentation/bloc/brand_vouchers_bloc.dart';
+// Gift card imports
+import 'package:savedge/features/gift_cards/data/services/gift_card_service.dart';
+import 'package:savedge/features/gift_cards/data/repositories/gift_card_repository_impl.dart';
+import 'package:savedge/features/gift_cards/domain/repositories/gift_card_repository.dart';
+import 'package:savedge/features/gift_cards/domain/usecases/get_gift_card_products_usecase.dart';
+import 'package:savedge/features/gift_cards/domain/usecases/create_gift_card_order_usecase.dart';
+import 'package:savedge/features/gift_cards/domain/usecases/get_gift_card_orders_usecase.dart';
+import 'package:savedge/features/gift_cards/presentation/bloc/gift_cards_bloc.dart';
 import 'package:savedge/features/coupons/data/services/coupon_payment_service.dart';
 import 'package:savedge/features/coupons/data/services/coupon_service.dart';
 // Enhanced coupon imports
@@ -398,6 +406,38 @@ Future<void> configureDependencies() async {
       createVoucherOrderUseCase: getIt<CreateVoucherOrderUseCase>(),
       getVoucherOrdersUseCase: getIt<GetVoucherOrdersUseCase>(),
       brandVoucherRepository: getIt<BrandVoucherRepository>(),
+    ),
+  );
+
+  // Gift card layer
+  getIt.registerSingleton<GiftCardService>(
+    GiftCardService(getIt<Dio>()),
+  );
+
+  getIt.registerSingleton<GiftCardRepository>(
+    GiftCardRepositoryImpl(getIt<GiftCardService>()),
+  );
+
+  // Gift card Use Cases
+  getIt.registerSingleton<GetGiftCardProductsUseCase>(
+    GetGiftCardProductsUseCase(getIt<GiftCardRepository>()),
+  );
+
+  getIt.registerSingleton<CreateGiftCardOrderUseCase>(
+    CreateGiftCardOrderUseCase(getIt<GiftCardRepository>()),
+  );
+
+  getIt.registerSingleton<GetGiftCardOrdersUseCase>(
+    GetGiftCardOrdersUseCase(getIt<GiftCardRepository>()),
+  );
+
+  // Gift card BLoC
+  getIt.registerFactory<GiftCardsBloc>(
+    () => GiftCardsBloc(
+      getGiftCardProductsUseCase: getIt<GetGiftCardProductsUseCase>(),
+      createGiftCardOrderUseCase: getIt<CreateGiftCardOrderUseCase>(),
+      getGiftCardOrdersUseCase: getIt<GetGiftCardOrdersUseCase>(),
+      giftCardRepository: getIt<GiftCardRepository>(),
     ),
   );
 

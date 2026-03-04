@@ -8,6 +8,11 @@ import 'package:savedge/features/app/presentation/navigation/main_navigation_pag
 import 'package:savedge/features/brand_vouchers/presentation/pages/voucher_purchase_page.dart';
 import 'package:savedge/features/brand_vouchers/presentation/pages/voucher_orders_page.dart';
 import 'package:savedge/features/brand_vouchers/domain/entities/brand_voucher_entity.dart';
+import 'package:savedge/features/gift_cards/presentation/pages/gift_cards_page.dart';
+import 'package:savedge/features/gift_cards/presentation/pages/gift_card_detail_page.dart';
+import 'package:savedge/features/gift_cards/presentation/pages/gift_card_checkout_page.dart';
+import 'package:savedge/features/gift_cards/presentation/pages/gift_card_orders_page.dart';
+import 'package:savedge/features/gift_cards/domain/entities/gift_card_entity.dart';
 import 'package:savedge/features/city/presentation/bloc/city_bloc.dart';
 import 'package:savedge/features/city/presentation/bloc/city_event.dart';
 import 'package:savedge/features/notifications/presentation/bloc/notification_bloc.dart';
@@ -77,6 +82,31 @@ class SavedgeApp extends StatelessWidget {
       case '/notifications':
         return MaterialPageRoute(
           builder: (_) => const NotificationCenterPage(),
+          settings: settings,
+        );
+      case '/gift-cards':
+        return MaterialPageRoute(
+          builder: (_) => const GiftCardsPage(),
+          settings: settings,
+        );
+      case '/gift-card-detail':
+        final product = settings.arguments as GiftCardProductEntity;
+        return MaterialPageRoute(
+          builder: (_) => GiftCardDetailPage(product: product),
+          settings: settings,
+        );
+      case '/gift-card-checkout':
+        final args = settings.arguments as Map<String, dynamic>;
+        return MaterialPageRoute(
+          builder: (_) => GiftCardCheckoutPage(
+            product: args['product'] as GiftCardProductEntity,
+            amount: args['amount'] as double,
+          ),
+          settings: settings,
+        );
+      case '/gift-card-orders':
+        return MaterialPageRoute(
+          builder: (_) => const GiftCardOrdersPage(),
           settings: settings,
         );
       default:
