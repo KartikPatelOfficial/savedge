@@ -352,15 +352,11 @@ class _GiftCardCheckoutViewState extends State<GiftCardCheckoutView> {
                   SafeArea(
                     child: Container(
                       padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         color: Colors.white,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 10,
-                            offset: const Offset(0, -2),
-                          ),
-                        ],
+                        border: Border(
+                          top: BorderSide(color: Color(0xFFF3F4F6), width: 1.5),
+                        ),
                       ),
                       child: BlocBuilder<GiftCardsBloc, GiftCardsState>(
                         builder: (context, state) {

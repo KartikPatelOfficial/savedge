@@ -41,6 +41,7 @@ class GiftCardProductEntity extends Equatable {
   final String sku;
   final String? imageUrl;
   final String? thumbnailUrl;
+  final String priceType;
   final double minPrice;
   final double maxPrice;
   final bool isActive;
@@ -59,6 +60,7 @@ class GiftCardProductEntity extends Equatable {
     required this.sku,
     this.imageUrl,
     this.thumbnailUrl,
+    required this.priceType,
     required this.minPrice,
     required this.maxPrice,
     required this.isActive,
@@ -92,6 +94,7 @@ class GiftCardProductEntity extends Equatable {
         sku,
         imageUrl,
         thumbnailUrl,
+        priceType,
         minPrice,
         maxPrice,
         isActive,

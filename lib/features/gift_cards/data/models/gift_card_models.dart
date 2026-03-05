@@ -29,6 +29,7 @@ abstract class GiftCardProduct with _$GiftCardProduct {
     required String sku,
     String? imageUrl,
     String? thumbnailUrl,
+    required String priceType,
     required double minPrice,
     required double maxPrice,
     required bool isActive,

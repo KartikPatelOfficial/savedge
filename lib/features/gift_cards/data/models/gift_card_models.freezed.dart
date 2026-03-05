@@ -305,7 +305,7 @@ as List<GiftCardCategory>,
 /// @nodoc
 mixin _$GiftCardProduct {
 
- int get id; String get name; String? get description; String get sku; String? get imageUrl; String? get thumbnailUrl; double get minPrice; double get maxPrice; bool get isActive; String? get categoryName; String? get brandName; String? get denominations; String? get currencySymbol; String? get offerDescription; String? get formatExpiry; double? get discountPercentage;
+ int get id; String get name; String? get description; String get sku; String? get imageUrl; String? get thumbnailUrl; String get priceType; double get minPrice; double get maxPrice; bool get isActive; String? get categoryName; String? get brandName; String? get denominations; String? get currencySymbol; String? get offerDescription; String? get formatExpiry; double? get discountPercentage;
 /// Create a copy of GiftCardProduct
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -318,16 +318,16 @@ $GiftCardProductCopyWith<GiftCardProduct> get copyWith => _$GiftCardProductCopyW
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is GiftCardProduct&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.sku, sku) || other.sku == sku)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.thumbnailUrl, thumbnailUrl) || other.thumbnailUrl == thumbnailUrl)&&(identical(other.minPrice, minPrice) || other.minPrice == minPrice)&&(identical(other.maxPrice, maxPrice) || other.maxPrice == maxPrice)&&(identical(other.isActive, isActive) || other.isActive == isActive)&&(identical(other.categoryName, categoryName) || other.categoryName == categoryName)&&(identical(other.brandName, brandName) || other.brandName == brandName)&&(identical(other.denominations, denominations) || other.denominations == denominations)&&(identical(other.currencySymbol, currencySymbol) || other.currencySymbol == currencySymbol)&&(identical(other.offerDescription, offerDescription) || other.offerDescription == offerDescription)&&(identical(other.formatExpiry, formatExpiry) || other.formatExpiry == formatExpiry)&&(identical(other.discountPercentage, discountPercentage) || other.discountPercentage == discountPercentage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is GiftCardProduct&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.sku, sku) || other.sku == sku)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.thumbnailUrl, thumbnailUrl) || other.thumbnailUrl == thumbnailUrl)&&(identical(other.priceType, priceType) || other.priceType == priceType)&&(identical(other.minPrice, minPrice) || other.minPrice == minPrice)&&(identical(other.maxPrice, maxPrice) || other.maxPrice == maxPrice)&&(identical(other.isActive, isActive) || other.isActive == isActive)&&(identical(other.categoryName, categoryName) || other.categoryName == categoryName)&&(identical(other.brandName, brandName) || other.brandName == brandName)&&(identical(other.denominations, denominations) || other.denominations == denominations)&&(identical(other.currencySymbol, currencySymbol) || other.currencySymbol == currencySymbol)&&(identical(other.offerDescription, offerDescription) || other.offerDescription == offerDescription)&&(identical(other.formatExpiry, formatExpiry) || other.formatExpiry == formatExpiry)&&(identical(other.discountPercentage, discountPercentage) || other.discountPercentage == discountPercentage));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,description,sku,imageUrl,thumbnailUrl,minPrice,maxPrice,isActive,categoryName,brandName,denominations,currencySymbol,offerDescription,formatExpiry,discountPercentage);
+int get hashCode => Object.hash(runtimeType,id,name,description,sku,imageUrl,thumbnailUrl,priceType,minPrice,maxPrice,isActive,categoryName,brandName,denominations,currencySymbol,offerDescription,formatExpiry,discountPercentage);
 
 @override
 String toString() {
-  return 'GiftCardProduct(id: $id, name: $name, description: $description, sku: $sku, imageUrl: $imageUrl, thumbnailUrl: $thumbnailUrl, minPrice: $minPrice, maxPrice: $maxPrice, isActive: $isActive, categoryName: $categoryName, brandName: $brandName, denominations: $denominations, currencySymbol: $currencySymbol, offerDescription: $offerDescription, formatExpiry: $formatExpiry, discountPercentage: $discountPercentage)';
+  return 'GiftCardProduct(id: $id, name: $name, description: $description, sku: $sku, imageUrl: $imageUrl, thumbnailUrl: $thumbnailUrl, priceType: $priceType, minPrice: $minPrice, maxPrice: $maxPrice, isActive: $isActive, categoryName: $categoryName, brandName: $brandName, denominations: $denominations, currencySymbol: $currencySymbol, offerDescription: $offerDescription, formatExpiry: $formatExpiry, discountPercentage: $discountPercentage)';
 }
 
 
@@ -338,7 +338,7 @@ abstract mixin class $GiftCardProductCopyWith<$Res>  {
   factory $GiftCardProductCopyWith(GiftCardProduct value, $Res Function(GiftCardProduct) _then) = _$GiftCardProductCopyWithImpl;
 @useResult
 $Res call({
- int id, String name, String? description, String sku, String? imageUrl, String? thumbnailUrl, double minPrice, double maxPrice, bool isActive, String? categoryName, String? brandName, String? denominations, String? currencySymbol, String? offerDescription, String? formatExpiry, double? discountPercentage
+ int id, String name, String? description, String sku, String? imageUrl, String? thumbnailUrl, String priceType, double minPrice, double maxPrice, bool isActive, String? categoryName, String? brandName, String? denominations, String? currencySymbol, String? offerDescription, String? formatExpiry, double? discountPercentage
 });
 
 
@@ -355,7 +355,7 @@ class _$GiftCardProductCopyWithImpl<$Res>
 
 /// Create a copy of GiftCardProduct
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? description = freezed,Object? sku = null,Object? imageUrl = freezed,Object? thumbnailUrl = freezed,Object? minPrice = null,Object? maxPrice = null,Object? isActive = null,Object? categoryName = freezed,Object? brandName = freezed,Object? denominations = freezed,Object? currencySymbol = freezed,Object? offerDescription = freezed,Object? formatExpiry = freezed,Object? discountPercentage = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? description = freezed,Object? sku = null,Object? imageUrl = freezed,Object? thumbnailUrl = freezed,Object? priceType = null,Object? minPrice = null,Object? maxPrice = null,Object? isActive = null,Object? categoryName = freezed,Object? brandName = freezed,Object? denominations = freezed,Object? currencySymbol = freezed,Object? offerDescription = freezed,Object? formatExpiry = freezed,Object? discountPercentage = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -363,7 +363,8 @@ as String,description: freezed == description ? _self.description : description 
 as String?,sku: null == sku ? _self.sku : sku // ignore: cast_nullable_to_non_nullable
 as String,imageUrl: freezed == imageUrl ? _self.imageUrl : imageUrl // ignore: cast_nullable_to_non_nullable
 as String?,thumbnailUrl: freezed == thumbnailUrl ? _self.thumbnailUrl : thumbnailUrl // ignore: cast_nullable_to_non_nullable
-as String?,minPrice: null == minPrice ? _self.minPrice : minPrice // ignore: cast_nullable_to_non_nullable
+as String?,priceType: null == priceType ? _self.priceType : priceType // ignore: cast_nullable_to_non_nullable
+as String,minPrice: null == minPrice ? _self.minPrice : minPrice // ignore: cast_nullable_to_non_nullable
 as double,maxPrice: null == maxPrice ? _self.maxPrice : maxPrice // ignore: cast_nullable_to_non_nullable
 as double,isActive: null == isActive ? _self.isActive : isActive // ignore: cast_nullable_to_non_nullable
 as bool,categoryName: freezed == categoryName ? _self.categoryName : categoryName // ignore: cast_nullable_to_non_nullable
@@ -458,10 +459,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String name,  String? description,  String sku,  String? imageUrl,  String? thumbnailUrl,  double minPrice,  double maxPrice,  bool isActive,  String? categoryName,  String? brandName,  String? denominations,  String? currencySymbol,  String? offerDescription,  String? formatExpiry,  double? discountPercentage)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String name,  String? description,  String sku,  String? imageUrl,  String? thumbnailUrl,  String priceType,  double minPrice,  double maxPrice,  bool isActive,  String? categoryName,  String? brandName,  String? denominations,  String? currencySymbol,  String? offerDescription,  String? formatExpiry,  double? discountPercentage)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _GiftCardProduct() when $default != null:
-return $default(_that.id,_that.name,_that.description,_that.sku,_that.imageUrl,_that.thumbnailUrl,_that.minPrice,_that.maxPrice,_that.isActive,_that.categoryName,_that.brandName,_that.denominations,_that.currencySymbol,_that.offerDescription,_that.formatExpiry,_that.discountPercentage);case _:
+return $default(_that.id,_that.name,_that.description,_that.sku,_that.imageUrl,_that.thumbnailUrl,_that.priceType,_that.minPrice,_that.maxPrice,_that.isActive,_that.categoryName,_that.brandName,_that.denominations,_that.currencySymbol,_that.offerDescription,_that.formatExpiry,_that.discountPercentage);case _:
   return orElse();
 
 }
@@ -479,10 +480,10 @@ return $default(_that.id,_that.name,_that.description,_that.sku,_that.imageUrl,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String name,  String? description,  String sku,  String? imageUrl,  String? thumbnailUrl,  double minPrice,  double maxPrice,  bool isActive,  String? categoryName,  String? brandName,  String? denominations,  String? currencySymbol,  String? offerDescription,  String? formatExpiry,  double? discountPercentage)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String name,  String? description,  String sku,  String? imageUrl,  String? thumbnailUrl,  String priceType,  double minPrice,  double maxPrice,  bool isActive,  String? categoryName,  String? brandName,  String? denominations,  String? currencySymbol,  String? offerDescription,  String? formatExpiry,  double? discountPercentage)  $default,) {final _that = this;
 switch (_that) {
 case _GiftCardProduct():
-return $default(_that.id,_that.name,_that.description,_that.sku,_that.imageUrl,_that.thumbnailUrl,_that.minPrice,_that.maxPrice,_that.isActive,_that.categoryName,_that.brandName,_that.denominations,_that.currencySymbol,_that.offerDescription,_that.formatExpiry,_that.discountPercentage);case _:
+return $default(_that.id,_that.name,_that.description,_that.sku,_that.imageUrl,_that.thumbnailUrl,_that.priceType,_that.minPrice,_that.maxPrice,_that.isActive,_that.categoryName,_that.brandName,_that.denominations,_that.currencySymbol,_that.offerDescription,_that.formatExpiry,_that.discountPercentage);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -499,10 +500,10 @@ return $default(_that.id,_that.name,_that.description,_that.sku,_that.imageUrl,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String name,  String? description,  String sku,  String? imageUrl,  String? thumbnailUrl,  double minPrice,  double maxPrice,  bool isActive,  String? categoryName,  String? brandName,  String? denominations,  String? currencySymbol,  String? offerDescription,  String? formatExpiry,  double? discountPercentage)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String name,  String? description,  String sku,  String? imageUrl,  String? thumbnailUrl,  String priceType,  double minPrice,  double maxPrice,  bool isActive,  String? categoryName,  String? brandName,  String? denominations,  String? currencySymbol,  String? offerDescription,  String? formatExpiry,  double? discountPercentage)?  $default,) {final _that = this;
 switch (_that) {
 case _GiftCardProduct() when $default != null:
-return $default(_that.id,_that.name,_that.description,_that.sku,_that.imageUrl,_that.thumbnailUrl,_that.minPrice,_that.maxPrice,_that.isActive,_that.categoryName,_that.brandName,_that.denominations,_that.currencySymbol,_that.offerDescription,_that.formatExpiry,_that.discountPercentage);case _:
+return $default(_that.id,_that.name,_that.description,_that.sku,_that.imageUrl,_that.thumbnailUrl,_that.priceType,_that.minPrice,_that.maxPrice,_that.isActive,_that.categoryName,_that.brandName,_that.denominations,_that.currencySymbol,_that.offerDescription,_that.formatExpiry,_that.discountPercentage);case _:
   return null;
 
 }
@@ -514,7 +515,7 @@ return $default(_that.id,_that.name,_that.description,_that.sku,_that.imageUrl,_
 @JsonSerializable()
 
 class _GiftCardProduct implements GiftCardProduct {
-  const _GiftCardProduct({required this.id, required this.name, this.description, required this.sku, this.imageUrl, this.thumbnailUrl, required this.minPrice, required this.maxPrice, required this.isActive, this.categoryName, this.brandName, this.denominations, this.currencySymbol, this.offerDescription, this.formatExpiry, this.discountPercentage});
+  const _GiftCardProduct({required this.id, required this.name, this.description, required this.sku, this.imageUrl, this.thumbnailUrl, required this.priceType, required this.minPrice, required this.maxPrice, required this.isActive, this.categoryName, this.brandName, this.denominations, this.currencySymbol, this.offerDescription, this.formatExpiry, this.discountPercentage});
   factory _GiftCardProduct.fromJson(Map<String, dynamic> json) => _$GiftCardProductFromJson(json);
 
 @override final  int id;
@@ -523,6 +524,7 @@ class _GiftCardProduct implements GiftCardProduct {
 @override final  String sku;
 @override final  String? imageUrl;
 @override final  String? thumbnailUrl;
+@override final  String priceType;
 @override final  double minPrice;
 @override final  double maxPrice;
 @override final  bool isActive;
@@ -547,16 +549,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _GiftCardProduct&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.sku, sku) || other.sku == sku)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.thumbnailUrl, thumbnailUrl) || other.thumbnailUrl == thumbnailUrl)&&(identical(other.minPrice, minPrice) || other.minPrice == minPrice)&&(identical(other.maxPrice, maxPrice) || other.maxPrice == maxPrice)&&(identical(other.isActive, isActive) || other.isActive == isActive)&&(identical(other.categoryName, categoryName) || other.categoryName == categoryName)&&(identical(other.brandName, brandName) || other.brandName == brandName)&&(identical(other.denominations, denominations) || other.denominations == denominations)&&(identical(other.currencySymbol, currencySymbol) || other.currencySymbol == currencySymbol)&&(identical(other.offerDescription, offerDescription) || other.offerDescription == offerDescription)&&(identical(other.formatExpiry, formatExpiry) || other.formatExpiry == formatExpiry)&&(identical(other.discountPercentage, discountPercentage) || other.discountPercentage == discountPercentage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _GiftCardProduct&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.sku, sku) || other.sku == sku)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.thumbnailUrl, thumbnailUrl) || other.thumbnailUrl == thumbnailUrl)&&(identical(other.priceType, priceType) || other.priceType == priceType)&&(identical(other.minPrice, minPrice) || other.minPrice == minPrice)&&(identical(other.maxPrice, maxPrice) || other.maxPrice == maxPrice)&&(identical(other.isActive, isActive) || other.isActive == isActive)&&(identical(other.categoryName, categoryName) || other.categoryName == categoryName)&&(identical(other.brandName, brandName) || other.brandName == brandName)&&(identical(other.denominations, denominations) || other.denominations == denominations)&&(identical(other.currencySymbol, currencySymbol) || other.currencySymbol == currencySymbol)&&(identical(other.offerDescription, offerDescription) || other.offerDescription == offerDescription)&&(identical(other.formatExpiry, formatExpiry) || other.formatExpiry == formatExpiry)&&(identical(other.discountPercentage, discountPercentage) || other.discountPercentage == discountPercentage));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,description,sku,imageUrl,thumbnailUrl,minPrice,maxPrice,isActive,categoryName,brandName,denominations,currencySymbol,offerDescription,formatExpiry,discountPercentage);
+int get hashCode => Object.hash(runtimeType,id,name,description,sku,imageUrl,thumbnailUrl,priceType,minPrice,maxPrice,isActive,categoryName,brandName,denominations,currencySymbol,offerDescription,formatExpiry,discountPercentage);
 
 @override
 String toString() {
-  return 'GiftCardProduct(id: $id, name: $name, description: $description, sku: $sku, imageUrl: $imageUrl, thumbnailUrl: $thumbnailUrl, minPrice: $minPrice, maxPrice: $maxPrice, isActive: $isActive, categoryName: $categoryName, brandName: $brandName, denominations: $denominations, currencySymbol: $currencySymbol, offerDescription: $offerDescription, formatExpiry: $formatExpiry, discountPercentage: $discountPercentage)';
+  return 'GiftCardProduct(id: $id, name: $name, description: $description, sku: $sku, imageUrl: $imageUrl, thumbnailUrl: $thumbnailUrl, priceType: $priceType, minPrice: $minPrice, maxPrice: $maxPrice, isActive: $isActive, categoryName: $categoryName, brandName: $brandName, denominations: $denominations, currencySymbol: $currencySymbol, offerDescription: $offerDescription, formatExpiry: $formatExpiry, discountPercentage: $discountPercentage)';
 }
 
 
@@ -567,7 +569,7 @@ abstract mixin class _$GiftCardProductCopyWith<$Res> implements $GiftCardProduct
   factory _$GiftCardProductCopyWith(_GiftCardProduct value, $Res Function(_GiftCardProduct) _then) = __$GiftCardProductCopyWithImpl;
 @override @useResult
 $Res call({
- int id, String name, String? description, String sku, String? imageUrl, String? thumbnailUrl, double minPrice, double maxPrice, bool isActive, String? categoryName, String? brandName, String? denominations, String? currencySymbol, String? offerDescription, String? formatExpiry, double? discountPercentage
+ int id, String name, String? description, String sku, String? imageUrl, String? thumbnailUrl, String priceType, double minPrice, double maxPrice, bool isActive, String? categoryName, String? brandName, String? denominations, String? currencySymbol, String? offerDescription, String? formatExpiry, double? discountPercentage
 });
 
 
@@ -584,7 +586,7 @@ class __$GiftCardProductCopyWithImpl<$Res>
 
 /// Create a copy of GiftCardProduct
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? description = freezed,Object? sku = null,Object? imageUrl = freezed,Object? thumbnailUrl = freezed,Object? minPrice = null,Object? maxPrice = null,Object? isActive = null,Object? categoryName = freezed,Object? brandName = freezed,Object? denominations = freezed,Object? currencySymbol = freezed,Object? offerDescription = freezed,Object? formatExpiry = freezed,Object? discountPercentage = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? description = freezed,Object? sku = null,Object? imageUrl = freezed,Object? thumbnailUrl = freezed,Object? priceType = null,Object? minPrice = null,Object? maxPrice = null,Object? isActive = null,Object? categoryName = freezed,Object? brandName = freezed,Object? denominations = freezed,Object? currencySymbol = freezed,Object? offerDescription = freezed,Object? formatExpiry = freezed,Object? discountPercentage = freezed,}) {
   return _then(_GiftCardProduct(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -592,7 +594,8 @@ as String,description: freezed == description ? _self.description : description 
 as String?,sku: null == sku ? _self.sku : sku // ignore: cast_nullable_to_non_nullable
 as String,imageUrl: freezed == imageUrl ? _self.imageUrl : imageUrl // ignore: cast_nullable_to_non_nullable
 as String?,thumbnailUrl: freezed == thumbnailUrl ? _self.thumbnailUrl : thumbnailUrl // ignore: cast_nullable_to_non_nullable
-as String?,minPrice: null == minPrice ? _self.minPrice : minPrice // ignore: cast_nullable_to_non_nullable
+as String?,priceType: null == priceType ? _self.priceType : priceType // ignore: cast_nullable_to_non_nullable
+as String,minPrice: null == minPrice ? _self.minPrice : minPrice // ignore: cast_nullable_to_non_nullable
 as double,maxPrice: null == maxPrice ? _self.maxPrice : maxPrice // ignore: cast_nullable_to_non_nullable
 as double,isActive: null == isActive ? _self.isActive : isActive // ignore: cast_nullable_to_non_nullable
 as bool,categoryName: freezed == categoryName ? _self.categoryName : categoryName // ignore: cast_nullable_to_non_nullable

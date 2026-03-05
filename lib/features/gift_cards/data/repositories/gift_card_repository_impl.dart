@@ -1,11 +1,10 @@
 import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
-
-import '../../../../core/error/failures.dart';
-import '../../domain/entities/gift_card_entity.dart';
-import '../../domain/repositories/gift_card_repository.dart';
-import '../models/gift_card_models.dart';
-import '../services/gift_card_service.dart';
+import 'package:savedge/core/error/failures.dart';
+import 'package:savedge/features/gift_cards/data/models/gift_card_models.dart';
+import 'package:savedge/features/gift_cards/data/services/gift_card_service.dart';
+import 'package:savedge/features/gift_cards/domain/entities/gift_card_entity.dart';
+import 'package:savedge/features/gift_cards/domain/repositories/gift_card_repository.dart';
 
 @LazySingleton(as: GiftCardRepository)
 class GiftCardRepositoryImpl implements GiftCardRepository {
@@ -92,7 +91,7 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
 
   @override
   Future<Either<Failure, CreateGiftCardPaymentOrderResponse>>
-      createPaymentOrder({
+  createPaymentOrder({
     required int giftCardProductId,
     required double amount,
   }) async {
@@ -169,8 +168,7 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
       isActive: model.isActive,
       productCount: model.productCount,
       parentCategoryId: model.parentCategoryId,
-      subCategories:
-          model.subCategories.map(_mapCategoryToEntity).toList(),
+      subCategories: model.subCategories.map(_mapCategoryToEntity).toList(),
     );
   }
 
@@ -182,6 +180,7 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
       sku: model.sku,
       imageUrl: model.imageUrl,
       thumbnailUrl: model.thumbnailUrl,
+      priceType: model.priceType,
       minPrice: model.minPrice,
       maxPrice: model.maxPrice,
       isActive: model.isActive,
@@ -224,7 +223,8 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
   }
 
   GiftCardOrderStatusEntity _mapOrderStatusToEntity(
-      GiftCardOrderStatus status) {
+    GiftCardOrderStatus status,
+  ) {
     switch (status) {
       case GiftCardOrderStatus.pending:
         return GiftCardOrderStatusEntity.pending;
@@ -244,7 +244,8 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
   }
 
   GiftCardPaymentMethodEntity _mapPaymentMethodToEntity(
-      GiftCardPaymentMethod method) {
+    GiftCardPaymentMethod method,
+  ) {
     switch (method) {
       case GiftCardPaymentMethod.none:
         return GiftCardPaymentMethodEntity.none;
@@ -256,7 +257,8 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
   }
 
   GiftCardPaymentStatusEntity _mapPaymentStatusToEntity(
-      GiftCardPaymentStatus status) {
+    GiftCardPaymentStatus status,
+  ) {
     switch (status) {
       case GiftCardPaymentStatus.pending:
         return GiftCardPaymentStatusEntity.pending;
@@ -270,7 +272,8 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
   }
 
   GiftCardPaymentMethod _mapPaymentMethodToModel(
-      GiftCardPaymentMethodEntity method) {
+    GiftCardPaymentMethodEntity method,
+  ) {
     switch (method) {
       case GiftCardPaymentMethodEntity.none:
         return GiftCardPaymentMethod.none;
