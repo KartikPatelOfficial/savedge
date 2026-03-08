@@ -33,8 +33,16 @@ class HomeDrawer extends StatelessWidget {
     return Container(
       width: double.infinity,
       height: double.infinity,
-      decoration: BoxDecoration(
-        color: const Color(0xFF1A202C).withOpacity(0.85), // Deep premium dark glass background
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xFFF3EAFF), // Light lavender
+            Color(0xFFE8D5FF), // Soft purple
+            Color(0xFFDFC6FF), // Slightly deeper purple at bottom
+          ],
+        ),
       ),
       child: SafeArea(
         child: Padding(
@@ -60,7 +68,7 @@ class HomeDrawer extends StatelessWidget {
               Text(
                 'Savedge App v1.0.0',
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.4),
+                  color: const Color(0xFF6F3FCC).withOpacity(0.4),
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
                   letterSpacing: 1.0,
@@ -172,15 +180,8 @@ class _PremiumUserProfileSection extends StatelessWidget {
           Container(
             width: 80,
             height: 80,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFF6F3FCC).withOpacity(0.4),
-                  blurRadius: 24,
-                  offset: const Offset(0, 12),
-                ),
-              ],
             ),
             child: userAvatar != null
                 ? ClipRRect(
@@ -200,7 +201,7 @@ class _PremiumUserProfileSection extends StatelessWidget {
             'Welcome back,',
             style: TextStyle(
               fontSize: 16,
-              color: Colors.white.withOpacity(0.6),
+              color: const Color(0xFF6F3FCC).withOpacity(0.6),
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -210,7 +211,7 @@ class _PremiumUserProfileSection extends StatelessWidget {
             style: const TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.w800,
-              color: Colors.white,
+              color: Color(0xFF2D1B69),
               letterSpacing: -0.5,
               height: 1.1,
             ),
@@ -313,8 +314,8 @@ class _PremiumDrawerMenuItemTile extends StatelessWidget {
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(16),
-          highlightColor: Colors.white.withOpacity(0.05),
-          splashColor: Colors.white.withOpacity(0.1),
+          highlightColor: const Color(0xFF6F3FCC).withOpacity(0.08),
+          splashColor: const Color(0xFF6F3FCC).withOpacity(0.12),
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 14),
             child: Row(
@@ -322,11 +323,11 @@ class _PremiumDrawerMenuItemTile extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.1),
+                    color: const Color(0xFF6F3FCC).withOpacity(0.12),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(item.icon,
-                      color: Colors.white, size: 22),
+                      color: const Color(0xFF6F3FCC), size: 22),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -335,7 +336,7 @@ class _PremiumDrawerMenuItemTile extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: Colors.white,
+                      color: Color(0xFF2D1B69),
                     ),
                   ),
                 ),

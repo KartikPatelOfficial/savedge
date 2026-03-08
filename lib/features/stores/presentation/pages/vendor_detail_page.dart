@@ -1,11 +1,15 @@
 import 'dart:async';
 import 'dart:ui';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:savedge/core/enums/coupon_enums.dart';
 import 'package:savedge/core/injection/injection.dart';
 import 'package:savedge/core/network/image_cache_manager.dart';
+import 'package:savedge/features/auth/data/models/user_profile_models.dart';
+import 'package:savedge/features/auth/domain/repositories/auth_repository.dart';
 import 'package:savedge/features/favorites/presentation/bloc/favorites_bloc.dart';
 import 'package:savedge/features/favorites/presentation/bloc/favorites_event.dart';
 import 'package:savedge/features/favorites/presentation/bloc/favorites_state.dart';
@@ -13,11 +17,8 @@ import 'package:savedge/features/points_payment/presentation/widgets/points_paym
 import 'package:savedge/features/qr_scanner/presentation/pages/qr_scanner_page.dart';
 import 'package:savedge/features/stores/presentation/widgets/vendor_offers_section.dart';
 import 'package:savedge/features/user_profile/presentation/bloc/points_bloc.dart';
-import 'package:savedge/features/vendors/domain/entities/vendor.dart';
-import 'package:savedge/features/auth/domain/repositories/auth_repository.dart';
-import 'package:savedge/features/auth/data/models/user_profile_models.dart';
-import 'package:savedge/core/enums/coupon_enums.dart';
 import 'package:savedge/features/vendors/domain/entities/coupon.dart';
+import 'package:savedge/features/vendors/domain/entities/vendor.dart';
 import 'package:savedge/features/vendors/presentation/bloc/vendor_detail_bloc.dart';
 import 'package:savedge/features/vendors/presentation/bloc/vendor_detail_event.dart';
 import 'package:savedge/features/vendors/presentation/bloc/vendor_detail_state.dart';
@@ -731,7 +732,10 @@ class _VendorDetailViewState extends State<_VendorDetailView> {
                     ),
                     const SizedBox(height: 8),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: const Color(0xFF6F3FCC).withOpacity(0.12),
                         borderRadius: BorderRadius.circular(12),
@@ -758,7 +762,9 @@ class _VendorDetailViewState extends State<_VendorDetailView> {
                   return IconButton(
                     onPressed: () {
                       HapticFeedback.lightImpact();
-                      context.read<FavoritesBloc>().add(ToggleFavorite(widget.vendor));
+                      context.read<FavoritesBloc>().add(
+                        ToggleFavorite(widget.vendor),
+                      );
                     },
                     style: IconButton.styleFrom(
                       backgroundColor: isFavorite
@@ -767,8 +773,12 @@ class _VendorDetailViewState extends State<_VendorDetailView> {
                       padding: const EdgeInsets.all(12),
                     ),
                     icon: Icon(
-                      isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-                      color: isFavorite ? const Color(0xFFEF4444) : const Color(0xFF6B7280),
+                      isFavorite
+                          ? Icons.favorite_rounded
+                          : Icons.favorite_border_rounded,
+                      color: isFavorite
+                          ? const Color(0xFFEF4444)
+                          : const Color(0xFF6B7280),
                       size: 24,
                     ),
                   );
@@ -852,7 +862,11 @@ class _VendorDetailViewState extends State<_VendorDetailView> {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(Icons.location_on_rounded, color: Color(0xFF6B7280), size: 20),
+                    const Icon(
+                      Icons.location_on_rounded,
+                      color: Color(0xFF6B7280),
+                      size: 20,
+                    ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
@@ -877,17 +891,36 @@ class _VendorDetailViewState extends State<_VendorDetailView> {
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Icon(Icons.info_outline_rounded, color: Color(0xFF6B7280), size: 20),
+                      const Icon(
+                        Icons.info_outline_rounded,
+                        color: Color(0xFF6B7280),
+                        size: 20,
+                      ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: Text(
-                          widget.vendor.description!,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
-                            color: Color(0xFF4B5563),
-                            height: 1.5,
-                          ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "About Business",
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w800,
+                                color: Color(0xFF4B5563),
+                                height: 1.5,
+                              ),
+                            ),
+                            SizedBox(height: 4),
+                            Text(
+                              widget.vendor.description!,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400,
+                                color: Color(0xFF4B5563),
+                                height: 1.5,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
@@ -927,7 +960,11 @@ class _VendorDetailViewState extends State<_VendorDetailView> {
               color: Colors.white.withOpacity(0.1),
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.account_balance_wallet_rounded, color: Colors.white, size: 22),
+            child: const Icon(
+              Icons.account_balance_wallet_rounded,
+              color: Colors.white,
+              size: 22,
+            ),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -945,7 +982,9 @@ class _VendorDetailViewState extends State<_VendorDetailView> {
                 const SizedBox(height: 2),
                 BlocBuilder<PointsBloc, PointsState>(
                   builder: (context, pointsState) {
-                    final balance = pointsState is PointsLoaded ? pointsState.points.balance : 0;
+                    final balance = pointsState is PointsLoaded
+                        ? pointsState.points.balance
+                        : 0;
                     return Text(
                       'Balance: $balance pts',
                       style: TextStyle(
@@ -970,7 +1009,10 @@ class _VendorDetailViewState extends State<_VendorDetailView> {
               ),
               elevation: 0,
             ),
-            child: const Text('Pay Bill', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+            child: const Text(
+              'Pay Bill',
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+            ),
           ),
         ],
       ),
@@ -1037,7 +1079,11 @@ class _VendorDetailViewState extends State<_VendorDetailView> {
         children: [
           Row(
             children: [
-              const Icon(Icons.share_rounded, color: Color(0xFF6B7280), size: 20),
+              const Icon(
+                Icons.share_rounded,
+                color: Color(0xFF6B7280),
+                size: 20,
+              ),
               const SizedBox(width: 12),
               const Text(
                 'Connect With Us',

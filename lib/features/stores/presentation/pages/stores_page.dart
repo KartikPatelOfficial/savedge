@@ -243,8 +243,9 @@ class _StoresViewState extends State<StoresView> {
       child: Container(
         height: 48,
         decoration: BoxDecoration(
-          color: const Color(0xFFEDF0F4),
+          color: const Color(0xFFFFFFFF),
           borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: const Color(0xFFE2E8F0)),
         ),
         child: Row(
           children: [
@@ -252,7 +253,7 @@ class _StoresViewState extends State<StoresView> {
             const Icon(
               Icons.search_rounded,
               size: 20,
-              color: Color(0xFFADB5C0),
+              color: Color(0xFF393939),
             ),
             const SizedBox(width: 8),
             Expanded(
@@ -961,7 +962,7 @@ class _PopularPicksSectionState extends State<_PopularPicksSection> {
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: const Text(
-                          '🔥 Hot',
+                          'Hot',
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w700,
