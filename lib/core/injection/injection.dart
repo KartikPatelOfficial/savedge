@@ -99,6 +99,9 @@ import 'package:savedge/features/city/presentation/bloc/city_bloc.dart';
 // Free trial imports
 import 'package:savedge/features/free_trial/data/repositories/free_trial_repository.dart';
 import 'package:savedge/features/free_trial/presentation/bloc/free_trial_bloc.dart';
+// Promotion imports
+import 'package:savedge/features/promotion/data/repositories/promotion_repository.dart';
+import 'package:savedge/features/promotion/presentation/bloc/promotion_bloc.dart';
 // Notification imports
 import 'package:savedge/features/notifications/data/datasources/notification_remote_data_source.dart';
 import 'package:savedge/features/notifications/data/repositories/notification_repository_impl.dart';
@@ -454,6 +457,15 @@ Future<void> configureDependencies() async {
   // Free trial BLoC
   getIt.registerLazySingleton<FreeTrialBloc>(
     () => FreeTrialBloc(getIt<FreeTrialRepository>()),
+  );
+
+  // Promotion layer
+  getIt.registerSingleton<PromotionRepository>(
+    PromotionRepositoryImpl(getIt<Dio>()),
+  );
+
+  getIt.registerLazySingleton<PromotionBloc>(
+    () => PromotionBloc(getIt<PromotionRepository>()),
   );
 
   // Payment services

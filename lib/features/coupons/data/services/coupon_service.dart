@@ -181,6 +181,34 @@ class CouponService {
     }
   }
 
+  /// Claim a coupon from promotion (free)
+  Future<ClaimCouponResponse> claimCouponFromPromotion(int couponId) async {
+    try {
+      final request = ClaimFromSubscriptionRequest(couponId: couponId);
+
+      final response = await _httpClient.post(
+        '/api/user/coupons/claim/promotion',
+        data: request.toJson(),
+      );
+
+      return ClaimCouponResponse.fromJson(
+        response.data as Map<String, dynamic>,
+      );
+    } catch (e) {
+      String errorMessage = 'Failed to claim coupon from promotion';
+
+      if (e.toString().contains('not enrolled')) {
+        errorMessage = 'You are not enrolled in the promotion';
+      } else if (e.toString().contains('No active promotion')) {
+        errorMessage = 'The promotion has ended';
+      } else {
+        errorMessage = 'Unable to claim coupon: ${e.toString()}';
+      }
+
+      throw Exception(errorMessage);
+    }
+  }
+
   /// Purchase a coupon with payment (DEPRECATED - kept for backward compatibility)
   @Deprecated('Use CouponPaymentService for proper payment integration')
   Future<ClaimCouponResponse> purchaseCouponWithPayment(int couponId) async {

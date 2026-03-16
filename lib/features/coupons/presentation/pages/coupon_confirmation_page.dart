@@ -524,7 +524,7 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
 
       case CouponConfirmationType.claim:
         items.add(buildRow(_getPaymentIcon(), 'Payment', _getPaymentMethodText(), _getPaymentColor()));
-        if (widget.redemptionMethod == 'membership' || widget.redemptionMethod == 'freeTrial') {
+        if (widget.redemptionMethod == 'membership' || widget.redemptionMethod == 'freeTrial' || widget.redemptionMethod == 'promotion') {
           final remaining = widget.claimCoupon?.remainingSubscriptionClaims ?? 
               ((widget.claimCoupon?.userMaxRedemptions ?? 1) - (widget.claimCoupon?.userUsedRedemptions ?? 0));
           items.add(buildRow(Icons.workspace_premium_rounded, 'After This', '${remaining - 1} claims remaining', primaryColor));
@@ -568,6 +568,8 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
         return 'Use membership benefits';
       case 'freeTrial':
         return 'Use free trial benefits';
+      case 'promotion':
+        return 'Free via promotion';
       default:
         return 'Unknown payment method';
     }
@@ -599,6 +601,8 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
         return Icons.workspace_premium;
       case 'freeTrial':
         return Icons.celebration;
+      case 'promotion':
+        return Icons.celebration;
       default:
         return Icons.payment;
     }
@@ -611,6 +615,8 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
       case 'membership':
         return const Color(0xFF6F3FCC);
       case 'freeTrial':
+        return const Color(0xFFFF6B35);
+      case 'promotion':
         return const Color(0xFFFF6B35);
       default:
         return const Color(0xFF2196F3);
@@ -635,7 +641,8 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
           );
         }
         if (widget.redemptionMethod == 'membership' ||
-            widget.redemptionMethod == 'freeTrial') {
+            widget.redemptionMethod == 'freeTrial' ||
+            widget.redemptionMethod == 'promotion') {
           await _claimNewCoupon();
           if (!mounted) return;
           _showSuccessDialog();
@@ -686,6 +693,12 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
       case 'membership':
       case 'freeTrial':
         final response = await _couponService.claimCouponFromSubscription(
+          widget.claimCoupon!.couponId,
+        );
+        _claimedCouponId = response.userCouponId;
+        break;
+      case 'promotion':
+        final response = await _couponService.claimCouponFromPromotion(
           widget.claimCoupon!.couponId,
         );
         _claimedCouponId = response.userCouponId;

@@ -9,6 +9,7 @@ import 'package:savedge/features/coupons/data/services/coupon_service.dart';
 import 'package:savedge/features/coupons/presentation/pages/coupon_redemption_options_page.dart';
 import 'package:savedge/features/coupons/presentation/widgets/coupon_hero_tag.dart';
 import 'package:savedge/features/vendors/domain/entities/coupon.dart';
+import 'package:savedge/features/promotion/presentation/bloc/promotion_bloc.dart';
 import 'package:savedge/features/vendors/presentation/bloc/coupons_bloc.dart';
 
 /// Decide if a coupon can be claimed via membership/subscription.
@@ -913,6 +914,32 @@ class _VendorOfferCardState extends State<VendorOfferCard>
   }
 
   Widget _buildClaimChips(Color accentColor, bool hasCash, bool hasMembership) {
+    // Check if promotion is active + enrolled
+    bool hasActivePromotion = false;
+    try {
+      final promotionBloc = getIt<PromotionBloc>();
+      hasActivePromotion = promotionBloc.state.maybeWhen(
+        active: (status) => status.isEnrolled,
+        orElse: () => false,
+      );
+    } catch (_) {}
+
+    if (hasActivePromotion) {
+      return Wrap(
+        spacing: 8,
+        runSpacing: 8,
+        alignment: WrapAlignment.end,
+        runAlignment: WrapAlignment.end,
+        children: [
+          _claimChip(
+            const Color(0xFFFF6B35),
+            icon: Icons.celebration_rounded,
+            label: 'FREE',
+          ),
+        ],
+      );
+    }
+
     return Wrap(
       spacing: 8,
       runSpacing: 8,

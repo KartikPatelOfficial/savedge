@@ -8,6 +8,7 @@ import 'package:savedge/features/coupons/data/models/coupon_gifting_models.dart'
 import 'package:savedge/features/coupons/presentation/widgets/coupon_hero_tag.dart';
 import 'package:savedge/features/free_trial/data/models/free_trial_models.dart';
 import 'package:savedge/features/free_trial/data/repositories/free_trial_repository.dart';
+import 'package:savedge/features/promotion/presentation/bloc/promotion_bloc.dart';
 import 'package:savedge/features/user_profile/presentation/widgets/subscription_status_card.dart';
 
 import 'coupon_confirmation_page.dart';
@@ -43,6 +44,7 @@ class _CouponRedemptionOptionsPageState
   UserProfileResponse3? _userProfile;
   String? _profileError;
   FreeTrialStatusResponse? _freeTrialStatus;
+  bool _hasActivePromotion = false;
 
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
@@ -91,9 +93,22 @@ class _CouponRedemptionOptionsPageState
         print('Failed to load free trial status: $e');
       }
 
+      // Check promotion status
+      bool hasActivePromotion = false;
+      try {
+        final promotionBloc = GetIt.I<PromotionBloc>();
+        hasActivePromotion = promotionBloc.state.maybeWhen(
+          active: (status) => status.isEnrolled,
+          orElse: () => false,
+        );
+      } catch (e) {
+        print('Failed to check promotion status: $e');
+      }
+
       setState(() {
         _userProfile = profile;
         _freeTrialStatus = freeTrialStatus;
+        _hasActivePromotion = hasActivePromotion;
         isLoadingProfile = false;
       });
     } catch (e) {
@@ -388,6 +403,19 @@ class _CouponRedemptionOptionsPageState
   Widget _buildMethodGrid() {
     final tiles = <Widget>[];
 
+    // If promotion is active and user is enrolled, show ONLY promotion tile
+    if (_hasActivePromotion) {
+      tiles.add(_buildMethodTile(
+        method: RedemptionMethod.promotion,
+        icon: Icons.celebration_rounded,
+        title: 'Claim Free',
+        subtitle: 'Promotion',
+        color: const Color(0xFFFF6B35),
+        isEnabled: true,
+      ));
+      return _buildTileGrid(tiles);
+    }
+
     // Online payment tile
     if (widget.couponData.cashPrice != null &&
         widget.couponData.cashPrice! > 0) {
@@ -413,6 +441,10 @@ class _CouponRedemptionOptionsPageState
       }
     }
 
+    return _buildTileGrid(tiles);
+  }
+
+  Widget _buildTileGrid(List<Widget> tiles) {
     if (tiles.isEmpty) {
       return Container(
         padding: const EdgeInsets.all(20),
@@ -787,7 +819,9 @@ class _CouponRedemptionOptionsPageState
                 ? const Color(0xFF6F3FCC)
                 : selectedMethod == RedemptionMethod.freeTrial
                     ? const Color(0xFFFF6B35)
-                    : const Color(0xFF6F3FCC);
+                    : selectedMethod == RedemptionMethod.promotion
+                        ? const Color(0xFFFF6B35)
+                        : const Color(0xFF6F3FCC);
 
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
@@ -871,6 +905,8 @@ class _CouponRedemptionOptionsPageState
         return Icons.workspace_premium_rounded;
       case RedemptionMethod.freeTrial:
         return Icons.celebration_rounded;
+      case RedemptionMethod.promotion:
+        return Icons.celebration_rounded;
       default:
         return Icons.arrow_forward_rounded;
     }
@@ -888,6 +924,8 @@ class _CouponRedemptionOptionsPageState
         return 'Claim for FREE';
       case RedemptionMethod.freeTrial:
         return 'Claim with Free Trial';
+      case RedemptionMethod.promotion:
+        return 'Claim Free (Promotion)';
     }
   }
 
@@ -1543,6 +1581,8 @@ class _CouponRedemptionOptionsPageState
         return 'membership';
       case RedemptionMethod.freeTrial:
         return 'freeTrial';
+      case RedemptionMethod.promotion:
+        return 'promotion';
     }
   }
 
@@ -1601,7 +1641,7 @@ class _CouponRedemptionOptionsPageState
   }
 }
 
-enum RedemptionMethod { existing, online, membership, freeTrial }
+enum RedemptionMethod { existing, online, membership, freeTrial, promotion }
 
 enum CouponPreviewSource { vendor, wallet }
 

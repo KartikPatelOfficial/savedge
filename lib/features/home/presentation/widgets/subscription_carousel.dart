@@ -8,6 +8,7 @@ import 'package:savedge/core/injection/injection.dart';
 import 'package:savedge/features/auth/domain/repositories/auth_repository.dart';
 import 'package:savedge/features/free_trial/data/models/free_trial_models.dart';
 import 'package:savedge/features/free_trial/presentation/bloc/free_trial_bloc.dart';
+import 'package:savedge/features/promotion/presentation/bloc/promotion_bloc.dart';
 import 'package:savedge/features/subscription/domain/entities/subscription_plan.dart';
 import 'package:savedge/features/subscription/presentation/bloc/subscription_plan_bloc.dart';
 import 'package:savedge/features/subscription/presentation/pages/subscription_purchase_page.dart';
@@ -52,6 +53,24 @@ class _SubscriptionCarouselState extends State<SubscriptionCarousel> {
 
   Future<void> _checkVisibility() async {
     try {
+      // Check if user has active promotion enrollment - hide carousel if so
+      final promotionBloc = getIt<PromotionBloc>();
+      final promotionState = promotionBloc.state;
+      final hasActivePromotion = promotionState.maybeWhen(
+        active: (status) => status.isEnrolled,
+        orElse: () => false,
+      );
+
+      if (hasActivePromotion) {
+        if (mounted) {
+          setState(() {
+            _isVisible = false;
+            _isLoading = false;
+          });
+        }
+        return;
+      }
+
       final profile = await _authRepository.getUserProfileExtended();
       final bool hasActiveSubscription = profile.hasActiveSubscription;
       final bool shouldBeVisible = !hasActiveSubscription;

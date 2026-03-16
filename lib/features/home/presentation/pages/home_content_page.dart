@@ -11,6 +11,9 @@ import 'package:savedge/features/city/presentation/bloc/city_state.dart';
 import 'package:savedge/features/city/presentation/widgets/city_selection_sheet.dart';
 import 'package:savedge/features/favorites/presentation/pages/favorites_page.dart';
 import 'package:savedge/features/free_trial/presentation/bloc/free_trial_bloc.dart';
+import 'package:savedge/features/promotion/presentation/bloc/promotion_bloc.dart';
+import 'package:savedge/features/promotion/presentation/widgets/promotion_banner.dart';
+import 'package:savedge/features/promotion/presentation/widgets/promotion_enrollment_dialog.dart';
 import 'package:savedge/features/home/presentation/widgets/widgets.dart';
 import 'package:savedge/features/notifications/presentation/bloc/notification_bloc.dart';
 import 'package:savedge/features/stores/presentation/pages/stores_page.dart';
@@ -37,9 +40,11 @@ class _HomeContentPageState extends State<HomeContentPage> {
   late final VendorsBloc _vendorsBloc;
   late final SubscriptionPlanBloc _subscriptionBloc;
   late final FreeTrialBloc _freeTrialBloc;
+  late final PromotionBloc _promotionBloc;
 
   bool _isEmployee = false;
   bool _hasLoadedFreeTrialStatus = false;
+  bool _hasShownPromotionDialog = false;
   String _userName = 'Welcome';
 
   AuthRepository get _authRepository => GetIt.I<AuthRepository>();
@@ -51,6 +56,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
     _vendorsBloc = getIt<VendorsBloc>();
     _subscriptionBloc = getIt<SubscriptionPlanBloc>();
     _freeTrialBloc = getIt<FreeTrialBloc>();
+    _promotionBloc = getIt<PromotionBloc>();
     _loadInitialData();
     _loadUserProfile();
   }
@@ -65,6 +71,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
     // Load Top Offer vendors with city filter
     _vendorsBloc.add(LoadTopOfferVendors(cityId: cityId));
     _subscriptionBloc.add(const LoadSubscriptionPlans());
+    _promotionBloc.add(const PromotionEvent.checkStatus());
   }
 
   /// Reload data when city changes
@@ -119,13 +126,30 @@ class _HomeContentPageState extends State<HomeContentPage> {
         BlocProvider.value(value: _vendorsBloc),
         BlocProvider.value(value: _subscriptionBloc),
         BlocProvider.value(value: _freeTrialBloc),
+        BlocProvider.value(value: _promotionBloc),
       ],
-      child: BlocListener<CityBloc, CityState>(
-        listener: (context, state) {
-          if (state is CitiesLoaded) {
-            _onCityChanged(state.selectedCityId);
-          }
-        },
+      child: MultiBlocListener(
+        listeners: [
+          BlocListener<CityBloc, CityState>(
+            listener: (context, state) {
+              if (state is CitiesLoaded) {
+                _onCityChanged(state.selectedCityId);
+              }
+            },
+          ),
+          BlocListener<PromotionBloc, PromotionState>(
+            listener: (context, state) {
+              state.whenOrNull(
+                active: (status) {
+                  if (!status.isEnrolled && !_hasShownPromotionDialog) {
+                    _hasShownPromotionDialog = true;
+                    PromotionEnrollmentDialog.show(context);
+                  }
+                },
+              );
+            },
+          ),
+        ],
         child: Scaffold(
           key: _scaffoldKey,
           backgroundColor: Colors.transparent,
@@ -160,9 +184,19 @@ class _HomeContentPageState extends State<HomeContentPage> {
                   children: [
                     _buildHotDealsSection(),
                     _buildCategoriesSection(),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: const SubscriptionCarousel(),
+                    const PromotionBanner(),
+                    BlocBuilder<PromotionBloc, PromotionState>(
+                      builder: (context, state) {
+                        final isPromotionActive = state.maybeWhen(
+                          active: (status) => status.isPromotionActive,
+                          orElse: () => false,
+                        );
+                        if (isPromotionActive) return const SizedBox.shrink();
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: const SubscriptionCarousel(),
+                        );
+                      },
                     ),
                     _buildTopOffersSection(),
                   ],
@@ -516,6 +550,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
     if (!_isEmployee) {
       _freeTrialBloc.add(const FreeTrialEvent.loadStatus());
     }
+    _promotionBloc.add(const PromotionEvent.checkStatus());
 
     // Wait for data to load (approximate time)
     await Future.delayed(const Duration(milliseconds: 800));
