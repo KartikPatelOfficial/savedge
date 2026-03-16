@@ -221,6 +221,7 @@ class VendorsRepositoryImpl implements VendorsRepository {
       occasionType: dto.occasionType,
       daysBeforeOccasion: dto.daysBeforeOccasion,
       daysAfterOccasion: dto.daysAfterOccasion,
+      displayOrder: dto.displayOrder,
     );
   }
 

@@ -18,7 +18,13 @@ abstract class AuthRepository {
     String? firstName,
     String? lastName,
     String? email,
+    String? phoneNumber,
     String? profileImageUrl,
+    String? residentialAddress,
+    String? city,
+    String? state,
+    String? country,
+    String? pinCode,
     DateTime? dateOfBirth,
     DateTime? anniversaryDate,
   });

@@ -16,5 +16,10 @@ abstract class OtpAuthRepository {
     String firstName,
     String lastName,
     DateTime? dateOfBirth,
+    String residentialAddress,
+    String city,
+    String state,
+    String country,
+    String pinCode,
   );
 }

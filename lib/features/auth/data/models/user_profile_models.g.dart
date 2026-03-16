@@ -38,6 +38,11 @@ _UserProfileResponse3 _$UserProfileResponse3FromJson(
       : SubscriptionInfo.fromJson(
           json['subscriptionInfo'] as Map<String, dynamic>,
         ),
+  residentialAddress: json['residentialAddress'] as String?,
+  city: json['city'] as String?,
+  state: json['state'] as String?,
+  country: json['country'] as String?,
+  pinCode: json['pinCode'] as String?,
   dateOfBirth: json['dateOfBirth'] == null
       ? null
       : DateTime.parse(json['dateOfBirth'] as String),
@@ -64,6 +69,11 @@ Map<String, dynamic> _$UserProfileResponse3ToJson(
   'vendorInfo': instance.vendorInfo,
   'organizationInfo': instance.organizationInfo,
   'subscriptionInfo': instance.subscriptionInfo,
+  'residentialAddress': instance.residentialAddress,
+  'city': instance.city,
+  'state': instance.state,
+  'country': instance.country,
+  'pinCode': instance.pinCode,
   'dateOfBirth': instance.dateOfBirth?.toIso8601String(),
   'anniversaryDate': instance.anniversaryDate?.toIso8601String(),
 };
@@ -145,7 +155,13 @@ _UpdateUserProfileRequest3 _$UpdateUserProfileRequest3FromJson(
   firstName: json['firstName'] as String?,
   lastName: json['lastName'] as String?,
   email: json['email'] as String?,
+  phoneNumber: json['phoneNumber'] as String?,
   profileImageUrl: json['profileImageUrl'] as String?,
+  residentialAddress: json['residentialAddress'] as String?,
+  city: json['city'] as String?,
+  state: json['state'] as String?,
+  country: json['country'] as String?,
+  pinCode: json['pinCode'] as String?,
   dateOfBirth: json['dateOfBirth'] == null
       ? null
       : DateTime.parse(json['dateOfBirth'] as String),
@@ -160,7 +176,13 @@ Map<String, dynamic> _$UpdateUserProfileRequest3ToJson(
   'firstName': instance.firstName,
   'lastName': instance.lastName,
   'email': instance.email,
+  'phoneNumber': instance.phoneNumber,
   'profileImageUrl': instance.profileImageUrl,
+  'residentialAddress': instance.residentialAddress,
+  'city': instance.city,
+  'state': instance.state,
+  'country': instance.country,
+  'pinCode': instance.pinCode,
   'dateOfBirth': instance.dateOfBirth?.toIso8601String(),
   'anniversaryDate': instance.anniversaryDate?.toIso8601String(),
 };

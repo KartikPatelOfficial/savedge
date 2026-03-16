@@ -31,6 +31,11 @@ abstract class RegisterIndividualRequest with _$RegisterIndividualRequest {
     required String firstName,
     required String lastName,
     DateTime? dateOfBirth,
+    required String residentialAddress,
+    required String city,
+    required String state,
+    @Default('India') String country,
+    required String pinCode,
   }) = _RegisterIndividualRequest;
 
   factory RegisterIndividualRequest.fromJson(Map<String, dynamic> json) =>

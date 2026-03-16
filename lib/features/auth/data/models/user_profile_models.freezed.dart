@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$UserProfileResponse3 {
 
- String get id; String get email; String get phoneNumber; String get firstName; String get lastName; String get fullName; String? get profileImageUrl; bool get isActive; DateTime get createdAt; DateTime? get lastLoginAt; List<String> get roles; EmployeeInfo? get employeeInfo; VendorInfo? get vendorInfo; OrganizationInfo? get organizationInfo; SubscriptionInfo? get subscriptionInfo; DateTime? get dateOfBirth; DateTime? get anniversaryDate;
+ String get id; String get email; String get phoneNumber; String get firstName; String get lastName; String get fullName; String? get profileImageUrl; bool get isActive; DateTime get createdAt; DateTime? get lastLoginAt; List<String> get roles; EmployeeInfo? get employeeInfo; VendorInfo? get vendorInfo; OrganizationInfo? get organizationInfo; SubscriptionInfo? get subscriptionInfo; String? get residentialAddress; String? get city; String? get state; String? get country; String? get pinCode; DateTime? get dateOfBirth; DateTime? get anniversaryDate;
 /// Create a copy of UserProfileResponse3
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $UserProfileResponse3CopyWith<UserProfileResponse3> get copyWith => _$UserProfil
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is UserProfileResponse3&&(identical(other.id, id) || other.id == id)&&(identical(other.email, email) || other.email == email)&&(identical(other.phoneNumber, phoneNumber) || other.phoneNumber == phoneNumber)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.profileImageUrl, profileImageUrl) || other.profileImageUrl == profileImageUrl)&&(identical(other.isActive, isActive) || other.isActive == isActive)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.lastLoginAt, lastLoginAt) || other.lastLoginAt == lastLoginAt)&&const DeepCollectionEquality().equals(other.roles, roles)&&(identical(other.employeeInfo, employeeInfo) || other.employeeInfo == employeeInfo)&&(identical(other.vendorInfo, vendorInfo) || other.vendorInfo == vendorInfo)&&(identical(other.organizationInfo, organizationInfo) || other.organizationInfo == organizationInfo)&&(identical(other.subscriptionInfo, subscriptionInfo) || other.subscriptionInfo == subscriptionInfo)&&(identical(other.dateOfBirth, dateOfBirth) || other.dateOfBirth == dateOfBirth)&&(identical(other.anniversaryDate, anniversaryDate) || other.anniversaryDate == anniversaryDate));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is UserProfileResponse3&&(identical(other.id, id) || other.id == id)&&(identical(other.email, email) || other.email == email)&&(identical(other.phoneNumber, phoneNumber) || other.phoneNumber == phoneNumber)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.profileImageUrl, profileImageUrl) || other.profileImageUrl == profileImageUrl)&&(identical(other.isActive, isActive) || other.isActive == isActive)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.lastLoginAt, lastLoginAt) || other.lastLoginAt == lastLoginAt)&&const DeepCollectionEquality().equals(other.roles, roles)&&(identical(other.employeeInfo, employeeInfo) || other.employeeInfo == employeeInfo)&&(identical(other.vendorInfo, vendorInfo) || other.vendorInfo == vendorInfo)&&(identical(other.organizationInfo, organizationInfo) || other.organizationInfo == organizationInfo)&&(identical(other.subscriptionInfo, subscriptionInfo) || other.subscriptionInfo == subscriptionInfo)&&(identical(other.residentialAddress, residentialAddress) || other.residentialAddress == residentialAddress)&&(identical(other.city, city) || other.city == city)&&(identical(other.state, state) || other.state == state)&&(identical(other.country, country) || other.country == country)&&(identical(other.pinCode, pinCode) || other.pinCode == pinCode)&&(identical(other.dateOfBirth, dateOfBirth) || other.dateOfBirth == dateOfBirth)&&(identical(other.anniversaryDate, anniversaryDate) || other.anniversaryDate == anniversaryDate));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,email,phoneNumber,firstName,lastName,fullName,profileImageUrl,isActive,createdAt,lastLoginAt,const DeepCollectionEquality().hash(roles),employeeInfo,vendorInfo,organizationInfo,subscriptionInfo,dateOfBirth,anniversaryDate);
+int get hashCode => Object.hashAll([runtimeType,id,email,phoneNumber,firstName,lastName,fullName,profileImageUrl,isActive,createdAt,lastLoginAt,const DeepCollectionEquality().hash(roles),employeeInfo,vendorInfo,organizationInfo,subscriptionInfo,residentialAddress,city,state,country,pinCode,dateOfBirth,anniversaryDate]);
 
 @override
 String toString() {
-  return 'UserProfileResponse3(id: $id, email: $email, phoneNumber: $phoneNumber, firstName: $firstName, lastName: $lastName, fullName: $fullName, profileImageUrl: $profileImageUrl, isActive: $isActive, createdAt: $createdAt, lastLoginAt: $lastLoginAt, roles: $roles, employeeInfo: $employeeInfo, vendorInfo: $vendorInfo, organizationInfo: $organizationInfo, subscriptionInfo: $subscriptionInfo, dateOfBirth: $dateOfBirth, anniversaryDate: $anniversaryDate)';
+  return 'UserProfileResponse3(id: $id, email: $email, phoneNumber: $phoneNumber, firstName: $firstName, lastName: $lastName, fullName: $fullName, profileImageUrl: $profileImageUrl, isActive: $isActive, createdAt: $createdAt, lastLoginAt: $lastLoginAt, roles: $roles, employeeInfo: $employeeInfo, vendorInfo: $vendorInfo, organizationInfo: $organizationInfo, subscriptionInfo: $subscriptionInfo, residentialAddress: $residentialAddress, city: $city, state: $state, country: $country, pinCode: $pinCode, dateOfBirth: $dateOfBirth, anniversaryDate: $anniversaryDate)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $UserProfileResponse3CopyWith<$Res>  {
   factory $UserProfileResponse3CopyWith(UserProfileResponse3 value, $Res Function(UserProfileResponse3) _then) = _$UserProfileResponse3CopyWithImpl;
 @useResult
 $Res call({
- String id, String email, String phoneNumber, String firstName, String lastName, String fullName, String? profileImageUrl, bool isActive, DateTime createdAt, DateTime? lastLoginAt, List<String> roles, EmployeeInfo? employeeInfo, VendorInfo? vendorInfo, OrganizationInfo? organizationInfo, SubscriptionInfo? subscriptionInfo, DateTime? dateOfBirth, DateTime? anniversaryDate
+ String id, String email, String phoneNumber, String firstName, String lastName, String fullName, String? profileImageUrl, bool isActive, DateTime createdAt, DateTime? lastLoginAt, List<String> roles, EmployeeInfo? employeeInfo, VendorInfo? vendorInfo, OrganizationInfo? organizationInfo, SubscriptionInfo? subscriptionInfo, String? residentialAddress, String? city, String? state, String? country, String? pinCode, DateTime? dateOfBirth, DateTime? anniversaryDate
 });
 
 
@@ -65,7 +65,7 @@ class _$UserProfileResponse3CopyWithImpl<$Res>
 
 /// Create a copy of UserProfileResponse3
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? email = null,Object? phoneNumber = null,Object? firstName = null,Object? lastName = null,Object? fullName = null,Object? profileImageUrl = freezed,Object? isActive = null,Object? createdAt = null,Object? lastLoginAt = freezed,Object? roles = null,Object? employeeInfo = freezed,Object? vendorInfo = freezed,Object? organizationInfo = freezed,Object? subscriptionInfo = freezed,Object? dateOfBirth = freezed,Object? anniversaryDate = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? email = null,Object? phoneNumber = null,Object? firstName = null,Object? lastName = null,Object? fullName = null,Object? profileImageUrl = freezed,Object? isActive = null,Object? createdAt = null,Object? lastLoginAt = freezed,Object? roles = null,Object? employeeInfo = freezed,Object? vendorInfo = freezed,Object? organizationInfo = freezed,Object? subscriptionInfo = freezed,Object? residentialAddress = freezed,Object? city = freezed,Object? state = freezed,Object? country = freezed,Object? pinCode = freezed,Object? dateOfBirth = freezed,Object? anniversaryDate = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
@@ -82,7 +82,12 @@ as List<String>,employeeInfo: freezed == employeeInfo ? _self.employeeInfo : emp
 as EmployeeInfo?,vendorInfo: freezed == vendorInfo ? _self.vendorInfo : vendorInfo // ignore: cast_nullable_to_non_nullable
 as VendorInfo?,organizationInfo: freezed == organizationInfo ? _self.organizationInfo : organizationInfo // ignore: cast_nullable_to_non_nullable
 as OrganizationInfo?,subscriptionInfo: freezed == subscriptionInfo ? _self.subscriptionInfo : subscriptionInfo // ignore: cast_nullable_to_non_nullable
-as SubscriptionInfo?,dateOfBirth: freezed == dateOfBirth ? _self.dateOfBirth : dateOfBirth // ignore: cast_nullable_to_non_nullable
+as SubscriptionInfo?,residentialAddress: freezed == residentialAddress ? _self.residentialAddress : residentialAddress // ignore: cast_nullable_to_non_nullable
+as String?,city: freezed == city ? _self.city : city // ignore: cast_nullable_to_non_nullable
+as String?,state: freezed == state ? _self.state : state // ignore: cast_nullable_to_non_nullable
+as String?,country: freezed == country ? _self.country : country // ignore: cast_nullable_to_non_nullable
+as String?,pinCode: freezed == pinCode ? _self.pinCode : pinCode // ignore: cast_nullable_to_non_nullable
+as String?,dateOfBirth: freezed == dateOfBirth ? _self.dateOfBirth : dateOfBirth // ignore: cast_nullable_to_non_nullable
 as DateTime?,anniversaryDate: freezed == anniversaryDate ? _self.anniversaryDate : anniversaryDate // ignore: cast_nullable_to_non_nullable
 as DateTime?,
   ));
@@ -217,10 +222,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String email,  String phoneNumber,  String firstName,  String lastName,  String fullName,  String? profileImageUrl,  bool isActive,  DateTime createdAt,  DateTime? lastLoginAt,  List<String> roles,  EmployeeInfo? employeeInfo,  VendorInfo? vendorInfo,  OrganizationInfo? organizationInfo,  SubscriptionInfo? subscriptionInfo,  DateTime? dateOfBirth,  DateTime? anniversaryDate)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String email,  String phoneNumber,  String firstName,  String lastName,  String fullName,  String? profileImageUrl,  bool isActive,  DateTime createdAt,  DateTime? lastLoginAt,  List<String> roles,  EmployeeInfo? employeeInfo,  VendorInfo? vendorInfo,  OrganizationInfo? organizationInfo,  SubscriptionInfo? subscriptionInfo,  String? residentialAddress,  String? city,  String? state,  String? country,  String? pinCode,  DateTime? dateOfBirth,  DateTime? anniversaryDate)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _UserProfileResponse3() when $default != null:
-return $default(_that.id,_that.email,_that.phoneNumber,_that.firstName,_that.lastName,_that.fullName,_that.profileImageUrl,_that.isActive,_that.createdAt,_that.lastLoginAt,_that.roles,_that.employeeInfo,_that.vendorInfo,_that.organizationInfo,_that.subscriptionInfo,_that.dateOfBirth,_that.anniversaryDate);case _:
+return $default(_that.id,_that.email,_that.phoneNumber,_that.firstName,_that.lastName,_that.fullName,_that.profileImageUrl,_that.isActive,_that.createdAt,_that.lastLoginAt,_that.roles,_that.employeeInfo,_that.vendorInfo,_that.organizationInfo,_that.subscriptionInfo,_that.residentialAddress,_that.city,_that.state,_that.country,_that.pinCode,_that.dateOfBirth,_that.anniversaryDate);case _:
   return orElse();
 
 }
@@ -238,10 +243,10 @@ return $default(_that.id,_that.email,_that.phoneNumber,_that.firstName,_that.las
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String email,  String phoneNumber,  String firstName,  String lastName,  String fullName,  String? profileImageUrl,  bool isActive,  DateTime createdAt,  DateTime? lastLoginAt,  List<String> roles,  EmployeeInfo? employeeInfo,  VendorInfo? vendorInfo,  OrganizationInfo? organizationInfo,  SubscriptionInfo? subscriptionInfo,  DateTime? dateOfBirth,  DateTime? anniversaryDate)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String email,  String phoneNumber,  String firstName,  String lastName,  String fullName,  String? profileImageUrl,  bool isActive,  DateTime createdAt,  DateTime? lastLoginAt,  List<String> roles,  EmployeeInfo? employeeInfo,  VendorInfo? vendorInfo,  OrganizationInfo? organizationInfo,  SubscriptionInfo? subscriptionInfo,  String? residentialAddress,  String? city,  String? state,  String? country,  String? pinCode,  DateTime? dateOfBirth,  DateTime? anniversaryDate)  $default,) {final _that = this;
 switch (_that) {
 case _UserProfileResponse3():
-return $default(_that.id,_that.email,_that.phoneNumber,_that.firstName,_that.lastName,_that.fullName,_that.profileImageUrl,_that.isActive,_that.createdAt,_that.lastLoginAt,_that.roles,_that.employeeInfo,_that.vendorInfo,_that.organizationInfo,_that.subscriptionInfo,_that.dateOfBirth,_that.anniversaryDate);case _:
+return $default(_that.id,_that.email,_that.phoneNumber,_that.firstName,_that.lastName,_that.fullName,_that.profileImageUrl,_that.isActive,_that.createdAt,_that.lastLoginAt,_that.roles,_that.employeeInfo,_that.vendorInfo,_that.organizationInfo,_that.subscriptionInfo,_that.residentialAddress,_that.city,_that.state,_that.country,_that.pinCode,_that.dateOfBirth,_that.anniversaryDate);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -258,10 +263,10 @@ return $default(_that.id,_that.email,_that.phoneNumber,_that.firstName,_that.las
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String email,  String phoneNumber,  String firstName,  String lastName,  String fullName,  String? profileImageUrl,  bool isActive,  DateTime createdAt,  DateTime? lastLoginAt,  List<String> roles,  EmployeeInfo? employeeInfo,  VendorInfo? vendorInfo,  OrganizationInfo? organizationInfo,  SubscriptionInfo? subscriptionInfo,  DateTime? dateOfBirth,  DateTime? anniversaryDate)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String email,  String phoneNumber,  String firstName,  String lastName,  String fullName,  String? profileImageUrl,  bool isActive,  DateTime createdAt,  DateTime? lastLoginAt,  List<String> roles,  EmployeeInfo? employeeInfo,  VendorInfo? vendorInfo,  OrganizationInfo? organizationInfo,  SubscriptionInfo? subscriptionInfo,  String? residentialAddress,  String? city,  String? state,  String? country,  String? pinCode,  DateTime? dateOfBirth,  DateTime? anniversaryDate)?  $default,) {final _that = this;
 switch (_that) {
 case _UserProfileResponse3() when $default != null:
-return $default(_that.id,_that.email,_that.phoneNumber,_that.firstName,_that.lastName,_that.fullName,_that.profileImageUrl,_that.isActive,_that.createdAt,_that.lastLoginAt,_that.roles,_that.employeeInfo,_that.vendorInfo,_that.organizationInfo,_that.subscriptionInfo,_that.dateOfBirth,_that.anniversaryDate);case _:
+return $default(_that.id,_that.email,_that.phoneNumber,_that.firstName,_that.lastName,_that.fullName,_that.profileImageUrl,_that.isActive,_that.createdAt,_that.lastLoginAt,_that.roles,_that.employeeInfo,_that.vendorInfo,_that.organizationInfo,_that.subscriptionInfo,_that.residentialAddress,_that.city,_that.state,_that.country,_that.pinCode,_that.dateOfBirth,_that.anniversaryDate);case _:
   return null;
 
 }
@@ -273,7 +278,7 @@ return $default(_that.id,_that.email,_that.phoneNumber,_that.firstName,_that.las
 @JsonSerializable()
 
 class _UserProfileResponse3 implements UserProfileResponse3 {
-  const _UserProfileResponse3({required this.id, required this.email, required this.phoneNumber, required this.firstName, required this.lastName, required this.fullName, this.profileImageUrl, required this.isActive, required this.createdAt, this.lastLoginAt, required final  List<String> roles, this.employeeInfo, this.vendorInfo, this.organizationInfo, this.subscriptionInfo, this.dateOfBirth, this.anniversaryDate}): _roles = roles;
+  const _UserProfileResponse3({required this.id, required this.email, required this.phoneNumber, required this.firstName, required this.lastName, required this.fullName, this.profileImageUrl, required this.isActive, required this.createdAt, this.lastLoginAt, required final  List<String> roles, this.employeeInfo, this.vendorInfo, this.organizationInfo, this.subscriptionInfo, this.residentialAddress, this.city, this.state, this.country, this.pinCode, this.dateOfBirth, this.anniversaryDate}): _roles = roles;
   factory _UserProfileResponse3.fromJson(Map<String, dynamic> json) => _$UserProfileResponse3FromJson(json);
 
 @override final  String id;
@@ -297,6 +302,11 @@ class _UserProfileResponse3 implements UserProfileResponse3 {
 @override final  VendorInfo? vendorInfo;
 @override final  OrganizationInfo? organizationInfo;
 @override final  SubscriptionInfo? subscriptionInfo;
+@override final  String? residentialAddress;
+@override final  String? city;
+@override final  String? state;
+@override final  String? country;
+@override final  String? pinCode;
 @override final  DateTime? dateOfBirth;
 @override final  DateTime? anniversaryDate;
 
@@ -313,16 +323,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UserProfileResponse3&&(identical(other.id, id) || other.id == id)&&(identical(other.email, email) || other.email == email)&&(identical(other.phoneNumber, phoneNumber) || other.phoneNumber == phoneNumber)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.profileImageUrl, profileImageUrl) || other.profileImageUrl == profileImageUrl)&&(identical(other.isActive, isActive) || other.isActive == isActive)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.lastLoginAt, lastLoginAt) || other.lastLoginAt == lastLoginAt)&&const DeepCollectionEquality().equals(other._roles, _roles)&&(identical(other.employeeInfo, employeeInfo) || other.employeeInfo == employeeInfo)&&(identical(other.vendorInfo, vendorInfo) || other.vendorInfo == vendorInfo)&&(identical(other.organizationInfo, organizationInfo) || other.organizationInfo == organizationInfo)&&(identical(other.subscriptionInfo, subscriptionInfo) || other.subscriptionInfo == subscriptionInfo)&&(identical(other.dateOfBirth, dateOfBirth) || other.dateOfBirth == dateOfBirth)&&(identical(other.anniversaryDate, anniversaryDate) || other.anniversaryDate == anniversaryDate));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UserProfileResponse3&&(identical(other.id, id) || other.id == id)&&(identical(other.email, email) || other.email == email)&&(identical(other.phoneNumber, phoneNumber) || other.phoneNumber == phoneNumber)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.fullName, fullName) || other.fullName == fullName)&&(identical(other.profileImageUrl, profileImageUrl) || other.profileImageUrl == profileImageUrl)&&(identical(other.isActive, isActive) || other.isActive == isActive)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.lastLoginAt, lastLoginAt) || other.lastLoginAt == lastLoginAt)&&const DeepCollectionEquality().equals(other._roles, _roles)&&(identical(other.employeeInfo, employeeInfo) || other.employeeInfo == employeeInfo)&&(identical(other.vendorInfo, vendorInfo) || other.vendorInfo == vendorInfo)&&(identical(other.organizationInfo, organizationInfo) || other.organizationInfo == organizationInfo)&&(identical(other.subscriptionInfo, subscriptionInfo) || other.subscriptionInfo == subscriptionInfo)&&(identical(other.residentialAddress, residentialAddress) || other.residentialAddress == residentialAddress)&&(identical(other.city, city) || other.city == city)&&(identical(other.state, state) || other.state == state)&&(identical(other.country, country) || other.country == country)&&(identical(other.pinCode, pinCode) || other.pinCode == pinCode)&&(identical(other.dateOfBirth, dateOfBirth) || other.dateOfBirth == dateOfBirth)&&(identical(other.anniversaryDate, anniversaryDate) || other.anniversaryDate == anniversaryDate));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,email,phoneNumber,firstName,lastName,fullName,profileImageUrl,isActive,createdAt,lastLoginAt,const DeepCollectionEquality().hash(_roles),employeeInfo,vendorInfo,organizationInfo,subscriptionInfo,dateOfBirth,anniversaryDate);
+int get hashCode => Object.hashAll([runtimeType,id,email,phoneNumber,firstName,lastName,fullName,profileImageUrl,isActive,createdAt,lastLoginAt,const DeepCollectionEquality().hash(_roles),employeeInfo,vendorInfo,organizationInfo,subscriptionInfo,residentialAddress,city,state,country,pinCode,dateOfBirth,anniversaryDate]);
 
 @override
 String toString() {
-  return 'UserProfileResponse3(id: $id, email: $email, phoneNumber: $phoneNumber, firstName: $firstName, lastName: $lastName, fullName: $fullName, profileImageUrl: $profileImageUrl, isActive: $isActive, createdAt: $createdAt, lastLoginAt: $lastLoginAt, roles: $roles, employeeInfo: $employeeInfo, vendorInfo: $vendorInfo, organizationInfo: $organizationInfo, subscriptionInfo: $subscriptionInfo, dateOfBirth: $dateOfBirth, anniversaryDate: $anniversaryDate)';
+  return 'UserProfileResponse3(id: $id, email: $email, phoneNumber: $phoneNumber, firstName: $firstName, lastName: $lastName, fullName: $fullName, profileImageUrl: $profileImageUrl, isActive: $isActive, createdAt: $createdAt, lastLoginAt: $lastLoginAt, roles: $roles, employeeInfo: $employeeInfo, vendorInfo: $vendorInfo, organizationInfo: $organizationInfo, subscriptionInfo: $subscriptionInfo, residentialAddress: $residentialAddress, city: $city, state: $state, country: $country, pinCode: $pinCode, dateOfBirth: $dateOfBirth, anniversaryDate: $anniversaryDate)';
 }
 
 
@@ -333,7 +343,7 @@ abstract mixin class _$UserProfileResponse3CopyWith<$Res> implements $UserProfil
   factory _$UserProfileResponse3CopyWith(_UserProfileResponse3 value, $Res Function(_UserProfileResponse3) _then) = __$UserProfileResponse3CopyWithImpl;
 @override @useResult
 $Res call({
- String id, String email, String phoneNumber, String firstName, String lastName, String fullName, String? profileImageUrl, bool isActive, DateTime createdAt, DateTime? lastLoginAt, List<String> roles, EmployeeInfo? employeeInfo, VendorInfo? vendorInfo, OrganizationInfo? organizationInfo, SubscriptionInfo? subscriptionInfo, DateTime? dateOfBirth, DateTime? anniversaryDate
+ String id, String email, String phoneNumber, String firstName, String lastName, String fullName, String? profileImageUrl, bool isActive, DateTime createdAt, DateTime? lastLoginAt, List<String> roles, EmployeeInfo? employeeInfo, VendorInfo? vendorInfo, OrganizationInfo? organizationInfo, SubscriptionInfo? subscriptionInfo, String? residentialAddress, String? city, String? state, String? country, String? pinCode, DateTime? dateOfBirth, DateTime? anniversaryDate
 });
 
 
@@ -350,7 +360,7 @@ class __$UserProfileResponse3CopyWithImpl<$Res>
 
 /// Create a copy of UserProfileResponse3
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? email = null,Object? phoneNumber = null,Object? firstName = null,Object? lastName = null,Object? fullName = null,Object? profileImageUrl = freezed,Object? isActive = null,Object? createdAt = null,Object? lastLoginAt = freezed,Object? roles = null,Object? employeeInfo = freezed,Object? vendorInfo = freezed,Object? organizationInfo = freezed,Object? subscriptionInfo = freezed,Object? dateOfBirth = freezed,Object? anniversaryDate = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? email = null,Object? phoneNumber = null,Object? firstName = null,Object? lastName = null,Object? fullName = null,Object? profileImageUrl = freezed,Object? isActive = null,Object? createdAt = null,Object? lastLoginAt = freezed,Object? roles = null,Object? employeeInfo = freezed,Object? vendorInfo = freezed,Object? organizationInfo = freezed,Object? subscriptionInfo = freezed,Object? residentialAddress = freezed,Object? city = freezed,Object? state = freezed,Object? country = freezed,Object? pinCode = freezed,Object? dateOfBirth = freezed,Object? anniversaryDate = freezed,}) {
   return _then(_UserProfileResponse3(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
@@ -367,7 +377,12 @@ as List<String>,employeeInfo: freezed == employeeInfo ? _self.employeeInfo : emp
 as EmployeeInfo?,vendorInfo: freezed == vendorInfo ? _self.vendorInfo : vendorInfo // ignore: cast_nullable_to_non_nullable
 as VendorInfo?,organizationInfo: freezed == organizationInfo ? _self.organizationInfo : organizationInfo // ignore: cast_nullable_to_non_nullable
 as OrganizationInfo?,subscriptionInfo: freezed == subscriptionInfo ? _self.subscriptionInfo : subscriptionInfo // ignore: cast_nullable_to_non_nullable
-as SubscriptionInfo?,dateOfBirth: freezed == dateOfBirth ? _self.dateOfBirth : dateOfBirth // ignore: cast_nullable_to_non_nullable
+as SubscriptionInfo?,residentialAddress: freezed == residentialAddress ? _self.residentialAddress : residentialAddress // ignore: cast_nullable_to_non_nullable
+as String?,city: freezed == city ? _self.city : city // ignore: cast_nullable_to_non_nullable
+as String?,state: freezed == state ? _self.state : state // ignore: cast_nullable_to_non_nullable
+as String?,country: freezed == country ? _self.country : country // ignore: cast_nullable_to_non_nullable
+as String?,pinCode: freezed == pinCode ? _self.pinCode : pinCode // ignore: cast_nullable_to_non_nullable
+as String?,dateOfBirth: freezed == dateOfBirth ? _self.dateOfBirth : dateOfBirth // ignore: cast_nullable_to_non_nullable
 as DateTime?,anniversaryDate: freezed == anniversaryDate ? _self.anniversaryDate : anniversaryDate // ignore: cast_nullable_to_non_nullable
 as DateTime?,
   ));
@@ -1528,7 +1543,7 @@ as double,
 /// @nodoc
 mixin _$UpdateUserProfileRequest3 {
 
- String? get firstName; String? get lastName; String? get email; String? get profileImageUrl; DateTime? get dateOfBirth; DateTime? get anniversaryDate;
+ String? get firstName; String? get lastName; String? get email; String? get phoneNumber; String? get profileImageUrl; String? get residentialAddress; String? get city; String? get state; String? get country; String? get pinCode; DateTime? get dateOfBirth; DateTime? get anniversaryDate;
 /// Create a copy of UpdateUserProfileRequest3
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1541,16 +1556,16 @@ $UpdateUserProfileRequest3CopyWith<UpdateUserProfileRequest3> get copyWith => _$
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is UpdateUserProfileRequest3&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.email, email) || other.email == email)&&(identical(other.profileImageUrl, profileImageUrl) || other.profileImageUrl == profileImageUrl)&&(identical(other.dateOfBirth, dateOfBirth) || other.dateOfBirth == dateOfBirth)&&(identical(other.anniversaryDate, anniversaryDate) || other.anniversaryDate == anniversaryDate));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is UpdateUserProfileRequest3&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.email, email) || other.email == email)&&(identical(other.phoneNumber, phoneNumber) || other.phoneNumber == phoneNumber)&&(identical(other.profileImageUrl, profileImageUrl) || other.profileImageUrl == profileImageUrl)&&(identical(other.residentialAddress, residentialAddress) || other.residentialAddress == residentialAddress)&&(identical(other.city, city) || other.city == city)&&(identical(other.state, state) || other.state == state)&&(identical(other.country, country) || other.country == country)&&(identical(other.pinCode, pinCode) || other.pinCode == pinCode)&&(identical(other.dateOfBirth, dateOfBirth) || other.dateOfBirth == dateOfBirth)&&(identical(other.anniversaryDate, anniversaryDate) || other.anniversaryDate == anniversaryDate));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,firstName,lastName,email,profileImageUrl,dateOfBirth,anniversaryDate);
+int get hashCode => Object.hash(runtimeType,firstName,lastName,email,phoneNumber,profileImageUrl,residentialAddress,city,state,country,pinCode,dateOfBirth,anniversaryDate);
 
 @override
 String toString() {
-  return 'UpdateUserProfileRequest3(firstName: $firstName, lastName: $lastName, email: $email, profileImageUrl: $profileImageUrl, dateOfBirth: $dateOfBirth, anniversaryDate: $anniversaryDate)';
+  return 'UpdateUserProfileRequest3(firstName: $firstName, lastName: $lastName, email: $email, phoneNumber: $phoneNumber, profileImageUrl: $profileImageUrl, residentialAddress: $residentialAddress, city: $city, state: $state, country: $country, pinCode: $pinCode, dateOfBirth: $dateOfBirth, anniversaryDate: $anniversaryDate)';
 }
 
 
@@ -1561,7 +1576,7 @@ abstract mixin class $UpdateUserProfileRequest3CopyWith<$Res>  {
   factory $UpdateUserProfileRequest3CopyWith(UpdateUserProfileRequest3 value, $Res Function(UpdateUserProfileRequest3) _then) = _$UpdateUserProfileRequest3CopyWithImpl;
 @useResult
 $Res call({
- String? firstName, String? lastName, String? email, String? profileImageUrl, DateTime? dateOfBirth, DateTime? anniversaryDate
+ String? firstName, String? lastName, String? email, String? phoneNumber, String? profileImageUrl, String? residentialAddress, String? city, String? state, String? country, String? pinCode, DateTime? dateOfBirth, DateTime? anniversaryDate
 });
 
 
@@ -1578,12 +1593,18 @@ class _$UpdateUserProfileRequest3CopyWithImpl<$Res>
 
 /// Create a copy of UpdateUserProfileRequest3
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? firstName = freezed,Object? lastName = freezed,Object? email = freezed,Object? profileImageUrl = freezed,Object? dateOfBirth = freezed,Object? anniversaryDate = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? firstName = freezed,Object? lastName = freezed,Object? email = freezed,Object? phoneNumber = freezed,Object? profileImageUrl = freezed,Object? residentialAddress = freezed,Object? city = freezed,Object? state = freezed,Object? country = freezed,Object? pinCode = freezed,Object? dateOfBirth = freezed,Object? anniversaryDate = freezed,}) {
   return _then(_self.copyWith(
 firstName: freezed == firstName ? _self.firstName : firstName // ignore: cast_nullable_to_non_nullable
 as String?,lastName: freezed == lastName ? _self.lastName : lastName // ignore: cast_nullable_to_non_nullable
 as String?,email: freezed == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
+as String?,phoneNumber: freezed == phoneNumber ? _self.phoneNumber : phoneNumber // ignore: cast_nullable_to_non_nullable
 as String?,profileImageUrl: freezed == profileImageUrl ? _self.profileImageUrl : profileImageUrl // ignore: cast_nullable_to_non_nullable
+as String?,residentialAddress: freezed == residentialAddress ? _self.residentialAddress : residentialAddress // ignore: cast_nullable_to_non_nullable
+as String?,city: freezed == city ? _self.city : city // ignore: cast_nullable_to_non_nullable
+as String?,state: freezed == state ? _self.state : state // ignore: cast_nullable_to_non_nullable
+as String?,country: freezed == country ? _self.country : country // ignore: cast_nullable_to_non_nullable
+as String?,pinCode: freezed == pinCode ? _self.pinCode : pinCode // ignore: cast_nullable_to_non_nullable
 as String?,dateOfBirth: freezed == dateOfBirth ? _self.dateOfBirth : dateOfBirth // ignore: cast_nullable_to_non_nullable
 as DateTime?,anniversaryDate: freezed == anniversaryDate ? _self.anniversaryDate : anniversaryDate // ignore: cast_nullable_to_non_nullable
 as DateTime?,
@@ -1671,10 +1692,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? firstName,  String? lastName,  String? email,  String? profileImageUrl,  DateTime? dateOfBirth,  DateTime? anniversaryDate)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? firstName,  String? lastName,  String? email,  String? phoneNumber,  String? profileImageUrl,  String? residentialAddress,  String? city,  String? state,  String? country,  String? pinCode,  DateTime? dateOfBirth,  DateTime? anniversaryDate)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _UpdateUserProfileRequest3() when $default != null:
-return $default(_that.firstName,_that.lastName,_that.email,_that.profileImageUrl,_that.dateOfBirth,_that.anniversaryDate);case _:
+return $default(_that.firstName,_that.lastName,_that.email,_that.phoneNumber,_that.profileImageUrl,_that.residentialAddress,_that.city,_that.state,_that.country,_that.pinCode,_that.dateOfBirth,_that.anniversaryDate);case _:
   return orElse();
 
 }
@@ -1692,10 +1713,10 @@ return $default(_that.firstName,_that.lastName,_that.email,_that.profileImageUrl
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? firstName,  String? lastName,  String? email,  String? profileImageUrl,  DateTime? dateOfBirth,  DateTime? anniversaryDate)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? firstName,  String? lastName,  String? email,  String? phoneNumber,  String? profileImageUrl,  String? residentialAddress,  String? city,  String? state,  String? country,  String? pinCode,  DateTime? dateOfBirth,  DateTime? anniversaryDate)  $default,) {final _that = this;
 switch (_that) {
 case _UpdateUserProfileRequest3():
-return $default(_that.firstName,_that.lastName,_that.email,_that.profileImageUrl,_that.dateOfBirth,_that.anniversaryDate);case _:
+return $default(_that.firstName,_that.lastName,_that.email,_that.phoneNumber,_that.profileImageUrl,_that.residentialAddress,_that.city,_that.state,_that.country,_that.pinCode,_that.dateOfBirth,_that.anniversaryDate);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -1712,10 +1733,10 @@ return $default(_that.firstName,_that.lastName,_that.email,_that.profileImageUrl
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? firstName,  String? lastName,  String? email,  String? profileImageUrl,  DateTime? dateOfBirth,  DateTime? anniversaryDate)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? firstName,  String? lastName,  String? email,  String? phoneNumber,  String? profileImageUrl,  String? residentialAddress,  String? city,  String? state,  String? country,  String? pinCode,  DateTime? dateOfBirth,  DateTime? anniversaryDate)?  $default,) {final _that = this;
 switch (_that) {
 case _UpdateUserProfileRequest3() when $default != null:
-return $default(_that.firstName,_that.lastName,_that.email,_that.profileImageUrl,_that.dateOfBirth,_that.anniversaryDate);case _:
+return $default(_that.firstName,_that.lastName,_that.email,_that.phoneNumber,_that.profileImageUrl,_that.residentialAddress,_that.city,_that.state,_that.country,_that.pinCode,_that.dateOfBirth,_that.anniversaryDate);case _:
   return null;
 
 }
@@ -1727,13 +1748,19 @@ return $default(_that.firstName,_that.lastName,_that.email,_that.profileImageUrl
 @JsonSerializable()
 
 class _UpdateUserProfileRequest3 implements UpdateUserProfileRequest3 {
-  const _UpdateUserProfileRequest3({this.firstName, this.lastName, this.email, this.profileImageUrl, this.dateOfBirth, this.anniversaryDate});
+  const _UpdateUserProfileRequest3({this.firstName, this.lastName, this.email, this.phoneNumber, this.profileImageUrl, this.residentialAddress, this.city, this.state, this.country, this.pinCode, this.dateOfBirth, this.anniversaryDate});
   factory _UpdateUserProfileRequest3.fromJson(Map<String, dynamic> json) => _$UpdateUserProfileRequest3FromJson(json);
 
 @override final  String? firstName;
 @override final  String? lastName;
 @override final  String? email;
+@override final  String? phoneNumber;
 @override final  String? profileImageUrl;
+@override final  String? residentialAddress;
+@override final  String? city;
+@override final  String? state;
+@override final  String? country;
+@override final  String? pinCode;
 @override final  DateTime? dateOfBirth;
 @override final  DateTime? anniversaryDate;
 
@@ -1750,16 +1777,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UpdateUserProfileRequest3&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.email, email) || other.email == email)&&(identical(other.profileImageUrl, profileImageUrl) || other.profileImageUrl == profileImageUrl)&&(identical(other.dateOfBirth, dateOfBirth) || other.dateOfBirth == dateOfBirth)&&(identical(other.anniversaryDate, anniversaryDate) || other.anniversaryDate == anniversaryDate));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UpdateUserProfileRequest3&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.email, email) || other.email == email)&&(identical(other.phoneNumber, phoneNumber) || other.phoneNumber == phoneNumber)&&(identical(other.profileImageUrl, profileImageUrl) || other.profileImageUrl == profileImageUrl)&&(identical(other.residentialAddress, residentialAddress) || other.residentialAddress == residentialAddress)&&(identical(other.city, city) || other.city == city)&&(identical(other.state, state) || other.state == state)&&(identical(other.country, country) || other.country == country)&&(identical(other.pinCode, pinCode) || other.pinCode == pinCode)&&(identical(other.dateOfBirth, dateOfBirth) || other.dateOfBirth == dateOfBirth)&&(identical(other.anniversaryDate, anniversaryDate) || other.anniversaryDate == anniversaryDate));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,firstName,lastName,email,profileImageUrl,dateOfBirth,anniversaryDate);
+int get hashCode => Object.hash(runtimeType,firstName,lastName,email,phoneNumber,profileImageUrl,residentialAddress,city,state,country,pinCode,dateOfBirth,anniversaryDate);
 
 @override
 String toString() {
-  return 'UpdateUserProfileRequest3(firstName: $firstName, lastName: $lastName, email: $email, profileImageUrl: $profileImageUrl, dateOfBirth: $dateOfBirth, anniversaryDate: $anniversaryDate)';
+  return 'UpdateUserProfileRequest3(firstName: $firstName, lastName: $lastName, email: $email, phoneNumber: $phoneNumber, profileImageUrl: $profileImageUrl, residentialAddress: $residentialAddress, city: $city, state: $state, country: $country, pinCode: $pinCode, dateOfBirth: $dateOfBirth, anniversaryDate: $anniversaryDate)';
 }
 
 
@@ -1770,7 +1797,7 @@ abstract mixin class _$UpdateUserProfileRequest3CopyWith<$Res> implements $Updat
   factory _$UpdateUserProfileRequest3CopyWith(_UpdateUserProfileRequest3 value, $Res Function(_UpdateUserProfileRequest3) _then) = __$UpdateUserProfileRequest3CopyWithImpl;
 @override @useResult
 $Res call({
- String? firstName, String? lastName, String? email, String? profileImageUrl, DateTime? dateOfBirth, DateTime? anniversaryDate
+ String? firstName, String? lastName, String? email, String? phoneNumber, String? profileImageUrl, String? residentialAddress, String? city, String? state, String? country, String? pinCode, DateTime? dateOfBirth, DateTime? anniversaryDate
 });
 
 
@@ -1787,12 +1814,18 @@ class __$UpdateUserProfileRequest3CopyWithImpl<$Res>
 
 /// Create a copy of UpdateUserProfileRequest3
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? firstName = freezed,Object? lastName = freezed,Object? email = freezed,Object? profileImageUrl = freezed,Object? dateOfBirth = freezed,Object? anniversaryDate = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? firstName = freezed,Object? lastName = freezed,Object? email = freezed,Object? phoneNumber = freezed,Object? profileImageUrl = freezed,Object? residentialAddress = freezed,Object? city = freezed,Object? state = freezed,Object? country = freezed,Object? pinCode = freezed,Object? dateOfBirth = freezed,Object? anniversaryDate = freezed,}) {
   return _then(_UpdateUserProfileRequest3(
 firstName: freezed == firstName ? _self.firstName : firstName // ignore: cast_nullable_to_non_nullable
 as String?,lastName: freezed == lastName ? _self.lastName : lastName // ignore: cast_nullable_to_non_nullable
 as String?,email: freezed == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
+as String?,phoneNumber: freezed == phoneNumber ? _self.phoneNumber : phoneNumber // ignore: cast_nullable_to_non_nullable
 as String?,profileImageUrl: freezed == profileImageUrl ? _self.profileImageUrl : profileImageUrl // ignore: cast_nullable_to_non_nullable
+as String?,residentialAddress: freezed == residentialAddress ? _self.residentialAddress : residentialAddress // ignore: cast_nullable_to_non_nullable
+as String?,city: freezed == city ? _self.city : city // ignore: cast_nullable_to_non_nullable
+as String?,state: freezed == state ? _self.state : state // ignore: cast_nullable_to_non_nullable
+as String?,country: freezed == country ? _self.country : country // ignore: cast_nullable_to_non_nullable
+as String?,pinCode: freezed == pinCode ? _self.pinCode : pinCode // ignore: cast_nullable_to_non_nullable
 as String?,dateOfBirth: freezed == dateOfBirth ? _self.dateOfBirth : dateOfBirth // ignore: cast_nullable_to_non_nullable
 as DateTime?,anniversaryDate: freezed == anniversaryDate ? _self.anniversaryDate : anniversaryDate // ignore: cast_nullable_to_non_nullable
 as DateTime?,

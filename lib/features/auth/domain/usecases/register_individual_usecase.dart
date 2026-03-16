@@ -20,6 +20,11 @@ class RegisterIndividualUseCase implements UseCase<IndividualRegistrationResult,
       params.firstName,
       params.lastName,
       params.dateOfBirth,
+      params.residentialAddress,
+      params.city,
+      params.state,
+      params.country,
+      params.pinCode,
     );
   }
 }
@@ -30,6 +35,11 @@ class RegisterIndividualParams extends Equatable {
   final String firstName;
   final String lastName;
   final DateTime? dateOfBirth;
+  final String residentialAddress;
+  final String city;
+  final String state;
+  final String country;
+  final String pinCode;
 
   const RegisterIndividualParams({
     required this.phoneNumber,
@@ -37,8 +47,13 @@ class RegisterIndividualParams extends Equatable {
     required this.firstName,
     required this.lastName,
     this.dateOfBirth,
+    required this.residentialAddress,
+    required this.city,
+    required this.state,
+    this.country = 'India',
+    required this.pinCode,
   });
 
   @override
-  List<Object?> get props => [phoneNumber, email, firstName, lastName, dateOfBirth];
+  List<Object?> get props => [phoneNumber, email, firstName, lastName, dateOfBirth, residentialAddress, city, state, country, pinCode];
 }

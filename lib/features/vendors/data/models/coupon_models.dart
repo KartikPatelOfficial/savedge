@@ -48,6 +48,7 @@ class CouponResponse {
       daysBeforeOccasion: json['daysBeforeOccasion'] as int?,
       daysAfterOccasion: json['daysAfterOccasion'] as int?,
       isOccasionBased: json['isOccasionBased'] as bool? ?? false,
+      displayOrder: json['displayOrder'] as int? ?? 0,
     );
   }
   const CouponResponse({
@@ -86,6 +87,7 @@ class CouponResponse {
     this.daysBeforeOccasion,
     this.daysAfterOccasion,
     this.isOccasionBased = false,
+    this.displayOrder = 0,
   });
 
   final int id;
@@ -123,6 +125,7 @@ class CouponResponse {
   final int? daysBeforeOccasion;
   final int? daysAfterOccasion;
   final bool isOccasionBased;
+  final int displayOrder;
 
   Map<String, dynamic> toJson() {
     return {
@@ -149,6 +152,7 @@ class CouponResponse {
       'statusDisplay': statusDisplay,
       'isValid': isValid,
       'isExpired': isExpired,
+      'displayOrder': displayOrder,
     };
   }
 

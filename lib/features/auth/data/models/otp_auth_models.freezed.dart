@@ -544,7 +544,7 @@ as String,
 /// @nodoc
 mixin _$RegisterIndividualRequest {
 
- String get phoneNumber; String get email; String get firstName; String get lastName; DateTime? get dateOfBirth;
+ String get phoneNumber; String get email; String get firstName; String get lastName; DateTime? get dateOfBirth; String get residentialAddress; String get city; String get state; String get country; String get pinCode;
 /// Create a copy of RegisterIndividualRequest
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -557,16 +557,16 @@ $RegisterIndividualRequestCopyWith<RegisterIndividualRequest> get copyWith => _$
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is RegisterIndividualRequest&&(identical(other.phoneNumber, phoneNumber) || other.phoneNumber == phoneNumber)&&(identical(other.email, email) || other.email == email)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.dateOfBirth, dateOfBirth) || other.dateOfBirth == dateOfBirth));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is RegisterIndividualRequest&&(identical(other.phoneNumber, phoneNumber) || other.phoneNumber == phoneNumber)&&(identical(other.email, email) || other.email == email)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.dateOfBirth, dateOfBirth) || other.dateOfBirth == dateOfBirth)&&(identical(other.residentialAddress, residentialAddress) || other.residentialAddress == residentialAddress)&&(identical(other.city, city) || other.city == city)&&(identical(other.state, state) || other.state == state)&&(identical(other.country, country) || other.country == country)&&(identical(other.pinCode, pinCode) || other.pinCode == pinCode));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,phoneNumber,email,firstName,lastName,dateOfBirth);
+int get hashCode => Object.hash(runtimeType,phoneNumber,email,firstName,lastName,dateOfBirth,residentialAddress,city,state,country,pinCode);
 
 @override
 String toString() {
-  return 'RegisterIndividualRequest(phoneNumber: $phoneNumber, email: $email, firstName: $firstName, lastName: $lastName, dateOfBirth: $dateOfBirth)';
+  return 'RegisterIndividualRequest(phoneNumber: $phoneNumber, email: $email, firstName: $firstName, lastName: $lastName, dateOfBirth: $dateOfBirth, residentialAddress: $residentialAddress, city: $city, state: $state, country: $country, pinCode: $pinCode)';
 }
 
 
@@ -577,7 +577,7 @@ abstract mixin class $RegisterIndividualRequestCopyWith<$Res>  {
   factory $RegisterIndividualRequestCopyWith(RegisterIndividualRequest value, $Res Function(RegisterIndividualRequest) _then) = _$RegisterIndividualRequestCopyWithImpl;
 @useResult
 $Res call({
- String phoneNumber, String email, String firstName, String lastName, DateTime? dateOfBirth
+ String phoneNumber, String email, String firstName, String lastName, DateTime? dateOfBirth, String residentialAddress, String city, String state, String country, String pinCode
 });
 
 
@@ -594,14 +594,19 @@ class _$RegisterIndividualRequestCopyWithImpl<$Res>
 
 /// Create a copy of RegisterIndividualRequest
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? phoneNumber = null,Object? email = null,Object? firstName = null,Object? lastName = null,Object? dateOfBirth = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? phoneNumber = null,Object? email = null,Object? firstName = null,Object? lastName = null,Object? dateOfBirth = freezed,Object? residentialAddress = null,Object? city = null,Object? state = null,Object? country = null,Object? pinCode = null,}) {
   return _then(_self.copyWith(
 phoneNumber: null == phoneNumber ? _self.phoneNumber : phoneNumber // ignore: cast_nullable_to_non_nullable
 as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
 as String,firstName: null == firstName ? _self.firstName : firstName // ignore: cast_nullable_to_non_nullable
 as String,lastName: null == lastName ? _self.lastName : lastName // ignore: cast_nullable_to_non_nullable
 as String,dateOfBirth: freezed == dateOfBirth ? _self.dateOfBirth : dateOfBirth // ignore: cast_nullable_to_non_nullable
-as DateTime?,
+as DateTime?,residentialAddress: null == residentialAddress ? _self.residentialAddress : residentialAddress // ignore: cast_nullable_to_non_nullable
+as String,city: null == city ? _self.city : city // ignore: cast_nullable_to_non_nullable
+as String,state: null == state ? _self.state : state // ignore: cast_nullable_to_non_nullable
+as String,country: null == country ? _self.country : country // ignore: cast_nullable_to_non_nullable
+as String,pinCode: null == pinCode ? _self.pinCode : pinCode // ignore: cast_nullable_to_non_nullable
+as String,
   ));
 }
 
@@ -686,10 +691,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String phoneNumber,  String email,  String firstName,  String lastName,  DateTime? dateOfBirth)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String phoneNumber,  String email,  String firstName,  String lastName,  DateTime? dateOfBirth,  String residentialAddress,  String city,  String state,  String country,  String pinCode)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _RegisterIndividualRequest() when $default != null:
-return $default(_that.phoneNumber,_that.email,_that.firstName,_that.lastName,_that.dateOfBirth);case _:
+return $default(_that.phoneNumber,_that.email,_that.firstName,_that.lastName,_that.dateOfBirth,_that.residentialAddress,_that.city,_that.state,_that.country,_that.pinCode);case _:
   return orElse();
 
 }
@@ -707,10 +712,10 @@ return $default(_that.phoneNumber,_that.email,_that.firstName,_that.lastName,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String phoneNumber,  String email,  String firstName,  String lastName,  DateTime? dateOfBirth)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String phoneNumber,  String email,  String firstName,  String lastName,  DateTime? dateOfBirth,  String residentialAddress,  String city,  String state,  String country,  String pinCode)  $default,) {final _that = this;
 switch (_that) {
 case _RegisterIndividualRequest():
-return $default(_that.phoneNumber,_that.email,_that.firstName,_that.lastName,_that.dateOfBirth);case _:
+return $default(_that.phoneNumber,_that.email,_that.firstName,_that.lastName,_that.dateOfBirth,_that.residentialAddress,_that.city,_that.state,_that.country,_that.pinCode);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -727,10 +732,10 @@ return $default(_that.phoneNumber,_that.email,_that.firstName,_that.lastName,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String phoneNumber,  String email,  String firstName,  String lastName,  DateTime? dateOfBirth)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String phoneNumber,  String email,  String firstName,  String lastName,  DateTime? dateOfBirth,  String residentialAddress,  String city,  String state,  String country,  String pinCode)?  $default,) {final _that = this;
 switch (_that) {
 case _RegisterIndividualRequest() when $default != null:
-return $default(_that.phoneNumber,_that.email,_that.firstName,_that.lastName,_that.dateOfBirth);case _:
+return $default(_that.phoneNumber,_that.email,_that.firstName,_that.lastName,_that.dateOfBirth,_that.residentialAddress,_that.city,_that.state,_that.country,_that.pinCode);case _:
   return null;
 
 }
@@ -742,7 +747,7 @@ return $default(_that.phoneNumber,_that.email,_that.firstName,_that.lastName,_th
 @JsonSerializable()
 
 class _RegisterIndividualRequest implements RegisterIndividualRequest {
-  const _RegisterIndividualRequest({required this.phoneNumber, required this.email, required this.firstName, required this.lastName, this.dateOfBirth});
+  const _RegisterIndividualRequest({required this.phoneNumber, required this.email, required this.firstName, required this.lastName, this.dateOfBirth, required this.residentialAddress, required this.city, required this.state, this.country = 'India', required this.pinCode});
   factory _RegisterIndividualRequest.fromJson(Map<String, dynamic> json) => _$RegisterIndividualRequestFromJson(json);
 
 @override final  String phoneNumber;
@@ -750,6 +755,11 @@ class _RegisterIndividualRequest implements RegisterIndividualRequest {
 @override final  String firstName;
 @override final  String lastName;
 @override final  DateTime? dateOfBirth;
+@override final  String residentialAddress;
+@override final  String city;
+@override final  String state;
+@override@JsonKey() final  String country;
+@override final  String pinCode;
 
 /// Create a copy of RegisterIndividualRequest
 /// with the given fields replaced by the non-null parameter values.
@@ -764,16 +774,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _RegisterIndividualRequest&&(identical(other.phoneNumber, phoneNumber) || other.phoneNumber == phoneNumber)&&(identical(other.email, email) || other.email == email)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.dateOfBirth, dateOfBirth) || other.dateOfBirth == dateOfBirth));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _RegisterIndividualRequest&&(identical(other.phoneNumber, phoneNumber) || other.phoneNumber == phoneNumber)&&(identical(other.email, email) || other.email == email)&&(identical(other.firstName, firstName) || other.firstName == firstName)&&(identical(other.lastName, lastName) || other.lastName == lastName)&&(identical(other.dateOfBirth, dateOfBirth) || other.dateOfBirth == dateOfBirth)&&(identical(other.residentialAddress, residentialAddress) || other.residentialAddress == residentialAddress)&&(identical(other.city, city) || other.city == city)&&(identical(other.state, state) || other.state == state)&&(identical(other.country, country) || other.country == country)&&(identical(other.pinCode, pinCode) || other.pinCode == pinCode));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,phoneNumber,email,firstName,lastName,dateOfBirth);
+int get hashCode => Object.hash(runtimeType,phoneNumber,email,firstName,lastName,dateOfBirth,residentialAddress,city,state,country,pinCode);
 
 @override
 String toString() {
-  return 'RegisterIndividualRequest(phoneNumber: $phoneNumber, email: $email, firstName: $firstName, lastName: $lastName, dateOfBirth: $dateOfBirth)';
+  return 'RegisterIndividualRequest(phoneNumber: $phoneNumber, email: $email, firstName: $firstName, lastName: $lastName, dateOfBirth: $dateOfBirth, residentialAddress: $residentialAddress, city: $city, state: $state, country: $country, pinCode: $pinCode)';
 }
 
 
@@ -784,7 +794,7 @@ abstract mixin class _$RegisterIndividualRequestCopyWith<$Res> implements $Regis
   factory _$RegisterIndividualRequestCopyWith(_RegisterIndividualRequest value, $Res Function(_RegisterIndividualRequest) _then) = __$RegisterIndividualRequestCopyWithImpl;
 @override @useResult
 $Res call({
- String phoneNumber, String email, String firstName, String lastName, DateTime? dateOfBirth
+ String phoneNumber, String email, String firstName, String lastName, DateTime? dateOfBirth, String residentialAddress, String city, String state, String country, String pinCode
 });
 
 
@@ -801,14 +811,19 @@ class __$RegisterIndividualRequestCopyWithImpl<$Res>
 
 /// Create a copy of RegisterIndividualRequest
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? phoneNumber = null,Object? email = null,Object? firstName = null,Object? lastName = null,Object? dateOfBirth = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? phoneNumber = null,Object? email = null,Object? firstName = null,Object? lastName = null,Object? dateOfBirth = freezed,Object? residentialAddress = null,Object? city = null,Object? state = null,Object? country = null,Object? pinCode = null,}) {
   return _then(_RegisterIndividualRequest(
 phoneNumber: null == phoneNumber ? _self.phoneNumber : phoneNumber // ignore: cast_nullable_to_non_nullable
 as String,email: null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
 as String,firstName: null == firstName ? _self.firstName : firstName // ignore: cast_nullable_to_non_nullable
 as String,lastName: null == lastName ? _self.lastName : lastName // ignore: cast_nullable_to_non_nullable
 as String,dateOfBirth: freezed == dateOfBirth ? _self.dateOfBirth : dateOfBirth // ignore: cast_nullable_to_non_nullable
-as DateTime?,
+as DateTime?,residentialAddress: null == residentialAddress ? _self.residentialAddress : residentialAddress // ignore: cast_nullable_to_non_nullable
+as String,city: null == city ? _self.city : city // ignore: cast_nullable_to_non_nullable
+as String,state: null == state ? _self.state : state // ignore: cast_nullable_to_non_nullable
+as String,country: null == country ? _self.country : country // ignore: cast_nullable_to_non_nullable
+as String,pinCode: null == pinCode ? _self.pinCode : pinCode // ignore: cast_nullable_to_non_nullable
+as String,
   ));
 }
 

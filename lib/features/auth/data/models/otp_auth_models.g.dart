@@ -31,6 +31,11 @@ _RegisterIndividualRequest _$RegisterIndividualRequestFromJson(
   dateOfBirth: json['dateOfBirth'] == null
       ? null
       : DateTime.parse(json['dateOfBirth'] as String),
+  residentialAddress: json['residentialAddress'] as String,
+  city: json['city'] as String,
+  state: json['state'] as String,
+  country: json['country'] as String? ?? 'India',
+  pinCode: json['pinCode'] as String,
 );
 
 Map<String, dynamic> _$RegisterIndividualRequestToJson(
@@ -41,6 +46,11 @@ Map<String, dynamic> _$RegisterIndividualRequestToJson(
   'firstName': instance.firstName,
   'lastName': instance.lastName,
   'dateOfBirth': instance.dateOfBirth?.toIso8601String(),
+  'residentialAddress': instance.residentialAddress,
+  'city': instance.city,
+  'state': instance.state,
+  'country': instance.country,
+  'pinCode': instance.pinCode,
 };
 
 _OtpResponse _$OtpResponseFromJson(Map<String, dynamic> json) => _OtpResponse(

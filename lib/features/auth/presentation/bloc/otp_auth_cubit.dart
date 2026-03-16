@@ -86,9 +86,14 @@ class OtpAuthCubit extends Cubit<OtpAuthState> {
     required String firstName,
     required String lastName,
     DateTime? dateOfBirth,
+    required String residentialAddress,
+    required String city,
+    required String state,
+    String country = 'India',
+    required String pinCode,
   }) async {
     emit(const OtpAuthLoading());
-    
+
     final result = await _registerIndividualUseCase(
       RegisterIndividualParams(
         phoneNumber: phoneNumber,
@@ -96,6 +101,11 @@ class OtpAuthCubit extends Cubit<OtpAuthState> {
         firstName: firstName,
         lastName: lastName,
         dateOfBirth: dateOfBirth,
+        residentialAddress: residentialAddress,
+        city: city,
+        state: state,
+        country: country,
+        pinCode: pinCode,
       ),
     );
     

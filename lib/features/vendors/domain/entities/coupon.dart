@@ -30,6 +30,7 @@ class Coupon extends Equatable {
     this.occasionType = CouponOccasionType.regular,
     this.daysBeforeOccasion,
     this.daysAfterOccasion,
+    this.displayOrder = 0,
   });
 
   final int id;
@@ -58,6 +59,7 @@ class Coupon extends Equatable {
   final CouponOccasionType occasionType;
   final int? daysBeforeOccasion;
   final int? daysAfterOccasion;
+  final int displayOrder;
 
   /// Check if coupon is currently valid
   bool get isValid {
@@ -126,5 +128,6 @@ class Coupon extends Equatable {
     occasionType,
     daysBeforeOccasion,
     daysAfterOccasion,
+    displayOrder,
   ];
 }

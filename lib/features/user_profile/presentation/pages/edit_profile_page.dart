@@ -19,6 +19,10 @@ class _EditProfilePageState extends State<EditProfilePage>
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
   final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _addressController = TextEditingController();
+  final _cityController = TextEditingController();
+  final _pinCodeController = TextEditingController();
 
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
@@ -30,6 +34,18 @@ class _EditProfilePageState extends State<EditProfilePage>
 
   DateTime? _dateOfBirth;
   DateTime? _anniversaryDate;
+  String? _selectedState;
+
+  static const _indianStates = [
+    'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
+    'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka',
+    'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya',
+    'Mizoram', 'Nagaland', 'Odisha', 'Punjab', 'Rajasthan', 'Sikkim',
+    'Tamil Nadu', 'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand',
+    'West Bengal', 'Andaman and Nicobar Islands', 'Chandigarh',
+    'Dadra and Nagar Haveli and Daman and Diu', 'Delhi', 'Jammu and Kashmir',
+    'Ladakh', 'Lakshadweep', 'Puducherry',
+  ];
 
   AuthRepository get _authRepository => GetIt.I<AuthRepository>();
 
@@ -44,6 +60,13 @@ class _EditProfilePageState extends State<EditProfilePage>
     _firstNameController.text = widget.userProfile.firstName;
     _lastNameController.text = widget.userProfile.lastName;
     _emailController.text = widget.userProfile.email;
+    _phoneController.text = widget.userProfile.phoneNumber;
+    _addressController.text = widget.userProfile.residentialAddress ?? '';
+    _cityController.text = widget.userProfile.city ?? '';
+    _pinCodeController.text = widget.userProfile.pinCode ?? '';
+    _selectedState = _indianStates.contains(widget.userProfile.state)
+        ? widget.userProfile.state
+        : null;
     _isEmployee = widget.userProfile.isEmployee;
     _dateOfBirth = widget.userProfile.dateOfBirth;
     _anniversaryDate = widget.userProfile.anniversaryDate;
@@ -51,6 +74,10 @@ class _EditProfilePageState extends State<EditProfilePage>
     // Listen for changes
     _firstNameController.addListener(_checkForChanges);
     _lastNameController.addListener(_checkForChanges);
+    _phoneController.addListener(_checkForChanges);
+    _addressController.addListener(_checkForChanges);
+    _cityController.addListener(_checkForChanges);
+    _pinCodeController.addListener(_checkForChanges);
   }
 
   void _setupAnimations() {
@@ -80,8 +107,13 @@ class _EditProfilePageState extends State<EditProfilePage>
 
   void _checkForChanges() {
     final hasChanges = _firstNameController.text != (widget.userProfile.firstName ?? '') ||
-        _lastNameController.text != (widget.userProfile.lastName ?? '');
-    
+        _lastNameController.text != (widget.userProfile.lastName ?? '') ||
+        _phoneController.text != (widget.userProfile.phoneNumber) ||
+        _addressController.text != (widget.userProfile.residentialAddress ?? '') ||
+        _cityController.text != (widget.userProfile.city ?? '') ||
+        _selectedState != widget.userProfile.state ||
+        _pinCodeController.text != (widget.userProfile.pinCode ?? '');
+
     if (hasChanges != _hasChanges) {
       setState(() {
         _hasChanges = hasChanges;
@@ -93,9 +125,17 @@ class _EditProfilePageState extends State<EditProfilePage>
   void dispose() {
     _firstNameController.removeListener(_checkForChanges);
     _lastNameController.removeListener(_checkForChanges);
+    _phoneController.removeListener(_checkForChanges);
+    _addressController.removeListener(_checkForChanges);
+    _cityController.removeListener(_checkForChanges);
+    _pinCodeController.removeListener(_checkForChanges);
     _firstNameController.dispose();
     _lastNameController.dispose();
     _emailController.dispose();
+    _phoneController.dispose();
+    _addressController.dispose();
+    _cityController.dispose();
+    _pinCodeController.dispose();
     _animationController.dispose();
     super.dispose();
   }
@@ -336,8 +376,20 @@ class _EditProfilePageState extends State<EditProfilePage>
           const SizedBox(height: 16),
           _buildInfoRow(
             icon: Icons.person_outline,
-            label: 'Full Name',
-            value: '${widget.userProfile.firstName ?? ''} ${widget.userProfile.lastName ?? ''}',
+            label: 'First Name',
+            value: widget.userProfile.firstName.isNotEmpty ? widget.userProfile.firstName : 'Not set',
+          ),
+          const SizedBox(height: 16),
+          _buildInfoRow(
+            icon: Icons.person_outline,
+            label: 'Last Name',
+            value: widget.userProfile.lastName.isNotEmpty ? widget.userProfile.lastName : 'Not set',
+          ),
+          const SizedBox(height: 16),
+          _buildInfoRow(
+            icon: Icons.phone_outlined,
+            label: 'Mobile Number',
+            value: widget.userProfile.phoneNumber.isNotEmpty ? widget.userProfile.phoneNumber : 'Not set',
           ),
           const SizedBox(height: 16),
           _buildInfoRow(
@@ -345,6 +397,26 @@ class _EditProfilePageState extends State<EditProfilePage>
             label: 'Email Address',
             value: widget.userProfile.email,
           ),
+          if (widget.userProfile.residentialAddress != null) ...[
+            const SizedBox(height: 16),
+            _buildInfoRow(
+              icon: Icons.home_outlined,
+              label: 'Residential Address',
+              value: widget.userProfile.residentialAddress!,
+            ),
+          ],
+          if (widget.userProfile.city != null || widget.userProfile.state != null || widget.userProfile.pinCode != null) ...[
+            const SizedBox(height: 16),
+            _buildInfoRow(
+              icon: Icons.location_on_outlined,
+              label: 'Location',
+              value: [
+                widget.userProfile.city,
+                widget.userProfile.state,
+                widget.userProfile.pinCode,
+              ].where((e) => e != null && e.isNotEmpty).join(', '),
+            ),
+          ],
           if (widget.userProfile.employeeInfo?.organizationName != null) ...[
             const SizedBox(height: 16),
             _buildInfoRow(
@@ -504,6 +576,22 @@ class _EditProfilePageState extends State<EditProfilePage>
 
                 const SizedBox(height: 20),
 
+                // Mobile Number Field
+                _buildTextField(
+                  controller: _phoneController,
+                  label: 'Mobile Number',
+                  icon: Icons.phone_outlined,
+                  keyboardType: TextInputType.phone,
+                  validator: (value) {
+                    if (value != null && value.isNotEmpty && value.length < 10) {
+                      return 'Enter a valid mobile number';
+                    }
+                    return null;
+                  },
+                ),
+
+                const SizedBox(height: 20),
+
                 // Email Field (Read-only)
                 _buildTextField(
                   controller: _emailController,
@@ -511,6 +599,91 @@ class _EditProfilePageState extends State<EditProfilePage>
                   icon: Icons.email_outlined,
                   enabled: false,
                   helperText: 'Email cannot be changed',
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 24),
+
+          // Residential Address Section
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.04),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF10B981), Color(0xFF34D399)],
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.home_outlined,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    const Text(
+                      'Residential Address',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+
+                _buildTextField(
+                  controller: _addressController,
+                  label: 'Address',
+                  icon: Icons.location_on_outlined,
+                  maxLines: 2,
+                ),
+
+                const SizedBox(height: 20),
+
+                _buildTextField(
+                  controller: _cityController,
+                  label: 'City',
+                  icon: Icons.location_city_outlined,
+                ),
+
+                const SizedBox(height: 20),
+
+                _buildStateDropdown(),
+
+                const SizedBox(height: 20),
+
+                _buildTextField(
+                  controller: _pinCodeController,
+                  label: 'Pin Code',
+                  icon: Icons.pin_drop_outlined,
+                  keyboardType: TextInputType.number,
+                  validator: (value) {
+                    if (value != null && value.isNotEmpty && value.length != 6) {
+                      return 'Enter a valid 6-digit pin code';
+                    }
+                    return null;
+                  },
                 ),
               ],
             ),
@@ -715,11 +888,15 @@ class _EditProfilePageState extends State<EditProfilePage>
     bool enabled = true,
     String? helperText,
     String? Function(String?)? validator,
+    TextInputType? keyboardType,
+    int maxLines = 1,
   }) {
     return TextFormField(
       controller: controller,
       enabled: enabled,
       validator: validator,
+      keyboardType: keyboardType,
+      maxLines: maxLines,
       style: TextStyle(
         fontSize: 15,
         fontWeight: FontWeight.w500,
@@ -881,6 +1058,91 @@ class _EditProfilePageState extends State<EditProfilePage>
     );
   }
 
+  Widget _buildStateDropdown() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Container(
+              margin: const EdgeInsets.only(right: 12),
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: const Color(0xFF6366F1).withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(
+                Icons.map_outlined,
+                size: 18,
+                color: Color(0xFF6366F1),
+              ),
+            ),
+            const Text(
+              'State',
+              style: TextStyle(
+                fontSize: 14,
+                color: Color(0xFF374151),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        DropdownButtonFormField<String>(
+          value: _selectedState,
+          isExpanded: true,
+          icon: Icon(
+            Icons.keyboard_arrow_down_rounded,
+            color: Colors.grey[400],
+            size: 22,
+          ),
+          decoration: InputDecoration(
+            hintText: 'Select your state',
+            hintStyle: TextStyle(
+              color: Colors.grey[400],
+              fontSize: 15,
+            ),
+            filled: true,
+            fillColor: Colors.grey[50],
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.grey[200]!, width: 1),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: Color(0xFF6366F1), width: 2),
+            ),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            isDense: true,
+          ),
+          style: const TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w500,
+            color: Colors.black87,
+          ),
+          dropdownColor: Colors.white,
+          menuMaxHeight: 300,
+          items: _indianStates.map((state) {
+            return DropdownMenuItem<String>(
+              value: state,
+              child: Text(state),
+            );
+          }).toList(),
+          onChanged: (value) {
+            setState(() {
+              _selectedState = value;
+              _hasChanges = true;
+            });
+          },
+        ),
+      ],
+    );
+  }
+
   Future<void> _selectDate(BuildContext context, bool isBirthday) async {
     final DateTime? initialDate = isBirthday ? _dateOfBirth : _anniversaryDate;
     final DateTime? picked = await showDatePicker(
@@ -926,6 +1188,11 @@ class _EditProfilePageState extends State<EditProfilePage>
       await _authRepository.updateCurrentUserProfile(
         firstName: _firstNameController.text.trim(),
         lastName: _lastNameController.text.trim(),
+        phoneNumber: _phoneController.text.trim().isNotEmpty ? _phoneController.text.trim() : null,
+        residentialAddress: _addressController.text.trim().isNotEmpty ? _addressController.text.trim() : null,
+        city: _cityController.text.trim().isNotEmpty ? _cityController.text.trim() : null,
+        state: _selectedState,
+        pinCode: _pinCodeController.text.trim().isNotEmpty ? _pinCodeController.text.trim() : null,
         dateOfBirth: _dateOfBirth,
         anniversaryDate: _anniversaryDate,
       );

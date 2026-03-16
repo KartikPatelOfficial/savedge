@@ -63,6 +63,11 @@ class OtpAuthRepositoryImpl implements OtpAuthRepository {
     String firstName,
     String lastName,
     DateTime? dateOfBirth,
+    String residentialAddress,
+    String city,
+    String state,
+    String country,
+    String pinCode,
   ) async {
     try {
       final request = RegisterIndividualRequest(
@@ -71,6 +76,11 @@ class OtpAuthRepositoryImpl implements OtpAuthRepository {
         firstName: firstName,
         lastName: lastName,
         dateOfBirth: dateOfBirth,
+        residentialAddress: residentialAddress,
+        city: city,
+        state: state,
+        country: country,
+        pinCode: pinCode,
       );
       final response = await remoteDataSource.registerIndividual(request);
 
