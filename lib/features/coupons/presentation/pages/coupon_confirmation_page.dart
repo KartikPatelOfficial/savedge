@@ -94,26 +94,33 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
                     GestureDetector(
                       onTap: () => Navigator.of(context).pop(),
                       child: Container(
-                        width: 50,
-                        height: 50,
-                        decoration: const BoxDecoration(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
                           color: Colors.white,
-                          shape: BoxShape.circle,
+                          borderRadius: BorderRadius.circular(14),
                         ),
-                        child: const Icon(Icons.close_rounded, size: 24, color: Color(0xFF0F172A)),
+                        child: const Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: Color(0xFF0F172A)),
                       ),
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       decoration: BoxDecoration(
-                        color: primaryColor.withOpacity(0.15),
+                        color: Colors.white,
                         borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: primaryColor.withOpacity(0.1),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          )
+                        ],
                       ),
                       child: Text(
                         isUse ? 'REDEEM' : 'CLAIM',
                         style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w900,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w800,
                           color: primaryColor,
                           letterSpacing: 1.5,
                         ),
@@ -122,45 +129,55 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
                   ],
                 ),
               ),
-              const SizedBox(height: 32),
+              
+              // Vector Illustration section
+              const SizedBox(height: 20),
+              _buildVectorIllustration(primaryColor, isUse),
+              const SizedBox(height: 10),
+
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Text(
                   isUse ? 'Ready to\nUse!' : 'Almost\nThere!',
                   style: const TextStyle(
-                    fontSize: 48,
+                    fontSize: 40,
                     height: 1.1,
                     fontWeight: FontWeight.w900,
                     color: Color(0xFF0F172A),
-                    letterSpacing: -1.5,
+                    letterSpacing: -1.0,
                   ),
                 ),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 24),
               Expanded(
                 child: Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.fromLTRB(24, 32, 24, 24),
+                  padding: const EdgeInsets.fromLTRB(28, 36, 28, 24),
                   decoration: const BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(40),
                       topRight: Radius.circular(40),
                     ),
+                    boxShadow: [
+                      BoxShadow(color: Color(0x08000000), blurRadius: 20, offset: Offset(0, -5))
+                    ],
                   ),
                   child: Column(
                     children: [
                       // Brand & Offer
                       Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Container(
-                            width: 64,
-                            height: 64,
+                            width: 56,
+                            height: 56,
                             decoration: BoxDecoration(
                               color: bgColor,
-                              borderRadius: BorderRadius.circular(20),
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(color: primaryColor.withOpacity(0.3), width: 1.5),
                             ),
-                            child: Icon(Icons.storefront_rounded, color: primaryColor, size: 32),
+                            child: Icon(Icons.storefront_rounded, color: primaryColor, size: 26),
                           ),
                           const SizedBox(width: 16),
                           Expanded(
@@ -170,17 +187,18 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
                                 Text(
                                   vendorName,
                                   style: const TextStyle(
-                                    fontSize: 16,
+                                    fontSize: 14,
                                     fontWeight: FontWeight.w700,
                                     color: Color(0xFF64748B),
+                                    letterSpacing: 0.5,
                                   ),
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
                                   title,
                                   style: const TextStyle(
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.w900,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w800,
                                     color: Color(0xFF0F172A),
                                     letterSpacing: -0.5,
                                   ),
@@ -192,52 +210,77 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
                           ),
                         ],
                       ),
-                      const SizedBox(height: 32),
+                      const SizedBox(height: 28),
                       
-                      // Huge Discount Display
-                      AnimatedBuilder(
-                        animation: _iconScale,
-                        builder: (context, _) => Transform.scale(
-                          scale: _iconScale.value,
-                          child: Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.symmetric(vertical: 24),
-                            decoration: BoxDecoration(
-                              color: primaryColor,
-                              borderRadius: BorderRadius.circular(24),
-                            ),
-                            child: Column(
+                      // Refined Discount Display
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
+                        decoration: BoxDecoration(
+                          color: primaryColor.withOpacity(0.08),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: primaryColor.withOpacity(0.2), width: 1),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
+                                  'DISCOUNT',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w800,
+                                    color: primaryColor,
+                                    letterSpacing: 1.5,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
                                   discountDisplay.toUpperCase(),
-                                  style: const TextStyle(
-                                    fontSize: 40,
+                                  style: TextStyle(
+                                    fontSize: 32,
                                     fontWeight: FontWeight.w900,
-                                    color: Colors.white,
+                                    color: primaryColor,
                                     letterSpacing: -1.0,
                                   ),
                                 ),
-                                if (minCartValue > 0) ...[
-                                  const SizedBox(height: 8),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withOpacity(0.2),
-                                      borderRadius: BorderRadius.circular(16),
-                                    ),
-                                    child: Text(
-                                      'Min. Order ₹${minCartValue.toInt()}',
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w700,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                ],
                               ],
                             ),
-                          ),
+                            if (minCartValue > 0)
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(12),
+                                  boxShadow: [
+                                    BoxShadow(color: primaryColor.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 4))
+                                  ],
+                                ),
+                                child: Column(
+                                  children: [
+                                    const Text(
+                                      'MINIMUM',
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w800,
+                                        color: Color(0xFF94A3B8),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      '₹${minCartValue.toInt()}',
+                                      style: const TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w800,
+                                        color: Color(0xFF0F172A),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                          ],
                         ),
                       ),
                       const SizedBox(height: 32),
@@ -246,6 +289,7 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
                       Expanded(
                         child: SingleChildScrollView(
                           child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: _getInfoItemsFlat(primaryColor),
                           ),
                         ),
@@ -258,19 +302,23 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
                           padding: const EdgeInsets.only(top: 16),
                           child: SizedBox(
                             width: double.infinity,
-                            height: 64,
+                            height: 60,
                             child: ElevatedButton(
                               onPressed: _isConfirming ? null : _handleConfirm,
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF0F172A),
+                                backgroundColor: primaryColor,
                                 foregroundColor: Colors.white,
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(24),
+                                  borderRadius: BorderRadius.circular(20),
                                 ),
                                 elevation: 0,
+                                shadowColor: primaryColor.withOpacity(0.5),
                               ),
                               child: _isConfirming
-                                  ? const CircularProgressIndicator(color: Colors.white)
+                                  ? const SizedBox(
+                                      height: 24, width: 24,
+                                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3),
+                                    )
                                   : Row(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
@@ -283,7 +331,7 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
                                           ),
                                         ),
                                         const SizedBox(width: 8),
-                                        const Icon(Icons.arrow_forward_rounded, size: 24),
+                                        const Icon(Icons.arrow_forward_rounded, size: 20),
                                       ],
                                     ),
                             ),
@@ -301,6 +349,135 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
     );
   }
 
+  Widget _buildVectorIllustration(Color primary, bool isUse) {
+    return AnimatedBuilder(
+      animation: _iconScale,
+      builder: (context, _) => Transform.scale(
+        scale: _iconScale.value,
+        child: SizedBox(
+          height: 140,
+          width: double.infinity,
+          child: Stack(
+            alignment: Alignment.center,
+            clipBehavior: Clip.none,
+            children: [
+              // Background soft blob / circles
+              Positioned(
+                right: 20,
+                top: 0,
+                child: Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    color: primary.withOpacity(0.2),
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 30,
+                bottom: 10,
+                child: Container(
+                  width: 50,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: primary.withOpacity(0.15),
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ),
+              // Vector Card
+              Transform.rotate(
+                angle: -0.15,
+                child: Container(
+                  width: 150,
+                  height: 90,
+                  decoration: BoxDecoration(
+                    color: primary,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: primary.withOpacity(0.4),
+                        blurRadius: 20,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
+                    gradient: LinearGradient(
+                      colors: [primary.withOpacity(0.8), primary],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                  ),
+                  child: Stack(
+                    children: [
+                      // Vector dashed line
+                      Positioned(
+                        left: 100,
+                        top: 0,
+                        bottom: 0,
+                        child: CustomPaint(
+                          painter: _DashedLinePainterVertical(Colors.white.withOpacity(0.6)),
+                          size: const Size(1, 90),
+                        ),
+                      ),
+                      // Icon inside the card
+                      Center(
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 30),
+                          child: Icon(
+                            isUse ? Icons.qr_code_2_rounded : Icons.card_giftcard_rounded,
+                            color: Colors.white,
+                            size: 40,
+                          ),
+                        ),
+                      ),
+                      // Small cutouts on the card
+                      Positioned(
+                        left: 95,
+                        top: -5,
+                        child: Container(
+                          width: 10,
+                          height: 10,
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        left: 95,
+                        bottom: -5,
+                        child: Container(
+                          width: 10,
+                          height: 10,
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              // Floating Sparkles
+              const Positioned(
+                right: 40,
+                top: 10,
+                child: Icon(Icons.auto_awesome_rounded, color: Color(0xFFF59E0B), size: 28),
+              ),
+              Positioned(
+                left: 70,
+                bottom: 0,
+                child: Icon(Icons.auto_awesome_rounded, color: primary, size: 20),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   List<Widget> _getInfoItemsFlat(Color primaryColor) {
     final items = <Widget>[];
 
@@ -310,26 +487,25 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
         child: Row(
           children: [
             Container(
-              width: 48,
-              height: 48,
+              width: 44,
+              height: 44,
               decoration: BoxDecoration(
-                color: iconColor.withOpacity(0.15),
-                shape: BoxShape.circle,
+                color: iconColor.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(14),
               ),
-              child: Icon(icon, color: iconColor, size: 24),
+              child: Icon(icon, color: iconColor, size: 20),
             ),
             const SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF64748B))),
+                  Text(label, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF94A3B8))),
                   const SizedBox(height: 2),
-                  Text(value, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Color(0xFF0F172A))),
+                  Text(value, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: Color(0xFF1E293B))),
                 ],
               ),
             ),
-            Icon(Icons.check_circle_rounded, color: iconColor, size: 20),
           ],
         ),
       );
@@ -576,16 +752,17 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
   void _showSuccessDialog() {
     final isUse = widget.confirmationType == CouponConfirmationType.use;
     final successColor =
-        isUse ? const Color(0xFF10B981) : const Color(0xFF6F3FCC);
+        isUse ? const Color(0xFF22C55E) : const Color(0xFF8B5CF6);
 
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => Dialog(
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
+        backgroundColor: Colors.white,
+        elevation: 0,
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(32),
           child: Stack(
             children: [
               Container(
@@ -600,16 +777,16 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
                       builder: (context, v, _) => Transform.scale(
                         scale: v,
                         child: Container(
-                          width: 80,
-                          height: 80,
+                          width: 88,
+                          height: 88,
                           decoration: BoxDecoration(
-                            color: successColor,
+                            color: successColor.withOpacity(0.12),
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
-                            isUse ? Icons.check_circle : Icons.celebration,
-                            color: Colors.white,
-                            size: 40,
+                            isUse ? Icons.check_circle_rounded : Icons.celebration_rounded,
+                            color: successColor,
+                            size: 44,
                           ),
                         ),
                       ),
@@ -617,23 +794,25 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
                     const SizedBox(height: 24),
                     Text(
                       isUse
-                          ? 'Used Successfully! 🎉'
-                          : 'Claimed Successfully! 🎉',
+                          ? 'Used Successfully!'
+                          : 'Claimed Successfully!',
                       style: const TextStyle(
                         fontSize: 24,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.black87,
+                        fontWeight: FontWeight.w900,
+                        color: Color(0xFF0F172A),
+                        letterSpacing: -0.5,
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
                     Text(
                       isUse
                           ? 'Show this to the vendor for your discount'
                           : 'Your coupon is ready to use!',
                       textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.grey[600],
+                      style: const TextStyle(
+                        fontSize: 15,
+                        color: Color(0xFF64748B),
+                        fontWeight: FontWeight.w500,
                         height: 1.4,
                       ),
                     ),
@@ -641,7 +820,7 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
                     if (isUse) ...[
                       SizedBox(
                         width: double.infinity,
-                        height: 56,
+                        height: 60,
                         child: ElevatedButton(
                           onPressed: () {
                             Navigator.of(context).pop();
@@ -658,13 +837,13 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
                             backgroundColor: successColor,
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16)),
+                                borderRadius: BorderRadius.circular(20)),
                             elevation: 0,
                           ),
                           child: const Text(
                             'View Details',
                             style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.w700),
+                                fontSize: 18, fontWeight: FontWeight.w800),
                           ),
                         ),
                       ),
@@ -673,7 +852,7 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
                         children: [
                           SizedBox(
                             width: double.infinity,
-                            height: 56,
+                            height: 60,
                             child: ElevatedButton(
                               onPressed: () async {
                                 Navigator.of(context).pop();
@@ -683,19 +862,19 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
                                 backgroundColor: successColor,
                                 foregroundColor: Colors.white,
                                 shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(16)),
+                                    borderRadius: BorderRadius.circular(20)),
                                 elevation: 0,
                               ),
                               child: const Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Icon(Icons.redeem, size: 20),
+                                  Icon(Icons.redeem_rounded, size: 22),
                                   SizedBox(width: 8),
                                   Text(
                                     'Use Now',
                                     style: TextStyle(
                                         fontSize: 18,
-                                        fontWeight: FontWeight.w700),
+                                        fontWeight: FontWeight.w800),
                                   ),
                                 ],
                               ),
@@ -704,18 +883,23 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
                           const SizedBox(height: 12),
                           SizedBox(
                             width: double.infinity,
-                            height: 48,
+                            height: 52,
                             child: TextButton(
                               onPressed: () {
                                 Navigator.of(context).pop();
                                 Navigator.of(context).pop(true);
                               },
-                              child: Text(
+                              style: TextButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16)
+                                ),
+                              ),
+                              child: const Text(
                                 'Go to Wallet',
                                 style: TextStyle(
                                   fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.grey[600],
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xFF64748B),
                                 ),
                               ),
                             ),
@@ -727,7 +911,9 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
                 ),
               ),
               // Confetti overlay clipped to dialog bounds
-              IgnorePointer(child: _ConfettiWidget()),
+              Positioned.fill(
+                child: IgnorePointer(child: _ConfettiWidget()),
+              ),
             ],
           ),
         ),
@@ -779,22 +965,62 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
   void _showErrorDialog(String error) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Row(
-          children: [
-            Icon(Icons.error_outline, color: Colors.red, size: 24),
-            SizedBox(width: 8),
-            Text('Error'),
-          ],
-        ),
-        content: Text(error.replaceAll('Exception: ', '')),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('OK'),
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        child: Padding(
+          padding: const EdgeInsets.all(28),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.red.shade50,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(Icons.error_outline_rounded, color: Colors.red.shade500, size: 40),
+              ),
+              const SizedBox(height: 24),
+              const Text(
+                'Oops!',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w900,
+                  color: Color(0xFF0F172A),
+                  letterSpacing: -0.5,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                error.replaceAll('Exception: ', ''),
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF64748B),
+                  height: 1.4,
+                ),
+              ),
+              const SizedBox(height: 32),
+              SizedBox(
+                width: double.infinity,
+                height: 56,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red.shade500,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    elevation: 0,
+                  ),
+                  child: const Text('Try Again', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -993,4 +1219,32 @@ class _CPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_CPainter old) => old.progress != progress;
+}
+
+// ─── Vertical dashed separator painter ─────────────────────────────────────
+
+class _DashedLinePainterVertical extends CustomPainter {
+  final Color color;
+  _DashedLinePainterVertical(this.color);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final dash = Paint()
+      ..color = color
+      ..strokeWidth = 2
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+
+    const dashH = 6.0;
+    const gapH = 4.0;
+    double y = 0.0;
+    while (y < size.height) {
+      canvas.drawLine(
+          Offset(0, y), Offset(0, y + dashH), dash);
+      y += dashH + gapH;
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
