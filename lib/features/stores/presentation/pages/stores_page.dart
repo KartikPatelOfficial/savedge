@@ -192,42 +192,47 @@ class _StoresViewState extends State<StoresView> {
                   .clamp(0.0, 1.0);
           final leftPadding = 20.0 + (52.0 * (1 - t));
 
-          return Stack(
-            children: [
-              if (t > 0.05)
-                Positioned(
-                  bottom: 52,
-                  left: 20,
-                  child: Opacity(
-                    opacity: t.clamp(0.0, 1.0),
-                    child: const Text(
-                      'Find the best local deals',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                        color: Color(0xFF9CA3AF),
+          return Container(
+            decoration: BoxDecoration(
+              color: Color.lerp(Colors.white, Colors.transparent, t),
+            ),
+            child: Stack(
+              children: [
+                if (t > 0.05)
+                  Positioned(
+                    bottom: 52,
+                    left: 20,
+                    child: Opacity(
+                      opacity: t.clamp(0.0, 1.0),
+                      child: const Text(
+                        'Find the best local deals',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                          color: Color(0xFF9CA3AF),
+                        ),
                       ),
                     ),
                   ),
-                ),
-              FlexibleSpaceBar(
-                titlePadding: EdgeInsets.only(
-                  left: leftPadding,
-                  bottom: 16,
-                  right: 20,
-                ),
-                centerTitle: false,
-                title: Text(
-                  'Discover Stores',
-                  style: TextStyle(
-                    color: const Color(0xFF1A202C),
-                    fontSize: t > 0.5 ? 24 : 20,
-                    fontWeight: t > 0.5 ? FontWeight.w800 : FontWeight.w700,
-                    letterSpacing: -0.5,
+                FlexibleSpaceBar(
+                  titlePadding: EdgeInsets.only(
+                    left: leftPadding,
+                    bottom: 16,
+                    right: 20,
+                  ),
+                  centerTitle: false,
+                  title: Text(
+                    'Discover Stores',
+                    style: TextStyle(
+                      color: const Color(0xFF1A202C),
+                      fontSize: t > 0.5 ? 24 : 20,
+                      fontWeight: t > 0.5 ? FontWeight.w800 : FontWeight.w700,
+                      letterSpacing: -0.5,
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           );
         },
       ),

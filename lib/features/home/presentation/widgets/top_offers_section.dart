@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:savedge/core/constants/categories_constants.dart';
 import 'package:savedge/core/injection/injection.dart';
 import 'package:savedge/features/vendors/domain/entities/vendor.dart';
 import 'package:savedge/features/vendors/presentation/bloc/vendors_bloc.dart';
@@ -51,7 +52,7 @@ class _TopOffersSectionState extends State<TopOffersSection> {
   }
 }
 
-/// Top offers view — compact ranked vertical list
+/// Top offers view — image background cards with content overlay
 class TopOffersView extends StatelessWidget {
   const TopOffersView({super.key, required this.title, this.onVendorTap});
 
@@ -94,19 +95,14 @@ class TopOffersView extends StatelessWidget {
                     color: const Color(0xFFFF6B35),
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        'HOT',
-                        style: TextStyle(
-                          fontSize: 9,
-                          fontWeight: FontWeight.w900,
-                          color: Colors.white,
-                          letterSpacing: 0.8,
-                        ),
-                      ),
-                    ],
+                  child: const Text(
+                    'HOT',
+                    style: TextStyle(
+                      fontSize: 9,
+                      fontWeight: FontWeight.w900,
+                      color: Colors.white,
+                      letterSpacing: 0.8,
+                    ),
                   ),
                 ),
               ],
@@ -135,18 +131,16 @@ class TopOffersView extends StatelessWidget {
     if (vendors.isEmpty) return _buildEmptyState();
     final items = vendors.take(5).toList();
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Column(
-        children: List.generate(items.length, (index) {
-          return _AnimatedOfferCard(
+    return Column(
+      children: List.generate(items.length, (index) {
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 12, left: 24, right: 24),
+          child: _TopVendorCard(
             vendor: items[index],
-            rank: index + 1,
             onTap: () => onVendorTap?.call(items[index]),
-            delay: Duration(milliseconds: index * 70),
-          );
-        }),
-      ),
+          ),
+        );
+      }),
     );
   }
 
@@ -155,7 +149,7 @@ class TopOffersView extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
         children: List.generate(
-          4,
+          3,
           (i) => _ShimmerCard(delay: Duration(milliseconds: i * 80)),
         ),
       ),
@@ -213,132 +207,22 @@ class TopOffersView extends StatelessWidget {
   }
 }
 
-// ─── Animated card wrapper ────────────────────────────────────────────────────
+// ─── Image background card ──────────────────────────────────────────────────
 
-class _AnimatedOfferCard extends StatefulWidget {
-  const _AnimatedOfferCard({
-    required this.vendor,
-    required this.rank,
-    required this.onTap,
-    required this.delay,
-  });
+class _TopVendorCard extends StatelessWidget {
+  const _TopVendorCard({required this.vendor, this.onTap});
 
   final Vendor vendor;
-  final int rank;
-  final VoidCallback onTap;
-  final Duration delay;
+  final VoidCallback? onTap;
 
-  @override
-  State<_AnimatedOfferCard> createState() => _AnimatedOfferCardState();
-}
-
-class _AnimatedOfferCardState extends State<_AnimatedOfferCard>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _ctrl;
-  late Animation<double> _opacity;
-  late Animation<Offset> _slide;
-  bool _pressed = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _ctrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 400),
-    );
-    _opacity = CurvedAnimation(
-      parent: _ctrl,
-      curve: Curves.easeOut,
-    ).drive(Tween(begin: 0.0, end: 1.0));
-    _slide = CurvedAnimation(
-      parent: _ctrl,
-      curve: Curves.easeOutCubic,
-    ).drive(Tween(begin: const Offset(0, 0.2), end: Offset.zero));
-    Future.delayed(widget.delay, () {
-      if (mounted) _ctrl.forward();
-    });
-  }
-
-  @override
-  void dispose() {
-    _ctrl.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FadeTransition(
-      opacity: _opacity,
-      child: SlideTransition(
-        position: _slide,
-        child: Padding(
-          padding: const EdgeInsets.only(bottom: 10),
-          child: GestureDetector(
-            onTapDown: (_) => setState(() => _pressed = true),
-            onTapUp: (_) {
-              setState(() => _pressed = false);
-              widget.onTap();
-            },
-            onTapCancel: () => setState(() => _pressed = false),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 120),
-              decoration: BoxDecoration(
-                color: _pressed
-                    ? const Color(0xFFF3EEFF)
-                    : const Color(0xFFFAF8FF),
-                borderRadius: BorderRadius.circular(18),
-                border: Border.all(
-                  color: _pressed
-                      ? const Color(0xFFCDB4F7)
-                      : const Color(0xFFEDE8FA),
-                  width: 1.2,
-                ),
-              ),
-              child: _VendorCardContent(
-                vendor: widget.vendor,
-                rank: widget.rank,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ─── Card content ─────────────────────────────────────────────────────────────
-
-class _VendorCardContent extends StatelessWidget {
-  const _VendorCardContent({required this.vendor, required this.rank});
-
-  final Vendor vendor;
-  final int rank;
-
-  static const _colors = [
-    Color(0xFF6F3FCC),
-    Color(0xFF0694A2),
-    Color(0xFFDD6B20),
-    Color(0xFFC53030),
-    Color(0xFF2F855A),
-    Color(0xFF2C5282),
-    Color(0xFF744210),
-    Color(0xFF553C9A),
+  static const _gradients = [
+    [Color(0xFF6F3FCC), Color(0xFF9F7AEA)],
+    [Color(0xFF38B2AC), Color(0xFF4FD1C7)],
+    [Color(0xFFED8936), Color(0xFFF56500)],
+    [Color(0xFFE53E3E), Color(0xFFF56565)],
+    [Color(0xFF3182CE), Color(0xFF63B3ED)],
+    [Color(0xFF38A169), Color(0xFF68D391)],
   ];
-
-  Color get _accentColor => _colors[vendor.id % _colors.length];
-
-  String get _rankLabel {
-    switch (rank) {
-      case 1:
-        return '🥇';
-      case 2:
-        return '🥈';
-      case 3:
-        return '🥉';
-      default:
-        return '$rank';
-    }
-  }
 
   String get _locationText {
     final parts = [
@@ -348,143 +232,199 @@ class _VendorCardContent extends StatelessWidget {
     return parts.isNotEmpty ? parts.join(', ') : '';
   }
 
-  int get _activeCoupons => vendor.coupons.where((c) => c.isValid).length;
-
   @override
   Widget build(BuildContext context) {
-    final location = _locationText;
-    final couponCount = _activeCoupons;
-
-    return Padding(
-      padding: const EdgeInsets.all(12),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Thumbnail with rank overlay
-          Stack(
-            clipBehavior: Clip.none,
+    return SizedBox(
+      height: 200,
+      child: GestureDetector(
+        onTap: onTap,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: Stack(
             children: [
-              _buildThumbnail(),
-              Positioned(
-                top: -4,
-                left: -4,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 5,
-                    vertical: 2,
+              _buildBackgroundImage(),
+              // Gradient overlay
+              Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    colors: [
+                      Colors.black.withOpacity(0.7),
+                      Colors.black.withOpacity(0.3),
+                      Colors.transparent,
+                    ],
+                    stops: const [0.0, 0.5, 1.0],
                   ),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: const Color(0xFFEDE8FA),
-                      width: 1,
+                ),
+              ),
+              // Content
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Row(
+                  children: [
+                    // Left content
+                    Expanded(
+                      flex: 2,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // Category badge
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF6F3FCC),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              vendor.category,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          // Vendor name
+                          Text(
+                            vendor.businessName,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                              shadows: [
+                                Shadow(
+                                  color: Colors.black54,
+                                  blurRadius: 2,
+                                  offset: Offset(0, 1),
+                                ),
+                              ],
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 4),
+                          // Description or location
+                          Text(
+                            vendor.description ?? _locationText,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w400,
+                              shadows: [
+                                Shadow(
+                                  color: Colors.black54,
+                                  blurRadius: 1,
+                                  offset: Offset(0, 1),
+                                ),
+                              ],
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 8),
+                          // Location badge
+                          if (_locationText.isNotEmpty)
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(
+                                    Icons.place_outlined,
+                                    color: Colors.white,
+                                    size: 12,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Flexible(
+                                    child: Text(
+                                      _locationText,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                        ],
+                      ),
                     ),
-                  ),
-                  child: rank <= 3
-                      ? Text(_rankLabel, style: const TextStyle(fontSize: 12))
-                      : Text(
-                          _rankLabel,
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w900,
-                            color: Colors.grey[500],
+                    // Right content - Category icon and arrow
+                    const SizedBox(width: 16),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // Category icon
+                        Container(
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(14),
+                            child: Image.asset(
+                              CategoriesConstants.getCategoryIcon(
+                                vendor.category,
+                              ),
+                              width: 48,
+                              height: 48,
+                              fit: BoxFit.contain,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  const Icon(
+                                Icons.store,
+                                color: Colors.white,
+                                size: 24,
+                              ),
+                            ),
                           ),
                         ),
+                        const SizedBox(height: 12),
+                        // Arrow indicator
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.15),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.arrow_forward_ios,
+                            color: Colors.white,
+                            size: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
-          const SizedBox(width: 14),
-          // Info block
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Name + arrow
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        vendor.businessName,
-                        style: const TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFF1A202C),
-                          letterSpacing: -0.2,
-                          height: 1.2,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Icon(
-                      Icons.chevron_right_rounded,
-                      size: 20,
-                      color: _accentColor,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 6),
-                // Category + location row
-                Row(
-                  children: [
-                    _Chip(
-                      label: vendor.category,
-                      color: _accentColor,
-                      filled: true,
-                    ),
-                    if (location.isNotEmpty) ...[
-                      const SizedBox(width: 6),
-                      const Icon(
-                        Icons.place_outlined,
-                        size: 12,
-                        color: Color(0xFF9CA3AF),
-                      ),
-                      const SizedBox(width: 2),
-                      Flexible(
-                        child: Text(
-                          location,
-                          style: const TextStyle(
-                            fontSize: 11,
-                            color: Color(0xFF6B7280),
-                            fontWeight: FontWeight.w500,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-                const SizedBox(height: 6),
-                // Description snippet (if available)
-                if (vendor.description != null &&
-                    vendor.description!.isNotEmpty) ...[
-                  const SizedBox(height: 5),
-                  Text(
-                    vendor.description!,
-                    style: const TextStyle(
-                      fontSize: 11,
-                      color: Color(0xFF9CA3AF),
-                      height: 1.4,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ],
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
 
-  Widget _buildThumbnail() {
-    final image = vendor.images.firstWhere(
+  Widget _buildBackgroundImage() {
+    final primaryImage = vendor.images.firstWhere(
       (img) => img.isPrimary,
       orElse: () => vendor.images.isNotEmpty
           ? vendor.images[0]
@@ -498,76 +438,58 @@ class _VendorCardContent extends StatelessWidget {
             ),
     );
 
-    return Container(
-      width: 64,
-      height: 64,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFEDE8FA), width: 1),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(13),
-        child: image.imageUrl.isNotEmpty
-            ? Image.network(
-                image.imageUrl,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => _gradientFallback(),
-                loadingBuilder: (_, child, progress) =>
-                    progress == null ? child : _gradientFallback(),
-              )
-            : _gradientFallback(),
-      ),
-    );
+    if (primaryImage.imageUrl.isNotEmpty) {
+      return Positioned.fill(
+        child: Image.network(
+          primaryImage.imageUrl,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) =>
+              _buildDefaultBackground(),
+        ),
+      );
+    } else {
+      return _buildDefaultBackground();
+    }
   }
 
-  Widget _gradientFallback() {
+  Widget _buildDefaultBackground() {
+    final colors = _gradients[vendor.id % _gradients.length];
+
     return Container(
-      color: _accentColor.withOpacity(0.12),
-      child: Center(
-        child: Text(
-          vendor.businessName.isNotEmpty
-              ? vendor.businessName[0].toUpperCase()
-              : '?',
-          style: TextStyle(
-            color: _accentColor,
-            fontSize: 24,
-            fontWeight: FontWeight.w800,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: colors,
+        ),
+      ),
+      child: Stack(
+        children: [
+          Positioned(
+            top: -30,
+            right: -30,
+            child: Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withOpacity(0.1),
+              ),
+            ),
           ),
-        ),
-      ),
-    );
-  }
-}
-
-// ─── Reusable chip ────────────────────────────────────────────────────────────
-
-class _Chip extends StatelessWidget {
-  const _Chip({required this.label, required this.color, this.filled = false});
-
-  final String label;
-  final Color color;
-  final bool filled;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-      decoration: BoxDecoration(
-        color: filled ? color.withOpacity(0.1) : Colors.transparent,
-        borderRadius: BorderRadius.circular(6),
-        border: filled
-            ? null
-            : Border.all(color: color.withOpacity(0.3), width: 1),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          fontSize: 11,
-          fontWeight: FontWeight.w600,
-          color: color,
-        ),
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
+          Positioned(
+            bottom: -20,
+            left: -20,
+            child: Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withOpacity(0.08),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -615,62 +537,13 @@ class _ShimmerCardState extends State<_ShimmerCard>
           const Color(0xFFDDD6FE),
           _anim.value,
         )!;
-        final light = base.withOpacity(0.5);
         return Padding(
-          padding: const EdgeInsets.only(bottom: 10),
+          padding: const EdgeInsets.only(bottom: 12),
           child: Container(
-            padding: const EdgeInsets.all(12),
+            height: 200,
             decoration: BoxDecoration(
-              color: const Color(0xFFFAF8FF),
-              borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: const Color(0xFFEDE8FA), width: 1.2),
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: 64,
-                  height: 64,
-                  decoration: BoxDecoration(
-                    color: base,
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        height: 14,
-                        width: 160,
-                        decoration: BoxDecoration(
-                          color: base,
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Container(
-                        height: 11,
-                        width: 100,
-                        decoration: BoxDecoration(
-                          color: light,
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Container(
-                        height: 11,
-                        width: 130,
-                        decoration: BoxDecoration(
-                          color: light,
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+              color: base,
+              borderRadius: BorderRadius.circular(20),
             ),
           ),
         );
