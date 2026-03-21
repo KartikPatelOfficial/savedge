@@ -390,12 +390,16 @@ class _StoresViewState extends State<StoresView> {
             ),
           ),
           const SizedBox(height: 16),
-          // Circle icon row — fixed items, no ListView (no scroll)
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: displayCategories.map((category) {
+          // Circle icon row — horizontally scrollable
+          SizedBox(
+            height: 82,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              itemCount: displayCategories.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 16),
+              itemBuilder: (context, index) {
+                final category = displayCategories[index];
                 final isSelected =
                     _selectedCategory == category ||
                     (category == 'All' && _selectedCategory == null);
@@ -407,7 +411,7 @@ class _StoresViewState extends State<StoresView> {
                 return GestureDetector(
                   onTap: () => _onCategorySelected(category),
                   child: SizedBox(
-                    width: 56,
+                    width: 60,
                     child: Column(
                       children: [
                         AnimatedContainer(
@@ -469,7 +473,7 @@ class _StoresViewState extends State<StoresView> {
                     ),
                   ),
                 );
-              }).toList(),
+              },
             ),
           ),
         ],
