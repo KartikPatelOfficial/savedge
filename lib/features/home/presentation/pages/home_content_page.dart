@@ -234,8 +234,8 @@ class _HomeContentPageState extends State<HomeContentPage> {
                     children: [
                       // Menu button
                       Container(
-                        width: 48,
-                        height: 48,
+                        width: 44,
+                        height: 44,
                         decoration: BoxDecoration(
                           color: const Color(0xFF1A202C),
                           borderRadius: BorderRadius.circular(16),
@@ -298,7 +298,8 @@ class _HomeContentPageState extends State<HomeContentPage> {
             CitySelectionSheet.show(context);
           },
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            height: 44,
+            padding: const EdgeInsets.symmetric(horizontal: 12),
             decoration: BoxDecoration(
               color: const Color(0xFFF8F9FA),
               borderRadius: BorderRadius.circular(12),

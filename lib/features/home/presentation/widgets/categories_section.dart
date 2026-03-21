@@ -101,7 +101,7 @@ class _CategoriesGrid extends StatelessWidget {
     final displayCategories = CategoriesConstants.categories.take(6).toList();
 
     return SizedBox(
-      height: 110,
+      height: 95,
       child: ListView.builder(
         padding: const EdgeInsets.symmetric(horizontal: 24.0),
         scrollDirection: Axis.horizontal,
@@ -145,11 +145,11 @@ class CategoryItemWidget extends StatelessWidget {
         children: [
           // Category icon with squircle shape and shadow
           Container(
-            width: 72,
-            height: 72,
+            width: 58,
+            height: 58,
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: BorderRadius.circular(18),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.04),
@@ -164,11 +164,11 @@ class CategoryItemWidget extends StatelessWidget {
               ],
             ),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: BorderRadius.circular(18),
               child: Image.asset(
                 category.iconPath,
-                width: 48,
-                height: 48,
+                width: 38,
+                height: 38,
                 fit: BoxFit.contain,
                 errorBuilder: (context, error, stackTrace) => Container(
                   decoration: BoxDecoration(

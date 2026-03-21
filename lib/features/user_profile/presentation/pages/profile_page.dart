@@ -174,17 +174,25 @@ class _ProfilePageState extends State<ProfilePage> {
             centerTitle: false,
             scrolledUnderElevation: 0,
             surfaceTintColor: Colors.transparent,
-            flexibleSpace: FlexibleSpaceBar(
-              background: Container(color: Colors.transparent),
-              title: const Text(
-                'Profile',
-                style: TextStyle(
-                  color: Color(0xFF1A202C),
-                  fontSize: 24,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              titlePadding: const EdgeInsets.only(left: 20, bottom: 16),
+            flexibleSpace: LayoutBuilder(
+              builder: (context, constraints) {
+                final minHeight = kToolbarHeight + MediaQuery.of(context).padding.top;
+                final t = ((constraints.maxHeight - minHeight) / (140 - minHeight)).clamp(0.0, 1.0);
+                return Container(
+                  color: Color.lerp(Colors.white, Colors.transparent, t),
+                  child: FlexibleSpaceBar(
+                    title: const Text(
+                      'Profile',
+                      style: TextStyle(
+                        color: Color(0xFF1A202C),
+                        fontSize: 24,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    titlePadding: const EdgeInsets.only(left: 20, bottom: 16),
+                  ),
+                );
+              },
             ),
           ),
 

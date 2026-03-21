@@ -59,16 +59,25 @@ class _GiftPageState extends State<GiftPage> with TickerProviderStateMixin {
                 elevation: 0,
                 scrolledUnderElevation: 0,
                 surfaceTintColor: Colors.transparent,
-                flexibleSpace: FlexibleSpaceBar(
-                  title: const Text(
-                    'Send & Receive Gifts',
-                    style: TextStyle(
-                      color: Color(0xFF1A202C),
-                      fontSize: 24,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  titlePadding: const EdgeInsets.only(left: 16, bottom: 16),
+                flexibleSpace: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final minHeight = kToolbarHeight + MediaQuery.of(context).padding.top;
+                    final t = ((constraints.maxHeight - minHeight) / (120 - minHeight)).clamp(0.0, 1.0);
+                    return Container(
+                      color: Color.lerp(Colors.white, Colors.transparent, t),
+                      child: FlexibleSpaceBar(
+                        title: const Text(
+                          'Send & Receive Gifts',
+                          style: TextStyle(
+                            color: Color(0xFF1A202C),
+                            fontSize: 24,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        titlePadding: const EdgeInsets.only(left: 16, bottom: 16),
+                      ),
+                    );
+                  },
                 ),
               ),
               SliverPersistentHeader(

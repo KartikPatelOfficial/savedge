@@ -213,17 +213,20 @@ class _CouponsViewState extends State<CouponsView> {
                       (120 - kToolbarHeight))
                   .clamp(0.0, 1.0);
 
-          return FlexibleSpaceBar(
-            titlePadding: EdgeInsets.only(
-              left: 16,
-              bottom: 16 * collapsedPercentage + 8,
-            ),
-            title: const Text(
-              'My Coupons',
-              style: TextStyle(
-                color: Color(0xFF1A202C),
-                fontSize: 24,
-                fontWeight: FontWeight.w700,
+          return Container(
+            color: Color.lerp(Colors.white, Colors.transparent, collapsedPercentage),
+            child: FlexibleSpaceBar(
+              titlePadding: EdgeInsets.only(
+                left: 16,
+                bottom: 16 * collapsedPercentage + 8,
+              ),
+              title: const Text(
+                'My Coupons',
+                style: TextStyle(
+                  color: Color(0xFF1A202C),
+                  fontSize: 24,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ),
           );
