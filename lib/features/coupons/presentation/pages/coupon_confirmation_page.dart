@@ -682,6 +682,7 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
       if (!mounted) return;
       _showSuccessDialog();
     }
+    // If user backed out without scanning, stay on page (coupon not yet used)
   }
 
   Future<void> _claimNewCoupon() async {
@@ -868,8 +869,12 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
                             height: 60,
                             child: ElevatedButton(
                               onPressed: () async {
-                                Navigator.of(context).pop();
-                                _navigateToUseNow();
+                                Navigator.of(context).pop(); // close dialog
+                                await _navigateToUseNow();
+                                // If user came back without redeeming, re-show the dialog
+                                if (mounted && _claimedCouponId != null) {
+                                  _showSuccessDialog();
+                                }
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: successColor,
@@ -899,8 +904,11 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
                             height: 52,
                             child: TextButton(
                               onPressed: () {
-                                Navigator.of(context).pop();
-                                Navigator.of(context).pop(true);
+                                Navigator.of(context).pushNamedAndRemoveUntil(
+                                  '/home',
+                                  (route) => false,
+                                  arguments: 1, // Coupons tab index
+                                );
                               },
                               style: TextButton.styleFrom(
                                 shape: RoundedRectangleBorder(
@@ -908,7 +916,7 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
                                 ),
                               ),
                               child: const Text(
-                                'Go to Wallet',
+                                'My Coupons',
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w700,
@@ -934,7 +942,7 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
     );
   }
 
-  void _navigateToUseNow() async {
+  Future<void> _navigateToUseNow() async {
     if (_claimedCouponId == null || widget.claimCoupon == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -959,10 +967,16 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
       );
 
       if (result == true) {
+        // QR scan and redemption successful - navigate to home
         if (mounted) {
-          Navigator.of(context).pop(true);
+          Navigator.of(context).pushNamedAndRemoveUntil(
+            '/home',
+            (route) => false,
+            arguments: 1, // Coupons tab
+          );
         }
       }
+      // If user backed out without scanning, do nothing - dialog will be re-shown
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

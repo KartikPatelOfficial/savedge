@@ -504,7 +504,7 @@ class CouponCard extends StatelessWidget {
     if (categoryLower == 'hotels' || categoryLower == 'resort and gateways')
       return 'hotel';
     if (categoryLower == 'tours and travels') return 'travel';
-    if (categoryLower == 'theatre') return 'entertainment';
+    if (categoryLower == 'theatre' || categoryLower == 'multiplex') return 'entertainment';
     if (categoryLower == 'grocery') return 'grocery';
     if (categoryLower == 'mobile shop') return 'electronics';
 
@@ -517,9 +517,6 @@ class CouponCard extends StatelessWidget {
     if (categoryLower == 'stationary' || categoryLower == 'kitchen utensils')
       return 'shopping';
     if (categoryLower == 'indoor games') return 'entertainment';
-    if (categoryLower == 'consultancy' || categoryLower == 'financial services')
-      return 'default';
-    if (categoryLower == 'service centre') return 'default';
 
     return 'default';
   }

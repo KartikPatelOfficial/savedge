@@ -93,11 +93,12 @@ class HomeDrawer extends StatelessWidget {
         title: 'Stores',
         onTap: () => _navigateToStores(context),
       ),
-      DrawerMenuItem(
-        icon: Icons.card_giftcard_rounded,
-        title: 'Gift Cards',
-        onTap: () => _navigateToGiftCards(context),
-      ),
+      // Gift Cards hidden until Pine Labs integration is completed
+      // DrawerMenuItem(
+      //   icon: Icons.card_giftcard_rounded,
+      //   title: 'Gift Cards',
+      //   onTap: () => _navigateToGiftCards(context),
+      // ),
       DrawerMenuItem(
         icon: Icons.info_outline_rounded,
         title: 'About Us',

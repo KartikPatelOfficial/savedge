@@ -103,7 +103,7 @@ class _SubscriptionCarouselState extends State<SubscriptionCarousel> {
     _autoScrollTimer?.cancel();
     if (_totalCards <= 1) return;
     _autoScrollTimer = Timer.periodic(
-      const Duration(seconds: 4),
+      const Duration(seconds: 3),
       (_) => _scrollToNextPage(),
     );
   }

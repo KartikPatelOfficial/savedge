@@ -19,14 +19,15 @@ import 'package:savedge/features/user_profile/presentation/pages/profile_page.da
 
 /// Main navigation wrapper that handles bottom navigation
 class MainNavigationPage extends StatefulWidget {
-  const MainNavigationPage({super.key});
+  final int initialTab;
+  const MainNavigationPage({super.key, this.initialTab = 0});
 
   @override
   State<MainNavigationPage> createState() => _MainNavigationPageState();
 }
 
 class _MainNavigationPageState extends State<MainNavigationPage> with SingleTickerProviderStateMixin {
-  int _currentIndex = 0;
+  late int _currentIndex = widget.initialTab;
   bool _isEmployee = false;
   bool _isLoadingProfile = true;
   bool _citySelectionShown = false;
@@ -142,10 +143,10 @@ class _MainNavigationPageState extends State<MainNavigationPage> with SingleTick
       HomeContentPage(onMenuTap: _toggleDrawer), // Home page content without bottom nav
     ];
 
-    // Only add Gift page for employees
-    if (_isEmployee) {
-      _pages.add(const GiftPage());
-    }
+    // Gift page hidden until Pine Labs integration is completed
+    // if (_isEmployee) {
+    //   _pages.add(const GiftPage());
+    // }
 
     _pages.addAll([
       const CouponsPage(), // Enhanced coupon management page

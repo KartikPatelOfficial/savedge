@@ -405,7 +405,7 @@ class _VendorDetailViewState extends State<_VendorDetailView> {
 
     // Only start auto-scroll if there are multiple images
     if (imagesToShow.length > 1) {
-      _autoScrollTimer = Timer.periodic(const Duration(seconds: 4), (timer) {
+      _autoScrollTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
         if (_pageController.hasClients) {
           final nextPage = (_currentPage + 1) % imagesToShow.length;
           _pageController.animateToPage(

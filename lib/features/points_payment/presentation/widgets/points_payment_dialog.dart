@@ -121,31 +121,27 @@ class _PointsPaymentDialogState extends State<PointsPaymentDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      backgroundColor: Colors.transparent,
+      backgroundColor: Colors.white,
       insetPadding: const EdgeInsets.all(16),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
       child: _buildDialogContent(),
     );
   }
 
   Widget _buildDialogContent() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _buildHeader(),
-          Flexible(child: _buildStepContent()),
-        ],
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        color: Colors.white,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _buildHeader(),
+            Flexible(child: _buildStepContent()),
+          ],
+        ),
       ),
     );
   }
@@ -155,14 +151,16 @@ class _PointsPaymentDialogState extends State<PointsPaymentDialog> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [cs.primary.withOpacity(0.1), cs.primary.withOpacity(0.05)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: const Color(0xFFF8F7FF),
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(20),
           topRight: Radius.circular(20),
+        ),
+        border: Border(
+          bottom: BorderSide(
+            color: const Color(0xFF6366F1).withOpacity(0.1),
+            width: 1,
+          ),
         ),
       ),
       child: Row(
@@ -216,12 +214,12 @@ class _PointsPaymentDialogState extends State<PointsPaymentDialog> {
           if (_currentStep != PaymentStep.success)
             Container(
               decoration: BoxDecoration(
-                color: cs.surfaceContainerLow,
+                color: const Color(0xFFF1F5F9),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: IconButton(
                 onPressed: () => Navigator.of(context).pop(),
-                icon: Icon(Icons.close, color: cs.onSurfaceVariant, size: 20),
+                icon: const Icon(Icons.close, color: Color(0xFF64748B), size: 20),
               ),
             ),
         ],
@@ -980,19 +978,32 @@ class _PointsPaymentDialogState extends State<PointsPaymentDialog> {
         final hasFocus = _otpFocusNodes[index].hasFocus;
 
         return Container(
-          width: 48,
-          height: 60,
+          width: 46,
+          height: 56,
+          decoration: BoxDecoration(
+            color: hasValue
+                ? const Color(0xFF6366F1).withOpacity(0.05)
+                : Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: hasFocus
+                  ? const Color(0xFF6366F1)
+                  : hasValue
+                      ? const Color(0xFF6366F1).withOpacity(0.4)
+                      : const Color(0xFFE2E8F0),
+              width: hasFocus ? 2 : 1.5,
+            ),
+          ),
           child: TextField(
             controller: _otpControllers[index],
             focusNode: _otpFocusNodes[index],
             keyboardType: TextInputType.number,
             textAlign: TextAlign.center,
             maxLength: 1,
-            style: TextStyle(
-              fontSize: 24,
+            style: const TextStyle(
+              fontSize: 22,
               fontWeight: FontWeight.w800,
-              color: cs.onSurface,
-              letterSpacing: -0.5,
+              color: Color(0xFF1A202C),
             ),
             decoration: const InputDecoration(
               counterText: '',
@@ -1006,6 +1017,9 @@ class _PointsPaymentDialogState extends State<PointsPaymentDialog> {
             onChanged: (value) {
               if (value.isNotEmpty && index < 5) {
                 _otpFocusNodes[index + 1].requestFocus();
+              }
+              if (value.isEmpty && index > 0) {
+                _otpFocusNodes[index - 1].requestFocus();
               }
               if (index == 5 && value.isNotEmpty) {
                 _verifyOtp();
@@ -1036,18 +1050,56 @@ class _PointsPaymentDialogState extends State<PointsPaymentDialog> {
   Widget _buildVerifyButton(ColorScheme cs) {
     final otp = _otpControllers.map((c) => c.text).join();
     final isComplete = otp.length == 6;
+    final isEnabled = isComplete && !_isVerifying;
 
-    return SizedBox(
+    return Container(
       width: double.infinity,
-      child: ElevatedButton(
-        onPressed: (_isVerifying || !isComplete) ? null : _verifyOtp,
-        child: _isVerifying
-            ? SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(strokeWidth: 2),
+      height: 56,
+      decoration: BoxDecoration(
+        gradient: isEnabled
+            ? const LinearGradient(
+                colors: [Color(0xFF8B5CF6), Color(0xFF6366F1)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               )
-            : Text('Verify & Pay'),
+            : null,
+        color: isEnabled ? null : const Color(0xFFE2E8F0),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: isEnabled
+            ? [
+                BoxShadow(
+                  color: const Color(0xFF6366F1).withOpacity(0.4),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ]
+            : null,
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: isEnabled ? _verifyOtp : null,
+          borderRadius: BorderRadius.circular(16),
+          child: Center(
+            child: _isVerifying
+                ? const SizedBox(
+                    width: 22,
+                    height: 22,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.5,
+                      color: Colors.white,
+                    ),
+                  )
+                : Text(
+                    'Verify & Pay',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: isEnabled ? Colors.white : const Color(0xFF94A3B8),
+                    ),
+                  ),
+          ),
+        ),
       ),
     );
   }

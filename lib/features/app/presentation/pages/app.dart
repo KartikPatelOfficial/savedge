@@ -16,6 +16,7 @@ import 'package:savedge/features/gift_cards/domain/entities/gift_card_entity.dar
 import 'package:savedge/features/city/presentation/bloc/city_bloc.dart';
 import 'package:savedge/features/city/presentation/bloc/city_event.dart';
 import 'package:savedge/features/notifications/presentation/bloc/notification_bloc.dart';
+import 'package:savedge/features/invoices/presentation/pages/invoices_page.dart';
 import 'package:savedge/features/notifications/presentation/pages/notification_center_page.dart';
 import 'package:savedge/core/widgets/animated_blur_background.dart';
 
@@ -42,20 +43,18 @@ class SavedgeApp extends StatelessWidget {
         home: const AuthWrapper(),
         onGenerateRoute: _generateRoute,
         builder: (context, child) {
-          return Scaffold(
-            backgroundColor: Colors.transparent,
-            body: Stack(
-              children: [
-                const AnimatedBlurBackground(),
-                if (child != null)
-                  Theme(
-                    data: Theme.of(context).copyWith(
-                      scaffoldBackgroundColor: Colors.transparent,
-                    ),
-                    child: child,
+          return Stack(
+            fit: StackFit.expand,
+            children: [
+              const AnimatedBlurBackground(),
+              if (child != null)
+                Theme(
+                  data: Theme.of(context).copyWith(
+                    scaffoldBackgroundColor: Colors.transparent,
                   ),
-              ],
-            ),
+                  child: child,
+                ),
+            ],
           );
         },
       ),
@@ -65,8 +64,9 @@ class SavedgeApp extends StatelessWidget {
   static Route<dynamic> _generateRoute(RouteSettings settings) {
     switch (settings.name) {
       case '/home':
+        final initialTab = settings.arguments is int ? settings.arguments as int : 0;
         return MaterialPageRoute(
-          builder: (_) => const MainNavigationPage(),
+          builder: (_) => MainNavigationPage(initialTab: initialTab),
         );
       case '/voucher-purchase':
         final voucher = settings.arguments as BrandVoucherEntity;
@@ -84,31 +84,37 @@ class SavedgeApp extends StatelessWidget {
           builder: (_) => const NotificationCenterPage(),
           settings: settings,
         );
-      case '/gift-cards':
+      case '/invoices':
         return MaterialPageRoute(
-          builder: (_) => const GiftCardsPage(),
+          builder: (_) => const InvoicesPage(),
           settings: settings,
         );
-      case '/gift-card-detail':
-        final product = settings.arguments as GiftCardProductEntity;
-        return MaterialPageRoute(
-          builder: (_) => GiftCardDetailPage(product: product),
-          settings: settings,
-        );
-      case '/gift-card-checkout':
-        final args = settings.arguments as Map<String, dynamic>;
-        return MaterialPageRoute(
-          builder: (_) => GiftCardCheckoutPage(
-            product: args['product'] as GiftCardProductEntity,
-            amount: args['amount'] as double,
-          ),
-          settings: settings,
-        );
-      case '/gift-card-orders':
-        return MaterialPageRoute(
-          builder: (_) => const GiftCardOrdersPage(),
-          settings: settings,
-        );
+      // Gift Cards routes hidden until Pine Labs integration is completed
+      // case '/gift-cards':
+      //   return MaterialPageRoute(
+      //     builder: (_) => const GiftCardsPage(),
+      //     settings: settings,
+      //   );
+      // case '/gift-card-detail':
+      //   final product = settings.arguments as GiftCardProductEntity;
+      //   return MaterialPageRoute(
+      //     builder: (_) => GiftCardDetailPage(product: product),
+      //     settings: settings,
+      //   );
+      // case '/gift-card-checkout':
+      //   final args = settings.arguments as Map<String, dynamic>;
+      //   return MaterialPageRoute(
+      //     builder: (_) => GiftCardCheckoutPage(
+      //       product: args['product'] as GiftCardProductEntity,
+      //       amount: args['amount'] as double,
+      //     ),
+      //     settings: settings,
+      //   );
+      // case '/gift-card-orders':
+      //   return MaterialPageRoute(
+      //     builder: (_) => const GiftCardOrdersPage(),
+      //     settings: settings,
+      //   );
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(

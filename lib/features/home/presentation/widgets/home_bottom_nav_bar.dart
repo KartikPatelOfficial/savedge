@@ -114,15 +114,16 @@ class HomeBottomNavBar extends StatelessWidget {
       ),
     ];
 
-    if (isEmployee) {
-      navItems.add(
-        const BottomNavItem(
-          icon: Icons.card_giftcard_outlined,
-          selectedIcon: Icons.card_giftcard_rounded,
-          label: 'Gift',
-        ),
-      );
-    }
+    // Gift Cards hidden until Pine Labs integration is completed
+    // if (isEmployee) {
+    //   navItems.add(
+    //     const BottomNavItem(
+    //       icon: Icons.card_giftcard_outlined,
+    //       selectedIcon: Icons.card_giftcard_rounded,
+    //       label: 'Gift',
+    //     ),
+    //   );
+    // }
 
     navItems.addAll([
       const BottomNavItem(

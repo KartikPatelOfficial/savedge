@@ -207,7 +207,7 @@ class TopOffersView extends StatelessWidget {
   }
 }
 
-// ─── Image background card ──────────────────────────────────────────────────
+// ─── Premium offer card with gradient border & embossed effects ─────────────
 
 class _TopVendorCard extends StatelessWidget {
   const _TopVendorCard({required this.vendor, this.onTap});
@@ -215,14 +215,17 @@ class _TopVendorCard extends StatelessWidget {
   final Vendor vendor;
   final VoidCallback? onTap;
 
-  static const _gradients = [
-    [Color(0xFF6F3FCC), Color(0xFF9F7AEA)],
-    [Color(0xFF38B2AC), Color(0xFF4FD1C7)],
-    [Color(0xFFED8936), Color(0xFFF56500)],
-    [Color(0xFFE53E3E), Color(0xFFF56565)],
-    [Color(0xFF3182CE), Color(0xFF63B3ED)],
-    [Color(0xFF38A169), Color(0xFF68D391)],
+  // Premium gradient border color pairs
+  static const _accentColors = [
+    [Color(0xFF7C3AED), Color(0xFFA78BFA)], // Violet
+    [Color(0xFF0EA5E9), Color(0xFF67E8F9)], // Sky
+    [Color(0xFFEC4899), Color(0xFFF9A8D4)], // Pink
+    [Color(0xFFF59E0B), Color(0xFFFCD34D)], // Amber
+    [Color(0xFF10B981), Color(0xFF6EE7B7)], // Emerald
+    [Color(0xFFEF4444), Color(0xFFFCA5A5)], // Rose
   ];
+
+  List<Color> get _accent => _accentColors[vendor.id % _accentColors.length];
 
   String get _locationText {
     final parts = [
@@ -234,196 +237,177 @@ class _TopVendorCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 200,
-      child: GestureDetector(
-        onTap: onTap,
-        child: ClipRRect(
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
-          child: Stack(
-            children: [
-              _buildBackgroundImage(),
-              // Gradient overlay
-              Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                    colors: [
-                      Colors.black.withOpacity(0.7),
-                      Colors.black.withOpacity(0.3),
-                      Colors.transparent,
-                    ],
-                    stops: const [0.0, 0.5, 1.0],
-                  ),
-                ),
-              ),
-              // Content
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: Row(
-                  children: [
-                    // Left content
-                    Expanded(
-                      flex: 2,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          // Category badge
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF6F3FCC),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              vendor.category,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
+          // Gradient border via outer container
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              _accent[0].withOpacity(0.5),
+              _accent[1].withOpacity(0.3),
+              _accent[0].withOpacity(0.15),
+            ],
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: _accent[0].withOpacity(0.12),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+              spreadRadius: 0,
+            ),
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.all(1.5), // Border width
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(18.5),
+            color: Colors.white,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(14),
+            child: Row(
+              children: [
+                // Vendor logo / image
+                _buildVendorImage(),
+                const SizedBox(width: 16),
+                // Vendor info
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Category pill
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              _accent[0].withOpacity(0.12),
+                              _accent[1].withOpacity(0.08),
+                            ],
                           ),
-                          const SizedBox(height: 8),
-                          // Vendor name
-                          Text(
-                            vendor.businessName,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w700,
-                              shadows: [
-                                Shadow(
-                                  color: Colors.black54,
-                                  blurRadius: 2,
-                                  offset: Offset(0, 1),
-                                ),
-                              ],
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: 4),
-                          // Description or location
-                          Text(
-                            vendor.description ?? _locationText,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w400,
-                              shadows: [
-                                Shadow(
-                                  color: Colors.black54,
-                                  blurRadius: 1,
-                                  offset: Offset(0, 1),
-                                ),
-                              ],
-                            ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: 8),
-                          // Location badge
-                          if (_locationText.isNotEmpty)
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.2),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Icon(
-                                    Icons.place_outlined,
-                                    color: Colors.white,
-                                    size: 12,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Flexible(
-                                    child: Text(
-                                      _locationText,
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                    // Right content - Category icon and arrow
-                    const SizedBox(width: 16),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        // Category icon
-                        Container(
-                          width: 48,
-                          height: 48,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.15),
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(14),
-                            child: Image.asset(
-                              CategoriesConstants.getCategoryIcon(
-                                vendor.category,
-                              ),
-                              width: 48,
-                              height: 48,
-                              fit: BoxFit.contain,
-                              errorBuilder: (context, error, stackTrace) =>
-                                  const Icon(
-                                Icons.store,
-                                color: Colors.white,
-                                size: 24,
-                              ),
-                            ),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          vendor.category,
+                          style: TextStyle(
+                            color: _accent[0],
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.3,
                           ),
                         ),
-                        const SizedBox(height: 12),
-                        // Arrow indicator
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.15),
-                            shape: BoxShape.circle,
+                      ),
+                      const SizedBox(height: 8),
+                      // Vendor name with embossed effect
+                      Text(
+                        vendor.businessName,
+                        style: TextStyle(
+                          color: const Color(0xFF1A202C),
+                          fontSize: 18,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: -0.3,
+                          shadows: [
+                            Shadow(
+                              color: _accent[0].withOpacity(0.08),
+                              blurRadius: 0,
+                              offset: const Offset(0, 1),
+                            ),
+                          ],
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4),
+                      // Description text
+                      if (vendor.description != null &&
+                          vendor.description!.isNotEmpty)
+                        Text(
+                          vendor.description!,
+                          style: TextStyle(
+                            color: _accent[0],
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                            height: 1.2,
                           ),
-                          child: const Icon(
-                            Icons.arrow_forward_ios,
-                            color: Colors.white,
-                            size: 14,
-                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      if (_locationText.isNotEmpty) ...[
+                        const SizedBox(height: 6),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.place_rounded,
+                              size: 13,
+                              color: Colors.grey[400],
+                            ),
+                            const SizedBox(width: 3),
+                            Flexible(
+                              child: Text(
+                                _locationText,
+                                style: TextStyle(
+                                  color: Colors.grey[500],
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(width: 8),
+                // Arrow button
+                Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: _accent,
+                    ),
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: _accent[0].withOpacity(0.3),
+                        blurRadius: 8,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
+                    Icons.arrow_forward_rounded,
+                    color: Colors.white,
+                    size: 18,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildBackgroundImage() {
+  Widget _buildVendorImage() {
     final primaryImage = vendor.images.firstWhere(
       (img) => img.isPrimary,
       orElse: () => vendor.images.isNotEmpty
@@ -438,58 +422,81 @@ class _TopVendorCard extends StatelessWidget {
             ),
     );
 
-    if (primaryImage.imageUrl.isNotEmpty) {
-      return Positioned.fill(
-        child: Image.network(
-          primaryImage.imageUrl,
-          fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) =>
-              _buildDefaultBackground(),
+    return Container(
+      width: 82,
+      height: 82,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(18),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            const Color(0xFF1A202C),
+            const Color(0xFF2D3748),
+          ],
         ),
-      );
-    } else {
-      return _buildDefaultBackground();
-    }
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.15),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(18),
+        child: primaryImage.imageUrl.isNotEmpty
+            ? Image.network(
+                primaryImage.imageUrl,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => _buildFallbackIcon(),
+              )
+            : _buildFallbackIcon(),
+      ),
+    );
   }
 
-  Widget _buildDefaultBackground() {
-    final colors = _gradients[vendor.id % _gradients.length];
-
+  Widget _buildFallbackIcon() {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: colors,
+          colors: [
+            const Color(0xFF1A202C),
+            const Color(0xFF374151),
+          ],
         ),
       ),
-      child: Stack(
-        children: [
-          Positioned(
-            top: -30,
-            right: -30,
-            child: Container(
-              width: 100,
-              height: 100,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.1),
+      child: Center(
+        child: Container(
+          width: 48,
+          height: 48,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: ClipOval(
+            child: Image.asset(
+              CategoriesConstants.getCategoryIcon(vendor.category),
+              width: 32,
+              height: 32,
+              fit: BoxFit.contain,
+              errorBuilder: (_, __, ___) => Icon(
+                Icons.store_rounded,
+                color: _accent[0],
+                size: 24,
               ),
             ),
           ),
-          Positioned(
-            bottom: -20,
-            left: -20,
-            child: Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.08),
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -540,10 +547,13 @@ class _ShimmerCardState extends State<_ShimmerCard>
         return Padding(
           padding: const EdgeInsets.only(bottom: 12),
           child: Container(
-            height: 200,
+            height: 110,
             decoration: BoxDecoration(
               color: base,
               borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: const Color(0xFFDDD6FE).withOpacity(0.5),
+              ),
             ),
           ),
         );

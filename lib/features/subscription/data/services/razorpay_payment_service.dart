@@ -74,6 +74,12 @@ class RazorpayPaymentService {
       'theme': {
         'color': '#059669',
       },
+      'method': {
+        'card': false,
+        'netbanking': true,
+        'upi': true,
+        'wallet': true,
+      },
     };
 
     try {

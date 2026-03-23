@@ -166,6 +166,14 @@ class _QRScannerPageState extends State<QRScannerPage>
           MobileScanner(
             controller: cameraController,
             onDetect: _onQRCodeDetected,
+            scanWindow: Rect.fromCenter(
+              center: Offset(
+                MediaQuery.of(context).size.width / 2,
+                MediaQuery.of(context).size.height / 2 - 60,
+              ),
+              width: 280,
+              height: 280,
+            ),
             errorBuilder: (context, error) {
               return Center(
                 child: Container(
@@ -211,6 +219,24 @@ class _QRScannerPageState extends State<QRScannerPage>
                 ),
               );
             },
+          ),
+
+          // Square scanner frame overlay
+          Center(
+            child: Transform.translate(
+              offset: const Offset(0, -60),
+              child: Container(
+                width: 280,
+                height: 280,
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.8),
+                    width: 3,
+                  ),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+            ),
           ),
 
           // Top bar with back button and title
@@ -570,81 +596,108 @@ class _QRScannerPageState extends State<QRScannerPage>
   void _showErrorDialog(String error) {
     if (!mounted || _isDisposed) return;
 
+    final isWrongVendor = error.toLowerCase().contains('different vendor');
+    final cleanError = error.replaceAll('Exception: ', '');
+
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Row(
-          children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: const Color(0xFFE53E3E).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: const Icon(
-                Icons.error_outline,
-                color: Color(0xFFE53E3E),
-                size: 22,
-              ),
-            ),
-            const SizedBox(width: 12),
-            const Expanded(
-              child: Text(
-                'Scanning Error',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  color: Color(0xFF1A202C),
+      barrierColor: Colors.black87,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        elevation: 8,
+        child: Padding(
+          padding: const EdgeInsets.all(28),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Error icon
+              Container(
+                width: 72,
+                height: 72,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE53E3E).withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.error_outline_rounded,
+                  color: Color(0xFFE53E3E),
+                  size: 36,
                 ),
               ),
-            ),
-          ],
-        ),
-        content: Text(
-          error.replaceAll('Exception: ', ''),
-          style: const TextStyle(
-            fontSize: 16,
-            color: Color(0xFF4A5568),
-            height: 1.4,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              _resetScanning();
-            },
-            style: TextButton.styleFrom(
-              foregroundColor: const Color(0xFF718096),
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            ),
-            child: const Text(
-              'Try Again',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pop(); // Close dialog
-              Navigator.of(context).pop(false); // Return to previous page
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFE53E3E),
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+              const SizedBox(height: 20),
+              // Title
+              Text(
+                isWrongVendor ? 'Wrong QR Code' : 'Scanning Error',
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w800,
+                  color: Color(0xFF1A202C),
+                  letterSpacing: -0.3,
+                ),
               ),
-            ),
-            child: const Text(
-              'Cancel',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-            ),
+              const SizedBox(height: 12),
+              // Error message
+              Text(
+                cleanError,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF64748B),
+                  height: 1.5,
+                ),
+              ),
+              const SizedBox(height: 28),
+              // Try Again button
+              SizedBox(
+                width: double.infinity,
+                height: 52,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    _resetScanning();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF6F3FCC),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: const Text(
+                    'Try Again',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              // Go Back button
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Close dialog
+                    Navigator.of(context).pop(false); // Return to previous page
+                  },
+                  style: TextButton.styleFrom(
+                    foregroundColor: const Color(0xFF64748B),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                  child: const Text(
+                    'Go Back',
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

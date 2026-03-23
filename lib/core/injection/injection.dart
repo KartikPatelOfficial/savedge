@@ -59,6 +59,7 @@ import 'package:savedge/features/favorites/domain/usecases/remove_favorite_useca
 import 'package:savedge/features/favorites/presentation/bloc/favorites_bloc.dart';
 // Points payment imports
 import 'package:savedge/features/points_payment/data/services/points_payment_service.dart';
+import 'package:savedge/features/invoices/data/services/invoice_service.dart';
 import 'package:savedge/features/static_pages/data/services/contact_message_service.dart';
 // Subscription imports
 import 'package:savedge/features/subscription/data/datasources/subscription_plan_remote_data_source.dart';
@@ -482,6 +483,11 @@ Future<void> configureDependencies() async {
   // Contact us services
   getIt.registerSingleton<ContactMessageService>(
     ContactMessageService(getIt<Dio>()),
+  );
+
+  // Invoice services
+  getIt.registerSingleton<InvoiceService>(
+    InvoiceService(getIt<Dio>()),
   );
 
   // Enhanced coupon services

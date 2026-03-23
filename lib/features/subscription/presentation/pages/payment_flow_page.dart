@@ -432,9 +432,23 @@ class _PaymentFlowViewState extends State<_PaymentFlowView> {
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.grey[600]),
             ),
+            const SizedBox(height: 4),
+            Text(
+              'Your invoice has been sent to your email.',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.grey[500], fontSize: 13),
+            ),
           ],
         ),
         actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(); // Close dialog
+              Navigator.of(context).pop(); // Close payment page
+              Navigator.of(context).pushNamed('/invoices');
+            },
+            child: const Text('View Invoices'),
+          ),
           ElevatedButton(
             onPressed: () {
               Navigator.of(context).pop(); // Close dialog

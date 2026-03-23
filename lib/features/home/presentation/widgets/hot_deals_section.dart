@@ -298,7 +298,7 @@ class _StackedDealsCardsState extends State<StackedDealsCards>
   void _startAutoScroll() {
     _autoScrollTimer?.cancel();
     _autoScrollTimer = Timer.periodic(
-      const Duration(seconds: 4),
+      const Duration(seconds: 3),
       (_) => _scrollToNextPage(),
     );
   }

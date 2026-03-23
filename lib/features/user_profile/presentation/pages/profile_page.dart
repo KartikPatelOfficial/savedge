@@ -479,6 +479,12 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                       ],
                       ProfileMenuItem(
+                        icon: Icons.receipt_long_rounded,
+                        title: 'Invoices',
+                        subtitle: 'View and download your invoices',
+                        onTap: _onInvoicesTap,
+                      ),
+                      ProfileMenuItem(
                         icon: Icons.favorite,
                         title: 'Favorites',
                         subtitle: 'Your favorite restaurants and items',
@@ -642,13 +648,16 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _onNotificationsTap() {
-    // Open Settings app on the notifications page
-    launchUrlString('app-settings:', mode: LaunchMode.externalApplication);
+    Navigator.of(context).pushNamed('/notifications');
   }
 
   void _onOrderHistoryTap() {
     debugPrint('Order History tapped');
     // TODO: Navigate to order history
+  }
+
+  void _onInvoicesTap() {
+    Navigator.of(context).pushNamed('/invoices');
   }
 
   void _onFavoritesTap() {

@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:savedge/core/injection/injection.dart';
 import 'package:savedge/features/static_pages/data/models/contact_message_models.dart';
 import 'package:savedge/features/static_pages/data/services/contact_message_service.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// Professional Contact Us page with clean white design
 class ContactUsPage extends StatefulWidget {
@@ -306,12 +307,14 @@ class _ContactUsPageState extends State<ContactUsPage> {
                 subtitle: 'info@savedge.com',
                 icon: Icons.email,
                 color: const Color(0xFF6366F1),
+                onTap: _launchEmail,
               ),
               _buildContactMethodCard(
                 title: 'Phone',
                 subtitle: '+91 99099 11482',
                 icon: Icons.phone,
                 color: const Color(0xFF14B8A6),
+                onTap: _launchPhone,
               ),
             ],
           ),
@@ -320,13 +323,30 @@ class _ContactUsPageState extends State<ContactUsPage> {
     );
   }
 
+  void _launchEmail() async {
+    final uri = Uri(scheme: 'mailto', path: 'info@savedge.com');
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    }
+  }
+
+  void _launchPhone() async {
+    final uri = Uri(scheme: 'tel', path: '+919909911482');
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    }
+  }
+
   Widget _buildContactMethodCard({
     required String title,
     required String subtitle,
     required IconData icon,
     required Color color,
+    VoidCallback? onTap,
   }) {
-    return Container(
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -372,6 +392,7 @@ class _ContactUsPageState extends State<ContactUsPage> {
             textAlign: TextAlign.center,
           ),
         ],
+      ),
       ),
     );
   }
