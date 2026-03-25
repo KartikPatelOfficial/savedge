@@ -24,6 +24,8 @@ abstract class FreeTrialStatusResponse with _$FreeTrialStatusResponse {
     required DateTime offerExpiresAt,
     RemainingTimeResponse? remainingTime,
     required bool hasActiveSubscription,
+    @Default(30) int trialDurationDays,
+    String? freeTrialImageUrl,
   }) = _FreeTrialStatusResponse;
 
   factory FreeTrialStatusResponse.fromJson(Map<String, dynamic> json) =>

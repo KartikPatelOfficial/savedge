@@ -24,6 +24,8 @@ _FreeTrialStatusResponse _$FreeTrialStatusResponseFromJson(
           json['remainingTime'] as Map<String, dynamic>,
         ),
   hasActiveSubscription: json['hasActiveSubscription'] as bool,
+  trialDurationDays: (json['trialDurationDays'] as num?)?.toInt() ?? 30,
+  freeTrialImageUrl: json['freeTrialImageUrl'] as String?,
 );
 
 Map<String, dynamic> _$FreeTrialStatusResponseToJson(
@@ -36,6 +38,8 @@ Map<String, dynamic> _$FreeTrialStatusResponseToJson(
   'offerExpiresAt': instance.offerExpiresAt.toIso8601String(),
   'remainingTime': instance.remainingTime,
   'hasActiveSubscription': instance.hasActiveSubscription,
+  'trialDurationDays': instance.trialDurationDays,
+  'freeTrialImageUrl': instance.freeTrialImageUrl,
 };
 
 const _$FreeTrialStatusEnumMap = {

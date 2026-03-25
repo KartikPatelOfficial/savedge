@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$FreeTrialStatusResponse {
 
- FreeTrialStatus get status; bool get canActivate; DateTime? get activatedAt; DateTime? get expiresAt; DateTime get offerExpiresAt; RemainingTimeResponse? get remainingTime; bool get hasActiveSubscription;
+ FreeTrialStatus get status; bool get canActivate; DateTime? get activatedAt; DateTime? get expiresAt; DateTime get offerExpiresAt; RemainingTimeResponse? get remainingTime; bool get hasActiveSubscription; int get trialDurationDays; String? get freeTrialImageUrl;
 /// Create a copy of FreeTrialStatusResponse
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $FreeTrialStatusResponseCopyWith<FreeTrialStatusResponse> get copyWith => _$Free
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is FreeTrialStatusResponse&&(identical(other.status, status) || other.status == status)&&(identical(other.canActivate, canActivate) || other.canActivate == canActivate)&&(identical(other.activatedAt, activatedAt) || other.activatedAt == activatedAt)&&(identical(other.expiresAt, expiresAt) || other.expiresAt == expiresAt)&&(identical(other.offerExpiresAt, offerExpiresAt) || other.offerExpiresAt == offerExpiresAt)&&(identical(other.remainingTime, remainingTime) || other.remainingTime == remainingTime)&&(identical(other.hasActiveSubscription, hasActiveSubscription) || other.hasActiveSubscription == hasActiveSubscription));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is FreeTrialStatusResponse&&(identical(other.status, status) || other.status == status)&&(identical(other.canActivate, canActivate) || other.canActivate == canActivate)&&(identical(other.activatedAt, activatedAt) || other.activatedAt == activatedAt)&&(identical(other.expiresAt, expiresAt) || other.expiresAt == expiresAt)&&(identical(other.offerExpiresAt, offerExpiresAt) || other.offerExpiresAt == offerExpiresAt)&&(identical(other.remainingTime, remainingTime) || other.remainingTime == remainingTime)&&(identical(other.hasActiveSubscription, hasActiveSubscription) || other.hasActiveSubscription == hasActiveSubscription)&&(identical(other.trialDurationDays, trialDurationDays) || other.trialDurationDays == trialDurationDays)&&(identical(other.freeTrialImageUrl, freeTrialImageUrl) || other.freeTrialImageUrl == freeTrialImageUrl));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,status,canActivate,activatedAt,expiresAt,offerExpiresAt,remainingTime,hasActiveSubscription);
+int get hashCode => Object.hash(runtimeType,status,canActivate,activatedAt,expiresAt,offerExpiresAt,remainingTime,hasActiveSubscription,trialDurationDays,freeTrialImageUrl);
 
 @override
 String toString() {
-  return 'FreeTrialStatusResponse(status: $status, canActivate: $canActivate, activatedAt: $activatedAt, expiresAt: $expiresAt, offerExpiresAt: $offerExpiresAt, remainingTime: $remainingTime, hasActiveSubscription: $hasActiveSubscription)';
+  return 'FreeTrialStatusResponse(status: $status, canActivate: $canActivate, activatedAt: $activatedAt, expiresAt: $expiresAt, offerExpiresAt: $offerExpiresAt, remainingTime: $remainingTime, hasActiveSubscription: $hasActiveSubscription, trialDurationDays: $trialDurationDays, freeTrialImageUrl: $freeTrialImageUrl)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $FreeTrialStatusResponseCopyWith<$Res>  {
   factory $FreeTrialStatusResponseCopyWith(FreeTrialStatusResponse value, $Res Function(FreeTrialStatusResponse) _then) = _$FreeTrialStatusResponseCopyWithImpl;
 @useResult
 $Res call({
- FreeTrialStatus status, bool canActivate, DateTime? activatedAt, DateTime? expiresAt, DateTime offerExpiresAt, RemainingTimeResponse? remainingTime, bool hasActiveSubscription
+ FreeTrialStatus status, bool canActivate, DateTime? activatedAt, DateTime? expiresAt, DateTime offerExpiresAt, RemainingTimeResponse? remainingTime, bool hasActiveSubscription, int trialDurationDays, String? freeTrialImageUrl
 });
 
 
@@ -65,7 +65,7 @@ class _$FreeTrialStatusResponseCopyWithImpl<$Res>
 
 /// Create a copy of FreeTrialStatusResponse
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? status = null,Object? canActivate = null,Object? activatedAt = freezed,Object? expiresAt = freezed,Object? offerExpiresAt = null,Object? remainingTime = freezed,Object? hasActiveSubscription = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? status = null,Object? canActivate = null,Object? activatedAt = freezed,Object? expiresAt = freezed,Object? offerExpiresAt = null,Object? remainingTime = freezed,Object? hasActiveSubscription = null,Object? trialDurationDays = null,Object? freeTrialImageUrl = freezed,}) {
   return _then(_self.copyWith(
 status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as FreeTrialStatus,canActivate: null == canActivate ? _self.canActivate : canActivate // ignore: cast_nullable_to_non_nullable
@@ -74,7 +74,9 @@ as DateTime?,expiresAt: freezed == expiresAt ? _self.expiresAt : expiresAt // ig
 as DateTime?,offerExpiresAt: null == offerExpiresAt ? _self.offerExpiresAt : offerExpiresAt // ignore: cast_nullable_to_non_nullable
 as DateTime,remainingTime: freezed == remainingTime ? _self.remainingTime : remainingTime // ignore: cast_nullable_to_non_nullable
 as RemainingTimeResponse?,hasActiveSubscription: null == hasActiveSubscription ? _self.hasActiveSubscription : hasActiveSubscription // ignore: cast_nullable_to_non_nullable
-as bool,
+as bool,trialDurationDays: null == trialDurationDays ? _self.trialDurationDays : trialDurationDays // ignore: cast_nullable_to_non_nullable
+as int,freeTrialImageUrl: freezed == freeTrialImageUrl ? _self.freeTrialImageUrl : freeTrialImageUrl // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 /// Create a copy of FreeTrialStatusResponse
@@ -171,10 +173,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( FreeTrialStatus status,  bool canActivate,  DateTime? activatedAt,  DateTime? expiresAt,  DateTime offerExpiresAt,  RemainingTimeResponse? remainingTime,  bool hasActiveSubscription)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( FreeTrialStatus status,  bool canActivate,  DateTime? activatedAt,  DateTime? expiresAt,  DateTime offerExpiresAt,  RemainingTimeResponse? remainingTime,  bool hasActiveSubscription,  int trialDurationDays,  String? freeTrialImageUrl)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _FreeTrialStatusResponse() when $default != null:
-return $default(_that.status,_that.canActivate,_that.activatedAt,_that.expiresAt,_that.offerExpiresAt,_that.remainingTime,_that.hasActiveSubscription);case _:
+return $default(_that.status,_that.canActivate,_that.activatedAt,_that.expiresAt,_that.offerExpiresAt,_that.remainingTime,_that.hasActiveSubscription,_that.trialDurationDays,_that.freeTrialImageUrl);case _:
   return orElse();
 
 }
@@ -192,10 +194,10 @@ return $default(_that.status,_that.canActivate,_that.activatedAt,_that.expiresAt
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( FreeTrialStatus status,  bool canActivate,  DateTime? activatedAt,  DateTime? expiresAt,  DateTime offerExpiresAt,  RemainingTimeResponse? remainingTime,  bool hasActiveSubscription)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( FreeTrialStatus status,  bool canActivate,  DateTime? activatedAt,  DateTime? expiresAt,  DateTime offerExpiresAt,  RemainingTimeResponse? remainingTime,  bool hasActiveSubscription,  int trialDurationDays,  String? freeTrialImageUrl)  $default,) {final _that = this;
 switch (_that) {
 case _FreeTrialStatusResponse():
-return $default(_that.status,_that.canActivate,_that.activatedAt,_that.expiresAt,_that.offerExpiresAt,_that.remainingTime,_that.hasActiveSubscription);case _:
+return $default(_that.status,_that.canActivate,_that.activatedAt,_that.expiresAt,_that.offerExpiresAt,_that.remainingTime,_that.hasActiveSubscription,_that.trialDurationDays,_that.freeTrialImageUrl);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -212,10 +214,10 @@ return $default(_that.status,_that.canActivate,_that.activatedAt,_that.expiresAt
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( FreeTrialStatus status,  bool canActivate,  DateTime? activatedAt,  DateTime? expiresAt,  DateTime offerExpiresAt,  RemainingTimeResponse? remainingTime,  bool hasActiveSubscription)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( FreeTrialStatus status,  bool canActivate,  DateTime? activatedAt,  DateTime? expiresAt,  DateTime offerExpiresAt,  RemainingTimeResponse? remainingTime,  bool hasActiveSubscription,  int trialDurationDays,  String? freeTrialImageUrl)?  $default,) {final _that = this;
 switch (_that) {
 case _FreeTrialStatusResponse() when $default != null:
-return $default(_that.status,_that.canActivate,_that.activatedAt,_that.expiresAt,_that.offerExpiresAt,_that.remainingTime,_that.hasActiveSubscription);case _:
+return $default(_that.status,_that.canActivate,_that.activatedAt,_that.expiresAt,_that.offerExpiresAt,_that.remainingTime,_that.hasActiveSubscription,_that.trialDurationDays,_that.freeTrialImageUrl);case _:
   return null;
 
 }
@@ -227,7 +229,7 @@ return $default(_that.status,_that.canActivate,_that.activatedAt,_that.expiresAt
 @JsonSerializable()
 
 class _FreeTrialStatusResponse implements FreeTrialStatusResponse {
-  const _FreeTrialStatusResponse({required this.status, required this.canActivate, this.activatedAt, this.expiresAt, required this.offerExpiresAt, this.remainingTime, required this.hasActiveSubscription});
+  const _FreeTrialStatusResponse({required this.status, required this.canActivate, this.activatedAt, this.expiresAt, required this.offerExpiresAt, this.remainingTime, required this.hasActiveSubscription, this.trialDurationDays = 30, this.freeTrialImageUrl});
   factory _FreeTrialStatusResponse.fromJson(Map<String, dynamic> json) => _$FreeTrialStatusResponseFromJson(json);
 
 @override final  FreeTrialStatus status;
@@ -237,6 +239,8 @@ class _FreeTrialStatusResponse implements FreeTrialStatusResponse {
 @override final  DateTime offerExpiresAt;
 @override final  RemainingTimeResponse? remainingTime;
 @override final  bool hasActiveSubscription;
+@override@JsonKey() final  int trialDurationDays;
+@override final  String? freeTrialImageUrl;
 
 /// Create a copy of FreeTrialStatusResponse
 /// with the given fields replaced by the non-null parameter values.
@@ -251,16 +255,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FreeTrialStatusResponse&&(identical(other.status, status) || other.status == status)&&(identical(other.canActivate, canActivate) || other.canActivate == canActivate)&&(identical(other.activatedAt, activatedAt) || other.activatedAt == activatedAt)&&(identical(other.expiresAt, expiresAt) || other.expiresAt == expiresAt)&&(identical(other.offerExpiresAt, offerExpiresAt) || other.offerExpiresAt == offerExpiresAt)&&(identical(other.remainingTime, remainingTime) || other.remainingTime == remainingTime)&&(identical(other.hasActiveSubscription, hasActiveSubscription) || other.hasActiveSubscription == hasActiveSubscription));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FreeTrialStatusResponse&&(identical(other.status, status) || other.status == status)&&(identical(other.canActivate, canActivate) || other.canActivate == canActivate)&&(identical(other.activatedAt, activatedAt) || other.activatedAt == activatedAt)&&(identical(other.expiresAt, expiresAt) || other.expiresAt == expiresAt)&&(identical(other.offerExpiresAt, offerExpiresAt) || other.offerExpiresAt == offerExpiresAt)&&(identical(other.remainingTime, remainingTime) || other.remainingTime == remainingTime)&&(identical(other.hasActiveSubscription, hasActiveSubscription) || other.hasActiveSubscription == hasActiveSubscription)&&(identical(other.trialDurationDays, trialDurationDays) || other.trialDurationDays == trialDurationDays)&&(identical(other.freeTrialImageUrl, freeTrialImageUrl) || other.freeTrialImageUrl == freeTrialImageUrl));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,status,canActivate,activatedAt,expiresAt,offerExpiresAt,remainingTime,hasActiveSubscription);
+int get hashCode => Object.hash(runtimeType,status,canActivate,activatedAt,expiresAt,offerExpiresAt,remainingTime,hasActiveSubscription,trialDurationDays,freeTrialImageUrl);
 
 @override
 String toString() {
-  return 'FreeTrialStatusResponse(status: $status, canActivate: $canActivate, activatedAt: $activatedAt, expiresAt: $expiresAt, offerExpiresAt: $offerExpiresAt, remainingTime: $remainingTime, hasActiveSubscription: $hasActiveSubscription)';
+  return 'FreeTrialStatusResponse(status: $status, canActivate: $canActivate, activatedAt: $activatedAt, expiresAt: $expiresAt, offerExpiresAt: $offerExpiresAt, remainingTime: $remainingTime, hasActiveSubscription: $hasActiveSubscription, trialDurationDays: $trialDurationDays, freeTrialImageUrl: $freeTrialImageUrl)';
 }
 
 
@@ -271,7 +275,7 @@ abstract mixin class _$FreeTrialStatusResponseCopyWith<$Res> implements $FreeTri
   factory _$FreeTrialStatusResponseCopyWith(_FreeTrialStatusResponse value, $Res Function(_FreeTrialStatusResponse) _then) = __$FreeTrialStatusResponseCopyWithImpl;
 @override @useResult
 $Res call({
- FreeTrialStatus status, bool canActivate, DateTime? activatedAt, DateTime? expiresAt, DateTime offerExpiresAt, RemainingTimeResponse? remainingTime, bool hasActiveSubscription
+ FreeTrialStatus status, bool canActivate, DateTime? activatedAt, DateTime? expiresAt, DateTime offerExpiresAt, RemainingTimeResponse? remainingTime, bool hasActiveSubscription, int trialDurationDays, String? freeTrialImageUrl
 });
 
 
@@ -288,7 +292,7 @@ class __$FreeTrialStatusResponseCopyWithImpl<$Res>
 
 /// Create a copy of FreeTrialStatusResponse
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? status = null,Object? canActivate = null,Object? activatedAt = freezed,Object? expiresAt = freezed,Object? offerExpiresAt = null,Object? remainingTime = freezed,Object? hasActiveSubscription = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? status = null,Object? canActivate = null,Object? activatedAt = freezed,Object? expiresAt = freezed,Object? offerExpiresAt = null,Object? remainingTime = freezed,Object? hasActiveSubscription = null,Object? trialDurationDays = null,Object? freeTrialImageUrl = freezed,}) {
   return _then(_FreeTrialStatusResponse(
 status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as FreeTrialStatus,canActivate: null == canActivate ? _self.canActivate : canActivate // ignore: cast_nullable_to_non_nullable
@@ -297,7 +301,9 @@ as DateTime?,expiresAt: freezed == expiresAt ? _self.expiresAt : expiresAt // ig
 as DateTime?,offerExpiresAt: null == offerExpiresAt ? _self.offerExpiresAt : offerExpiresAt // ignore: cast_nullable_to_non_nullable
 as DateTime,remainingTime: freezed == remainingTime ? _self.remainingTime : remainingTime // ignore: cast_nullable_to_non_nullable
 as RemainingTimeResponse?,hasActiveSubscription: null == hasActiveSubscription ? _self.hasActiveSubscription : hasActiveSubscription // ignore: cast_nullable_to_non_nullable
-as bool,
+as bool,trialDurationDays: null == trialDurationDays ? _self.trialDurationDays : trialDurationDays // ignore: cast_nullable_to_non_nullable
+as int,freeTrialImageUrl: freezed == freeTrialImageUrl ? _self.freeTrialImageUrl : freeTrialImageUrl // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 

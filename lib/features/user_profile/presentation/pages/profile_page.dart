@@ -837,6 +837,7 @@ class _ProfilePageState extends State<ProfilePage> {
   void _onDeleteAccountTap() {
     showDialog(
       context: context,
+      barrierColor: Colors.black54,
       builder: (dialogContext) => _DeleteAccountDialog(
         onConfirm: () async {
           // Capture navigator and messenger before async operations
@@ -895,6 +896,8 @@ class _DeleteAccountDialogState extends State<_DeleteAccountDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      backgroundColor: Colors.white,
+      surfaceTintColor: Colors.transparent,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       title: const Row(
         children: [
