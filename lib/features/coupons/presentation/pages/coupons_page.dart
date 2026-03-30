@@ -518,6 +518,7 @@ class _CouponsViewState extends State<CouponsView> {
       usedAt: userCoupon.redeemedDate?.toIso8601String(),
       claimedAt: userCoupon.acquiredDate.toIso8601String(),
       isGifted: userCoupon.isGifted,
+      isGiftable: userCoupon.isGiftable,
       terms: null,
       imageUrl: userCoupon.imageUrl,
       redemptionCode: userCoupon.uniqueCode,

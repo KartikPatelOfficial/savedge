@@ -95,6 +95,7 @@ abstract class UserCouponDetailModel with _$UserCouponDetailModel {
     double? amountPaid,
     String? imageUrl,
     required bool isGifted,
+    @Default(false) bool isGiftable,
     String? giftedFromUserId,
     String? giftedToUserId,
     DateTime? giftedDate,

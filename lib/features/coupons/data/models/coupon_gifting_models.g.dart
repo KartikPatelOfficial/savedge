@@ -118,6 +118,7 @@ _UserCouponDetailModel _$UserCouponDetailModelFromJson(
   amountPaid: (json['amountPaid'] as num?)?.toDouble(),
   imageUrl: json['imageUrl'] as String?,
   isGifted: json['isGifted'] as bool,
+  isGiftable: json['isGiftable'] as bool? ?? false,
   giftedFromUserId: json['giftedFromUserId'] as String?,
   giftedToUserId: json['giftedToUserId'] as String?,
   giftedDate: json['giftedDate'] == null
@@ -150,6 +151,7 @@ Map<String, dynamic> _$UserCouponDetailModelToJson(
   'amountPaid': instance.amountPaid,
   'imageUrl': instance.imageUrl,
   'isGifted': instance.isGifted,
+  'isGiftable': instance.isGiftable,
   'giftedFromUserId': instance.giftedFromUserId,
   'giftedToUserId': instance.giftedToUserId,
   'giftedDate': instance.giftedDate?.toIso8601String(),

@@ -199,7 +199,7 @@ class _GiftPageState extends State<GiftPage> with TickerProviderStateMixin {
                 return _buildLoadingCoupons();
               } else if (state is UserCouponsLoaded) {
                 final availableCoupons = state.coupons
-                    .where((coupon) => coupon.statusText == 'Active')
+                    .where((coupon) => coupon.isGiftable)
                     .toList();
 
                 if (availableCoupons.isEmpty) {

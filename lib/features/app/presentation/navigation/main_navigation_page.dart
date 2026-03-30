@@ -143,10 +143,9 @@ class _MainNavigationPageState extends State<MainNavigationPage> with SingleTick
       HomeContentPage(onMenuTap: _toggleDrawer), // Home page content without bottom nav
     ];
 
-    // Gift page hidden until Pine Labs integration is completed
-    // if (_isEmployee) {
-    //   _pages.add(const GiftPage());
-    // }
+    if (_isEmployee) {
+      _pages.add(const GiftPage());
+    }
 
     _pages.addAll([
       const CouponsPage(), // Enhanced coupon management page

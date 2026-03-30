@@ -18,6 +18,7 @@ class UserCouponModel {
     required this.usedAt,
     required this.claimedAt,
     required this.isGifted,
+    required this.isGiftable,
     this.terms,
     this.imageUrl,
     this.redemptionCode,
@@ -40,6 +41,7 @@ class UserCouponModel {
   final String? usedAt;
   final String claimedAt;
   final bool isGifted;
+  final bool isGiftable;
   final String? terms;
   final String? imageUrl;
   final String? redemptionCode;
@@ -86,6 +88,7 @@ class UserCouponModel {
       usedAt: json['redeemedDate'] as String?,
       claimedAt: json['purchasedDate'] as String,
       isGifted: json['isGifted'] as bool? ?? false,
+      isGiftable: json['isGiftable'] as bool? ?? false,
       terms: json['terms'] as String?,
       imageUrl: json['imageUrl'] as String?,
       redemptionCode: json['uniqueCode'] as String?,
@@ -125,6 +128,7 @@ class UserCouponModel {
       'usedAt': usedAt,
       'claimedAt': claimedAt,
       'isGifted': isGifted,
+      'isGiftable': isGiftable,
       'terms': terms,
       'imageUrl': imageUrl,
       'redemptionCode': redemptionCode,

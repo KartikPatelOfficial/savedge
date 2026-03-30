@@ -1075,6 +1075,7 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
       usedAt: DateTime.now().toIso8601String(),
       claimedAt: userCoupon.acquiredDate.toIso8601String(),
       isGifted: userCoupon.isGifted,
+      isGiftable: false,
       terms: null,
       imageUrl: userCoupon.imageUrl,
       redemptionCode: userCoupon.uniqueCode,
