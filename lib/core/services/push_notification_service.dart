@@ -153,6 +153,15 @@ class PushNotificationService {
   /// Get FCM token
   Future<String?> _getFcmToken() async {
     try {
+      // On iOS, APNS token must be available before FCM token can be retrieved.
+      // Try once — if not ready yet, the onTokenRefresh listener will capture it later.
+      if (Platform.isIOS) {
+        final apnsToken = await _messaging.getAPNSToken();
+        if (apnsToken == null) {
+          debugPrint('APNS token not yet available, skipping FCM token (will retry on refresh)');
+          return null;
+        }
+      }
       _fcmToken = await _messaging.getToken();
       debugPrint('FCM Token: $_fcmToken');
       return _fcmToken;
