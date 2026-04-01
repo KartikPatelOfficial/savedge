@@ -10,7 +10,7 @@ class AppConstants {
   static const String _productionEnv = 'production';
 
   // API Endpoints per environment
-  static const String _developmentBaseUrl = 'https://portal.savedge.in';
+  static const String _developmentBaseUrl = 'https://10.0.2.2:44447';
   static const String _stagingBaseUrl = 'https://portal.savedge.in';
   static const String _productionBaseUrl = 'https://portal.savedge.in';
 

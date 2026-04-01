@@ -581,43 +581,10 @@ class _VendorOfferCardState extends State<VendorOfferCard>
             tag: _heroTag,
             child: Material(
               color: Colors.transparent,
-              child: CustomPaint(
-                painter: _CouponOutlinePainter(color: accentColor),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.04),
-                          blurRadius: 24,
-                          offset: const Offset(0, 8),
-                        ),
-                      ],
-                    ),
-                    child: Stack(
-                      children: [
-                        IntrinsicHeight(
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              _buildDiscountStub(accentColor),
-                              Expanded(
-                                child: _buildDetailsPanel(
-                                  accentColor,
-                                  hasCash: hasCash,
-                                  hasMembership: hasMembership,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        _buildInternalCutouts(accentColor),
-                      ],
-                    ),
-                  ),
-                ),
+              child: _buildCouponShell(
+                accentColor: accentColor,
+                hasCash: hasCash,
+                hasMembership: hasMembership,
               ),
             ),
           ),
@@ -633,44 +600,10 @@ class _VendorOfferCardState extends State<VendorOfferCard>
   }) {
     return Material(
       color: Colors.transparent,
-      child: CustomPaint(
-        painter: _CouponOutlinePainter(color: accentColor),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.04),
-                blurRadius: 24,
-                offset: const Offset(0, 8),
-              ),
-            ],
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(16),
-            child: Stack(
-              children: [
-                IntrinsicHeight(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      _buildDiscountStub(accentColor),
-                      Expanded(
-                        child: _buildDetailsPanel(
-                          accentColor,
-                          hasCash: hasCash,
-                          hasMembership: hasMembership,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                _buildInternalCutouts(accentColor),
-              ],
-            ),
-          ),
-        ),
+      child: _buildCouponShell(
+        accentColor: accentColor,
+        hasCash: hasCash,
+        hasMembership: hasMembership,
       ),
     );
   }
@@ -689,25 +622,61 @@ class _VendorOfferCardState extends State<VendorOfferCard>
     return colors[widget.index % colors.length];
   }
 
+  /// Builds the full coupon card with clip, content, dashed divider, and border.
+  Widget _buildCouponShell({
+    required Color accentColor,
+    required bool hasCash,
+    required bool hasMembership,
+  }) {
+    return Stack(
+      children: [
+        // Clipped card content
+        ClipPath(
+          clipper: const _VendorCouponShapeClipper(),
+          child: Container(
+            color: Colors.white,
+            child: Stack(
+              children: [
+                IntrinsicHeight(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _buildDiscountStub(accentColor),
+                      Expanded(
+                        child: _buildDetailsPanel(
+                          accentColor,
+                          hasCash: hasCash,
+                          hasMembership: hasMembership,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                _buildDashedDivider(accentColor),
+              ],
+            ),
+          ),
+        ),
+        // Border that follows the coupon shape (including notch arcs)
+        Positioned.fill(
+          child: IgnorePointer(
+            child: CustomPaint(
+              painter: _CouponBorderPainter(color: accentColor),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildDiscountStub(Color accentColor) {
     return Container(
       width: 110,
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Colors.white,
-        borderRadius: const BorderRadius.only(
+        borderRadius: BorderRadius.only(
           topLeft: Radius.circular(16),
           bottomLeft: Radius.circular(16),
-        ),
-        border: Border(
-          top: BorderSide(color: accentColor.withValues(alpha: 0.25), width: 1),
-          left: BorderSide(
-            color: accentColor.withValues(alpha: 0.25),
-            width: 1,
-          ),
-          bottom: BorderSide(
-            color: accentColor.withValues(alpha: 0.25),
-            width: 1,
-          ),
         ),
       ),
       child: Center(
@@ -753,23 +722,6 @@ class _VendorOfferCardState extends State<VendorOfferCard>
     required bool hasMembership,
   }) {
     return Container(
-      decoration: BoxDecoration(
-        border: Border(
-          top: BorderSide(color: accentColor.withValues(alpha: 0.25), width: 1),
-          right: BorderSide(
-            color: accentColor.withValues(alpha: 0.25),
-            width: 1,
-          ),
-          bottom: BorderSide(
-            color: accentColor.withValues(alpha: 0.25),
-            width: 1,
-          ),
-        ),
-        borderRadius: const BorderRadius.only(
-          topRight: Radius.circular(16),
-          bottomRight: Radius.circular(16),
-        ),
-      ),
       padding: const EdgeInsets.all(14),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -800,8 +752,6 @@ class _VendorOfferCardState extends State<VendorOfferCard>
                         color: Theme.of(context).colorScheme.primary,
                         fontWeight: FontWeight.bold,
                       ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
                     ),
                     if (widget.coupon.description.isNotEmpty) ...[
                       const SizedBox(height: 4),
@@ -992,14 +942,14 @@ class _VendorOfferCardState extends State<VendorOfferCard>
     );
   }
 
-  Widget _buildInternalCutouts(Color accentColor) {
+  Widget _buildDashedDivider(Color accentColor) {
     return Positioned(
       left: 106,
       top: 0,
       bottom: 0,
       child: SizedBox(
         width: 12,
-        child: CustomPaint(painter: _TicketCutoutPainter(accentColor)),
+        child: CustomPaint(painter: _DashedDividerPainter(accentColor)),
       ),
     );
   }
@@ -1210,47 +1160,65 @@ class _VendorOfferCardState extends State<VendorOfferCard>
   }
 }
 
-class _TicketCutoutPainter extends CustomPainter {
-  const _TicketCutoutPainter(this.accentColor);
+/// Clips the vendor offer card into a coupon shape: rounded rectangle with
+/// semicircle notches at the divider (x = 112).
+class _VendorCouponShapeClipper extends CustomClipper<Path> {
+  const _VendorCouponShapeClipper();
+
+  static const double _notchRadius = 10.0;
+  static const double _notchX = 112.0;
+  static const double _cornerRadius = 16.0;
+
+  @override
+  Path getClip(Size size) {
+    final path = Path()
+      ..addRRect(
+        RRect.fromLTRBR(
+          0, 0, size.width, size.height,
+          const Radius.circular(_cornerRadius),
+        ),
+      );
+
+    final topNotch = Path()
+      ..addOval(Rect.fromCircle(
+        center: Offset(_notchX, 0),
+        radius: _notchRadius,
+      ));
+
+    final bottomNotch = Path()
+      ..addOval(Rect.fromCircle(
+        center: Offset(_notchX, size.height),
+        radius: _notchRadius,
+      ));
+
+    return Path.combine(
+      PathOperation.difference,
+      Path.combine(PathOperation.difference, path, topNotch),
+      bottomNotch,
+    );
+  }
+
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
+}
+
+/// Paints a dashed vertical line between the two notches.
+class _DashedDividerPainter extends CustomPainter {
+  const _DashedDividerPainter(this.accentColor);
 
   final Color accentColor;
 
   @override
   void paint(Canvas canvas, Size size) {
-    // Fill for the cutout (matches card background)
-    final fillPaint = Paint()
-      ..color = const Color(0xFFF8F9FA)
-      ..style = PaintingStyle.fill;
-
-    // Stroke around cutout using accent color (subtle alpha)
-    final strokePaint = Paint()
-      ..color = accentColor.withValues(alpha: 0.25)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5;
-
-    // Dashed divider line in accent color
     final linePaint = Paint()
-      ..color = accentColor
+      ..color = accentColor.withValues(alpha: 0.4)
       ..strokeWidth = 1.5
       ..style = PaintingStyle.stroke;
 
-    const double radius = 8.0;
-    final topCenter = Offset(size.width / 2, 0);
-    final bottomCenter = Offset(size.width / 2, size.height);
-
-    // Draw filled circles (cutouts)
-    canvas.drawCircle(topCenter, radius, fillPaint);
-    canvas.drawCircle(bottomCenter, radius, fillPaint);
-
-    // Draw stroke around cutouts so they have an accent border
-    canvas.drawCircle(topCenter, radius, strokePaint);
-    canvas.drawCircle(bottomCenter, radius, strokePaint);
-
-    // Draw dashed vertical divider between cutouts
     const dashHeight = 4.0;
     const dashSpace = 4.0;
-    double startY = radius; // start just after the top circle
-    final endY = size.height - radius; // end just before the bottom circle
+    double startY = 12;
+    final endY = size.height - 12;
 
     while (startY < endY) {
       final nextY = (startY + dashHeight).clamp(0.0, endY);
@@ -1264,22 +1232,60 @@ class _TicketCutoutPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _TicketCutoutPainter oldDelegate) =>
+  bool shouldRepaint(covariant _DashedDividerPainter oldDelegate) =>
       oldDelegate.accentColor != accentColor;
 }
 
-/// Outline painter to give the card a ticket-like silhouette.
-class _CouponOutlinePainter extends CustomPainter {
-  const _CouponOutlinePainter({required this.color});
+/// Strokes the coupon shape border (rounded rect with semicircle notch arcs).
+class _CouponBorderPainter extends CustomPainter {
+  const _CouponBorderPainter({required this.color});
 
   final Color color;
 
+  static const double _notchRadius = 10.0;
+  static const double _notchX = 112.0;
+  static const double _cornerRadius = 16.0;
+
   @override
   void paint(Canvas canvas, Size size) {
-    // Intentionally blank: keeping the painter to avoid re-layout but disabling cutout/outline drawing.
+    final paint = Paint()
+      ..color = color.withValues(alpha: 0.25)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.0;
+
+    // Build the same path as the clipper
+    final path = Path();
+
+    // Start with a full rounded rectangle
+    path.addRRect(
+      RRect.fromLTRBR(
+        0, 0, size.width, size.height,
+        const Radius.circular(_cornerRadius),
+      ),
+    );
+
+    // Subtract notches
+    final topNotch = Path()
+      ..addOval(Rect.fromCircle(
+        center: Offset(_notchX, 0),
+        radius: _notchRadius,
+      ));
+    final bottomNotch = Path()
+      ..addOval(Rect.fromCircle(
+        center: Offset(_notchX, size.height),
+        radius: _notchRadius,
+      ));
+
+    final clipped = Path.combine(
+      PathOperation.difference,
+      Path.combine(PathOperation.difference, path, topNotch),
+      bottomNotch,
+    );
+
+    canvas.drawPath(clipped, paint);
   }
 
   @override
-  bool shouldRepaint(covariant _CouponOutlinePainter oldDelegate) =>
+  bool shouldRepaint(covariant _CouponBorderPainter oldDelegate) =>
       oldDelegate.color != color;
 }

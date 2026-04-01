@@ -13,6 +13,7 @@ import 'package:savedge/features/coupons/presentation/pages/redeemed_coupon_page
 import 'package:savedge/features/coupons/presentation/widgets/coupon_card.dart';
 import 'package:savedge/features/coupons/presentation/widgets/coupon_filter_sheet.dart';
 import 'package:savedge/features/coupons/presentation/widgets/coupon_hero_tag.dart';
+import 'package:savedge/features/coupons/presentation/widgets/coupon_stack_card.dart';
 
 class CouponsPage extends StatelessWidget {
   const CouponsPage({super.key});
@@ -274,20 +275,44 @@ class _CouponsViewState extends State<CouponsView> {
     );
   }
 
+  /// Groups coupons by couponId so duplicates are stacked together.
+  List<List<UserCouponDetailModel>> _groupCoupons(
+    List<UserCouponDetailModel> coupons,
+  ) {
+    final Map<int, List<UserCouponDetailModel>> grouped = {};
+    for (final coupon in coupons) {
+      grouped.putIfAbsent(coupon.couponId, () => []).add(coupon);
+    }
+    return grouped.values.toList();
+  }
+
   Widget _buildCouponsSliverList(List<UserCouponDetailModel> coupons) {
+    final groups = _groupCoupons(coupons);
+
     return SliverPadding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       sliver: SliverList(
         delegate: SliverChildBuilderDelegate((context, index) {
-          final coupon = coupons[index];
+          final group = groups[index];
+
+          if (group.length == 1) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: CouponCard(
+                coupon: group[0],
+                onTap: () => _handleCouponTap(group[0]),
+              ),
+            );
+          }
+
           return Padding(
             padding: const EdgeInsets.only(bottom: 16),
-            child: CouponCard(
-              coupon: coupon,
-              onTap: () => _handleCouponTap(coupon),
+            child: CouponStackCard(
+              coupons: group,
+              onTap: _handleCouponTap,
             ),
           );
-        }, childCount: coupons.length),
+        }, childCount: groups.length),
       ),
     );
   }

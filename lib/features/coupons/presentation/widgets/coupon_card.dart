@@ -24,24 +24,30 @@ class CouponCard extends StatelessWidget {
     source: 'wallet',
   );
 
+  bool get _isInactive => coupon.isUsed || coupon.isExpired;
+
   @override
   Widget build(BuildContext context) {
+    // The coupon shape: rounded rect with semicircle notches at the divider
     final content = Material(
       color: Colors.transparent,
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.08),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(16),
+      child: PhysicalShape(
+        clipper: const _CouponShapeClipper(),
+        color: _isInactive ? const Color(0xFFF3F4F6) : Colors.white,
+        elevation: _isInactive ? 1 : 3,
+        shadowColor: Colors.black.withValues(alpha: _isInactive ? 0.06 : 0.12),
+        child: ColorFiltered(
+          colorFilter: _isInactive
+              ? const ColorFilter.matrix(<double>[
+                  0.2126, 0.7152, 0.0722, 0, 0,
+                  0.2126, 0.7152, 0.0722, 0, 0,
+                  0.2126, 0.7152, 0.0722, 0, 0,
+                  0, 0, 0, 1, 0,
+                ])
+              : const ColorFilter.mode(
+                  Colors.transparent,
+                  BlendMode.dst,
+                ),
           child: Stack(
             children: [
               // Main ticket layout
@@ -55,8 +61,18 @@ class CouponCard extends StatelessWidget {
                 ],
               ),
 
-              // Internal cutouts on the divider
-              _buildInternalCutouts(),
+              // Dashed line between cutouts
+              _buildDashedDivider(),
+
+              // Inactive overlay
+              if (_isInactive)
+                Positioned.fill(
+                  child: IgnorePointer(
+                    child: Container(
+                      color: Colors.white.withValues(alpha: 0.3),
+                    ),
+                  ),
+                ),
             ],
           ),
         ),
@@ -314,12 +330,15 @@ class CouponCard extends StatelessWidget {
     );
   }
 
-  Widget _buildInternalCutouts() {
+  Widget _buildDashedDivider() {
     return Positioned(
       left: 95,
       top: 0,
       bottom: 0,
-      child: SizedBox(width: 10, child: CustomPaint(painter: _CutoutPainter())),
+      child: SizedBox(
+        width: 10,
+        child: CustomPaint(painter: _DashedLinePainter()),
+      ),
     );
   }
 
@@ -594,22 +613,64 @@ class CouponCard extends StatelessWidget {
   }
 }
 
-/// Custom painter for internal cutouts (semi-circles on divider)
-class _CutoutPainter extends CustomPainter {
+/// Clips the card into a coupon shape: rounded rectangle with two
+/// semicircle notches (top and bottom) at the divider line (x = 100).
+class _CouponShapeClipper extends CustomClipper<Path> {
+  const _CouponShapeClipper();
+
+  static const double _notchRadius = 10.0;
+  static const double _notchX = 100.0;
+  static const double _cornerRadius = 16.0;
+
+  @override
+  Path getClip(Size size) {
+    final path = Path();
+
+    // Start with a full rounded rectangle
+    path.addRRect(
+      RRect.fromLTRBR(
+        0,
+        0,
+        size.width,
+        size.height,
+        const Radius.circular(_cornerRadius),
+      ),
+    );
+
+    // Punch out top semicircle notch
+    final topNotch = Path()
+      ..addOval(
+        Rect.fromCircle(
+          center: Offset(_notchX, 0),
+          radius: _notchRadius,
+        ),
+      );
+
+    // Punch out bottom semicircle notch
+    final bottomNotch = Path()
+      ..addOval(
+        Rect.fromCircle(
+          center: Offset(_notchX, size.height),
+          radius: _notchRadius,
+        ),
+      );
+
+    // Subtract notches from the rounded rect
+    return Path.combine(
+      PathOperation.difference,
+      Path.combine(PathOperation.difference, path, topNotch),
+      bottomNotch,
+    );
+  }
+
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
+}
+
+/// Paints a dashed line between the two notches.
+class _DashedLinePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color =
-          const Color(0xFFF5F5F5) // Match page background
-      ..style = PaintingStyle.fill;
-
-    // Top semi-circle cutout
-    canvas.drawCircle(Offset(size.width / 2, 0), 8, paint);
-
-    // Bottom semi-circle cutout
-    canvas.drawCircle(Offset(size.width / 2, size.height), 8, paint);
-
-    // Dotted line between cutouts
     final linePaint = Paint()
       ..color = const Color(0xFFE0E0E0)
       ..strokeWidth = 1.5
@@ -617,10 +678,9 @@ class _CutoutPainter extends CustomPainter {
 
     const dashHeight = 4.0;
     const dashSpace = 4.0;
-    double startY = 8; // Start after top cutout
+    double startY = 12; // Start after top notch
 
-    while (startY < size.height - 8) {
-      // End before bottom cutout
+    while (startY < size.height - 12) {
       canvas.drawLine(
         Offset(size.width / 2, startY),
         Offset(size.width / 2, startY + dashHeight),
