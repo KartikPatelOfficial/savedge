@@ -48,8 +48,7 @@ class _GiftPageState extends State<GiftPage> with TickerProviderStateMixin {
       ],
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        body: SafeArea(
-          child: NestedScrollView(
+        body: NestedScrollView(
             headerSliverBuilder: (context, innerBoxIsScrolled) => [
               SliverAppBar(
                 expandedHeight: 120,
@@ -63,9 +62,10 @@ class _GiftPageState extends State<GiftPage> with TickerProviderStateMixin {
                   builder: (context, constraints) {
                     final minHeight = kToolbarHeight + MediaQuery.of(context).padding.top;
                     final t = ((constraints.maxHeight - minHeight) / (120 - minHeight)).clamp(0.0, 1.0);
-                    return Container(
-                      color: Color.lerp(Colors.white, Colors.transparent, t),
+                    return ColoredBox(
+                      color: Color.lerp(Colors.white, Colors.transparent, t)!,
                       child: FlexibleSpaceBar(
+                        centerTitle: false,
                         title: const Text(
                           'Send & Receive Gifts',
                           style: TextStyle(
@@ -103,7 +103,6 @@ class _GiftPageState extends State<GiftPage> with TickerProviderStateMixin {
             ),
           ),
         ),
-      ),
     );
   }
 

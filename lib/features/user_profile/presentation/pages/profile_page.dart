@@ -178,9 +178,10 @@ class _ProfilePageState extends State<ProfilePage> {
               builder: (context, constraints) {
                 final minHeight = kToolbarHeight + MediaQuery.of(context).padding.top;
                 final t = ((constraints.maxHeight - minHeight) / (140 - minHeight)).clamp(0.0, 1.0);
-                return Container(
-                  color: Color.lerp(Colors.white, Colors.transparent, t),
+                return ColoredBox(
+                  color: Color.lerp(Colors.white, Colors.transparent, t)!,
                   child: FlexibleSpaceBar(
+                    centerTitle: false,
                     title: const Text(
                       'Profile',
                       style: TextStyle(

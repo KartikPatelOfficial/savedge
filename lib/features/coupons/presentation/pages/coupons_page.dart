@@ -64,8 +64,7 @@ class _CouponsViewState extends State<CouponsView> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       extendBodyBehindAppBar: true,
-      body: SafeArea(
-        child: BlocBuilder<CouponManagerBloc, CouponManagerState>(
+      body: BlocBuilder<CouponManagerBloc, CouponManagerState>(
           builder: (context, state) {
             if (state is CouponManagerLoading) {
               return _buildLoadingView();
@@ -77,7 +76,6 @@ class _CouponsViewState extends State<CouponsView> {
             return const SizedBox.shrink();
           },
         ),
-      ),
     );
   }
 
@@ -205,21 +203,22 @@ class _CouponsViewState extends State<CouponsView> {
       floating: false,
       pinned: true,
       backgroundColor: Colors.transparent,
+      scrolledUnderElevation: 0,
+      surfaceTintColor: Colors.transparent,
       elevation: _isScrolled ? 2 : 0,
       shadowColor: Colors.black.withValues(alpha: 0.1),
       flexibleSpace: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
-          final double collapsedPercentage =
-              ((constraints.maxHeight - kToolbarHeight) /
-                      (120 - kToolbarHeight))
-                  .clamp(0.0, 1.0);
+          final minHeight = kToolbarHeight + MediaQuery.of(context).padding.top;
+          final t = ((constraints.maxHeight - minHeight) / (120 - minHeight)).clamp(0.0, 1.0);
 
-          return Container(
-            color: Color.lerp(Colors.white, Colors.transparent, collapsedPercentage),
+          return ColoredBox(
+            color: Color.lerp(Colors.white, Colors.transparent, t)!,
             child: FlexibleSpaceBar(
+              centerTitle: false,
               titlePadding: EdgeInsets.only(
                 left: 16,
-                bottom: 16 * collapsedPercentage + 8,
+                bottom: 16 * t + 8,
               ),
               title: const Text(
                 'My Coupons',

@@ -1,17 +1,15 @@
 {
   "images" : [
     {
-      "filename" : "120.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "180.png",
+      "filename" : "SavEdge (500 x 200 px) (300 x 200 px) (Logo)_20260321_154828_0000.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "1024.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
