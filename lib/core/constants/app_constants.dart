@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 
 /// Application-wide constants
@@ -24,6 +26,7 @@ class AppConstants {
   static String get environment => _environment.toLowerCase();
 
   /// The active API base URL for the current environment
+  /// On iOS in development, uses staging URL since localhost isn't accessible
   static String get baseUrl {
     switch (environment) {
       case _stagingEnv:
@@ -31,7 +34,7 @@ class AppConstants {
       case _productionEnv:
         return _productionBaseUrl;
       default:
-        return _developmentBaseUrl;
+        return Platform.isIOS ? _stagingBaseUrl : _developmentBaseUrl;
     }
   }
 
