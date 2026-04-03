@@ -205,6 +205,9 @@ class _HomeContentPageState extends State<HomeContentPage> {
                       },
                     ),
                     _buildTopOffersSection(),
+                    // Bottom padding to prevent content from being hidden
+                    // behind the floating bottom navigation bar
+                    const SizedBox(height: 120),
                   ],
                 ),
               ),

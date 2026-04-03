@@ -192,6 +192,9 @@ class _CouponsViewState extends State<CouponsView> {
                   child: _buildEmptyState(state.selectedStatus),
                 )
               : _buildCouponsSliverList(coupons),
+          // Bottom padding to prevent content from being hidden
+          // behind the floating bottom navigation bar
+          const SliverToBoxAdapter(child: SizedBox(height: 120)),
         ],
       ),
     );
