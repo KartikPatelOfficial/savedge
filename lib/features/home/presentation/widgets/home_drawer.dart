@@ -3,6 +3,7 @@ import 'package:savedge/features/coupons/presentation/pages/redemption_history_p
 import 'package:savedge/features/static_pages/presentation/pages/about_us_page.dart';
 import 'package:savedge/features/static_pages/presentation/pages/contact_us_page.dart';
 import 'package:savedge/features/static_pages/presentation/pages/follow_us_page.dart';
+import 'package:savedge/features/auth/presentation/pages/phone_verification_page.dart';
 import 'package:savedge/features/stores/presentation/pages/stores_page.dart';
 import 'dart:ui';
 
@@ -22,11 +23,13 @@ class HomeDrawer extends StatelessWidget {
     this.userName = '',
     this.userAvatar,
     this.onMenuItemTap,
+    this.isGuest = false,
   });
 
   final String userName;
   final String? userAvatar;
   final Function(String)? onMenuItemTap;
+  final bool isGuest;
 
   @override
   Widget build(BuildContext context) {
@@ -82,23 +85,28 @@ class HomeDrawer extends StatelessWidget {
   }
 
   List<DrawerMenuItem> _getMenuItems(BuildContext context) {
-    return [
-      DrawerMenuItem(
+    final items = <DrawerMenuItem>[];
+
+    if (isGuest) {
+      items.add(DrawerMenuItem(
+        icon: Icons.login_rounded,
+        title: 'Sign In',
+        onTap: () => _navigateToSignIn(context),
+      ));
+    } else {
+      items.add(DrawerMenuItem(
         icon: Icons.history_rounded,
         title: 'Redemption History',
         onTap: () => _navigateToRedemptionHistory(context),
-      ),
+      ));
+    }
+
+    items.addAll([
       DrawerMenuItem(
         icon: Icons.storefront_rounded,
         title: 'Stores',
         onTap: () => _navigateToStores(context),
       ),
-      // Gift Cards hidden until Pine Labs integration is completed
-      // DrawerMenuItem(
-      //   icon: Icons.card_giftcard_rounded,
-      //   title: 'Gift Cards',
-      //   onTap: () => _navigateToGiftCards(context),
-      // ),
       DrawerMenuItem(
         icon: Icons.info_outline_rounded,
         title: 'About Us',
@@ -114,7 +122,17 @@ class HomeDrawer extends StatelessWidget {
         title: 'Follow Us',
         onTap: () => _navigateToFollowUs(context),
       ),
-    ];
+    ]);
+
+    return items;
+  }
+
+  void _navigateToSignIn(BuildContext context) {
+    onMenuItemTap?.call('Sign In');
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const PhoneVerificationPage()),
+    );
   }
 
   void _navigateToRedemptionHistory(BuildContext context) {
@@ -199,7 +217,7 @@ class _PremiumUserProfileSection extends StatelessWidget {
           const SizedBox(height: 24),
           // Greeting & Name
           Text(
-            'Welcome back,',
+            userName == 'Guest' ? 'Hello,' : 'Welcome back,',
             style: TextStyle(
               fontSize: 16,
               color: const Color(0xFF6F3FCC).withOpacity(0.6),

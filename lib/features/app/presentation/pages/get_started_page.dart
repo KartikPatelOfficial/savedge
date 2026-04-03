@@ -3,7 +3,7 @@ import 'dart:ui';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:savedge/features/auth/presentation/pages/phone_verification_page.dart';
+import 'package:savedge/features/app/presentation/navigation/main_navigation_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -221,7 +221,7 @@ class _GetStartedPageState extends State<GetStartedPage>
                               PageRouteBuilder(
                                 pageBuilder:
                                     (context, animation, secondaryAnimation) =>
-                                        const PhoneVerificationPage(),
+                                        const MainNavigationPage(isGuest: true),
                                 transitionsBuilder:
                                     (
                                       context,

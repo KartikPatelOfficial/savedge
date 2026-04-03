@@ -5,6 +5,8 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
 import 'package:savedge/core/injection/injection.dart';
+import 'package:savedge/core/storage/secure_storage_service.dart';
+import 'package:savedge/core/widgets/login_prompt.dart';
 import 'package:savedge/features/coupons/data/services/coupon_service.dart';
 import 'package:savedge/features/coupons/presentation/pages/coupon_redemption_options_page.dart';
 import 'package:savedge/features/coupons/presentation/widgets/coupon_hero_tag.dart';
@@ -1006,6 +1008,18 @@ class _VendorOfferCardState extends State<VendorOfferCard>
     try {
       // Show loading indicator with haptic feedback
       HapticFeedback.lightImpact();
+
+      // Check if user is authenticated - coupon redemption requires login
+      final secureStorage = getIt<SecureStorageService>();
+      final isAuthenticated = await secureStorage.isAuthenticated();
+      if (!isAuthenticated) {
+        if (!mounted) return;
+        LoginPrompt.show(
+          context,
+          message: 'Sign in to view coupon details and redeem offers.',
+        );
+        return;
+      }
 
       // First, check the coupon to get its details
       final couponService = GetIt.I<CouponService>();

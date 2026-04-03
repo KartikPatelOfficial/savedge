@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lottie/lottie.dart';
+import 'package:savedge/features/app/presentation/navigation/main_navigation_page.dart';
 import 'package:savedge/features/auth/presentation/bloc/otp_auth_cubit.dart';
 import 'package:savedge/features/auth/presentation/pages/otp_verification_page.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -212,7 +213,39 @@ class _PhoneVerificationPageState extends State<PhoneVerificationPage>
                       child: IntrinsicHeight(
                         child: Column(
                           children: [
-                            const SizedBox(height: 60),
+                            const SizedBox(height: 8),
+
+                            // Back button to return to browsing
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: IconButton(
+                                onPressed: () {
+                                  if (Navigator.of(context).canPop()) {
+                                    Navigator.of(context).pop();
+                                  } else {
+                                    Navigator.of(context).pushReplacement(
+                                      MaterialPageRoute(
+                                        builder: (_) => const MainNavigationPage(isGuest: true),
+                                      ),
+                                    );
+                                  }
+                                },
+                                icon: const Icon(
+                                  Icons.arrow_back_ios_new_rounded,
+                                  color: Color(0xFF1F2937),
+                                  size: 22,
+                                ),
+                                style: IconButton.styleFrom(
+                                  backgroundColor: const Color(0xFFF3F4F6),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  padding: const EdgeInsets.all(10),
+                                ),
+                              ),
+                            ),
+
+                            const SizedBox(height: 20),
 
                             // Lottie Animation
                             SizedBox(

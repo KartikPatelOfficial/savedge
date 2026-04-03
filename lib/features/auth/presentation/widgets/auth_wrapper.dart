@@ -10,7 +10,6 @@ import 'package:savedge/core/injection/injection.dart';
 import 'package:savedge/core/storage/secure_storage_service.dart';
 import 'package:savedge/features/app/presentation/navigation/main_navigation_page.dart';
 import 'package:savedge/features/app/presentation/pages/get_started_page.dart';
-import 'package:savedge/features/auth/presentation/pages/phone_verification_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthWrapper extends StatefulWidget {
@@ -173,7 +172,7 @@ class _AuthWrapperState extends State<AuthWrapper>
 
     return _isAuthenticated
         ? const MainNavigationPage()
-        : const PhoneVerificationPage();
+        : const MainNavigationPage(isGuest: true);
   }
 
   Widget _buildSplashScreen(BuildContext context) {

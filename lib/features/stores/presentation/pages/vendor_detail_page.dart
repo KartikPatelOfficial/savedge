@@ -8,6 +8,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:savedge/core/enums/coupon_enums.dart';
 import 'package:savedge/core/injection/injection.dart';
 import 'package:savedge/core/network/image_cache_manager.dart';
+import 'package:savedge/core/storage/secure_storage_service.dart';
+import 'package:savedge/core/widgets/login_prompt.dart';
 import 'package:savedge/features/auth/data/models/user_profile_models.dart';
 import 'package:savedge/features/auth/domain/repositories/auth_repository.dart';
 import 'package:savedge/features/favorites/presentation/bloc/favorites_bloc.dart';
@@ -40,14 +42,22 @@ class VendorDetailPage extends StatefulWidget {
 
 class _VendorDetailPageState extends State<VendorDetailPage> {
   UserProfileResponse3? _userProfile;
+  bool _isAuthenticated = false;
 
   @override
   void initState() {
     super.initState();
-    _loadUserProfile();
+    _checkAuthAndLoadProfile();
   }
 
-  Future<void> _loadUserProfile() async {
+  Future<void> _checkAuthAndLoadProfile() async {
+    final secureStorage = getIt<SecureStorageService>();
+    final isAuth = await secureStorage.isAuthenticated();
+    if (mounted) {
+      setState(() => _isAuthenticated = isAuth);
+    }
+    if (!isAuth) return;
+
     try {
       final authRepo = getIt<AuthRepository>();
       final profile = await authRepo.getCurrentUserProfile();
@@ -74,10 +84,18 @@ class _VendorDetailPageState extends State<VendorDetailPage> {
               getIt<VendorDetailBloc>()..add(LoadVendorDetail(id)),
         ),
         BlocProvider(
-          create: (context) => getIt<PointsBloc>()..add(LoadUserPoints()),
+          create: (context) {
+            final bloc = getIt<PointsBloc>();
+            if (_isAuthenticated) bloc.add(LoadUserPoints());
+            return bloc;
+          },
         ),
         BlocProvider(
-          create: (context) => getIt<FavoritesBloc>()..add(LoadFavorites()),
+          create: (context) {
+            final bloc = getIt<FavoritesBloc>();
+            if (_isAuthenticated) bloc.add(LoadFavorites());
+            return bloc;
+          },
         ),
       ],
       child: BlocBuilder<VendorDetailBloc, VendorDetailState>(
@@ -180,6 +198,7 @@ class _VendorDetailPageState extends State<VendorDetailPage> {
             return _VendorDetailView(
               vendor: state.vendor,
               userProfile: _userProfile,
+              isAuthenticated: _isAuthenticated,
             );
           } else if (state is VendorDetailError) {
             return Scaffold(
@@ -365,10 +384,11 @@ class _VendorDetailPageState extends State<VendorDetailPage> {
 }
 
 class _VendorDetailView extends StatefulWidget {
-  const _VendorDetailView({required this.vendor, this.userProfile});
+  const _VendorDetailView({required this.vendor, this.userProfile, this.isAuthenticated = true});
 
   final Vendor vendor;
   final UserProfileResponse3? userProfile;
+  final bool isAuthenticated;
 
   @override
   State<_VendorDetailView> createState() => _VendorDetailViewState();
@@ -756,12 +776,19 @@ class _VendorDetailViewState extends State<_VendorDetailView> {
               // Favorite Button inline
               BlocBuilder<FavoritesBloc, FavoritesState>(
                 builder: (context, favState) {
-                  final isFavorite =
+                  final isFavorite = widget.isAuthenticated &&
                       favState is FavoritesLoaded &&
                       favState.isFavorite(widget.vendor.id);
                   return IconButton(
                     onPressed: () {
                       HapticFeedback.lightImpact();
+                      if (!widget.isAuthenticated) {
+                        LoginPrompt.show(
+                          context,
+                          message: 'Sign in to save your favorite stores.',
+                        );
+                        return;
+                      }
                       context.read<FavoritesBloc>().add(
                         ToggleFavorite(widget.vendor),
                       );
@@ -936,9 +963,11 @@ class _VendorDetailViewState extends State<_VendorDetailView> {
             _buildSocialMediaSection(),
           ],
 
-          // Points Payment Banner
-          const SizedBox(height: 20),
-          _buildPointsPaymentCard(context),
+          // Points Payment Banner (only for authenticated users)
+          if (widget.isAuthenticated) ...[
+            const SizedBox(height: 20),
+            _buildPointsPaymentCard(context),
+          ],
         ],
       ),
     );

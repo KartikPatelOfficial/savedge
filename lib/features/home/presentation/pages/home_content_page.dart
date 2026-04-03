@@ -23,11 +23,13 @@ import 'package:savedge/features/vendors/domain/entities/vendor.dart';
 import 'package:savedge/features/vendors/presentation/bloc/coupons_bloc.dart';
 import 'package:savedge/features/vendors/presentation/bloc/vendors_bloc.dart';
 import 'package:savedge/features/vendors/presentation/bloc/vendors_event.dart';
+import 'package:savedge/core/widgets/login_prompt.dart';
 
 /// Beautiful home content page with modern design and real data integration
 class HomeContentPage extends StatefulWidget {
+  const HomeContentPage({super.key, this.onMenuTap, this.isGuest = false});
   final VoidCallback? onMenuTap;
-  const HomeContentPage({super.key, this.onMenuTap});
+  final bool isGuest;
 
   @override
   State<HomeContentPage> createState() => _HomeContentPageState();
@@ -58,7 +60,9 @@ class _HomeContentPageState extends State<HomeContentPage> {
     _freeTrialBloc = getIt<FreeTrialBloc>();
     _promotionBloc = getIt<PromotionBloc>();
     _loadInitialData();
-    _loadUserProfile();
+    if (!widget.isGuest) {
+      _loadUserProfile();
+    }
   }
 
   void _loadInitialData() {
@@ -70,8 +74,10 @@ class _HomeContentPageState extends State<HomeContentPage> {
     _couponsBloc.add(LoadSpecialOfferCoupons(cityId: cityId));
     // Load Top Offer vendors with city filter
     _vendorsBloc.add(LoadTopOfferVendors(cityId: cityId));
-    _subscriptionBloc.add(const LoadSubscriptionPlans());
-    _promotionBloc.add(const PromotionEvent.checkStatus());
+    if (!widget.isGuest) {
+      _subscriptionBloc.add(const LoadSubscriptionPlans());
+      _promotionBloc.add(const PromotionEvent.checkStatus());
+    }
   }
 
   /// Reload data when city changes
@@ -488,7 +494,10 @@ class _HomeContentPageState extends State<HomeContentPage> {
   // Event handlers
   void _onFavoriteTap() {
     HapticFeedback.lightImpact();
-
+    if (widget.isGuest) {
+      LoginPrompt.show(context, message: 'Sign in to save your favorite stores.');
+      return;
+    }
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const FavoritesPage()),
@@ -497,6 +506,10 @@ class _HomeContentPageState extends State<HomeContentPage> {
 
   void _onNotificationTap() {
     HapticFeedback.lightImpact();
+    if (widget.isGuest) {
+      LoginPrompt.show(context, message: 'Sign in to view your notifications.');
+      return;
+    }
     Navigator.pushNamed(context, '/notifications');
   }
 
@@ -547,11 +560,13 @@ class _HomeContentPageState extends State<HomeContentPage> {
     _couponsBloc.add(RefreshSpecialOfferCoupons(cityId: cityId));
     // Refresh Top Offer vendors with city filter
     _vendorsBloc.add(LoadTopOfferVendors(cityId: cityId));
-    _subscriptionBloc.add(const LoadSubscriptionPlans());
-    if (!_isEmployee) {
-      _freeTrialBloc.add(const FreeTrialEvent.loadStatus());
+    if (!widget.isGuest) {
+      _subscriptionBloc.add(const LoadSubscriptionPlans());
+      if (!_isEmployee) {
+        _freeTrialBloc.add(const FreeTrialEvent.loadStatus());
+      }
+      _promotionBloc.add(const PromotionEvent.checkStatus());
     }
-    _promotionBloc.add(const PromotionEvent.checkStatus());
 
     // Wait for data to load (approximate time)
     await Future.delayed(const Duration(milliseconds: 800));

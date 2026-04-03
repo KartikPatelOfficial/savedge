@@ -10,6 +10,7 @@ import 'package:savedge/features/city/presentation/bloc/city_event.dart';
 import 'package:savedge/features/city/presentation/bloc/city_state.dart';
 import 'package:savedge/features/city/presentation/pages/region_unavailable_page.dart';
 import 'package:savedge/features/city/presentation/widgets/city_selection_sheet.dart';
+import 'package:savedge/core/widgets/login_prompt.dart';
 import 'package:savedge/features/coupons/presentation/pages/coupons_page.dart';
 import 'package:savedge/features/coupons/presentation/pages/gift_page.dart';
 import 'package:savedge/features/home/presentation/pages/home_content_page.dart';
@@ -19,8 +20,9 @@ import 'package:savedge/features/user_profile/presentation/pages/profile_page.da
 
 /// Main navigation wrapper that handles bottom navigation
 class MainNavigationPage extends StatefulWidget {
+  const MainNavigationPage({super.key, this.initialTab = 0, this.isGuest = false});
   final int initialTab;
-  const MainNavigationPage({super.key, this.initialTab = 0});
+  final bool isGuest;
 
   @override
   State<MainNavigationPage> createState() => _MainNavigationPageState();
@@ -64,8 +66,12 @@ class _MainNavigationPageState extends State<MainNavigationPage> with SingleTick
     );
 
     _buildPages();
-    _loadUserProfile();
-    _initializeNotifications();
+    if (!widget.isGuest) {
+      _loadUserProfile();
+      _initializeNotifications();
+    } else {
+      _isLoadingProfile = false;
+    }
   }
 
   @override
@@ -140,15 +146,20 @@ class _MainNavigationPageState extends State<MainNavigationPage> with SingleTick
 
   void _buildPages() {
     _pages = <Widget>[
-      HomeContentPage(onMenuTap: _toggleDrawer), // Home page content without bottom nav
+      HomeContentPage(onMenuTap: _toggleDrawer, isGuest: widget.isGuest),
     ];
+
+    if (widget.isGuest) {
+      // Guest mode: only Home tab for browsing
+      return;
+    }
 
     if (_isEmployee) {
       _pages.add(const GiftPage());
     }
 
     _pages.addAll([
-      const CouponsPage(), // Enhanced coupon management page
+      const CouponsPage(),
       const ProfilePage(),
     ]);
   }
@@ -226,11 +237,13 @@ class _MainNavigationPageState extends State<MainNavigationPage> with SingleTick
                     duration: const Duration(milliseconds: 300),
                     curve: Curves.easeOutCubic,
                     offset: _isNavBarVisible ? Offset.zero : const Offset(0, 1.5),
-                    child: HomeBottomNavBar(
-                      currentIndex: _currentIndex,
-                      onTap: _onBottomNavTap,
-                      isEmployee: _isEmployee,
-                    ),
+                    child: widget.isGuest
+                        ? _buildGuestBottomBar()
+                        : HomeBottomNavBar(
+                            currentIndex: _currentIndex,
+                            onTap: _onBottomNavTap,
+                            isEmployee: _isEmployee,
+                          ),
                   ),
                 ),
               ],
@@ -247,7 +260,8 @@ class _MainNavigationPageState extends State<MainNavigationPage> with SingleTick
                       child: Transform.translate(
                         offset: Offset(-80 * (1 - animValue), 0),
                         child: HomeDrawer(
-                          userName: _userProfile?.displayName ?? '',
+                          userName: widget.isGuest ? 'Guest' : (_userProfile?.displayName ?? ''),
+                          isGuest: widget.isGuest,
                           onMenuItemTap: (title) {
                             _toggleDrawer();
                           },
@@ -315,6 +329,87 @@ class _MainNavigationPageState extends State<MainNavigationPage> with SingleTick
     } else {
       _animationController.reverse();
     }
+  }
+
+  Widget _buildGuestBottomBar() {
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 0, 20, 18),
+        child: Container(
+          height: 70,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(26),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF6F3FCC).withOpacity(0.14),
+                blurRadius: 32,
+                offset: const Offset(0, 10),
+                spreadRadius: -2,
+              ),
+              BoxShadow(
+                color: Colors.black.withOpacity(0.07),
+                blurRadius: 12,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              // Home tab (active)
+              Expanded(
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  child: const SizedBox(
+                    height: 70,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.explore_rounded, size: 24, color: Color(0xFF6F3FCC)),
+                        SizedBox(height: 5),
+                        Text(
+                          'Home',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF6F3FCC),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              // Sign In tab
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => LoginPrompt.show(context),
+                  behavior: HitTestBehavior.opaque,
+                  child: const SizedBox(
+                    height: 70,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.login_rounded, size: 24, color: Color(0xFFB8C1CC)),
+                        SizedBox(height: 5),
+                        Text(
+                          'Sign In',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFFB8C1CC),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
 
