@@ -556,6 +556,10 @@ class _ProfilePageState extends State<ProfilePage> {
 
                   // Sign Out Button
                   _buildSignOutSection(),
+
+                  // Bottom padding to prevent content from being hidden
+                  // behind the floating bottom navigation bar
+                  const SizedBox(height: 120),
                 ],
               ),
             ),
@@ -914,54 +918,56 @@ class _DeleteAccountDialogState extends State<_DeleteAccountDialog> {
           ),
         ],
       ),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'This action cannot be undone. Deleting your account will:',
-            style: TextStyle(
-              fontSize: 16,
-              color: Color(0xFF4A5568),
-              fontWeight: FontWeight.w600,
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'This action cannot be undone. Deleting your account will:',
+              style: TextStyle(
+                fontSize: 16,
+                color: Color(0xFF4A5568),
+                fontWeight: FontWeight.w600,
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          _buildWarningItem('Remove access to all your coupons and offers'),
-          _buildWarningItem('Delete your points and transaction history'),
-          _buildWarningItem('Cancel any active subscriptions'),
-          _buildWarningItem('Remove all your saved preferences'),
-          _buildWarningItem('Permanently delete your profile data'),
-          const SizedBox(height: 20),
-          InkWell(
-            onTap: () => setState(() => _confirmChecked = !_confirmChecked),
-            child: Row(
-              children: [
-                SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: Checkbox(
-                    value: _confirmChecked,
-                    onChanged: (value) =>
-                        setState(() => _confirmChecked = value ?? false),
-                    activeColor: const Color(0xFFE53E3E),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                const Expanded(
-                  child: Text(
-                    'I understand and want to delete my account',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Color(0xFF2D3748),
-                      fontWeight: FontWeight.w600,
+            const SizedBox(height: 16),
+            _buildWarningItem('Remove access to all your coupons and offers'),
+            _buildWarningItem('Delete your points and transaction history'),
+            _buildWarningItem('Cancel any active subscriptions'),
+            _buildWarningItem('Remove all your saved preferences'),
+            _buildWarningItem('Permanently delete your profile data'),
+            const SizedBox(height: 20),
+            InkWell(
+              onTap: () => setState(() => _confirmChecked = !_confirmChecked),
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: Checkbox(
+                      value: _confirmChecked,
+                      onChanged: (value) =>
+                          setState(() => _confirmChecked = value ?? false),
+                      activeColor: const Color(0xFFE53E3E),
                     ),
                   ),
-                ),
-              ],
+                  const SizedBox(width: 12),
+                  const Expanded(
+                    child: Text(
+                      'I understand and want to delete my account',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Color(0xFF2D3748),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
       actions: [
         TextButton(
