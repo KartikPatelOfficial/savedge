@@ -539,24 +539,26 @@ class _StackedDealsCardsState extends State<StackedDealsCards>
           ),
           const Spacer(),
           // Title
-          Text(
-            coupon.title,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 26,
-              fontWeight: FontWeight.w800,
-              letterSpacing: -0.5,
-              height: 1.1,
-              shadows: [
-                Shadow(
-                  color: Colors.black45,
-                  blurRadius: 8,
-                  offset: Offset(0, 2),
-                ),
-              ],
+          Flexible(
+            child: Text(
+              coupon.title,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 26,
+                fontWeight: FontWeight.w800,
+                letterSpacing: -0.5,
+                height: 1.1,
+                shadows: [
+                  Shadow(
+                    color: Colors.black45,
+                    blurRadius: 8,
+                    offset: Offset(0, 2),
+                  ),
+                ],
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 8),
           // Description
@@ -578,7 +580,7 @@ class _StackedDealsCardsState extends State<StackedDealsCards>
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           // Minimum amount info
           Row(
             children: [
