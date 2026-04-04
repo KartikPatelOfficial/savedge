@@ -31,14 +31,15 @@ class _TopOffersSectionState extends State<TopOffersSection> {
   void initState() {
     super.initState();
     // Use a dedicated bloc so regular vendor loads don't overwrite top offers
-    _topOffersBloc = getIt<VendorsBloc>()..add(LoadTopOfferVendors(cityId: widget.cityId));
+    // Don't filter by city — show all featured vendors regardless of location
+    _topOffersBloc = getIt<VendorsBloc>()..add(const LoadTopOfferVendors());
   }
 
   @override
   void didUpdateWidget(TopOffersSection oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.cityId != widget.cityId) {
-      _topOffersBloc.add(LoadTopOfferVendors(cityId: widget.cityId));
+    if (oldWidget.key != widget.key) {
+      _topOffersBloc.add(const LoadTopOfferVendors());
     }
   }
 
