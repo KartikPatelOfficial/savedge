@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
-/// Professional Follow Us page with clean white design
 class FollowUsPage extends StatelessWidget {
   const FollowUsPage({super.key});
+
+  static const _dark = Color(0xFF1A202C);
+  static const _grey = Color(0xFF718096);
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +22,7 @@ class FollowUsPage extends StatelessWidget {
           icon: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: const Color(0xFF1A202C),
+              color: _dark,
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(
@@ -35,201 +37,224 @@ class FollowUsPage extends StatelessWidget {
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w600,
-            color: Color(0xFF1A202C),
+            color: _dark,
           ),
         ),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildHeroSection(),
-            _buildSocialMediaSection(),
-            const SizedBox(height: 40),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeroSection() {
-    return Container(
-      margin: const EdgeInsets.all(20),
-      padding: const EdgeInsets.all(28),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF1A202C), Color(0xFF2D3748)],
-        ),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            blurRadius: 20,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 60,
-                height: 60,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF6F3FCC),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: const Icon(
-                  Icons.groups_rounded,
-                  color: Colors.white,
-                  size: 32,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Join Our Community',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 28,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: -0.5,
-                      ),
-                    ),
-                    Text(
-                      'Connect & Save Together',
-                      style: TextStyle(
-                        color: Colors.grey[400],
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          Text(
-            'Connect with us on social media for the latest deals, savings tips, and exclusive offers. Join thousands of smart savers in our community!',
-            style: TextStyle(
-              color: Colors.grey[300],
-              fontSize: 16,
-              height: 1.6,
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSocialMediaSection() {
-    final socialPlatforms = [
-      {
-        'name': 'Facebook',
-        'icon': 'assets/icons/social_media_platforms/Facebook.png',
-        'description': 'Daily deals and community discussions',
-        'color': const Color(0xFF1877F2),
-        'handle': 'https://www.facebook.com/SavEdge01',
-      },
-      {
-        'name': 'Instagram',
-        'icon': 'assets/icons/social_media_platforms/Instagram.png',
-        'description': 'Visual stories and behind-the-scenes',
-        'color': const Color(0xFFE1306C),
-        'handle': 'https://www.instagram.com/savedge_in',
-      },
-    ];
-
-    return Container(
-      margin: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Connect With Us',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.w700,
-              color: Color(0xFF1A202C),
-            ),
-          ),
-          const SizedBox(height: 20),
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              mainAxisSpacing: 16,
-              crossAxisSpacing: 16,
-              childAspectRatio: 1.1,
-            ),
-            itemCount: socialPlatforms.length,
-            itemBuilder: (context, index) {
-              final platform = socialPlatforms[index];
-              return _buildSocialCard(platform);
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSocialCard(Map<String, dynamic> platform) {
-    return InkWell(
-      onTap: () {
-        launchUrlString(
-          platform['handle'],
-          mode: LaunchMode.externalApplication,
-        );
-      },
-      borderRadius: BorderRadius.circular(16),
-
-      child: Container(
-        decoration: BoxDecoration(
-          color: platform['color'].withOpacity(0.1),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.grey[200]!),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(
-                width: 52,
-                height: 52,
-                child: Image.asset(platform['icon']),
+              const SizedBox(height: 12),
+              _buildHeader(),
+              const SizedBox(height: 32),
+              const Text(
+                'Find us on',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
+                  color: _dark,
+                  letterSpacing: -0.3,
+                ),
+              ),
+              const SizedBox(height: 16),
+              _buildSocialTile(
+                name: 'Facebook',
+                handle: '@SavEdge01',
+                description: 'Daily deals & community discussions',
+                assetPath: 'assets/icons/social_media_platforms/Facebook.png',
+                bgColor: const Color(0xFFEBF4FF),
+                accentColor: const Color(0xFF1877F2),
+                url: 'https://www.facebook.com/SavEdge01',
               ),
               const SizedBox(height: 12),
-              Text(
-                platform['name'] as String,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF1A202C),
-                ),
+              _buildSocialTile(
+                name: 'Instagram',
+                handle: '@savedge_in',
+                description: 'Behind the scenes & visual stories',
+                assetPath: 'assets/icons/social_media_platforms/Instagram.png',
+                bgColor: const Color(0xFFFDF2F8),
+                accentColor: const Color(0xFFE1306C),
+                url: 'https://www.instagram.com/savedge_in',
               ),
+              const SizedBox(height: 32),
+              _buildCta(),
+              const SizedBox(height: 48),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 16),
+        const Text(
+          'Join our\ncommunity',
+          style: TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.w800,
+            color: _dark,
+            letterSpacing: -0.5,
+            height: 1.2,
+          ),
+        ),
+        const SizedBox(height: 8),
+        const Text(
+          'Stay in the loop with the latest deals, savings tips, and exclusive offers.',
+          style: TextStyle(
+            fontSize: 15,
+            color: _grey,
+            height: 1.5,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSocialTile({
+    required String name,
+    required String handle,
+    required String description,
+    required String assetPath,
+    required Color bgColor,
+    required Color accentColor,
+    required String url,
+  }) {
+    return GestureDetector(
+      onTap: () => launchUrlString(url, mode: LaunchMode.externalApplication),
+      child: Container(
+        padding: const EdgeInsets.all(18),
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: SizedBox(
+                width: 48,
+                height: 48,
+                child: Image.asset(assetPath),
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        name,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: _dark,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 3,
+                        ),
+                        decoration: BoxDecoration(
+                          color: accentColor.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          handle,
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: accentColor,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    description,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: _grey,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.arrow_forward_ios_rounded,
+              size: 16,
+              color: accentColor,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCta() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: _dark,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        children: [
+          const Text(
+            '💬',
+            style: TextStyle(fontSize: 32),
+          ),
+          const SizedBox(height: 10),
+          const Text(
+            'Tag us in your savings!',
+            style: TextStyle(
+              fontSize: 17,
+              fontWeight: FontWeight.w700,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            'Share your SavEdge wins on social media\nand we might feature you!',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 13,
+              color: Colors.grey[400],
+              height: 1.5,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: const Text(
+              '#SavEdgeSavings',
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
+                color: Colors.white,
+                letterSpacing: 0.5,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
