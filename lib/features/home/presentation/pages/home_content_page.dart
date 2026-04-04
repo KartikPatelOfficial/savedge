@@ -40,6 +40,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
   final ScrollController _scrollController = ScrollController();
   late final CouponsBloc _couponsBloc;
   late final VendorsBloc _vendorsBloc;
+  int _topOffersRefreshKey = 0;
   late final SubscriptionPlanBloc _subscriptionBloc;
   late final FreeTrialBloc _freeTrialBloc;
   late final PromotionBloc _promotionBloc;
@@ -72,8 +73,6 @@ class _HomeContentPageState extends State<HomeContentPage> {
 
     // Load Hot Deals (special offers) with city filter
     _couponsBloc.add(LoadSpecialOfferCoupons(cityId: cityId));
-    // Load Top Offer vendors with city filter
-    _vendorsBloc.add(LoadTopOfferVendors(cityId: cityId));
     if (!widget.isGuest) {
       _subscriptionBloc.add(const LoadSubscriptionPlans());
       _promotionBloc.add(const PromotionEvent.checkStatus());
@@ -83,7 +82,8 @@ class _HomeContentPageState extends State<HomeContentPage> {
   /// Reload data when city changes
   void _onCityChanged(int? cityId) {
     _couponsBloc.add(LoadSpecialOfferCoupons(cityId: cityId));
-    _vendorsBloc.add(LoadTopOfferVendors(cityId: cityId));
+    // TopOffersSection manages its own bloc and reacts to cityId changes via didUpdateWidget
+    setState(() {}); // Trigger rebuild to pass new cityId to TopOffersSection
   }
 
   Future<void> _loadUserProfile() async {
@@ -491,7 +491,13 @@ class _HomeContentPageState extends State<HomeContentPage> {
   }
 
   Widget _buildTopOffersSection() {
-    return TopOffersSection(onVendorTap: _onVendorTap);
+    final cityState = context.read<CityBloc>().state;
+    final cityId = cityState is CitiesLoaded ? cityState.selectedCityId : null;
+    return TopOffersSection(
+      key: ValueKey('top_offers_$_topOffersRefreshKey'),
+      onVendorTap: _onVendorTap,
+      cityId: cityId,
+    );
   }
 
   // Event handlers
@@ -561,8 +567,8 @@ class _HomeContentPageState extends State<HomeContentPage> {
     // Reload all data from BLoCs
     // Refresh Hot Deals (special offers) with city filter
     _couponsBloc.add(RefreshSpecialOfferCoupons(cityId: cityId));
-    // Refresh Top Offer vendors with city filter
-    _vendorsBloc.add(LoadTopOfferVendors(cityId: cityId));
+    // Refresh Top Offers by recreating the section's bloc
+    setState(() => _topOffersRefreshKey++);
     if (!widget.isGuest) {
       _subscriptionBloc.add(const LoadSubscriptionPlans());
       if (!_isEmployee) {

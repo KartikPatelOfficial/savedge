@@ -13,42 +13,50 @@ class TopOffersSection extends StatefulWidget {
     super.key,
     this.title = 'Top Offers',
     this.onVendorTap,
+    this.cityId,
   });
 
   final String title;
   final Function(Vendor)? onVendorTap;
+  final int? cityId;
 
   @override
   State<TopOffersSection> createState() => _TopOffersSectionState();
 }
 
 class _TopOffersSectionState extends State<TopOffersSection> {
-  bool _dispatched = false;
+  late final VendorsBloc _topOffersBloc;
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final existingBloc = context.read<VendorsBloc?>();
-    if (existingBloc != null && !_dispatched) {
-      existingBloc.add(const LoadTopOfferVendors());
-      _dispatched = true;
+  void initState() {
+    super.initState();
+    // Use a dedicated bloc so regular vendor loads don't overwrite top offers
+    _topOffersBloc = getIt<VendorsBloc>()..add(LoadTopOfferVendors(cityId: widget.cityId));
+  }
+
+  @override
+  void didUpdateWidget(TopOffersSection oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.cityId != widget.cityId) {
+      _topOffersBloc.add(LoadTopOfferVendors(cityId: widget.cityId));
     }
   }
 
   @override
+  void dispose() {
+    _topOffersBloc.close();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final vendorsBloc = context.read<VendorsBloc?>();
-    if (vendorsBloc == null) {
-      return BlocProvider(
-        create: (context) =>
-            getIt<VendorsBloc>()..add(const LoadTopOfferVendors()),
-        child: TopOffersView(
-          title: widget.title,
-          onVendorTap: widget.onVendorTap,
-        ),
-      );
-    }
-    return TopOffersView(title: widget.title, onVendorTap: widget.onVendorTap);
+    return BlocProvider.value(
+      value: _topOffersBloc,
+      child: TopOffersView(
+        title: widget.title,
+        onVendorTap: widget.onVendorTap,
+      ),
+    );
   }
 }
 
@@ -129,15 +137,14 @@ class TopOffersView extends StatelessWidget {
 
   Widget _buildList(List<Vendor> vendors) {
     if (vendors.isEmpty) return _buildEmptyState();
-    final items = vendors.take(5).toList();
 
     return Column(
-      children: List.generate(items.length, (index) {
+      children: List.generate(vendors.length, (index) {
         return Padding(
           padding: const EdgeInsets.only(bottom: 12, left: 24, right: 24),
           child: _TopVendorCard(
-            vendor: items[index],
-            onTap: () => onVendorTap?.call(items[index]),
+            vendor: vendors[index],
+            onTap: () => onVendorTap?.call(vendors[index]),
           ),
         );
       }),
