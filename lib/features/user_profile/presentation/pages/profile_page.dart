@@ -678,8 +678,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _onGiftCardsTap() {
-    debugPrint('Gift Cards tapped');
-    // TODO: Navigate to gift cards/coupons
+    Navigator.of(context).pushNamed('/gift-cards');
   }
 
   void _onSendGiftsTap() {

@@ -36,14 +36,16 @@ class LoadGiftCardProduct extends GiftCardsEvent {
 class LoadPriceBreakdown extends GiftCardsEvent {
   final int productId;
   final double amount;
+  final int pointsToUse;
 
   const LoadPriceBreakdown({
     required this.productId,
     required this.amount,
+    this.pointsToUse = 0,
   });
 
   @override
-  List<Object> get props => [productId, amount];
+  List<Object> get props => [productId, amount, pointsToUse];
 }
 
 class CreateGiftCardOrder extends GiftCardsEvent {
@@ -64,14 +66,16 @@ class CreateGiftCardOrder extends GiftCardsEvent {
 class CreateGiftCardPaymentOrder extends GiftCardsEvent {
   final int giftCardProductId;
   final double amount;
+  final int pointsToUse;
 
   const CreateGiftCardPaymentOrder({
     required this.giftCardProductId,
     required this.amount,
+    this.pointsToUse = 0,
   });
 
   @override
-  List<Object> get props => [giftCardProductId, amount];
+  List<Object> get props => [giftCardProductId, amount, pointsToUse];
 }
 
 class VerifyGiftCardPayment extends GiftCardsEvent {

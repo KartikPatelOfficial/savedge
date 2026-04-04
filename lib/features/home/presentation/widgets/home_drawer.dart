@@ -103,6 +103,11 @@ class HomeDrawer extends StatelessWidget {
 
     items.addAll([
       DrawerMenuItem(
+        icon: Icons.card_giftcard_rounded,
+        title: 'Gift Cards',
+        onTap: () => _navigateToGiftCards(context),
+      ),
+      DrawerMenuItem(
         icon: Icons.storefront_rounded,
         title: 'Stores',
         onTap: () => _navigateToStores(context),

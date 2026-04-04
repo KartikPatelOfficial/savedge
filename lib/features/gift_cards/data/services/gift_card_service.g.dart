@@ -117,11 +117,13 @@ class _GiftCardService implements GiftCardService {
   Future<GiftCardPriceBreakdown> getPriceBreakdown({
     required int productId,
     required double amount,
+    int pointsToUse = 0,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{
       r'productId': productId,
       r'amount': amount,
+      r'pointsToUse': pointsToUse,
     };
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
@@ -203,14 +205,14 @@ class _GiftCardService implements GiftCardService {
   }
 
   @override
-  Future<GiftCardOrder> verifyPayment(
+  Future<VerifyGiftCardPaymentResponse> verifyPayment(
     VerifyGiftCardPaymentRequest request,
   ) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     final _data = request;
-    final _options = _setStreamType<GiftCardOrder>(
+    final _options = _setStreamType<VerifyGiftCardPaymentResponse>(
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
@@ -221,9 +223,9 @@ class _GiftCardService implements GiftCardService {
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    late GiftCardOrder _value;
+    late VerifyGiftCardPaymentResponse _value;
     try {
-      _value = GiftCardOrder.fromJson(_result.data!);
+      _value = VerifyGiftCardPaymentResponse.fromJson(_result.data!);
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;

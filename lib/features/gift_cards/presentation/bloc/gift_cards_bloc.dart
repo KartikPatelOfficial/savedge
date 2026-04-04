@@ -91,6 +91,7 @@ class GiftCardsBloc extends Bloc<GiftCardsEvent, GiftCardsState> {
     final result = await giftCardRepository.getPriceBreakdown(
       productId: event.productId,
       amount: event.amount,
+      pointsToUse: event.pointsToUse,
     );
 
     result.fold(
@@ -128,6 +129,7 @@ class GiftCardsBloc extends Bloc<GiftCardsEvent, GiftCardsState> {
     final result = await giftCardRepository.createPaymentOrder(
       giftCardProductId: event.giftCardProductId,
       amount: event.amount,
+      pointsToUse: event.pointsToUse,
     );
 
     result.fold(
@@ -164,7 +166,7 @@ class GiftCardsBloc extends Bloc<GiftCardsEvent, GiftCardsState> {
 
     result.fold(
       (failure) => emit(GiftCardPaymentError(failure.toString())),
-      (order) => emit(GiftCardPaymentVerified(order)),
+      (success) => emit(GiftCardPaymentVerified(success)),
     );
   }
 

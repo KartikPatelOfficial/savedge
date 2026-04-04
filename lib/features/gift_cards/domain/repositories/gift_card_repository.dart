@@ -22,6 +22,7 @@ abstract class GiftCardRepository {
   Future<Either<Failure, GiftCardPriceBreakdown>> getPriceBreakdown({
     required int productId,
     required double amount,
+    int pointsToUse = 0,
   });
 
   Future<Either<Failure, GiftCardOrderEntity>> createOrder({
@@ -34,9 +35,10 @@ abstract class GiftCardRepository {
       createPaymentOrder({
     required int giftCardProductId,
     required double amount,
+    int pointsToUse = 0,
   });
 
-  Future<Either<Failure, GiftCardOrderEntity>> verifyPayment({
+  Future<Either<Failure, bool>> verifyPayment({
     required int orderId,
     required String razorpayOrderId,
     required String razorpayPaymentId,

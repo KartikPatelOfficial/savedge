@@ -1,7 +1,7 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 
 import '../../../../core/injection/injection.dart';
 import '../../domain/entities/gift_card_entity.dart';
@@ -14,8 +14,9 @@ class GiftCardsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) =>
-          getIt<GiftCardsBloc>()..add(const LoadGiftCardCategories()),
+      create: (context) => getIt<GiftCardsBloc>()
+        ..add(const LoadGiftCardCategories())
+        ..add(const LoadGiftCardProducts()),
       child: const GiftCardsView(),
     );
   }
@@ -46,17 +47,17 @@ class _GiftCardsViewState extends State<GiftCardsView> {
       _searchActive = false;
     });
     context.read<GiftCardsBloc>().add(
-          LoadGiftCardProducts(categoryId: category?.id),
-        );
+      LoadGiftCardProducts(categoryId: category?.id),
+    );
   }
 
   void _searchProducts(String query) {
     context.read<GiftCardsBloc>().add(
-          LoadGiftCardProducts(
-            categoryId: _selectedCategory?.id,
-            searchTerm: query.isEmpty ? null : query,
-          ),
-        );
+      LoadGiftCardProducts(
+        categoryId: _selectedCategory?.id,
+        searchTerm: query.isEmpty ? null : query,
+      ),
+    );
   }
 
   @override
@@ -97,7 +98,9 @@ class _GiftCardsViewState extends State<GiftCardsView> {
                   if (state is GiftCardProductsLoading) {
                     return const Center(
                       child: CircularProgressIndicator(
-                          color: Color(0xFF6F3FCC), strokeWidth: 2.5),
+                        color: Color(0xFF6F3FCC),
+                        strokeWidth: 2.5,
+                      ),
                     );
                   }
                   if (state is GiftCardProductsLoaded) {
@@ -123,7 +126,11 @@ class _GiftCardsViewState extends State<GiftCardsView> {
     return Container(
       color: const Color(0xFFF8F7FC),
       padding: EdgeInsets.fromLTRB(
-          24, MediaQuery.of(context).padding.top + 16, 24, 16),
+        24,
+        MediaQuery.of(context).padding.top + 16,
+        24,
+        16,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -135,7 +142,7 @@ class _GiftCardsViewState extends State<GiftCardsView> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: const [
                     Text(
-                      'Gift Cards 🎁',
+                      'Gift Cards',
                       style: TextStyle(
                         fontSize: 26,
                         fontWeight: FontWeight.w900,
@@ -159,8 +166,10 @@ class _GiftCardsViewState extends State<GiftCardsView> {
               GestureDetector(
                 onTap: () => Navigator.pushNamed(context, '/gift-card-orders'),
                 child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 10,
+                  ),
                   decoration: BoxDecoration(
                     color: const Color(0xFF6F3FCC),
                     borderRadius: BorderRadius.circular(12),
@@ -168,8 +177,11 @@ class _GiftCardsViewState extends State<GiftCardsView> {
                   child: const Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.receipt_long_rounded,
-                          color: Colors.white, size: 16),
+                      Icon(
+                        Icons.receipt_long_rounded,
+                        color: Colors.white,
+                        size: 16,
+                      ),
                       SizedBox(width: 6),
                       Text(
                         'My Orders',
@@ -213,11 +225,13 @@ class _GiftCardsViewState extends State<GiftCardsView> {
                 ),
                 prefixIcon: Padding(
                   padding: const EdgeInsets.only(left: 14, right: 10),
-                  child: Icon(Icons.search_rounded,
-                      color: _searchActive
-                          ? const Color(0xFF6F3FCC)
-                          : const Color(0xFFBBC0C9),
-                      size: 22),
+                  child: Icon(
+                    Icons.search_rounded,
+                    color: _searchActive
+                        ? const Color(0xFF6F3FCC)
+                        : const Color(0xFFBBC0C9),
+                    size: 22,
+                  ),
                 ),
                 prefixIconConstraints: const BoxConstraints(minWidth: 0),
                 suffixIcon: _searchActive
@@ -229,15 +243,20 @@ class _GiftCardsViewState extends State<GiftCardsView> {
                         },
                         child: const Padding(
                           padding: EdgeInsets.only(right: 12),
-                          child: Icon(Icons.close_rounded,
-                              color: Color(0xFFBBC0C9), size: 20),
+                          child: Icon(
+                            Icons.close_rounded,
+                            color: Color(0xFFBBC0C9),
+                            size: 20,
+                          ),
                         ),
                       )
                     : null,
                 suffixIconConstraints: const BoxConstraints(minWidth: 0),
                 border: InputBorder.none,
-                contentPadding:
-                    const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                contentPadding: const EdgeInsets.symmetric(
+                  vertical: 14,
+                  horizontal: 16,
+                ),
               ),
             ),
           ),
@@ -366,19 +385,26 @@ class _GiftCardsViewState extends State<GiftCardsView> {
                 color: const Color(0xFFEDE9FE),
                 borderRadius: BorderRadius.circular(24),
               ),
-              child: const Icon(Icons.card_giftcard_rounded,
-                  size: 40, color: Color(0xFF7C3AED)),
+              child: const Icon(
+                Icons.card_giftcard_rounded,
+                size: 40,
+                color: Color(0xFF7C3AED),
+              ),
             ),
             const SizedBox(height: 16),
-            const Text('No gift cards found',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                  color: Color(0xFF374151),
-                )),
+            const Text(
+              'No gift cards found',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF374151),
+              ),
+            ),
             const SizedBox(height: 4),
-            const Text('Try a different category or search',
-                style: TextStyle(fontSize: 13, color: Color(0xFF9CA3AF))),
+            const Text(
+              'Try a different category or search',
+              style: TextStyle(fontSize: 13, color: Color(0xFF9CA3AF)),
+            ),
           ],
         ),
       );
@@ -418,36 +444,43 @@ class _GiftCardsViewState extends State<GiftCardsView> {
               color: const Color(0xFFFEF2F2),
               borderRadius: BorderRadius.circular(20),
             ),
-            child: const Icon(Icons.wifi_off_rounded,
-                size: 36, color: Color(0xFFEF4444)),
+            child: const Icon(
+              Icons.wifi_off_rounded,
+              size: 36,
+              color: Color(0xFFEF4444),
+            ),
           ),
           const SizedBox(height: 16),
-          const Text('Something went wrong',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
-                color: Color(0xFF374151),
-              )),
+          const Text(
+            'Something went wrong',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF374151),
+            ),
+          ),
           const SizedBox(height: 4),
-          Text(message,
-              style:
-                  const TextStyle(fontSize: 13, color: Color(0xFF9CA3AF))),
+          Text(
+            message,
+            style: const TextStyle(fontSize: 13, color: Color(0xFF9CA3AF)),
+          ),
           const SizedBox(height: 20),
           GestureDetector(
             onTap: () => _selectCategory(_selectedCategory),
             child: Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               decoration: BoxDecoration(
                 color: const Color(0xFF6F3FCC),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Text('Try Again',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 14,
-                  )),
+              child: const Text(
+                'Try Again',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 14,
+                ),
+              ),
             ),
           ),
         ],

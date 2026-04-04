@@ -170,12 +170,12 @@ class GiftCardRazorpayOrderError extends GiftCardsState {
 class GiftCardPaymentVerifying extends GiftCardsState {}
 
 class GiftCardPaymentVerified extends GiftCardsState {
-  final GiftCardOrderEntity order;
+  final bool success;
 
-  const GiftCardPaymentVerified(this.order);
+  const GiftCardPaymentVerified(this.success);
 
   @override
-  List<Object> get props => [order];
+  List<Object> get props => [success];
 }
 
 class GiftCardPaymentError extends GiftCardsState {

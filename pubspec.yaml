@@ -39,7 +39,7 @@ dependencies:
   get_it: ^8.2.0
   injectable: ^2.5.1
   dio: ^5.8.0+1
-  retrofit: ^4.7.0
+  retrofit: 4.8.0
   shared_preferences: ^2.5.3
   flutter_secure_storage: ^9.2.2
   hive: ^2.2.3
@@ -84,7 +84,7 @@ dev_dependencies:
   freezed: ^3.2.0
   json_serializable: ^6.10.0
   injectable_generator: ^2.8.0
-  retrofit_generator: ^10.0.1
+  retrofit_generator: 10.0.1
   bloc_test: ^10.0.0
   mocktail: ^1.0.4
 

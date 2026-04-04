@@ -219,6 +219,7 @@ _CreateGiftCardOrderRequest _$CreateGiftCardOrderRequestFromJson(
     _$GiftCardPaymentMethodEnumMap,
     json['paymentMethod'],
   ),
+  pointsToUse: (json['pointsToUse'] as num?)?.toInt() ?? 0,
 );
 
 Map<String, dynamic> _$CreateGiftCardOrderRequestToJson(
@@ -227,28 +228,35 @@ Map<String, dynamic> _$CreateGiftCardOrderRequestToJson(
   'giftCardProductId': instance.giftCardProductId,
   'amount': instance.amount,
   'paymentMethod': _$GiftCardPaymentMethodEnumMap[instance.paymentMethod]!,
+  'pointsToUse': instance.pointsToUse,
 };
 
 _GiftCardPriceBreakdown _$GiftCardPriceBreakdownFromJson(
   Map<String, dynamic> json,
 ) => _GiftCardPriceBreakdown(
-  productId: (json['productId'] as num).toInt(),
-  productName: json['productName'] as String,
-  requestedAmount: (json['requestedAmount'] as num).toDouble(),
-  discountPercentage: (json['discountPercentage'] as num).toDouble(),
-  discountAmount: (json['discountAmount'] as num).toDouble(),
-  payableAmount: (json['payableAmount'] as num).toDouble(),
+  productId: (json['giftCardProductId'] as num?)?.toInt() ?? 0,
+  productName: json['productName'] as String? ?? '',
+  requestedAmount: (json['requestedAmount'] as num?)?.toDouble() ?? 0,
+  discountPercentage: (json['discountPercentage'] as num?)?.toDouble() ?? 0,
+  discountAmount: (json['discountAmount'] as num?)?.toDouble() ?? 0,
+  payableAmount: (json['payableAmount'] as num?)?.toDouble() ?? 0,
+  availablePoints: (json['availablePoints'] as num?)?.toInt() ?? 0,
+  pointsDiscount: (json['pointsDiscount'] as num?)?.toDouble() ?? 0,
+  finalPayableAmount: (json['finalPayableAmount'] as num?)?.toDouble() ?? 0,
 );
 
 Map<String, dynamic> _$GiftCardPriceBreakdownToJson(
   _GiftCardPriceBreakdown instance,
 ) => <String, dynamic>{
-  'productId': instance.productId,
+  'giftCardProductId': instance.productId,
   'productName': instance.productName,
   'requestedAmount': instance.requestedAmount,
   'discountPercentage': instance.discountPercentage,
   'discountAmount': instance.discountAmount,
   'payableAmount': instance.payableAmount,
+  'availablePoints': instance.availablePoints,
+  'pointsDiscount': instance.pointsDiscount,
+  'finalPayableAmount': instance.finalPayableAmount,
 };
 
 _CreateGiftCardPaymentOrderRequest _$CreateGiftCardPaymentOrderRequestFromJson(
@@ -256,6 +264,7 @@ _CreateGiftCardPaymentOrderRequest _$CreateGiftCardPaymentOrderRequestFromJson(
 ) => _CreateGiftCardPaymentOrderRequest(
   giftCardProductId: (json['giftCardProductId'] as num).toInt(),
   amount: (json['amount'] as num).toDouble(),
+  pointsToUse: (json['pointsToUse'] as num?)?.toInt() ?? 0,
 );
 
 Map<String, dynamic> _$CreateGiftCardPaymentOrderRequestToJson(
@@ -263,42 +272,47 @@ Map<String, dynamic> _$CreateGiftCardPaymentOrderRequestToJson(
 ) => <String, dynamic>{
   'giftCardProductId': instance.giftCardProductId,
   'amount': instance.amount,
+  'pointsToUse': instance.pointsToUse,
 };
 
 _CreateGiftCardPaymentOrderResponse
 _$CreateGiftCardPaymentOrderResponseFromJson(Map<String, dynamic> json) =>
     _CreateGiftCardPaymentOrderResponse(
-      razorpayOrderId: json['razorpayOrderId'] as String,
-      razorpayAmountInPaise: (json['razorpayAmountInPaise'] as num).toInt(),
-      currency: json['currency'] as String,
-      razorpayKeyId: json['razorpayKeyId'] as String,
-      orderId: (json['orderId'] as num).toInt(),
-      productName: json['productName'] as String,
-      requestedAmount: (json['requestedAmount'] as num).toDouble(),
-      discountPercentage: (json['discountPercentage'] as num).toDouble(),
-      discountAmount: (json['discountAmount'] as num).toDouble(),
-      payableAmount: (json['payableAmount'] as num).toDouble(),
+      razorpayOrderId: json['orderId'] as String? ?? '',
+      razorpayAmountInPaise: (json['amount'] as num?)?.toInt() ?? 0,
+      currency: json['currency'] as String? ?? 'INR',
+      razorpayKeyId: json['razorpayKeyId'] as String? ?? '',
+      orderId: (json['giftCardOrderId'] as num?)?.toInt() ?? 0,
+      productName: json['productName'] as String? ?? '',
+      requestedAmount: (json['requestedAmount'] as num?)?.toDouble() ?? 0,
+      discountPercentage: (json['discountPercentage'] as num?)?.toDouble() ?? 0,
+      discountAmount: (json['discountAmount'] as num?)?.toDouble() ?? 0,
+      payableAmount: (json['payableAmount'] as num?)?.toDouble() ?? 0,
+      pointsDiscount: (json['pointsDiscount'] as num?)?.toDouble() ?? 0,
+      finalPayableAmount: (json['finalPayableAmount'] as num?)?.toDouble() ?? 0,
     );
 
 Map<String, dynamic> _$CreateGiftCardPaymentOrderResponseToJson(
   _CreateGiftCardPaymentOrderResponse instance,
 ) => <String, dynamic>{
-  'razorpayOrderId': instance.razorpayOrderId,
-  'razorpayAmountInPaise': instance.razorpayAmountInPaise,
+  'orderId': instance.razorpayOrderId,
+  'amount': instance.razorpayAmountInPaise,
   'currency': instance.currency,
   'razorpayKeyId': instance.razorpayKeyId,
-  'orderId': instance.orderId,
+  'giftCardOrderId': instance.orderId,
   'productName': instance.productName,
   'requestedAmount': instance.requestedAmount,
   'discountPercentage': instance.discountPercentage,
   'discountAmount': instance.discountAmount,
   'payableAmount': instance.payableAmount,
+  'pointsDiscount': instance.pointsDiscount,
+  'finalPayableAmount': instance.finalPayableAmount,
 };
 
 _VerifyGiftCardPaymentRequest _$VerifyGiftCardPaymentRequestFromJson(
   Map<String, dynamic> json,
 ) => _VerifyGiftCardPaymentRequest(
-  orderId: (json['orderId'] as num).toInt(),
+  orderId: (json['giftCardOrderId'] as num).toInt(),
   razorpayOrderId: json['razorpayOrderId'] as String,
   razorpayPaymentId: json['razorpayPaymentId'] as String,
   razorpaySignature: json['razorpaySignature'] as String,
@@ -307,8 +321,22 @@ _VerifyGiftCardPaymentRequest _$VerifyGiftCardPaymentRequestFromJson(
 Map<String, dynamic> _$VerifyGiftCardPaymentRequestToJson(
   _VerifyGiftCardPaymentRequest instance,
 ) => <String, dynamic>{
-  'orderId': instance.orderId,
+  'giftCardOrderId': instance.orderId,
   'razorpayOrderId': instance.razorpayOrderId,
   'razorpayPaymentId': instance.razorpayPaymentId,
   'razorpaySignature': instance.razorpaySignature,
+};
+
+_VerifyGiftCardPaymentResponse _$VerifyGiftCardPaymentResponseFromJson(
+  Map<String, dynamic> json,
+) => _VerifyGiftCardPaymentResponse(
+  success: json['success'] as bool? ?? false,
+  message: json['message'] as String? ?? '',
+);
+
+Map<String, dynamic> _$VerifyGiftCardPaymentResponseToJson(
+  _VerifyGiftCardPaymentResponse instance,
+) => <String, dynamic>{
+  'success': instance.success,
+  'message': instance.message,
 };

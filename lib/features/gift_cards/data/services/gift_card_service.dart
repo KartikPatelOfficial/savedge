@@ -30,6 +30,7 @@ abstract class GiftCardService {
   Future<GiftCardPriceBreakdown> getPriceBreakdown({
     @Query('productId') required int productId,
     @Query('amount') required double amount,
+    @Query('pointsToUse') int pointsToUse = 0,
   });
 
   @POST('/api/gift-card-orders')
@@ -43,7 +44,7 @@ abstract class GiftCardService {
   );
 
   @POST('/api/gift-card-orders/verify-payment')
-  Future<GiftCardOrder> verifyPayment(
+  Future<VerifyGiftCardPaymentResponse> verifyPayment(
     @Body() VerifyGiftCardPaymentRequest request,
   );
 

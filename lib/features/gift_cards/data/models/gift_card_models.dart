@@ -118,6 +118,7 @@ abstract class CreateGiftCardOrderRequest with _$CreateGiftCardOrderRequest {
     required int giftCardProductId,
     required double amount,
     required GiftCardPaymentMethod paymentMethod,
+    @Default(0) int pointsToUse,
   }) = _CreateGiftCardOrderRequest;
 
   factory CreateGiftCardOrderRequest.fromJson(Map<String, dynamic> json) =>
@@ -127,12 +128,15 @@ abstract class CreateGiftCardOrderRequest with _$CreateGiftCardOrderRequest {
 @freezed
 abstract class GiftCardPriceBreakdown with _$GiftCardPriceBreakdown {
   const factory GiftCardPriceBreakdown({
-    required int productId,
-    required String productName,
-    required double requestedAmount,
-    required double discountPercentage,
-    required double discountAmount,
-    required double payableAmount,
+    @JsonKey(name: 'giftCardProductId') @Default(0) int productId,
+    @Default('') String productName,
+    @Default(0) double requestedAmount,
+    @Default(0) double discountPercentage,
+    @Default(0) double discountAmount,
+    @Default(0) double payableAmount,
+    @Default(0) int availablePoints,
+    @Default(0) double pointsDiscount,
+    @Default(0) double finalPayableAmount,
   }) = _GiftCardPriceBreakdown;
 
   factory GiftCardPriceBreakdown.fromJson(Map<String, dynamic> json) =>
@@ -145,6 +149,7 @@ abstract class CreateGiftCardPaymentOrderRequest
   const factory CreateGiftCardPaymentOrderRequest({
     required int giftCardProductId,
     required double amount,
+    @Default(0) int pointsToUse,
   }) = _CreateGiftCardPaymentOrderRequest;
 
   factory CreateGiftCardPaymentOrderRequest.fromJson(
@@ -156,16 +161,18 @@ abstract class CreateGiftCardPaymentOrderRequest
 abstract class CreateGiftCardPaymentOrderResponse
     with _$CreateGiftCardPaymentOrderResponse {
   const factory CreateGiftCardPaymentOrderResponse({
-    required String razorpayOrderId,
-    required int razorpayAmountInPaise,
-    required String currency,
-    required String razorpayKeyId,
-    required int orderId,
-    required String productName,
-    required double requestedAmount,
-    required double discountPercentage,
-    required double discountAmount,
-    required double payableAmount,
+    @JsonKey(name: 'orderId') @Default('') String razorpayOrderId,
+    @JsonKey(name: 'amount') @Default(0) int razorpayAmountInPaise,
+    @Default('INR') String currency,
+    @Default('') String razorpayKeyId,
+    @JsonKey(name: 'giftCardOrderId') @Default(0) int orderId,
+    @Default('') String productName,
+    @Default(0) double requestedAmount,
+    @Default(0) double discountPercentage,
+    @Default(0) double discountAmount,
+    @Default(0) double payableAmount,
+    @Default(0) double pointsDiscount,
+    @Default(0) double finalPayableAmount,
   }) = _CreateGiftCardPaymentOrderResponse;
 
   factory CreateGiftCardPaymentOrderResponse.fromJson(
@@ -177,7 +184,7 @@ abstract class CreateGiftCardPaymentOrderResponse
 abstract class VerifyGiftCardPaymentRequest
     with _$VerifyGiftCardPaymentRequest {
   const factory VerifyGiftCardPaymentRequest({
-    required int orderId,
+    @JsonKey(name: 'giftCardOrderId') required int orderId,
     required String razorpayOrderId,
     required String razorpayPaymentId,
     required String razorpaySignature,
@@ -185,6 +192,18 @@ abstract class VerifyGiftCardPaymentRequest
 
   factory VerifyGiftCardPaymentRequest.fromJson(Map<String, dynamic> json) =>
       _$VerifyGiftCardPaymentRequestFromJson(json);
+}
+
+@freezed
+abstract class VerifyGiftCardPaymentResponse
+    with _$VerifyGiftCardPaymentResponse {
+  const factory VerifyGiftCardPaymentResponse({
+    @Default(false) bool success,
+    @Default('') String message,
+  }) = _VerifyGiftCardPaymentResponse;
+
+  factory VerifyGiftCardPaymentResponse.fromJson(Map<String, dynamic> json) =>
+      _$VerifyGiftCardPaymentResponseFromJson(json);
 }
 
 enum GiftCardOrderStatus {

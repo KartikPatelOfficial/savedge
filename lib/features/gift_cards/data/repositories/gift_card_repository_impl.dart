@@ -58,11 +58,13 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
   Future<Either<Failure, GiftCardPriceBreakdown>> getPriceBreakdown({
     required int productId,
     required double amount,
+    int pointsToUse = 0,
   }) async {
     try {
       final response = await _service.getPriceBreakdown(
         productId: productId,
         amount: amount,
+        pointsToUse: pointsToUse,
       );
       return Right(response);
     } catch (e) {
@@ -94,11 +96,13 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
   createPaymentOrder({
     required int giftCardProductId,
     required double amount,
+    int pointsToUse = 0,
   }) async {
     try {
       final request = CreateGiftCardPaymentOrderRequest(
         giftCardProductId: giftCardProductId,
         amount: amount,
+        pointsToUse: pointsToUse,
       );
       final response = await _service.createPaymentOrder(request);
       return Right(response);
@@ -108,7 +112,7 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
   }
 
   @override
-  Future<Either<Failure, GiftCardOrderEntity>> verifyPayment({
+  Future<Either<Failure, bool>> verifyPayment({
     required int orderId,
     required String razorpayOrderId,
     required String razorpayPaymentId,
@@ -122,7 +126,7 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
         razorpaySignature: razorpaySignature,
       );
       final response = await _service.verifyPayment(request);
-      return Right(_mapOrderToEntity(response));
+      return Right(response.success);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }

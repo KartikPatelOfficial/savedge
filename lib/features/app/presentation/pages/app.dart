@@ -89,32 +89,31 @@ class SavedgeApp extends StatelessWidget {
           builder: (_) => const InvoicesPage(),
           settings: settings,
         );
-      // Gift Cards routes hidden until Pine Labs integration is completed
-      // case '/gift-cards':
-      //   return MaterialPageRoute(
-      //     builder: (_) => const GiftCardsPage(),
-      //     settings: settings,
-      //   );
-      // case '/gift-card-detail':
-      //   final product = settings.arguments as GiftCardProductEntity;
-      //   return MaterialPageRoute(
-      //     builder: (_) => GiftCardDetailPage(product: product),
-      //     settings: settings,
-      //   );
-      // case '/gift-card-checkout':
-      //   final args = settings.arguments as Map<String, dynamic>;
-      //   return MaterialPageRoute(
-      //     builder: (_) => GiftCardCheckoutPage(
-      //       product: args['product'] as GiftCardProductEntity,
-      //       amount: args['amount'] as double,
-      //     ),
-      //     settings: settings,
-      //   );
-      // case '/gift-card-orders':
-      //   return MaterialPageRoute(
-      //     builder: (_) => const GiftCardOrdersPage(),
-      //     settings: settings,
-      //   );
+      case '/gift-cards':
+        return MaterialPageRoute(
+          builder: (_) => const GiftCardsPage(),
+          settings: settings,
+        );
+      case '/gift-card-detail':
+        final product = settings.arguments as GiftCardProductEntity;
+        return MaterialPageRoute(
+          builder: (_) => GiftCardDetailPage(product: product),
+          settings: settings,
+        );
+      case '/gift-card-checkout':
+        final args = settings.arguments as Map<String, dynamic>;
+        return MaterialPageRoute(
+          builder: (_) => GiftCardCheckoutPage(
+            product: args['product'] as GiftCardProductEntity,
+            amount: args['amount'] as double,
+          ),
+          settings: settings,
+        );
+      case '/gift-card-orders':
+        return MaterialPageRoute(
+          builder: (_) => const GiftCardOrdersPage(),
+          settings: settings,
+        );
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(
