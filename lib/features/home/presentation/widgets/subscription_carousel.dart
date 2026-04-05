@@ -15,7 +15,9 @@ import 'package:savedge/features/subscription/presentation/bloc/subscription_pla
 import 'package:savedge/features/subscription/presentation/pages/subscription_purchase_page.dart';
 
 class SubscriptionCarousel extends StatefulWidget {
-  const SubscriptionCarousel({super.key});
+  const SubscriptionCarousel({super.key, this.isGuest = false});
+
+  final bool isGuest;
 
   @override
   State<SubscriptionCarousel> createState() => _SubscriptionCarouselState();
@@ -53,6 +55,17 @@ class _SubscriptionCarouselState extends State<SubscriptionCarousel> {
   }
 
   Future<void> _checkVisibility() async {
+    // Guest users always see the plans carousel
+    if (widget.isGuest) {
+      if (mounted) {
+        setState(() {
+          _isVisible = true;
+          _isLoading = false;
+        });
+      }
+      return;
+    }
+
     try {
       // Check if user has active promotion enrollment - hide carousel if so
       final promotionBloc = getIt<PromotionBloc>();

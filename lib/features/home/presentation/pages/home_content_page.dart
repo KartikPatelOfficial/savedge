@@ -73,8 +73,8 @@ class _HomeContentPageState extends State<HomeContentPage> {
 
     // Load Hot Deals (special offers) with city filter
     _couponsBloc.add(LoadSpecialOfferCoupons(cityId: cityId));
+    _subscriptionBloc.add(const LoadSubscriptionPlans());
     if (!widget.isGuest) {
-      _subscriptionBloc.add(const LoadSubscriptionPlans());
       _promotionBloc.add(const PromotionEvent.checkStatus());
     }
   }
@@ -200,7 +200,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
                         if (isPromotionActive) return const SizedBox.shrink();
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: const SubscriptionCarousel(),
+                          child: SubscriptionCarousel(isGuest: widget.isGuest),
                         );
                       },
                     ),
