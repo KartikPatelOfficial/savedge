@@ -40,7 +40,7 @@ class AppConstants {
 
   static const String apiVersion = 'v1';
   static const Duration connectionTimeout = Duration(seconds: 30);
-  static const Duration receiveTimeout = Duration(seconds: 30);
+  static const Duration receiveTimeout = Duration(seconds: 60);
 
   // Storage Keys
   static const String authTokenKey = 'auth_token';

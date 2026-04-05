@@ -171,11 +171,12 @@ class GiftCardPaymentVerifying extends GiftCardsState {}
 
 class GiftCardPaymentVerified extends GiftCardsState {
   final bool success;
+  final String message;
 
-  const GiftCardPaymentVerified(this.success);
+  const GiftCardPaymentVerified({required this.success, required this.message});
 
   @override
-  List<Object> get props => [success];
+  List<Object> get props => [success, message];
 }
 
 class GiftCardPaymentError extends GiftCardsState {

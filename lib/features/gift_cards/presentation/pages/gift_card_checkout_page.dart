@@ -9,6 +9,7 @@ import 'package:savedge/features/gift_cards/data/models/gift_card_models.dart'
     show GiftCardPriceBreakdown;
 import 'package:savedge/features/gift_cards/domain/entities/gift_card_entity.dart';
 import 'package:savedge/core/storage/secure_storage_service.dart';
+import 'package:savedge/core/widgets/login_prompt.dart';
 import 'package:savedge/features/gift_cards/presentation/bloc/gift_cards_bloc.dart';
 
 class GiftCardCheckoutPage extends StatelessWidget {
@@ -163,13 +164,7 @@ class _GiftCardCheckoutViewState extends State<GiftCardCheckoutView> {
     final isAuthenticated = await secureStorage.isAuthenticated();
     if (!isAuthenticated) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please login to purchase gift cards'),
-          backgroundColor: Color(0xFFF59E0B),
-        ),
-      );
-      Navigator.pushNamed(context, '/login');
+      LoginPrompt.show(context, message: 'Please sign in to purchase gift cards');
       return;
     }
 
@@ -241,7 +236,11 @@ class _GiftCardCheckoutViewState extends State<GiftCardCheckoutView> {
           } else if (state is GiftCardRazorpayOrderError) {
             _showError(context, state.message);
           } else if (state is GiftCardPaymentVerified) {
-            _showSuccessDialogSimple(context);
+            if (state.success) {
+              _showSuccessDialogSimple(context, message: state.message);
+            } else {
+              _showFailureDialog(context, state.message);
+            }
           } else if (state is GiftCardPaymentError) {
             _showError(context, state.message);
           } else if (state is PriceBreakdownLoaded) {
@@ -745,7 +744,7 @@ class _GiftCardCheckoutViewState extends State<GiftCardCheckoutView> {
     );
   }
 
-  void _showSuccessDialogSimple(BuildContext context) {
+  void _showSuccessDialogSimple(BuildContext context, {String? message}) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -760,7 +759,7 @@ class _GiftCardCheckoutViewState extends State<GiftCardCheckoutView> {
               width: 60,
               height: 60,
               decoration: BoxDecoration(
-                color: const Color(0xFF059669).withOpacity(0.1),
+                color: const Color(0xFF059669).withAlpha(25),
                 borderRadius: BorderRadius.circular(30),
               ),
               child: const Icon(
@@ -780,7 +779,69 @@ class _GiftCardCheckoutViewState extends State<GiftCardCheckoutView> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Your gift card is being issued. Check your orders for details.',
+              message ?? 'Your gift card is being issued. Check your orders for details.',
+              style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.popUntil(context, (route) => route.isFirst);
+            },
+            child: const Text('OK'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.popUntil(context, (route) => route.isFirst);
+              Navigator.pushNamed(context, '/gift-card-orders');
+            },
+            child: const Text('View Orders'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showFailureDialog(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 60,
+              height: 60,
+              decoration: BoxDecoration(
+                color: const Color(0xFFEF4444).withAlpha(25),
+                borderRadius: BorderRadius.circular(30),
+              ),
+              child: const Icon(
+                Icons.error_outline_rounded,
+                size: 40,
+                color: Color(0xFFEF4444),
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Order Failed',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF1A202C),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              message,
               style: TextStyle(fontSize: 14, color: Colors.grey[600]),
               textAlign: TextAlign.center,
             ),

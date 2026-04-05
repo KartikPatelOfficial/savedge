@@ -44,7 +44,7 @@ class GiftCardsBloc extends Bloc<GiftCardsEvent, GiftCardsState> {
     final result = await giftCardRepository.getCategories();
 
     result.fold(
-      (failure) => emit(GiftCardCategoriesError(failure.toString())),
+      (failure) => emit(GiftCardCategoriesError(failure.message ?? 'Failed to load categories')),
       (categories) => emit(GiftCardCategoriesLoaded(categories)),
     );
   }
@@ -63,7 +63,7 @@ class GiftCardsBloc extends Bloc<GiftCardsEvent, GiftCardsState> {
     );
 
     result.fold(
-      (failure) => emit(GiftCardProductsError(failure.toString())),
+      (failure) => emit(GiftCardProductsError(failure.message ?? 'Failed to load products')),
       (products) => emit(GiftCardProductsLoaded(products)),
     );
   }
@@ -77,7 +77,7 @@ class GiftCardsBloc extends Bloc<GiftCardsEvent, GiftCardsState> {
     final result = await giftCardRepository.getProduct(event.productId);
 
     result.fold(
-      (failure) => emit(GiftCardProductError(failure.toString())),
+      (failure) => emit(GiftCardProductError(failure.message ?? 'Failed to load product')),
       (product) => emit(GiftCardProductLoaded(product)),
     );
   }
@@ -95,7 +95,7 @@ class GiftCardsBloc extends Bloc<GiftCardsEvent, GiftCardsState> {
     );
 
     result.fold(
-      (failure) => emit(PriceBreakdownError(failure.toString())),
+      (failure) => emit(PriceBreakdownError(failure.message ?? 'Failed to load price breakdown')),
       (breakdown) => emit(PriceBreakdownLoaded(breakdown)),
     );
   }
@@ -116,7 +116,7 @@ class GiftCardsBloc extends Bloc<GiftCardsEvent, GiftCardsState> {
     );
 
     result.fold(
-      (failure) => emit(GiftCardOrderError(failure.toString())),
+      (failure) => emit(GiftCardOrderError(failure.message ?? 'Failed to create order')),
       (order) => emit(GiftCardOrderCreated(order)),
     );
   }
@@ -135,7 +135,7 @@ class GiftCardsBloc extends Bloc<GiftCardsEvent, GiftCardsState> {
     );
 
     result.fold(
-      (failure) => emit(GiftCardRazorpayOrderError(failure.toString())),
+      (failure) => emit(GiftCardRazorpayOrderError(failure.message ?? 'Failed to create payment order')),
       (response) => emit(
         GiftCardRazorpayOrderCreated(
           razorpayOrderId: response.razorpayOrderId,
@@ -167,8 +167,11 @@ class GiftCardsBloc extends Bloc<GiftCardsEvent, GiftCardsState> {
     );
 
     result.fold(
-      (failure) => emit(GiftCardPaymentError(failure.toString())),
-      (success) => emit(GiftCardPaymentVerified(success)),
+      (failure) => emit(GiftCardPaymentError(failure.message ?? 'Payment verification failed')),
+      (response) => emit(GiftCardPaymentVerified(
+        success: response.success,
+        message: response.message,
+      )),
     );
   }
 
@@ -187,7 +190,7 @@ class GiftCardsBloc extends Bloc<GiftCardsEvent, GiftCardsState> {
     );
 
     result.fold(
-      (failure) => emit(GiftCardOrdersError(failure.toString())),
+      (failure) => emit(GiftCardOrdersError(failure.message ?? 'Failed to load orders')),
       (orders) => emit(GiftCardOrdersLoaded(orders)),
     );
   }

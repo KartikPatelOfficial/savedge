@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 import 'package:savedge/core/error/failures.dart';
 import 'package:savedge/features/gift_cards/data/models/gift_card_models.dart';
@@ -12,6 +13,43 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
 
   GiftCardRepositoryImpl(this._service);
 
+  /// Extracts a user-friendly error message from exceptions
+  String _extractErrorMessage(Object e) {
+    if (e is DioException) {
+      // Try to extract server error message from response body
+      final data = e.response?.data;
+      if (data is Map<String, dynamic>) {
+        // Backend returns { "message": "..." } via ErrorResponse
+        if (data.containsKey('message') && data['message'] != null) {
+          return data['message'].toString();
+        }
+        // Or it might return { "errors": [...] }
+        if (data.containsKey('errors') && data['errors'] is List) {
+          final errors = data['errors'] as List;
+          if (errors.isNotEmpty) return errors.join('; ');
+        }
+      }
+      // Handle specific DioException types
+      switch (e.type) {
+        case DioExceptionType.connectionTimeout:
+        case DioExceptionType.sendTimeout:
+        case DioExceptionType.receiveTimeout:
+          return 'Request timed out. Please try again.';
+        case DioExceptionType.connectionError:
+          return 'Unable to connect to server. Check your internet connection.';
+        case DioExceptionType.badResponse:
+          final statusCode = e.response?.statusCode;
+          if (statusCode == 401) return 'Session expired. Please login again.';
+          if (statusCode == 404) return 'The requested resource was not found.';
+          if (statusCode == 500) return 'Server error. Please try again later.';
+          return 'Something went wrong. Please try again.';
+        default:
+          return 'Something went wrong. Please try again.';
+      }
+    }
+    return 'Something went wrong. Please try again.';
+  }
+
   @override
   Future<Either<Failure, List<GiftCardCategoryEntity>>> getCategories() async {
     try {
@@ -19,7 +57,7 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
       final entities = response.map(_mapCategoryToEntity).toList();
       return Right(entities);
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(ServerFailure(_extractErrorMessage(e)));
     }
   }
 
@@ -40,7 +78,7 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
       final entities = response.items.map(_mapProductToEntity).toList();
       return Right(entities);
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(ServerFailure(_extractErrorMessage(e)));
     }
   }
 
@@ -50,7 +88,7 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
       final response = await _service.getProduct(id);
       return Right(_mapProductToEntity(response));
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(ServerFailure(_extractErrorMessage(e)));
     }
   }
 
@@ -68,7 +106,7 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
       );
       return Right(response);
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(ServerFailure(_extractErrorMessage(e)));
     }
   }
 
@@ -89,7 +127,7 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
       final response = await _service.createOrder(request);
       return Right(_mapOrderToEntity(response));
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(ServerFailure(_extractErrorMessage(e)));
     }
   }
 
@@ -111,12 +149,12 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
       final response = await _service.createPaymentOrder(request);
       return Right(response);
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(ServerFailure(_extractErrorMessage(e)));
     }
   }
 
   @override
-  Future<Either<Failure, bool>> verifyPayment({
+  Future<Either<Failure, VerifyGiftCardPaymentResponse>> verifyPayment({
     required int orderId,
     required String razorpayOrderId,
     required String razorpayPaymentId,
@@ -130,9 +168,9 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
         razorpaySignature: razorpaySignature,
       );
       final response = await _service.verifyPayment(request);
-      return Right(response.success);
+      return Right(response);
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(ServerFailure(_extractErrorMessage(e)));
     }
   }
 
@@ -151,7 +189,7 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
       final entities = response.items.map(_mapOrderToEntity).toList();
       return Right(entities);
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(ServerFailure(_extractErrorMessage(e)));
     }
   }
 
@@ -161,7 +199,7 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
       final response = await _service.getOrder(id);
       return Right(_mapOrderToEntity(response));
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(ServerFailure(_extractErrorMessage(e)));
     }
   }
 

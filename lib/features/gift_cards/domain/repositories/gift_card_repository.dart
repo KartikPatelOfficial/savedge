@@ -4,7 +4,8 @@ import '../../../../core/error/failures.dart';
 import '../../data/models/gift_card_models.dart'
     show
         CreateGiftCardPaymentOrderResponse,
-        GiftCardPriceBreakdown;
+        GiftCardPriceBreakdown,
+        VerifyGiftCardPaymentResponse;
 import '../entities/gift_card_entity.dart';
 
 abstract class GiftCardRepository {
@@ -40,7 +41,7 @@ abstract class GiftCardRepository {
     String? themeSku,
   });
 
-  Future<Either<Failure, bool>> verifyPayment({
+  Future<Either<Failure, VerifyGiftCardPaymentResponse>> verifyPayment({
     required int orderId,
     required String razorpayOrderId,
     required String razorpayPaymentId,
