@@ -69,6 +69,8 @@ class GiftCardProductEntity extends Equatable {
   final String? currencySymbol;
   final String? offerDescription;
   final String? formatExpiry;
+  final String? termsAndConditions;
+  final String? termsAndConditionsUrl;
   final double? discountPercentage;
   final List<GiftCardThemeEntity> themes;
 
@@ -90,6 +92,8 @@ class GiftCardProductEntity extends Equatable {
     this.currencySymbol,
     this.offerDescription,
     this.formatExpiry,
+    this.termsAndConditions,
+    this.termsAndConditionsUrl,
     this.discountPercentage,
     this.themes = const [],
   });
@@ -126,6 +130,8 @@ class GiftCardProductEntity extends Equatable {
         currencySymbol,
         offerDescription,
         formatExpiry,
+        termsAndConditions,
+        termsAndConditionsUrl,
         discountPercentage,
         themes,
       ];
@@ -154,6 +160,11 @@ class GiftCardOrderEntity extends Equatable {
   final double? woohooActivatedAmount;
   final DateTime? woohooCardExpiry;
   final String? failureReason;
+  final String? razorpayRefundId;
+  final double? refundAmount;
+  final String? refundStatus;
+  final DateTime? refundedAt;
+  final int? pointsRefunded;
   final DateTime created;
 
   const GiftCardOrderEntity({
@@ -179,6 +190,11 @@ class GiftCardOrderEntity extends Equatable {
     this.woohooActivatedAmount,
     this.woohooCardExpiry,
     this.failureReason,
+    this.razorpayRefundId,
+    this.refundAmount,
+    this.refundStatus,
+    this.refundedAt,
+    this.pointsRefunded,
     required this.created,
   });
 
@@ -187,6 +203,8 @@ class GiftCardOrderEntity extends Equatable {
   bool get isFailed => status == GiftCardOrderStatusEntity.failed;
   bool get hasCardDetails =>
       woohooCardNumber != null && woohooCardNumber!.isNotEmpty;
+  bool get isRefunded => status == GiftCardOrderStatusEntity.refunded;
+  bool get hasRefundDetails => razorpayRefundId != null || (pointsRefunded != null && pointsRefunded! > 0);
 
   @override
   List<Object?> get props => [
@@ -212,8 +230,46 @@ class GiftCardOrderEntity extends Equatable {
         woohooActivatedAmount,
         woohooCardExpiry,
         failureReason,
+        razorpayRefundId,
+        refundAmount,
+        refundStatus,
+        refundedAt,
+        pointsRefunded,
         created,
       ];
+}
+
+class GiftCardRelatedProductEntity extends Equatable {
+  final int id;
+  final int giftCardProductId;
+  final String relatedSku;
+  final String relatedName;
+  final String? relatedUrl;
+  final String? minPrice;
+  final String? maxPrice;
+  final String? offerShortDesc;
+  final String? thumbnailUrl;
+  final String? mobileImageUrl;
+  final String currencyCode;
+  final bool hasPromo;
+
+  const GiftCardRelatedProductEntity({
+    required this.id,
+    required this.giftCardProductId,
+    required this.relatedSku,
+    required this.relatedName,
+    this.relatedUrl,
+    this.minPrice,
+    this.maxPrice,
+    this.offerShortDesc,
+    this.thumbnailUrl,
+    this.mobileImageUrl,
+    this.currencyCode = 'INR',
+    this.hasPromo = false,
+  });
+
+  @override
+  List<Object?> get props => [id, giftCardProductId, relatedSku, relatedName, relatedUrl, minPrice, maxPrice, offerShortDesc, thumbnailUrl, mobileImageUrl, currencyCode, hasPromo];
 }
 
 enum GiftCardOrderStatusEntity {

@@ -237,6 +237,8 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
       currencySymbol: model.currencySymbol,
       offerDescription: model.offerDescription,
       formatExpiry: model.formatExpiry,
+      termsAndConditions: model.termsAndConditions,
+      termsAndConditionsUrl: model.termsAndConditionsUrl,
       discountPercentage: model.discountPercentage,
       themes: model.parsedThemes
           .map((t) => GiftCardThemeEntity(
@@ -273,6 +275,11 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
       woohooActivatedAmount: model.woohooActivatedAmount,
       woohooCardExpiry: model.woohooCardExpiry,
       failureReason: model.failureReason,
+      razorpayRefundId: model.razorpayRefundId,
+      refundAmount: model.refundAmount,
+      refundStatus: model.refundStatus,
+      refundedAt: model.refundedAt,
+      pointsRefunded: model.pointsRefunded,
       created: model.created,
     );
   }
@@ -337,6 +344,34 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
       case GiftCardPaymentMethodEntity.razorpay:
         return GiftCardPaymentMethod.razorpay;
     }
+  }
+
+  @override
+  Future<Either<Failure, List<GiftCardRelatedProductEntity>>> getRelatedProducts(int productId) async {
+    try {
+      final response = await _service.getRelatedProducts(productId);
+      final entities = response.map(_mapRelatedProductToEntity).toList();
+      return Right(entities);
+    } catch (e) {
+      return Left(ServerFailure(_extractErrorMessage(e)));
+    }
+  }
+
+  GiftCardRelatedProductEntity _mapRelatedProductToEntity(GiftCardRelatedProduct model) {
+    return GiftCardRelatedProductEntity(
+      id: model.id,
+      giftCardProductId: model.giftCardProductId,
+      relatedSku: model.relatedSku,
+      relatedName: model.relatedName,
+      relatedUrl: model.relatedUrl,
+      minPrice: model.minPrice,
+      maxPrice: model.maxPrice,
+      offerShortDesc: model.offerShortDesc,
+      thumbnailUrl: model.thumbnailUrl,
+      mobileImageUrl: model.mobileImageUrl,
+      currencyCode: model.currencyCode,
+      hasPromo: model.hasPromo,
+    );
   }
 
   int _mapStatusToInt(GiftCardOrderStatusEntity status) {

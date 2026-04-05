@@ -3,8 +3,12 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:savedge/core/injection/injection.dart';
 
 import '../../domain/entities/gift_card_entity.dart';
+import '../bloc/gift_cards_bloc.dart';
+import '../widgets/related_product_card.dart';
 
 class GiftCardDetailPage extends StatefulWidget {
   final GiftCardProductEntity product;
@@ -20,6 +24,7 @@ class _GiftCardDetailPageState extends State<GiftCardDetailPage>
   final _amountController = TextEditingController();
   double _selectedAmount = 0;
   bool _isAmountValid = false;
+  bool _tcExpanded = false;
   String? _selectedThemeSku;
   late AnimationController _amountAnimCtrl;
   late Animation<double> _amountScaleAnim;
@@ -137,7 +142,10 @@ class _GiftCardDetailPageState extends State<GiftCardDetailPage>
     final payable = product.calculatePayable(_selectedAmount);
     final currency = product.currencySymbol ?? '₹';
 
-    return Scaffold(
+    return BlocProvider(
+      create: (_) => getIt<GiftCardsBloc>()
+        ..add(LoadRelatedProducts(productId: widget.product.id)),
+      child: Scaffold(
       backgroundColor: const Color(0xFFF8F7FC),
       body: Column(
         children: [
@@ -157,15 +165,32 @@ class _GiftCardDetailPageState extends State<GiftCardDetailPage>
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Expanded(
-                        child: Text(
-                          product.name,
-                          style: const TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.w900,
-                            color: Color(0xFF111827),
-                            height: 1.2,
-                            letterSpacing: -0.3,
-                          ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (product.brandName != null) ...[
+                              Text(
+                                product.brandName!,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: _accent.withAlpha(180),
+                                  letterSpacing: 0.3,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                            ],
+                            Text(
+                              product.name,
+                              style: const TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.w900,
+                                color: Color(0xFF111827),
+                                height: 1.2,
+                                letterSpacing: -0.3,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                       if (product.hasDiscount) ...[
@@ -579,6 +604,58 @@ class _GiftCardDetailPageState extends State<GiftCardDetailPage>
                       ),
                     ),
                   ],
+
+                  // ── Terms & Conditions ──────────────────────────────────────
+                  if (product.termsAndConditions != null && product.termsAndConditions!.isNotEmpty) ...[
+                    const SizedBox(height: 20),
+                    _buildTermsSection(product),
+                  ],
+
+                  // ── Related Products ──────────────────────────────────────
+                  const SizedBox(height: 20),
+                  BlocBuilder<GiftCardsBloc, GiftCardsState>(
+                    buildWhen: (prev, curr) =>
+                        curr is RelatedProductsLoading || curr is RelatedProductsLoaded,
+                    builder: (context, state) {
+                      if (state is RelatedProductsLoaded && state.products.isNotEmpty) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'You Might Also Like',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w800,
+                                color: Color(0xFF111827),
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            SizedBox(
+                              height: 180,
+                              child: ListView.separated(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: state.products.length,
+                                separatorBuilder: (_, __) => const SizedBox(width: 12),
+                                itemBuilder: (context, index) {
+                                  final rp = state.products[index];
+                                  return RelatedProductCard(
+                                    name: rp.relatedName,
+                                    imageUrl: rp.thumbnailUrl ?? rp.mobileImageUrl,
+                                    minPrice: rp.minPrice,
+                                    maxPrice: rp.maxPrice,
+                                    offerShortDesc: rp.offerShortDesc,
+                                    currencySymbol: '₹',
+                                    index: index,
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
+                        );
+                      }
+                      return const SizedBox.shrink();
+                    },
+                  ),
                 ],
               ),
             ),
@@ -627,6 +704,79 @@ class _GiftCardDetailPageState extends State<GiftCardDetailPage>
           ),
         ),
       ),
+    ),
+    );
+  }
+
+  // ── Terms & Conditions ────────────────────────────────────────────────────
+
+  Widget _buildTermsSection(GiftCardProductEntity product) {
+    return StatefulBuilder(
+      builder: (context, setInnerState) {
+        return Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: const Color(0xFFF0F0F0), width: 1.5),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: Column(
+            children: [
+              GestureDetector(
+                onTap: () => setInnerState(() => _tcExpanded = !_tcExpanded),
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.shield_outlined,
+                          size: 18, color: Color(0xFF6B7280)),
+                      const SizedBox(width: 10),
+                      const Expanded(
+                        child: Text(
+                          'Terms & Conditions',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF374151),
+                          ),
+                        ),
+                      ),
+                      AnimatedRotation(
+                        turns: _tcExpanded ? 0.5 : 0,
+                        duration: const Duration(milliseconds: 200),
+                        child: const Icon(Icons.keyboard_arrow_down_rounded,
+                            size: 22, color: Color(0xFF9CA3AF)),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              AnimatedCrossFade(
+                firstChild: const SizedBox(width: double.infinity),
+                secondChild: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                  child: Text(
+                    product.termsAndConditions!
+                        .replaceAll(RegExp(r'<[^>]*>'), '\n')
+                        .replaceAll(RegExp(r'\n{2,}'), '\n')
+                        .trim(),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Color(0xFF6B7280),
+                      height: 1.6,
+                    ),
+                  ),
+                ),
+                crossFadeState: _tcExpanded
+                    ? CrossFadeState.showSecond
+                    : CrossFadeState.showFirst,
+                duration: const Duration(milliseconds: 200),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 

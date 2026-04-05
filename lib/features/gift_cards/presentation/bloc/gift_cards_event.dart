@@ -100,6 +100,13 @@ class VerifyGiftCardPayment extends GiftCardsEvent {
       [orderId, razorpayOrderId, razorpayPaymentId, razorpaySignature];
 }
 
+class LoadRelatedProducts extends GiftCardsEvent {
+  final int productId;
+  const LoadRelatedProducts({required this.productId});
+  @override
+  List<Object> get props => [productId];
+}
+
 class LoadGiftCardOrders extends GiftCardsEvent {
   final GiftCardOrderStatusEntity? status;
   final int pageNumber;

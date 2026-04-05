@@ -55,4 +55,6 @@ abstract class GiftCardRepository {
   });
 
   Future<Either<Failure, GiftCardOrderEntity>> getOrder(int id);
+
+  Future<Either<Failure, List<GiftCardRelatedProductEntity>>> getRelatedProducts(int productId);
 }

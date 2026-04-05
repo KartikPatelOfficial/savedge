@@ -26,6 +26,9 @@ abstract class GiftCardService {
   @GET('/api/gift-cards/products/{id}')
   Future<GiftCardProduct> getProduct(@Path('id') int id);
 
+  @GET('/api/gift-cards/products/{id}/related')
+  Future<List<GiftCardRelatedProduct>> getRelatedProducts(@Path('id') int id);
+
   @GET('/api/gift-card-orders/price-breakdown')
   Future<GiftCardPriceBreakdown> getPriceBreakdown({
     @Query('productId') required int productId,

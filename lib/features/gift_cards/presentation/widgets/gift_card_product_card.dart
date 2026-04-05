@@ -61,13 +61,13 @@ class GiftCardProductCard extends StatelessWidget {
             Stack(
               children: [
                 Container(
-                  height: 120,
+                  height: 130,
                   color: palette,
                   child: product.thumbnailUrl != null || product.imageUrl != null
                       ? CachedNetworkImage(
                           imageUrl: product.thumbnailUrl ?? product.imageUrl ?? '',
                           width: double.infinity,
-                          height: 120,
+                          height: 130,
                           fit: BoxFit.cover,
                           placeholder: (_, __) => Center(
                             child: Icon(Icons.card_giftcard_rounded,
@@ -116,6 +116,19 @@ class GiftCardProductCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Category name
+                    if (product.categoryName != null)
+                      Text(
+                        product.categoryName!,
+                        style: const TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xFF9CA3AF),
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+
                     // Brand name
                     Text(
                       product.name,
@@ -128,6 +141,35 @@ class GiftCardProductCard extends StatelessWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
+
+                    // Savings callout
+                    if (product.hasDiscount)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 2),
+                        child: Row(
+                          children: [
+                            Text(
+                              '${product.currencySymbol ?? '₹'}${product.minPrice.toStringAsFixed(0)}',
+                              style: const TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w500,
+                                color: Color(0xFF9CA3AF),
+                                decoration: TextDecoration.lineThrough,
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              '${product.currencySymbol ?? '₹'}${product.calculatePayable(product.minPrice).toStringAsFixed(0)}',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w800,
+                                color: accent,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
                     const Spacer(),
 
                     // Price tag row
@@ -151,14 +193,28 @@ class GiftCardProductCard extends StatelessWidget {
                         ),
                         const Spacer(),
                         Container(
-                          width: 28,
-                          height: 28,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
                             color: accent,
-                            shape: BoxShape.circle,
+                            borderRadius: BorderRadius.circular(14),
                           ),
-                          child: const Icon(Icons.arrow_forward_rounded,
-                              color: Colors.white, size: 14),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'View',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              SizedBox(width: 2),
+                              Icon(Icons.arrow_forward_rounded,
+                                  color: Colors.white, size: 12),
+                            ],
+                          ),
                         ),
                       ],
                     ),

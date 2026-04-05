@@ -33,6 +33,7 @@ class GiftCardsBloc extends Bloc<GiftCardsEvent, GiftCardsState> {
     on<CreateGiftCardPaymentOrder>(_onCreatePaymentOrder);
     on<VerifyGiftCardPayment>(_onVerifyPayment);
     on<LoadGiftCardOrders>(_onLoadOrders);
+    on<LoadRelatedProducts>(_onLoadRelatedProducts);
   }
 
   Future<void> _onLoadCategories(
@@ -192,6 +193,18 @@ class GiftCardsBloc extends Bloc<GiftCardsEvent, GiftCardsState> {
     result.fold(
       (failure) => emit(GiftCardOrdersError(failure.message ?? 'Failed to load orders')),
       (orders) => emit(GiftCardOrdersLoaded(orders)),
+    );
+  }
+
+  Future<void> _onLoadRelatedProducts(
+    LoadRelatedProducts event,
+    Emitter<GiftCardsState> emit,
+  ) async {
+    emit(RelatedProductsLoading());
+    final result = await giftCardRepository.getRelatedProducts(event.productId);
+    result.fold(
+      (failure) => emit(RelatedProductsError(failure.message ?? 'Failed to load related products')),
+      (products) => emit(RelatedProductsLoaded(products)),
     );
   }
 }

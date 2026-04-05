@@ -40,6 +40,8 @@ abstract class GiftCardProduct with _$GiftCardProduct {
     String? currencySymbol,
     String? offerDescription,
     String? formatExpiry,
+    String? termsAndConditions,
+    String? termsAndConditionsUrl,
     double? discountPercentage,
     String? themesJson,
     @Default([]) List<GiftCardTheme> parsedThemes,
@@ -60,6 +62,27 @@ abstract class GiftCardTheme with _$GiftCardTheme {
 
   factory GiftCardTheme.fromJson(Map<String, dynamic> json) =>
       _$GiftCardThemeFromJson(json);
+}
+
+@freezed
+abstract class GiftCardRelatedProduct with _$GiftCardRelatedProduct {
+  const factory GiftCardRelatedProduct({
+    required int id,
+    required int giftCardProductId,
+    required String relatedSku,
+    required String relatedName,
+    String? relatedUrl,
+    String? minPrice,
+    String? maxPrice,
+    String? offerShortDesc,
+    String? thumbnailUrl,
+    String? mobileImageUrl,
+    @Default('INR') String currencyCode,
+    @Default(false) bool hasPromo,
+  }) = _GiftCardRelatedProduct;
+
+  factory GiftCardRelatedProduct.fromJson(Map<String, dynamic> json) =>
+      _$GiftCardRelatedProductFromJson(json);
 }
 
 @freezed
@@ -104,6 +127,11 @@ abstract class GiftCardOrder with _$GiftCardOrder {
     double? woohooActivatedAmount,
     DateTime? woohooCardExpiry,
     String? failureReason,
+    String? razorpayRefundId,
+    double? refundAmount,
+    String? refundStatus,
+    DateTime? refundedAt,
+    int? pointsRefunded,
     required DateTime created,
   }) = _GiftCardOrder;
 

@@ -208,3 +208,20 @@ class GiftCardOrdersError extends GiftCardsState {
   @override
   List<Object> get props => [message];
 }
+
+// Related products
+class RelatedProductsLoading extends GiftCardsState {}
+
+class RelatedProductsLoaded extends GiftCardsState {
+  final List<GiftCardRelatedProductEntity> products;
+  const RelatedProductsLoaded(this.products);
+  @override
+  List<Object> get props => [products];
+}
+
+class RelatedProductsError extends GiftCardsState {
+  final String message;
+  const RelatedProductsError(this.message);
+  @override
+  List<Object> get props => [message];
+}

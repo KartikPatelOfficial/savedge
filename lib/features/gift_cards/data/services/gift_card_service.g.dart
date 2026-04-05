@@ -114,6 +114,38 @@ class _GiftCardService implements GiftCardService {
   }
 
   @override
+  Future<List<GiftCardRelatedProduct>> getRelatedProducts(int id) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<List<GiftCardRelatedProduct>>(
+      Options(method: 'GET', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/api/gift-cards/products/${id}/related',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<List<dynamic>>(_options);
+    late List<GiftCardRelatedProduct> _value;
+    try {
+      _value = _result.data!
+          .map(
+            (dynamic i) =>
+                GiftCardRelatedProduct.fromJson(i as Map<String, dynamic>),
+          )
+          .toList();
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
   Future<GiftCardPriceBreakdown> getPriceBreakdown({
     required int productId,
     required double amount,

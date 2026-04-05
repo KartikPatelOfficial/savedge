@@ -1,11 +1,16 @@
+import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
 import '../../../../core/injection/injection.dart';
 import '../../domain/entities/gift_card_entity.dart';
 import '../bloc/gift_cards_bloc.dart';
+import '../widgets/gift_card_category_card.dart';
+import '../widgets/gift_card_featured_banner.dart';
 import '../widgets/gift_card_product_card.dart';
 
 class GiftCardsPage extends StatelessWidget {
@@ -34,10 +39,46 @@ class _GiftCardsViewState extends State<GiftCardsView> {
   final _searchController = TextEditingController();
   bool _searchActive = false;
 
+  // Cached state for single-scroll layout
+  List<GiftCardCategoryEntity> _categories = [];
+  List<GiftCardProductEntity> _products = [];
+  List<GiftCardProductEntity> _featuredProducts = [];
+  bool _isLoading = true;
+  String? _error;
+
+  // Auto-scroll carousel
+  Timer? _autoScrollTimer;
+  PageController? _pageController;
+  int _currentPage = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController();
+  }
+
   @override
   void dispose() {
     _searchController.dispose();
+    _autoScrollTimer?.cancel();
+    _pageController?.dispose();
     super.dispose();
+  }
+
+  void _startAutoScroll() {
+    _autoScrollTimer?.cancel();
+    if (_featuredProducts.length <= 1) return;
+    _autoScrollTimer = Timer.periodic(const Duration(seconds: 4), (_) {
+      if (_pageController != null && _pageController!.hasClients) {
+        final next =
+            ((_pageController!.page?.round() ?? 0) + 1) % _featuredProducts.length;
+        _pageController!.animateToPage(
+          next,
+          duration: const Duration(milliseconds: 350),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
   }
 
   void _selectCategory(GiftCardCategoryEntity? category) {
@@ -66,61 +107,84 @@ class _GiftCardsViewState extends State<GiftCardsView> {
       backgroundColor: const Color(0xFFF8F7FC),
       body: AnnotatedRegion<SystemUiOverlayStyle>(
         value: SystemUiOverlayStyle.dark,
-        child: Column(
-          children: [
-            // === Custom top header ===
-            _buildHeader(context),
-
-            // === Categories ===
-            BlocBuilder<GiftCardsBloc, GiftCardsState>(
-              buildWhen: (prev, curr) =>
-                  curr is GiftCardCategoriesLoading ||
-                  curr is GiftCardCategoriesLoaded ||
-                  curr is GiftCardCategoriesError,
-              builder: (context, state) {
-                if (state is GiftCardCategoriesLoaded) {
-                  return _buildCategoryRow(state.categories);
+        child: BlocListener<GiftCardsBloc, GiftCardsState>(
+          listener: (context, state) {
+            if (state is GiftCardCategoriesLoaded) {
+              setState(() => _categories = state.categories);
+            } else if (state is GiftCardProductsLoaded) {
+              setState(() {
+                _products = state.products;
+                _isLoading = false;
+                _error = null;
+                // Cache featured products from first load (all products)
+                if (_featuredProducts.isEmpty && _selectedCategory == null) {
+                  _featuredProducts =
+                      state.products.where((p) => p.hasDiscount).take(5).toList();
+                  _startAutoScroll();
                 }
-                return const SizedBox.shrink();
-              },
-            ),
+              });
+            } else if (state is GiftCardProductsLoading) {
+              setState(() => _isLoading = true);
+            } else if (state is GiftCardProductsError) {
+              setState(() {
+                _error = state.message;
+                _isLoading = false;
+              });
+            }
+          },
+          child: AnimationLimiter(
+            child: CustomScrollView(
+              slivers: [
+                // 1. Header
+                SliverToBoxAdapter(child: _buildHeader(context)),
 
-            const SizedBox(height: 8),
+                // 2. Featured Deals Carousel
+                if (_featuredProducts.isNotEmpty)
+                  SliverToBoxAdapter(child: _buildFeaturedDeals()),
 
-            // === Products grid ===
-            Expanded(
-              child: BlocBuilder<GiftCardsBloc, GiftCardsState>(
-                buildWhen: (prev, curr) =>
-                    curr is GiftCardProductsLoading ||
-                    curr is GiftCardProductsLoaded ||
-                    curr is GiftCardProductsError,
-                builder: (context, state) {
-                  if (state is GiftCardProductsLoading) {
-                    return const Center(
+                // 3. Top Categories
+                if (_categories.isNotEmpty)
+                  SliverToBoxAdapter(child: _buildTopCategories()),
+
+                // 4. Category Chips
+                if (_categories.isNotEmpty)
+                  SliverToBoxAdapter(child: _buildCategoryRow(_categories)),
+
+                // 5. Section Heading
+                SliverToBoxAdapter(child: _buildSectionHeading()),
+
+                // 6. Products Grid / Loading / Error / Empty
+                if (_isLoading)
+                  const SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: Center(
                       child: CircularProgressIndicator(
                         color: Color(0xFF6F3FCC),
                         strokeWidth: 2.5,
                       ),
-                    );
-                  }
-                  if (state is GiftCardProductsLoaded) {
-                    return _buildGrid(state.products);
-                  }
-                  if (state is GiftCardProductsError) {
-                    return _buildError(state.message);
-                  }
-                  // Initial empty state
-                  return _buildEmptyState();
-                },
-              ),
+                    ),
+                  )
+                else if (_error != null)
+                  SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: _buildError(_error!),
+                  )
+                else if (_products.isEmpty)
+                  SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: _buildEmptyState(),
+                  )
+                else
+                  _buildProductsGrid(),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
   }
 
-  // ── Header ─────────────────────────────────────────────────────────────────
+  // -- Header ----------------------------------------------------------------
 
   Widget _buildHeader(BuildContext context) {
     return Container(
@@ -265,7 +329,158 @@ class _GiftCardsViewState extends State<GiftCardsView> {
     );
   }
 
-  // ── Categories ─────────────────────────────────────────────────────────────
+  // -- Featured Deals Carousel -----------------------------------------------
+
+  Widget _buildFeaturedDeals() {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Column(
+        children: [
+          // Heading row
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              children: [
+                const Text(
+                  'Hot Deals',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                    color: Color(0xFF111827),
+                  ),
+                ),
+                const Spacer(),
+                GestureDetector(
+                  onTap: () => _selectCategory(null),
+                  child: const Text(
+                    'View All',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF7C3AED),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 10),
+
+          // PageView carousel
+          SizedBox(
+            height: 190,
+            child: PageView.builder(
+              controller: _pageController,
+              itemCount: _featuredProducts.length,
+              onPageChanged: (i) => setState(() => _currentPage = i),
+              itemBuilder: (context, index) {
+                final product = _featuredProducts[index];
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: GiftCardFeaturedBanner(
+                    product: product,
+                    onTap: () => Navigator.pushNamed(
+                      context,
+                      '/gift-card-detail',
+                      arguments: product,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+
+          const SizedBox(height: 10),
+
+          // Dot indicators
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(
+              _featuredProducts.length,
+              (i) => AnimatedContainer(
+                duration: const Duration(milliseconds: 250),
+                margin: const EdgeInsets.symmetric(horizontal: 3),
+                width: 6,
+                height: 6,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: i == _currentPage
+                      ? const Color(0xFF7C3AED)
+                      : const Color(0xFFD1D5DB),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // -- Top Categories --------------------------------------------------------
+
+  Widget _buildTopCategories() {
+    final sorted = List<GiftCardCategoryEntity>.from(_categories)
+      ..sort((a, b) => b.productCount.compareTo(a.productCount));
+    final top = sorted.take(6).toList();
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              children: [
+                const Text(
+                  'Top Categories',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                    color: Color(0xFF111827),
+                  ),
+                ),
+                const Spacer(),
+                GestureDetector(
+                  onTap: () => _selectCategory(null),
+                  child: const Text(
+                    'View All',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF7C3AED),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 10),
+          SizedBox(
+            height: 120,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              itemCount: top.length,
+              itemBuilder: (context, index) {
+                final cat = top[index];
+                return Padding(
+                  padding: EdgeInsets.only(right: index < top.length - 1 ? 10 : 0),
+                  child: GiftCardCategoryCard(
+                    category: cat,
+                    isSelected: _selectedCategory?.id == cat.id,
+                    onTap: () => _selectCategory(cat),
+                    index: index,
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // -- Category Chips --------------------------------------------------------
 
   static const List<Color> _catBg = [
     Color(0xFFEDE9FE),
@@ -370,67 +585,73 @@ class _GiftCardsViewState extends State<GiftCardsView> {
     );
   }
 
-  // ── Grid ───────────────────────────────────────────────────────────────────
+  // -- Section Heading -------------------------------------------------------
 
-  Widget _buildGrid(List<GiftCardProductEntity> products) {
-    if (products.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: const Color(0xFFEDE9FE),
-                borderRadius: BorderRadius.circular(24),
-              ),
-              child: const Icon(
-                Icons.card_giftcard_rounded,
-                size: 40,
-                color: Color(0xFF7C3AED),
-              ),
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'No gift cards found',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
-                color: Color(0xFF374151),
-              ),
-            ),
-            const SizedBox(height: 4),
-            const Text(
-              'Try a different category or search',
-              style: TextStyle(fontSize: 13, color: Color(0xFF9CA3AF)),
-            ),
-          ],
-        ),
-      );
+  Widget _buildSectionHeading() {
+    String title;
+    if (_searchActive && _searchController.text.isNotEmpty) {
+      title = 'Search Results';
+    } else if (_selectedCategory != null) {
+      title = _selectedCategory!.name;
+    } else {
+      title = 'All Gift Cards';
     }
 
-    return GridView.builder(
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        childAspectRatio: 0.72,
-        crossAxisSpacing: 14,
-        mainAxisSpacing: 14,
+    final count = _products.length;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+      child: Text(
+        '$title ($count)',
+        style: const TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w800,
+          color: Color(0xFF111827),
+        ),
       ),
-      itemCount: products.length,
-      itemBuilder: (context, index) {
-        return GiftCardProductCard(
-          product: products[index],
-          onTap: () => Navigator.pushNamed(
-            context,
-            '/gift-card-detail',
-            arguments: products[index],
-          ),
-        );
-      },
     );
   }
+
+  // -- Products Grid ---------------------------------------------------------
+
+  Widget _buildProductsGrid() {
+    return SliverPadding(
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+      sliver: SliverGrid(
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          childAspectRatio: 0.68,
+          mainAxisSpacing: 14,
+          crossAxisSpacing: 14,
+        ),
+        delegate: SliverChildBuilderDelegate(
+          (context, index) {
+            final product = _products[index];
+            return AnimationConfiguration.staggeredGrid(
+              position: index,
+              columnCount: 2,
+              child: SlideAnimation(
+                verticalOffset: 30,
+                child: FadeInAnimation(
+                  child: GiftCardProductCard(
+                    product: product,
+                    onTap: () => Navigator.pushNamed(
+                      context,
+                      '/gift-card-detail',
+                      arguments: product,
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+          childCount: _products.length,
+        ),
+      ),
+    );
+  }
+
+  // -- Error & Empty States --------------------------------------------------
 
   Widget _buildError(String message) {
     return Center(
@@ -493,19 +714,31 @@ class _GiftCardsViewState extends State<GiftCardsView> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Text('🎁', style: TextStyle(fontSize: 64)),
+          Container(
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+              color: const Color(0xFFEDE9FE),
+              borderRadius: BorderRadius.circular(24),
+            ),
+            child: const Icon(
+              Icons.card_giftcard_rounded,
+              size: 40,
+              color: Color(0xFF7C3AED),
+            ),
+          ),
           const SizedBox(height: 16),
           const Text(
-            'Pick a category to browse',
+            'No gift cards found',
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 16,
               fontWeight: FontWeight.w700,
               color: Color(0xFF374151),
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 4),
           const Text(
-            'Hundreds of brands ready to gift',
+            'Try a different category or search',
             style: TextStyle(fontSize: 13, color: Color(0xFF9CA3AF)),
           ),
         ],
