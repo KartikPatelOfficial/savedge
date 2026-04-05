@@ -49,10 +49,21 @@ _GiftCardProduct _$GiftCardProductFromJson(Map<String, dynamic> json) =>
       categoryName: json['categoryName'] as String?,
       brandName: json['brandName'] as String?,
       denominations: json['denominations'] as String?,
+      parsedDenominations:
+          (json['parsedDenominations'] as List<dynamic>?)
+              ?.map((e) => (e as num).toDouble())
+              .toList() ??
+          const [],
       currencySymbol: json['currencySymbol'] as String?,
       offerDescription: json['offerDescription'] as String?,
       formatExpiry: json['formatExpiry'] as String?,
       discountPercentage: (json['discountPercentage'] as num?)?.toDouble(),
+      themesJson: json['themesJson'] as String?,
+      parsedThemes:
+          (json['parsedThemes'] as List<dynamic>?)
+              ?.map((e) => GiftCardTheme.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
     );
 
 Map<String, dynamic> _$GiftCardProductToJson(_GiftCardProduct instance) =>
@@ -70,10 +81,29 @@ Map<String, dynamic> _$GiftCardProductToJson(_GiftCardProduct instance) =>
       'categoryName': instance.categoryName,
       'brandName': instance.brandName,
       'denominations': instance.denominations,
+      'parsedDenominations': instance.parsedDenominations,
       'currencySymbol': instance.currencySymbol,
       'offerDescription': instance.offerDescription,
       'formatExpiry': instance.formatExpiry,
       'discountPercentage': instance.discountPercentage,
+      'themesJson': instance.themesJson,
+      'parsedThemes': instance.parsedThemes,
+    };
+
+_GiftCardTheme _$GiftCardThemeFromJson(Map<String, dynamic> json) =>
+    _GiftCardTheme(
+      sku: json['sku'] as String,
+      name: json['name'] as String?,
+      price: json['price'] as String?,
+      image: json['image'] as String?,
+    );
+
+Map<String, dynamic> _$GiftCardThemeToJson(_GiftCardTheme instance) =>
+    <String, dynamic>{
+      'sku': instance.sku,
+      'name': instance.name,
+      'price': instance.price,
+      'image': instance.image,
     };
 
 _PaginatedGiftCardProductResponse _$PaginatedGiftCardProductResponseFromJson(
@@ -220,6 +250,7 @@ _CreateGiftCardOrderRequest _$CreateGiftCardOrderRequestFromJson(
     json['paymentMethod'],
   ),
   pointsToUse: (json['pointsToUse'] as num?)?.toInt() ?? 0,
+  themeSku: json['themeSku'] as String?,
 );
 
 Map<String, dynamic> _$CreateGiftCardOrderRequestToJson(
@@ -229,6 +260,7 @@ Map<String, dynamic> _$CreateGiftCardOrderRequestToJson(
   'amount': instance.amount,
   'paymentMethod': _$GiftCardPaymentMethodEnumMap[instance.paymentMethod]!,
   'pointsToUse': instance.pointsToUse,
+  'themeSku': instance.themeSku,
 };
 
 _GiftCardPriceBreakdown _$GiftCardPriceBreakdownFromJson(
@@ -265,6 +297,7 @@ _CreateGiftCardPaymentOrderRequest _$CreateGiftCardPaymentOrderRequestFromJson(
   giftCardProductId: (json['giftCardProductId'] as num).toInt(),
   amount: (json['amount'] as num).toDouble(),
   pointsToUse: (json['pointsToUse'] as num?)?.toInt() ?? 0,
+  themeSku: json['themeSku'] as String?,
 );
 
 Map<String, dynamic> _$CreateGiftCardPaymentOrderRequestToJson(
@@ -273,6 +306,7 @@ Map<String, dynamic> _$CreateGiftCardPaymentOrderRequestToJson(
   'giftCardProductId': instance.giftCardProductId,
   'amount': instance.amount,
   'pointsToUse': instance.pointsToUse,
+  'themeSku': instance.themeSku,
 };
 
 _CreateGiftCardPaymentOrderResponse

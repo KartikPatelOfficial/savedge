@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -18,6 +20,7 @@ class _GiftCardDetailPageState extends State<GiftCardDetailPage>
   final _amountController = TextEditingController();
   double _selectedAmount = 0;
   bool _isAmountValid = false;
+  String? _selectedThemeSku;
   late AnimationController _amountAnimCtrl;
   late Animation<double> _amountScaleAnim;
 
@@ -66,8 +69,14 @@ class _GiftCardDetailPageState extends State<GiftCardDetailPage>
 
   void _validateAmount() {
     setState(() {
-      _isAmountValid = _selectedAmount >= widget.product.minPrice &&
-          _selectedAmount <= widget.product.maxPrice;
+      if (widget.product.priceType == 'SLAB') {
+        // For SLAB, amount must match exactly one of the denominations
+        final denoms = _denominations();
+        _isAmountValid = denoms.contains(_selectedAmount);
+      } else {
+        _isAmountValid = _selectedAmount >= widget.product.minPrice &&
+            _selectedAmount <= widget.product.maxPrice;
+      }
     });
   }
 
@@ -90,7 +99,23 @@ class _GiftCardDetailPageState extends State<GiftCardDetailPage>
   List<double> _denominations() {
     if (widget.product.denominations != null &&
         widget.product.denominations!.isNotEmpty) {
+      // Try parsing as JSON array first (e.g., '["100","1000","2000"]')
+      try {
+        final raw = widget.product.denominations!.trim();
+        if (raw.startsWith('[')) {
+          final List<dynamic> parsed =
+              List<dynamic>.from(jsonDecode(raw) as List);
+          final result = parsed
+              .map((v) => double.tryParse(v.toString()) ?? 0)
+              .where((d) => d > 0)
+              .toList()
+            ..sort();
+          if (result.isNotEmpty) return result;
+        }
+      } catch (_) {}
+      // Fallback: comma-separated
       return widget.product.denominations!
+          .replaceAll(RegExp(r'[\[\]"]'), '')
           .split(',')
           .map((d) => double.tryParse(d.trim()) ?? 0)
           .where((d) => d > 0)
@@ -336,6 +361,103 @@ class _GiftCardDetailPageState extends State<GiftCardDetailPage>
                     ),
                   ),
 
+                  // ── Theme selector ──────────────────────────────────────────
+                  if (product.themes.isNotEmpty) ...[
+                    const SizedBox(height: 20),
+                    _SectionHeading(title: 'Choose a Theme'),
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      height: 90,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: product.themes.length,
+                        separatorBuilder: (_, __) => const SizedBox(width: 12),
+                        itemBuilder: (context, index) {
+                          final theme = product.themes[index];
+                          final isSelected = _selectedThemeSku == theme.sku;
+                          return GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _selectedThemeSku =
+                                    isSelected ? null : theme.sku;
+                              });
+                            },
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 180),
+                              width: 90,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(
+                                  color: isSelected
+                                      ? _accent
+                                      : const Color(0xFFE5E7EB),
+                                  width: isSelected ? 2.5 : 1.5,
+                                ),
+                              ),
+                              clipBehavior: Clip.antiAlias,
+                              child: Column(
+                                children: [
+                                  Expanded(
+                                    child: theme.image != null
+                                        ? CachedNetworkImage(
+                                            imageUrl: theme.image!,
+                                            fit: BoxFit.cover,
+                                            width: double.infinity,
+                                            placeholder: (_, __) => Container(
+                                              color: _bg,
+                                              child: Icon(
+                                                Icons.palette_rounded,
+                                                color: _accent.withAlpha(80),
+                                                size: 24,
+                                              ),
+                                            ),
+                                            errorWidget: (_, __, ___) =>
+                                                Container(
+                                              color: _bg,
+                                              child: Icon(
+                                                Icons.palette_rounded,
+                                                color: _accent.withAlpha(80),
+                                                size: 24,
+                                              ),
+                                            ),
+                                          )
+                                        : Container(
+                                            color: _bg,
+                                            child: Icon(
+                                              Icons.palette_rounded,
+                                              color: _accent.withAlpha(80),
+                                              size: 24,
+                                            ),
+                                          ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(4),
+                                    child: Text(
+                                      theme.name ??
+                                          theme.sku
+                                              .replaceAll('_', ' ')
+                                              .toUpperCase(),
+                                      style: TextStyle(
+                                        fontSize: 9,
+                                        fontWeight: FontWeight.w700,
+                                        color: isSelected
+                                            ? _accent
+                                            : const Color(0xFF6B7280),
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+
                   // ── Price breakdown ─────────────────────────────────────────
                   if (_isAmountValid) ...[
                     const SizedBox(height: 16),
@@ -476,6 +598,7 @@ class _GiftCardDetailPageState extends State<GiftCardDetailPage>
                       arguments: {
                         'product': product,
                         'amount': _selectedAmount,
+                        'themeSku': _selectedThemeSku,
                       },
                     )
                 : null,

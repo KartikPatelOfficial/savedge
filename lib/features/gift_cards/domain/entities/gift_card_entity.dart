@@ -34,6 +34,23 @@ class GiftCardCategoryEntity extends Equatable {
       ];
 }
 
+class GiftCardThemeEntity extends Equatable {
+  final String sku;
+  final String? name;
+  final String? price;
+  final String? image;
+
+  const GiftCardThemeEntity({
+    required this.sku,
+    this.name,
+    this.price,
+    this.image,
+  });
+
+  @override
+  List<Object?> get props => [sku, name, price, image];
+}
+
 class GiftCardProductEntity extends Equatable {
   final int id;
   final String name;
@@ -48,10 +65,12 @@ class GiftCardProductEntity extends Equatable {
   final String? categoryName;
   final String? brandName;
   final String? denominations;
+  final List<double> parsedDenominations;
   final String? currencySymbol;
   final String? offerDescription;
   final String? formatExpiry;
   final double? discountPercentage;
+  final List<GiftCardThemeEntity> themes;
 
   const GiftCardProductEntity({
     required this.id,
@@ -67,10 +86,12 @@ class GiftCardProductEntity extends Equatable {
     this.categoryName,
     this.brandName,
     this.denominations,
+    this.parsedDenominations = const [],
     this.currencySymbol,
     this.offerDescription,
     this.formatExpiry,
     this.discountPercentage,
+    this.themes = const [],
   });
 
   bool get hasDiscount =>
@@ -101,10 +122,12 @@ class GiftCardProductEntity extends Equatable {
         categoryName,
         brandName,
         denominations,
+        parsedDenominations,
         currencySymbol,
         offerDescription,
         formatExpiry,
         discountPercentage,
+        themes,
       ];
 }
 

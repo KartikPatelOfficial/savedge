@@ -106,6 +106,7 @@ class SavedgeApp extends StatelessWidget {
           builder: (_) => GiftCardCheckoutPage(
             product: args['product'] as GiftCardProductEntity,
             amount: args['amount'] as double,
+            themeSku: args['themeSku'] as String?,
           ),
           settings: settings,
         );

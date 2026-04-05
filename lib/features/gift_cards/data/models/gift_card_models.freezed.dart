@@ -305,7 +305,7 @@ as List<GiftCardCategory>,
 /// @nodoc
 mixin _$GiftCardProduct {
 
- int get id; String get name; String? get description; String get sku; String? get imageUrl; String? get thumbnailUrl; String get priceType; double get minPrice; double get maxPrice; bool get isActive; String? get categoryName; String? get brandName; String? get denominations; String? get currencySymbol; String? get offerDescription; String? get formatExpiry; double? get discountPercentage;
+ int get id; String get name; String? get description; String get sku; String? get imageUrl; String? get thumbnailUrl; String get priceType; double get minPrice; double get maxPrice; bool get isActive; String? get categoryName; String? get brandName; String? get denominations; List<double> get parsedDenominations; String? get currencySymbol; String? get offerDescription; String? get formatExpiry; double? get discountPercentage; String? get themesJson; List<GiftCardTheme> get parsedThemes;
 /// Create a copy of GiftCardProduct
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -318,16 +318,16 @@ $GiftCardProductCopyWith<GiftCardProduct> get copyWith => _$GiftCardProductCopyW
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is GiftCardProduct&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.sku, sku) || other.sku == sku)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.thumbnailUrl, thumbnailUrl) || other.thumbnailUrl == thumbnailUrl)&&(identical(other.priceType, priceType) || other.priceType == priceType)&&(identical(other.minPrice, minPrice) || other.minPrice == minPrice)&&(identical(other.maxPrice, maxPrice) || other.maxPrice == maxPrice)&&(identical(other.isActive, isActive) || other.isActive == isActive)&&(identical(other.categoryName, categoryName) || other.categoryName == categoryName)&&(identical(other.brandName, brandName) || other.brandName == brandName)&&(identical(other.denominations, denominations) || other.denominations == denominations)&&(identical(other.currencySymbol, currencySymbol) || other.currencySymbol == currencySymbol)&&(identical(other.offerDescription, offerDescription) || other.offerDescription == offerDescription)&&(identical(other.formatExpiry, formatExpiry) || other.formatExpiry == formatExpiry)&&(identical(other.discountPercentage, discountPercentage) || other.discountPercentage == discountPercentage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is GiftCardProduct&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.sku, sku) || other.sku == sku)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.thumbnailUrl, thumbnailUrl) || other.thumbnailUrl == thumbnailUrl)&&(identical(other.priceType, priceType) || other.priceType == priceType)&&(identical(other.minPrice, minPrice) || other.minPrice == minPrice)&&(identical(other.maxPrice, maxPrice) || other.maxPrice == maxPrice)&&(identical(other.isActive, isActive) || other.isActive == isActive)&&(identical(other.categoryName, categoryName) || other.categoryName == categoryName)&&(identical(other.brandName, brandName) || other.brandName == brandName)&&(identical(other.denominations, denominations) || other.denominations == denominations)&&const DeepCollectionEquality().equals(other.parsedDenominations, parsedDenominations)&&(identical(other.currencySymbol, currencySymbol) || other.currencySymbol == currencySymbol)&&(identical(other.offerDescription, offerDescription) || other.offerDescription == offerDescription)&&(identical(other.formatExpiry, formatExpiry) || other.formatExpiry == formatExpiry)&&(identical(other.discountPercentage, discountPercentage) || other.discountPercentage == discountPercentage)&&(identical(other.themesJson, themesJson) || other.themesJson == themesJson)&&const DeepCollectionEquality().equals(other.parsedThemes, parsedThemes));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,description,sku,imageUrl,thumbnailUrl,priceType,minPrice,maxPrice,isActive,categoryName,brandName,denominations,currencySymbol,offerDescription,formatExpiry,discountPercentage);
+int get hashCode => Object.hashAll([runtimeType,id,name,description,sku,imageUrl,thumbnailUrl,priceType,minPrice,maxPrice,isActive,categoryName,brandName,denominations,const DeepCollectionEquality().hash(parsedDenominations),currencySymbol,offerDescription,formatExpiry,discountPercentage,themesJson,const DeepCollectionEquality().hash(parsedThemes)]);
 
 @override
 String toString() {
-  return 'GiftCardProduct(id: $id, name: $name, description: $description, sku: $sku, imageUrl: $imageUrl, thumbnailUrl: $thumbnailUrl, priceType: $priceType, minPrice: $minPrice, maxPrice: $maxPrice, isActive: $isActive, categoryName: $categoryName, brandName: $brandName, denominations: $denominations, currencySymbol: $currencySymbol, offerDescription: $offerDescription, formatExpiry: $formatExpiry, discountPercentage: $discountPercentage)';
+  return 'GiftCardProduct(id: $id, name: $name, description: $description, sku: $sku, imageUrl: $imageUrl, thumbnailUrl: $thumbnailUrl, priceType: $priceType, minPrice: $minPrice, maxPrice: $maxPrice, isActive: $isActive, categoryName: $categoryName, brandName: $brandName, denominations: $denominations, parsedDenominations: $parsedDenominations, currencySymbol: $currencySymbol, offerDescription: $offerDescription, formatExpiry: $formatExpiry, discountPercentage: $discountPercentage, themesJson: $themesJson, parsedThemes: $parsedThemes)';
 }
 
 
@@ -338,7 +338,7 @@ abstract mixin class $GiftCardProductCopyWith<$Res>  {
   factory $GiftCardProductCopyWith(GiftCardProduct value, $Res Function(GiftCardProduct) _then) = _$GiftCardProductCopyWithImpl;
 @useResult
 $Res call({
- int id, String name, String? description, String sku, String? imageUrl, String? thumbnailUrl, String priceType, double minPrice, double maxPrice, bool isActive, String? categoryName, String? brandName, String? denominations, String? currencySymbol, String? offerDescription, String? formatExpiry, double? discountPercentage
+ int id, String name, String? description, String sku, String? imageUrl, String? thumbnailUrl, String priceType, double minPrice, double maxPrice, bool isActive, String? categoryName, String? brandName, String? denominations, List<double> parsedDenominations, String? currencySymbol, String? offerDescription, String? formatExpiry, double? discountPercentage, String? themesJson, List<GiftCardTheme> parsedThemes
 });
 
 
@@ -355,7 +355,7 @@ class _$GiftCardProductCopyWithImpl<$Res>
 
 /// Create a copy of GiftCardProduct
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? description = freezed,Object? sku = null,Object? imageUrl = freezed,Object? thumbnailUrl = freezed,Object? priceType = null,Object? minPrice = null,Object? maxPrice = null,Object? isActive = null,Object? categoryName = freezed,Object? brandName = freezed,Object? denominations = freezed,Object? currencySymbol = freezed,Object? offerDescription = freezed,Object? formatExpiry = freezed,Object? discountPercentage = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? description = freezed,Object? sku = null,Object? imageUrl = freezed,Object? thumbnailUrl = freezed,Object? priceType = null,Object? minPrice = null,Object? maxPrice = null,Object? isActive = null,Object? categoryName = freezed,Object? brandName = freezed,Object? denominations = freezed,Object? parsedDenominations = null,Object? currencySymbol = freezed,Object? offerDescription = freezed,Object? formatExpiry = freezed,Object? discountPercentage = freezed,Object? themesJson = freezed,Object? parsedThemes = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -370,11 +370,14 @@ as double,isActive: null == isActive ? _self.isActive : isActive // ignore: cast
 as bool,categoryName: freezed == categoryName ? _self.categoryName : categoryName // ignore: cast_nullable_to_non_nullable
 as String?,brandName: freezed == brandName ? _self.brandName : brandName // ignore: cast_nullable_to_non_nullable
 as String?,denominations: freezed == denominations ? _self.denominations : denominations // ignore: cast_nullable_to_non_nullable
-as String?,currencySymbol: freezed == currencySymbol ? _self.currencySymbol : currencySymbol // ignore: cast_nullable_to_non_nullable
+as String?,parsedDenominations: null == parsedDenominations ? _self.parsedDenominations : parsedDenominations // ignore: cast_nullable_to_non_nullable
+as List<double>,currencySymbol: freezed == currencySymbol ? _self.currencySymbol : currencySymbol // ignore: cast_nullable_to_non_nullable
 as String?,offerDescription: freezed == offerDescription ? _self.offerDescription : offerDescription // ignore: cast_nullable_to_non_nullable
 as String?,formatExpiry: freezed == formatExpiry ? _self.formatExpiry : formatExpiry // ignore: cast_nullable_to_non_nullable
 as String?,discountPercentage: freezed == discountPercentage ? _self.discountPercentage : discountPercentage // ignore: cast_nullable_to_non_nullable
-as double?,
+as double?,themesJson: freezed == themesJson ? _self.themesJson : themesJson // ignore: cast_nullable_to_non_nullable
+as String?,parsedThemes: null == parsedThemes ? _self.parsedThemes : parsedThemes // ignore: cast_nullable_to_non_nullable
+as List<GiftCardTheme>,
   ));
 }
 
@@ -459,10 +462,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String name,  String? description,  String sku,  String? imageUrl,  String? thumbnailUrl,  String priceType,  double minPrice,  double maxPrice,  bool isActive,  String? categoryName,  String? brandName,  String? denominations,  String? currencySymbol,  String? offerDescription,  String? formatExpiry,  double? discountPercentage)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String name,  String? description,  String sku,  String? imageUrl,  String? thumbnailUrl,  String priceType,  double minPrice,  double maxPrice,  bool isActive,  String? categoryName,  String? brandName,  String? denominations,  List<double> parsedDenominations,  String? currencySymbol,  String? offerDescription,  String? formatExpiry,  double? discountPercentage,  String? themesJson,  List<GiftCardTheme> parsedThemes)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _GiftCardProduct() when $default != null:
-return $default(_that.id,_that.name,_that.description,_that.sku,_that.imageUrl,_that.thumbnailUrl,_that.priceType,_that.minPrice,_that.maxPrice,_that.isActive,_that.categoryName,_that.brandName,_that.denominations,_that.currencySymbol,_that.offerDescription,_that.formatExpiry,_that.discountPercentage);case _:
+return $default(_that.id,_that.name,_that.description,_that.sku,_that.imageUrl,_that.thumbnailUrl,_that.priceType,_that.minPrice,_that.maxPrice,_that.isActive,_that.categoryName,_that.brandName,_that.denominations,_that.parsedDenominations,_that.currencySymbol,_that.offerDescription,_that.formatExpiry,_that.discountPercentage,_that.themesJson,_that.parsedThemes);case _:
   return orElse();
 
 }
@@ -480,10 +483,10 @@ return $default(_that.id,_that.name,_that.description,_that.sku,_that.imageUrl,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String name,  String? description,  String sku,  String? imageUrl,  String? thumbnailUrl,  String priceType,  double minPrice,  double maxPrice,  bool isActive,  String? categoryName,  String? brandName,  String? denominations,  String? currencySymbol,  String? offerDescription,  String? formatExpiry,  double? discountPercentage)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String name,  String? description,  String sku,  String? imageUrl,  String? thumbnailUrl,  String priceType,  double minPrice,  double maxPrice,  bool isActive,  String? categoryName,  String? brandName,  String? denominations,  List<double> parsedDenominations,  String? currencySymbol,  String? offerDescription,  String? formatExpiry,  double? discountPercentage,  String? themesJson,  List<GiftCardTheme> parsedThemes)  $default,) {final _that = this;
 switch (_that) {
 case _GiftCardProduct():
-return $default(_that.id,_that.name,_that.description,_that.sku,_that.imageUrl,_that.thumbnailUrl,_that.priceType,_that.minPrice,_that.maxPrice,_that.isActive,_that.categoryName,_that.brandName,_that.denominations,_that.currencySymbol,_that.offerDescription,_that.formatExpiry,_that.discountPercentage);case _:
+return $default(_that.id,_that.name,_that.description,_that.sku,_that.imageUrl,_that.thumbnailUrl,_that.priceType,_that.minPrice,_that.maxPrice,_that.isActive,_that.categoryName,_that.brandName,_that.denominations,_that.parsedDenominations,_that.currencySymbol,_that.offerDescription,_that.formatExpiry,_that.discountPercentage,_that.themesJson,_that.parsedThemes);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -500,10 +503,10 @@ return $default(_that.id,_that.name,_that.description,_that.sku,_that.imageUrl,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String name,  String? description,  String sku,  String? imageUrl,  String? thumbnailUrl,  String priceType,  double minPrice,  double maxPrice,  bool isActive,  String? categoryName,  String? brandName,  String? denominations,  String? currencySymbol,  String? offerDescription,  String? formatExpiry,  double? discountPercentage)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String name,  String? description,  String sku,  String? imageUrl,  String? thumbnailUrl,  String priceType,  double minPrice,  double maxPrice,  bool isActive,  String? categoryName,  String? brandName,  String? denominations,  List<double> parsedDenominations,  String? currencySymbol,  String? offerDescription,  String? formatExpiry,  double? discountPercentage,  String? themesJson,  List<GiftCardTheme> parsedThemes)?  $default,) {final _that = this;
 switch (_that) {
 case _GiftCardProduct() when $default != null:
-return $default(_that.id,_that.name,_that.description,_that.sku,_that.imageUrl,_that.thumbnailUrl,_that.priceType,_that.minPrice,_that.maxPrice,_that.isActive,_that.categoryName,_that.brandName,_that.denominations,_that.currencySymbol,_that.offerDescription,_that.formatExpiry,_that.discountPercentage);case _:
+return $default(_that.id,_that.name,_that.description,_that.sku,_that.imageUrl,_that.thumbnailUrl,_that.priceType,_that.minPrice,_that.maxPrice,_that.isActive,_that.categoryName,_that.brandName,_that.denominations,_that.parsedDenominations,_that.currencySymbol,_that.offerDescription,_that.formatExpiry,_that.discountPercentage,_that.themesJson,_that.parsedThemes);case _:
   return null;
 
 }
@@ -515,7 +518,7 @@ return $default(_that.id,_that.name,_that.description,_that.sku,_that.imageUrl,_
 @JsonSerializable()
 
 class _GiftCardProduct implements GiftCardProduct {
-  const _GiftCardProduct({required this.id, required this.name, this.description, required this.sku, this.imageUrl, this.thumbnailUrl, required this.priceType, required this.minPrice, required this.maxPrice, required this.isActive, this.categoryName, this.brandName, this.denominations, this.currencySymbol, this.offerDescription, this.formatExpiry, this.discountPercentage});
+  const _GiftCardProduct({required this.id, required this.name, this.description, required this.sku, this.imageUrl, this.thumbnailUrl, required this.priceType, required this.minPrice, required this.maxPrice, required this.isActive, this.categoryName, this.brandName, this.denominations, final  List<double> parsedDenominations = const [], this.currencySymbol, this.offerDescription, this.formatExpiry, this.discountPercentage, this.themesJson, final  List<GiftCardTheme> parsedThemes = const []}): _parsedDenominations = parsedDenominations,_parsedThemes = parsedThemes;
   factory _GiftCardProduct.fromJson(Map<String, dynamic> json) => _$GiftCardProductFromJson(json);
 
 @override final  int id;
@@ -531,10 +534,25 @@ class _GiftCardProduct implements GiftCardProduct {
 @override final  String? categoryName;
 @override final  String? brandName;
 @override final  String? denominations;
+ final  List<double> _parsedDenominations;
+@override@JsonKey() List<double> get parsedDenominations {
+  if (_parsedDenominations is EqualUnmodifiableListView) return _parsedDenominations;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_parsedDenominations);
+}
+
 @override final  String? currencySymbol;
 @override final  String? offerDescription;
 @override final  String? formatExpiry;
 @override final  double? discountPercentage;
+@override final  String? themesJson;
+ final  List<GiftCardTheme> _parsedThemes;
+@override@JsonKey() List<GiftCardTheme> get parsedThemes {
+  if (_parsedThemes is EqualUnmodifiableListView) return _parsedThemes;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_parsedThemes);
+}
+
 
 /// Create a copy of GiftCardProduct
 /// with the given fields replaced by the non-null parameter values.
@@ -549,16 +567,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _GiftCardProduct&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.sku, sku) || other.sku == sku)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.thumbnailUrl, thumbnailUrl) || other.thumbnailUrl == thumbnailUrl)&&(identical(other.priceType, priceType) || other.priceType == priceType)&&(identical(other.minPrice, minPrice) || other.minPrice == minPrice)&&(identical(other.maxPrice, maxPrice) || other.maxPrice == maxPrice)&&(identical(other.isActive, isActive) || other.isActive == isActive)&&(identical(other.categoryName, categoryName) || other.categoryName == categoryName)&&(identical(other.brandName, brandName) || other.brandName == brandName)&&(identical(other.denominations, denominations) || other.denominations == denominations)&&(identical(other.currencySymbol, currencySymbol) || other.currencySymbol == currencySymbol)&&(identical(other.offerDescription, offerDescription) || other.offerDescription == offerDescription)&&(identical(other.formatExpiry, formatExpiry) || other.formatExpiry == formatExpiry)&&(identical(other.discountPercentage, discountPercentage) || other.discountPercentage == discountPercentage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _GiftCardProduct&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.sku, sku) || other.sku == sku)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.thumbnailUrl, thumbnailUrl) || other.thumbnailUrl == thumbnailUrl)&&(identical(other.priceType, priceType) || other.priceType == priceType)&&(identical(other.minPrice, minPrice) || other.minPrice == minPrice)&&(identical(other.maxPrice, maxPrice) || other.maxPrice == maxPrice)&&(identical(other.isActive, isActive) || other.isActive == isActive)&&(identical(other.categoryName, categoryName) || other.categoryName == categoryName)&&(identical(other.brandName, brandName) || other.brandName == brandName)&&(identical(other.denominations, denominations) || other.denominations == denominations)&&const DeepCollectionEquality().equals(other._parsedDenominations, _parsedDenominations)&&(identical(other.currencySymbol, currencySymbol) || other.currencySymbol == currencySymbol)&&(identical(other.offerDescription, offerDescription) || other.offerDescription == offerDescription)&&(identical(other.formatExpiry, formatExpiry) || other.formatExpiry == formatExpiry)&&(identical(other.discountPercentage, discountPercentage) || other.discountPercentage == discountPercentage)&&(identical(other.themesJson, themesJson) || other.themesJson == themesJson)&&const DeepCollectionEquality().equals(other._parsedThemes, _parsedThemes));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,description,sku,imageUrl,thumbnailUrl,priceType,minPrice,maxPrice,isActive,categoryName,brandName,denominations,currencySymbol,offerDescription,formatExpiry,discountPercentage);
+int get hashCode => Object.hashAll([runtimeType,id,name,description,sku,imageUrl,thumbnailUrl,priceType,minPrice,maxPrice,isActive,categoryName,brandName,denominations,const DeepCollectionEquality().hash(_parsedDenominations),currencySymbol,offerDescription,formatExpiry,discountPercentage,themesJson,const DeepCollectionEquality().hash(_parsedThemes)]);
 
 @override
 String toString() {
-  return 'GiftCardProduct(id: $id, name: $name, description: $description, sku: $sku, imageUrl: $imageUrl, thumbnailUrl: $thumbnailUrl, priceType: $priceType, minPrice: $minPrice, maxPrice: $maxPrice, isActive: $isActive, categoryName: $categoryName, brandName: $brandName, denominations: $denominations, currencySymbol: $currencySymbol, offerDescription: $offerDescription, formatExpiry: $formatExpiry, discountPercentage: $discountPercentage)';
+  return 'GiftCardProduct(id: $id, name: $name, description: $description, sku: $sku, imageUrl: $imageUrl, thumbnailUrl: $thumbnailUrl, priceType: $priceType, minPrice: $minPrice, maxPrice: $maxPrice, isActive: $isActive, categoryName: $categoryName, brandName: $brandName, denominations: $denominations, parsedDenominations: $parsedDenominations, currencySymbol: $currencySymbol, offerDescription: $offerDescription, formatExpiry: $formatExpiry, discountPercentage: $discountPercentage, themesJson: $themesJson, parsedThemes: $parsedThemes)';
 }
 
 
@@ -569,7 +587,7 @@ abstract mixin class _$GiftCardProductCopyWith<$Res> implements $GiftCardProduct
   factory _$GiftCardProductCopyWith(_GiftCardProduct value, $Res Function(_GiftCardProduct) _then) = __$GiftCardProductCopyWithImpl;
 @override @useResult
 $Res call({
- int id, String name, String? description, String sku, String? imageUrl, String? thumbnailUrl, String priceType, double minPrice, double maxPrice, bool isActive, String? categoryName, String? brandName, String? denominations, String? currencySymbol, String? offerDescription, String? formatExpiry, double? discountPercentage
+ int id, String name, String? description, String sku, String? imageUrl, String? thumbnailUrl, String priceType, double minPrice, double maxPrice, bool isActive, String? categoryName, String? brandName, String? denominations, List<double> parsedDenominations, String? currencySymbol, String? offerDescription, String? formatExpiry, double? discountPercentage, String? themesJson, List<GiftCardTheme> parsedThemes
 });
 
 
@@ -586,7 +604,7 @@ class __$GiftCardProductCopyWithImpl<$Res>
 
 /// Create a copy of GiftCardProduct
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? description = freezed,Object? sku = null,Object? imageUrl = freezed,Object? thumbnailUrl = freezed,Object? priceType = null,Object? minPrice = null,Object? maxPrice = null,Object? isActive = null,Object? categoryName = freezed,Object? brandName = freezed,Object? denominations = freezed,Object? currencySymbol = freezed,Object? offerDescription = freezed,Object? formatExpiry = freezed,Object? discountPercentage = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? description = freezed,Object? sku = null,Object? imageUrl = freezed,Object? thumbnailUrl = freezed,Object? priceType = null,Object? minPrice = null,Object? maxPrice = null,Object? isActive = null,Object? categoryName = freezed,Object? brandName = freezed,Object? denominations = freezed,Object? parsedDenominations = null,Object? currencySymbol = freezed,Object? offerDescription = freezed,Object? formatExpiry = freezed,Object? discountPercentage = freezed,Object? themesJson = freezed,Object? parsedThemes = null,}) {
   return _then(_GiftCardProduct(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -601,11 +619,286 @@ as double,isActive: null == isActive ? _self.isActive : isActive // ignore: cast
 as bool,categoryName: freezed == categoryName ? _self.categoryName : categoryName // ignore: cast_nullable_to_non_nullable
 as String?,brandName: freezed == brandName ? _self.brandName : brandName // ignore: cast_nullable_to_non_nullable
 as String?,denominations: freezed == denominations ? _self.denominations : denominations // ignore: cast_nullable_to_non_nullable
-as String?,currencySymbol: freezed == currencySymbol ? _self.currencySymbol : currencySymbol // ignore: cast_nullable_to_non_nullable
+as String?,parsedDenominations: null == parsedDenominations ? _self._parsedDenominations : parsedDenominations // ignore: cast_nullable_to_non_nullable
+as List<double>,currencySymbol: freezed == currencySymbol ? _self.currencySymbol : currencySymbol // ignore: cast_nullable_to_non_nullable
 as String?,offerDescription: freezed == offerDescription ? _self.offerDescription : offerDescription // ignore: cast_nullable_to_non_nullable
 as String?,formatExpiry: freezed == formatExpiry ? _self.formatExpiry : formatExpiry // ignore: cast_nullable_to_non_nullable
 as String?,discountPercentage: freezed == discountPercentage ? _self.discountPercentage : discountPercentage // ignore: cast_nullable_to_non_nullable
-as double?,
+as double?,themesJson: freezed == themesJson ? _self.themesJson : themesJson // ignore: cast_nullable_to_non_nullable
+as String?,parsedThemes: null == parsedThemes ? _self._parsedThemes : parsedThemes // ignore: cast_nullable_to_non_nullable
+as List<GiftCardTheme>,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$GiftCardTheme {
+
+ String get sku; String? get name; String? get price; String? get image;
+/// Create a copy of GiftCardTheme
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$GiftCardThemeCopyWith<GiftCardTheme> get copyWith => _$GiftCardThemeCopyWithImpl<GiftCardTheme>(this as GiftCardTheme, _$identity);
+
+  /// Serializes this GiftCardTheme to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is GiftCardTheme&&(identical(other.sku, sku) || other.sku == sku)&&(identical(other.name, name) || other.name == name)&&(identical(other.price, price) || other.price == price)&&(identical(other.image, image) || other.image == image));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,sku,name,price,image);
+
+@override
+String toString() {
+  return 'GiftCardTheme(sku: $sku, name: $name, price: $price, image: $image)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $GiftCardThemeCopyWith<$Res>  {
+  factory $GiftCardThemeCopyWith(GiftCardTheme value, $Res Function(GiftCardTheme) _then) = _$GiftCardThemeCopyWithImpl;
+@useResult
+$Res call({
+ String sku, String? name, String? price, String? image
+});
+
+
+
+
+}
+/// @nodoc
+class _$GiftCardThemeCopyWithImpl<$Res>
+    implements $GiftCardThemeCopyWith<$Res> {
+  _$GiftCardThemeCopyWithImpl(this._self, this._then);
+
+  final GiftCardTheme _self;
+  final $Res Function(GiftCardTheme) _then;
+
+/// Create a copy of GiftCardTheme
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? sku = null,Object? name = freezed,Object? price = freezed,Object? image = freezed,}) {
+  return _then(_self.copyWith(
+sku: null == sku ? _self.sku : sku // ignore: cast_nullable_to_non_nullable
+as String,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String?,price: freezed == price ? _self.price : price // ignore: cast_nullable_to_non_nullable
+as String?,image: freezed == image ? _self.image : image // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [GiftCardTheme].
+extension GiftCardThemePatterns on GiftCardTheme {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _GiftCardTheme value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _GiftCardTheme() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _GiftCardTheme value)  $default,){
+final _that = this;
+switch (_that) {
+case _GiftCardTheme():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _GiftCardTheme value)?  $default,){
+final _that = this;
+switch (_that) {
+case _GiftCardTheme() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String sku,  String? name,  String? price,  String? image)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _GiftCardTheme() when $default != null:
+return $default(_that.sku,_that.name,_that.price,_that.image);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String sku,  String? name,  String? price,  String? image)  $default,) {final _that = this;
+switch (_that) {
+case _GiftCardTheme():
+return $default(_that.sku,_that.name,_that.price,_that.image);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String sku,  String? name,  String? price,  String? image)?  $default,) {final _that = this;
+switch (_that) {
+case _GiftCardTheme() when $default != null:
+return $default(_that.sku,_that.name,_that.price,_that.image);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _GiftCardTheme implements GiftCardTheme {
+  const _GiftCardTheme({required this.sku, this.name, this.price, this.image});
+  factory _GiftCardTheme.fromJson(Map<String, dynamic> json) => _$GiftCardThemeFromJson(json);
+
+@override final  String sku;
+@override final  String? name;
+@override final  String? price;
+@override final  String? image;
+
+/// Create a copy of GiftCardTheme
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$GiftCardThemeCopyWith<_GiftCardTheme> get copyWith => __$GiftCardThemeCopyWithImpl<_GiftCardTheme>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$GiftCardThemeToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _GiftCardTheme&&(identical(other.sku, sku) || other.sku == sku)&&(identical(other.name, name) || other.name == name)&&(identical(other.price, price) || other.price == price)&&(identical(other.image, image) || other.image == image));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,sku,name,price,image);
+
+@override
+String toString() {
+  return 'GiftCardTheme(sku: $sku, name: $name, price: $price, image: $image)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$GiftCardThemeCopyWith<$Res> implements $GiftCardThemeCopyWith<$Res> {
+  factory _$GiftCardThemeCopyWith(_GiftCardTheme value, $Res Function(_GiftCardTheme) _then) = __$GiftCardThemeCopyWithImpl;
+@override @useResult
+$Res call({
+ String sku, String? name, String? price, String? image
+});
+
+
+
+
+}
+/// @nodoc
+class __$GiftCardThemeCopyWithImpl<$Res>
+    implements _$GiftCardThemeCopyWith<$Res> {
+  __$GiftCardThemeCopyWithImpl(this._self, this._then);
+
+  final _GiftCardTheme _self;
+  final $Res Function(_GiftCardTheme) _then;
+
+/// Create a copy of GiftCardTheme
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? sku = null,Object? name = freezed,Object? price = freezed,Object? image = freezed,}) {
+  return _then(_GiftCardTheme(
+sku: null == sku ? _self.sku : sku // ignore: cast_nullable_to_non_nullable
+as String,name: freezed == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String?,price: freezed == price ? _self.price : price // ignore: cast_nullable_to_non_nullable
+as String?,image: freezed == image ? _self.image : image // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
@@ -1513,7 +1806,7 @@ as bool,
 /// @nodoc
 mixin _$CreateGiftCardOrderRequest {
 
- int get giftCardProductId; double get amount; GiftCardPaymentMethod get paymentMethod; int get pointsToUse;
+ int get giftCardProductId; double get amount; GiftCardPaymentMethod get paymentMethod; int get pointsToUse; String? get themeSku;
 /// Create a copy of CreateGiftCardOrderRequest
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1526,16 +1819,16 @@ $CreateGiftCardOrderRequestCopyWith<CreateGiftCardOrderRequest> get copyWith => 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CreateGiftCardOrderRequest&&(identical(other.giftCardProductId, giftCardProductId) || other.giftCardProductId == giftCardProductId)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.paymentMethod, paymentMethod) || other.paymentMethod == paymentMethod)&&(identical(other.pointsToUse, pointsToUse) || other.pointsToUse == pointsToUse));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CreateGiftCardOrderRequest&&(identical(other.giftCardProductId, giftCardProductId) || other.giftCardProductId == giftCardProductId)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.paymentMethod, paymentMethod) || other.paymentMethod == paymentMethod)&&(identical(other.pointsToUse, pointsToUse) || other.pointsToUse == pointsToUse)&&(identical(other.themeSku, themeSku) || other.themeSku == themeSku));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,giftCardProductId,amount,paymentMethod,pointsToUse);
+int get hashCode => Object.hash(runtimeType,giftCardProductId,amount,paymentMethod,pointsToUse,themeSku);
 
 @override
 String toString() {
-  return 'CreateGiftCardOrderRequest(giftCardProductId: $giftCardProductId, amount: $amount, paymentMethod: $paymentMethod, pointsToUse: $pointsToUse)';
+  return 'CreateGiftCardOrderRequest(giftCardProductId: $giftCardProductId, amount: $amount, paymentMethod: $paymentMethod, pointsToUse: $pointsToUse, themeSku: $themeSku)';
 }
 
 
@@ -1546,7 +1839,7 @@ abstract mixin class $CreateGiftCardOrderRequestCopyWith<$Res>  {
   factory $CreateGiftCardOrderRequestCopyWith(CreateGiftCardOrderRequest value, $Res Function(CreateGiftCardOrderRequest) _then) = _$CreateGiftCardOrderRequestCopyWithImpl;
 @useResult
 $Res call({
- int giftCardProductId, double amount, GiftCardPaymentMethod paymentMethod, int pointsToUse
+ int giftCardProductId, double amount, GiftCardPaymentMethod paymentMethod, int pointsToUse, String? themeSku
 });
 
 
@@ -1563,13 +1856,14 @@ class _$CreateGiftCardOrderRequestCopyWithImpl<$Res>
 
 /// Create a copy of CreateGiftCardOrderRequest
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? giftCardProductId = null,Object? amount = null,Object? paymentMethod = null,Object? pointsToUse = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? giftCardProductId = null,Object? amount = null,Object? paymentMethod = null,Object? pointsToUse = null,Object? themeSku = freezed,}) {
   return _then(_self.copyWith(
 giftCardProductId: null == giftCardProductId ? _self.giftCardProductId : giftCardProductId // ignore: cast_nullable_to_non_nullable
 as int,amount: null == amount ? _self.amount : amount // ignore: cast_nullable_to_non_nullable
 as double,paymentMethod: null == paymentMethod ? _self.paymentMethod : paymentMethod // ignore: cast_nullable_to_non_nullable
 as GiftCardPaymentMethod,pointsToUse: null == pointsToUse ? _self.pointsToUse : pointsToUse // ignore: cast_nullable_to_non_nullable
-as int,
+as int,themeSku: freezed == themeSku ? _self.themeSku : themeSku // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
@@ -1654,10 +1948,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int giftCardProductId,  double amount,  GiftCardPaymentMethod paymentMethod,  int pointsToUse)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int giftCardProductId,  double amount,  GiftCardPaymentMethod paymentMethod,  int pointsToUse,  String? themeSku)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _CreateGiftCardOrderRequest() when $default != null:
-return $default(_that.giftCardProductId,_that.amount,_that.paymentMethod,_that.pointsToUse);case _:
+return $default(_that.giftCardProductId,_that.amount,_that.paymentMethod,_that.pointsToUse,_that.themeSku);case _:
   return orElse();
 
 }
@@ -1675,10 +1969,10 @@ return $default(_that.giftCardProductId,_that.amount,_that.paymentMethod,_that.p
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int giftCardProductId,  double amount,  GiftCardPaymentMethod paymentMethod,  int pointsToUse)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int giftCardProductId,  double amount,  GiftCardPaymentMethod paymentMethod,  int pointsToUse,  String? themeSku)  $default,) {final _that = this;
 switch (_that) {
 case _CreateGiftCardOrderRequest():
-return $default(_that.giftCardProductId,_that.amount,_that.paymentMethod,_that.pointsToUse);case _:
+return $default(_that.giftCardProductId,_that.amount,_that.paymentMethod,_that.pointsToUse,_that.themeSku);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -1695,10 +1989,10 @@ return $default(_that.giftCardProductId,_that.amount,_that.paymentMethod,_that.p
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int giftCardProductId,  double amount,  GiftCardPaymentMethod paymentMethod,  int pointsToUse)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int giftCardProductId,  double amount,  GiftCardPaymentMethod paymentMethod,  int pointsToUse,  String? themeSku)?  $default,) {final _that = this;
 switch (_that) {
 case _CreateGiftCardOrderRequest() when $default != null:
-return $default(_that.giftCardProductId,_that.amount,_that.paymentMethod,_that.pointsToUse);case _:
+return $default(_that.giftCardProductId,_that.amount,_that.paymentMethod,_that.pointsToUse,_that.themeSku);case _:
   return null;
 
 }
@@ -1710,13 +2004,14 @@ return $default(_that.giftCardProductId,_that.amount,_that.paymentMethod,_that.p
 @JsonSerializable()
 
 class _CreateGiftCardOrderRequest implements CreateGiftCardOrderRequest {
-  const _CreateGiftCardOrderRequest({required this.giftCardProductId, required this.amount, required this.paymentMethod, this.pointsToUse = 0});
+  const _CreateGiftCardOrderRequest({required this.giftCardProductId, required this.amount, required this.paymentMethod, this.pointsToUse = 0, this.themeSku});
   factory _CreateGiftCardOrderRequest.fromJson(Map<String, dynamic> json) => _$CreateGiftCardOrderRequestFromJson(json);
 
 @override final  int giftCardProductId;
 @override final  double amount;
 @override final  GiftCardPaymentMethod paymentMethod;
 @override@JsonKey() final  int pointsToUse;
+@override final  String? themeSku;
 
 /// Create a copy of CreateGiftCardOrderRequest
 /// with the given fields replaced by the non-null parameter values.
@@ -1731,16 +2026,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CreateGiftCardOrderRequest&&(identical(other.giftCardProductId, giftCardProductId) || other.giftCardProductId == giftCardProductId)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.paymentMethod, paymentMethod) || other.paymentMethod == paymentMethod)&&(identical(other.pointsToUse, pointsToUse) || other.pointsToUse == pointsToUse));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CreateGiftCardOrderRequest&&(identical(other.giftCardProductId, giftCardProductId) || other.giftCardProductId == giftCardProductId)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.paymentMethod, paymentMethod) || other.paymentMethod == paymentMethod)&&(identical(other.pointsToUse, pointsToUse) || other.pointsToUse == pointsToUse)&&(identical(other.themeSku, themeSku) || other.themeSku == themeSku));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,giftCardProductId,amount,paymentMethod,pointsToUse);
+int get hashCode => Object.hash(runtimeType,giftCardProductId,amount,paymentMethod,pointsToUse,themeSku);
 
 @override
 String toString() {
-  return 'CreateGiftCardOrderRequest(giftCardProductId: $giftCardProductId, amount: $amount, paymentMethod: $paymentMethod, pointsToUse: $pointsToUse)';
+  return 'CreateGiftCardOrderRequest(giftCardProductId: $giftCardProductId, amount: $amount, paymentMethod: $paymentMethod, pointsToUse: $pointsToUse, themeSku: $themeSku)';
 }
 
 
@@ -1751,7 +2046,7 @@ abstract mixin class _$CreateGiftCardOrderRequestCopyWith<$Res> implements $Crea
   factory _$CreateGiftCardOrderRequestCopyWith(_CreateGiftCardOrderRequest value, $Res Function(_CreateGiftCardOrderRequest) _then) = __$CreateGiftCardOrderRequestCopyWithImpl;
 @override @useResult
 $Res call({
- int giftCardProductId, double amount, GiftCardPaymentMethod paymentMethod, int pointsToUse
+ int giftCardProductId, double amount, GiftCardPaymentMethod paymentMethod, int pointsToUse, String? themeSku
 });
 
 
@@ -1768,13 +2063,14 @@ class __$CreateGiftCardOrderRequestCopyWithImpl<$Res>
 
 /// Create a copy of CreateGiftCardOrderRequest
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? giftCardProductId = null,Object? amount = null,Object? paymentMethod = null,Object? pointsToUse = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? giftCardProductId = null,Object? amount = null,Object? paymentMethod = null,Object? pointsToUse = null,Object? themeSku = freezed,}) {
   return _then(_CreateGiftCardOrderRequest(
 giftCardProductId: null == giftCardProductId ? _self.giftCardProductId : giftCardProductId // ignore: cast_nullable_to_non_nullable
 as int,amount: null == amount ? _self.amount : amount // ignore: cast_nullable_to_non_nullable
 as double,paymentMethod: null == paymentMethod ? _self.paymentMethod : paymentMethod // ignore: cast_nullable_to_non_nullable
 as GiftCardPaymentMethod,pointsToUse: null == pointsToUse ? _self.pointsToUse : pointsToUse // ignore: cast_nullable_to_non_nullable
-as int,
+as int,themeSku: freezed == themeSku ? _self.themeSku : themeSku // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
@@ -2072,7 +2368,7 @@ as double,
 /// @nodoc
 mixin _$CreateGiftCardPaymentOrderRequest {
 
- int get giftCardProductId; double get amount; int get pointsToUse;
+ int get giftCardProductId; double get amount; int get pointsToUse; String? get themeSku;
 /// Create a copy of CreateGiftCardPaymentOrderRequest
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -2085,16 +2381,16 @@ $CreateGiftCardPaymentOrderRequestCopyWith<CreateGiftCardPaymentOrderRequest> ge
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CreateGiftCardPaymentOrderRequest&&(identical(other.giftCardProductId, giftCardProductId) || other.giftCardProductId == giftCardProductId)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.pointsToUse, pointsToUse) || other.pointsToUse == pointsToUse));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CreateGiftCardPaymentOrderRequest&&(identical(other.giftCardProductId, giftCardProductId) || other.giftCardProductId == giftCardProductId)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.pointsToUse, pointsToUse) || other.pointsToUse == pointsToUse)&&(identical(other.themeSku, themeSku) || other.themeSku == themeSku));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,giftCardProductId,amount,pointsToUse);
+int get hashCode => Object.hash(runtimeType,giftCardProductId,amount,pointsToUse,themeSku);
 
 @override
 String toString() {
-  return 'CreateGiftCardPaymentOrderRequest(giftCardProductId: $giftCardProductId, amount: $amount, pointsToUse: $pointsToUse)';
+  return 'CreateGiftCardPaymentOrderRequest(giftCardProductId: $giftCardProductId, amount: $amount, pointsToUse: $pointsToUse, themeSku: $themeSku)';
 }
 
 
@@ -2105,7 +2401,7 @@ abstract mixin class $CreateGiftCardPaymentOrderRequestCopyWith<$Res>  {
   factory $CreateGiftCardPaymentOrderRequestCopyWith(CreateGiftCardPaymentOrderRequest value, $Res Function(CreateGiftCardPaymentOrderRequest) _then) = _$CreateGiftCardPaymentOrderRequestCopyWithImpl;
 @useResult
 $Res call({
- int giftCardProductId, double amount, int pointsToUse
+ int giftCardProductId, double amount, int pointsToUse, String? themeSku
 });
 
 
@@ -2122,12 +2418,13 @@ class _$CreateGiftCardPaymentOrderRequestCopyWithImpl<$Res>
 
 /// Create a copy of CreateGiftCardPaymentOrderRequest
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? giftCardProductId = null,Object? amount = null,Object? pointsToUse = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? giftCardProductId = null,Object? amount = null,Object? pointsToUse = null,Object? themeSku = freezed,}) {
   return _then(_self.copyWith(
 giftCardProductId: null == giftCardProductId ? _self.giftCardProductId : giftCardProductId // ignore: cast_nullable_to_non_nullable
 as int,amount: null == amount ? _self.amount : amount // ignore: cast_nullable_to_non_nullable
 as double,pointsToUse: null == pointsToUse ? _self.pointsToUse : pointsToUse // ignore: cast_nullable_to_non_nullable
-as int,
+as int,themeSku: freezed == themeSku ? _self.themeSku : themeSku // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
@@ -2212,10 +2509,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int giftCardProductId,  double amount,  int pointsToUse)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int giftCardProductId,  double amount,  int pointsToUse,  String? themeSku)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _CreateGiftCardPaymentOrderRequest() when $default != null:
-return $default(_that.giftCardProductId,_that.amount,_that.pointsToUse);case _:
+return $default(_that.giftCardProductId,_that.amount,_that.pointsToUse,_that.themeSku);case _:
   return orElse();
 
 }
@@ -2233,10 +2530,10 @@ return $default(_that.giftCardProductId,_that.amount,_that.pointsToUse);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int giftCardProductId,  double amount,  int pointsToUse)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int giftCardProductId,  double amount,  int pointsToUse,  String? themeSku)  $default,) {final _that = this;
 switch (_that) {
 case _CreateGiftCardPaymentOrderRequest():
-return $default(_that.giftCardProductId,_that.amount,_that.pointsToUse);case _:
+return $default(_that.giftCardProductId,_that.amount,_that.pointsToUse,_that.themeSku);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -2253,10 +2550,10 @@ return $default(_that.giftCardProductId,_that.amount,_that.pointsToUse);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int giftCardProductId,  double amount,  int pointsToUse)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int giftCardProductId,  double amount,  int pointsToUse,  String? themeSku)?  $default,) {final _that = this;
 switch (_that) {
 case _CreateGiftCardPaymentOrderRequest() when $default != null:
-return $default(_that.giftCardProductId,_that.amount,_that.pointsToUse);case _:
+return $default(_that.giftCardProductId,_that.amount,_that.pointsToUse,_that.themeSku);case _:
   return null;
 
 }
@@ -2268,12 +2565,13 @@ return $default(_that.giftCardProductId,_that.amount,_that.pointsToUse);case _:
 @JsonSerializable()
 
 class _CreateGiftCardPaymentOrderRequest implements CreateGiftCardPaymentOrderRequest {
-  const _CreateGiftCardPaymentOrderRequest({required this.giftCardProductId, required this.amount, this.pointsToUse = 0});
+  const _CreateGiftCardPaymentOrderRequest({required this.giftCardProductId, required this.amount, this.pointsToUse = 0, this.themeSku});
   factory _CreateGiftCardPaymentOrderRequest.fromJson(Map<String, dynamic> json) => _$CreateGiftCardPaymentOrderRequestFromJson(json);
 
 @override final  int giftCardProductId;
 @override final  double amount;
 @override@JsonKey() final  int pointsToUse;
+@override final  String? themeSku;
 
 /// Create a copy of CreateGiftCardPaymentOrderRequest
 /// with the given fields replaced by the non-null parameter values.
@@ -2288,16 +2586,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CreateGiftCardPaymentOrderRequest&&(identical(other.giftCardProductId, giftCardProductId) || other.giftCardProductId == giftCardProductId)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.pointsToUse, pointsToUse) || other.pointsToUse == pointsToUse));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CreateGiftCardPaymentOrderRequest&&(identical(other.giftCardProductId, giftCardProductId) || other.giftCardProductId == giftCardProductId)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.pointsToUse, pointsToUse) || other.pointsToUse == pointsToUse)&&(identical(other.themeSku, themeSku) || other.themeSku == themeSku));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,giftCardProductId,amount,pointsToUse);
+int get hashCode => Object.hash(runtimeType,giftCardProductId,amount,pointsToUse,themeSku);
 
 @override
 String toString() {
-  return 'CreateGiftCardPaymentOrderRequest(giftCardProductId: $giftCardProductId, amount: $amount, pointsToUse: $pointsToUse)';
+  return 'CreateGiftCardPaymentOrderRequest(giftCardProductId: $giftCardProductId, amount: $amount, pointsToUse: $pointsToUse, themeSku: $themeSku)';
 }
 
 
@@ -2308,7 +2606,7 @@ abstract mixin class _$CreateGiftCardPaymentOrderRequestCopyWith<$Res> implement
   factory _$CreateGiftCardPaymentOrderRequestCopyWith(_CreateGiftCardPaymentOrderRequest value, $Res Function(_CreateGiftCardPaymentOrderRequest) _then) = __$CreateGiftCardPaymentOrderRequestCopyWithImpl;
 @override @useResult
 $Res call({
- int giftCardProductId, double amount, int pointsToUse
+ int giftCardProductId, double amount, int pointsToUse, String? themeSku
 });
 
 
@@ -2325,12 +2623,13 @@ class __$CreateGiftCardPaymentOrderRequestCopyWithImpl<$Res>
 
 /// Create a copy of CreateGiftCardPaymentOrderRequest
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? giftCardProductId = null,Object? amount = null,Object? pointsToUse = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? giftCardProductId = null,Object? amount = null,Object? pointsToUse = null,Object? themeSku = freezed,}) {
   return _then(_CreateGiftCardPaymentOrderRequest(
 giftCardProductId: null == giftCardProductId ? _self.giftCardProductId : giftCardProductId // ignore: cast_nullable_to_non_nullable
 as int,amount: null == amount ? _self.amount : amount // ignore: cast_nullable_to_non_nullable
 as double,pointsToUse: null == pointsToUse ? _self.pointsToUse : pointsToUse // ignore: cast_nullable_to_non_nullable
-as int,
+as int,themeSku: freezed == themeSku ? _self.themeSku : themeSku // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 

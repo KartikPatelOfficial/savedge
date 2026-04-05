@@ -52,30 +52,34 @@ class CreateGiftCardOrder extends GiftCardsEvent {
   final int giftCardProductId;
   final double amount;
   final GiftCardPaymentMethodEntity paymentMethod;
+  final String? themeSku;
 
   const CreateGiftCardOrder({
     required this.giftCardProductId,
     required this.amount,
     required this.paymentMethod,
+    this.themeSku,
   });
 
   @override
-  List<Object> get props => [giftCardProductId, amount, paymentMethod];
+  List<Object?> get props => [giftCardProductId, amount, paymentMethod, themeSku];
 }
 
 class CreateGiftCardPaymentOrder extends GiftCardsEvent {
   final int giftCardProductId;
   final double amount;
   final int pointsToUse;
+  final String? themeSku;
 
   const CreateGiftCardPaymentOrder({
     required this.giftCardProductId,
     required this.amount,
     this.pointsToUse = 0,
+    this.themeSku,
   });
 
   @override
-  List<Object> get props => [giftCardProductId, amount, pointsToUse];
+  List<Object?> get props => [giftCardProductId, amount, pointsToUse, themeSku];
 }
 
 class VerifyGiftCardPayment extends GiftCardsEvent {

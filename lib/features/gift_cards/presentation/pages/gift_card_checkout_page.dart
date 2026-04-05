@@ -14,18 +14,20 @@ import 'package:savedge/features/gift_cards/presentation/bloc/gift_cards_bloc.da
 class GiftCardCheckoutPage extends StatelessWidget {
   final GiftCardProductEntity product;
   final double amount;
+  final String? themeSku;
 
   const GiftCardCheckoutPage({
     super.key,
     required this.product,
     required this.amount,
+    this.themeSku,
   });
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => getIt<GiftCardsBloc>(),
-      child: GiftCardCheckoutView(product: product, amount: amount),
+      child: GiftCardCheckoutView(product: product, amount: amount, themeSku: themeSku),
     );
   }
 }
@@ -33,11 +35,13 @@ class GiftCardCheckoutPage extends StatelessWidget {
 class GiftCardCheckoutView extends StatefulWidget {
   final GiftCardProductEntity product;
   final double amount;
+  final String? themeSku;
 
   const GiftCardCheckoutView({
     super.key,
     required this.product,
     required this.amount,
+    this.themeSku,
   });
 
   @override
@@ -179,6 +183,7 @@ class _GiftCardCheckoutViewState extends State<GiftCardCheckoutView> {
           giftCardProductId: widget.product.id,
           amount: widget.amount,
           paymentMethod: GiftCardPaymentMethodEntity.points,
+          themeSku: widget.themeSku,
         ),
       );
     } else {
@@ -187,6 +192,7 @@ class _GiftCardCheckoutViewState extends State<GiftCardCheckoutView> {
           giftCardProductId: widget.product.id,
           amount: widget.amount,
           pointsToUse: pointsToUse,
+          themeSku: widget.themeSku,
         ),
       );
     }

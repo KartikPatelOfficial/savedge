@@ -77,12 +77,14 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
     required int giftCardProductId,
     required double amount,
     required GiftCardPaymentMethodEntity paymentMethod,
+    String? themeSku,
   }) async {
     try {
       final request = CreateGiftCardOrderRequest(
         giftCardProductId: giftCardProductId,
         amount: amount,
         paymentMethod: _mapPaymentMethodToModel(paymentMethod),
+        themeSku: themeSku,
       );
       final response = await _service.createOrder(request);
       return Right(_mapOrderToEntity(response));
@@ -97,12 +99,14 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
     required int giftCardProductId,
     required double amount,
     int pointsToUse = 0,
+    String? themeSku,
   }) async {
     try {
       final request = CreateGiftCardPaymentOrderRequest(
         giftCardProductId: giftCardProductId,
         amount: amount,
         pointsToUse: pointsToUse,
+        themeSku: themeSku,
       );
       final response = await _service.createPaymentOrder(request);
       return Right(response);
@@ -191,10 +195,19 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
       categoryName: model.categoryName,
       brandName: model.brandName,
       denominations: model.denominations,
+      parsedDenominations: model.parsedDenominations,
       currencySymbol: model.currencySymbol,
       offerDescription: model.offerDescription,
       formatExpiry: model.formatExpiry,
       discountPercentage: model.discountPercentage,
+      themes: model.parsedThemes
+          .map((t) => GiftCardThemeEntity(
+                sku: t.sku,
+                name: t.name,
+                price: t.price,
+                image: t.image,
+              ))
+          .toList(),
     );
   }
 

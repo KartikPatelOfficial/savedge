@@ -36,14 +36,30 @@ abstract class GiftCardProduct with _$GiftCardProduct {
     String? categoryName,
     String? brandName,
     String? denominations,
+    @Default([]) List<double> parsedDenominations,
     String? currencySymbol,
     String? offerDescription,
     String? formatExpiry,
     double? discountPercentage,
+    String? themesJson,
+    @Default([]) List<GiftCardTheme> parsedThemes,
   }) = _GiftCardProduct;
 
   factory GiftCardProduct.fromJson(Map<String, dynamic> json) =>
       _$GiftCardProductFromJson(json);
+}
+
+@freezed
+abstract class GiftCardTheme with _$GiftCardTheme {
+  const factory GiftCardTheme({
+    required String sku,
+    String? name,
+    String? price,
+    String? image,
+  }) = _GiftCardTheme;
+
+  factory GiftCardTheme.fromJson(Map<String, dynamic> json) =>
+      _$GiftCardThemeFromJson(json);
 }
 
 @freezed
@@ -119,6 +135,7 @@ abstract class CreateGiftCardOrderRequest with _$CreateGiftCardOrderRequest {
     required double amount,
     required GiftCardPaymentMethod paymentMethod,
     @Default(0) int pointsToUse,
+    String? themeSku,
   }) = _CreateGiftCardOrderRequest;
 
   factory CreateGiftCardOrderRequest.fromJson(Map<String, dynamic> json) =>
@@ -150,6 +167,7 @@ abstract class CreateGiftCardPaymentOrderRequest
     required int giftCardProductId,
     required double amount,
     @Default(0) int pointsToUse,
+    String? themeSku,
   }) = _CreateGiftCardPaymentOrderRequest;
 
   factory CreateGiftCardPaymentOrderRequest.fromJson(

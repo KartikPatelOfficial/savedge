@@ -111,6 +111,7 @@ class GiftCardsBloc extends Bloc<GiftCardsEvent, GiftCardsState> {
         giftCardProductId: event.giftCardProductId,
         amount: event.amount,
         paymentMethod: event.paymentMethod,
+        themeSku: event.themeSku,
       ),
     );
 
@@ -130,6 +131,7 @@ class GiftCardsBloc extends Bloc<GiftCardsEvent, GiftCardsState> {
       giftCardProductId: event.giftCardProductId,
       amount: event.amount,
       pointsToUse: event.pointsToUse,
+      themeSku: event.themeSku,
     );
 
     result.fold(
