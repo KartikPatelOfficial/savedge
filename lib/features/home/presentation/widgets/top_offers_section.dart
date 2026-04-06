@@ -31,7 +31,7 @@ class _TopOffersSectionState extends State<TopOffersSection> {
   void initState() {
     super.initState();
     // Use a dedicated bloc so regular vendor loads don't overwrite top offers
-    // Don't filter by city — show all featured vendors regardless of location
+    // Don't filter by city - show all featured vendors regardless of location
     _topOffersBloc = getIt<VendorsBloc>()..add(const LoadTopOfferVendors());
   }
 
@@ -61,7 +61,7 @@ class _TopOffersSectionState extends State<TopOffersSection> {
   }
 }
 
-/// Top offers view — image background cards with content overlay
+/// Top offers view - image background cards with content overlay
 class TopOffersView extends StatelessWidget {
   const TopOffersView({super.key, required this.title, this.onVendorTap});
 
@@ -202,7 +202,7 @@ class TopOffersView extends StatelessWidget {
           Text('🏪', style: TextStyle(fontSize: 24)),
           SizedBox(width: 12),
           Text(
-            'No offers right now — check back soon!',
+            'No offers right now - check back soon!',
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,

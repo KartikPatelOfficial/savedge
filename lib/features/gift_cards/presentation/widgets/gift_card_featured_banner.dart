@@ -52,7 +52,7 @@ class GiftCardFeaturedBanner extends StatelessWidget {
         clipBehavior: Clip.antiAlias,
         child: Row(
           children: [
-            // Left side — text content
+            // Left side - text content
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -120,7 +120,7 @@ class GiftCardFeaturedBanner extends StatelessWidget {
               ),
             ),
 
-            // Right side — product image
+            // Right side - product image
             SizedBox(
               width: 120,
               child: Container(

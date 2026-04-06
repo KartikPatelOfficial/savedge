@@ -297,7 +297,7 @@ class AboutUsPage extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'We\'re a small team on a big mission — helping you keep more money in your pocket.',
+            'We\'re a small team on a big mission - helping you keep more money in your pocket.',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 14,

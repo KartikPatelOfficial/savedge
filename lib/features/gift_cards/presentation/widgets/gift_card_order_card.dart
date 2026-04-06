@@ -305,7 +305,7 @@ class GiftCardOrderCard extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 10),
-        // Card number — prominent
+        // Card number - prominent
         if (order.woohooCardNumber != null)
           _CardDetailRow(
             label: 'Card Number',

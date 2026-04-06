@@ -139,7 +139,7 @@ class _StoresViewState extends State<StoresView> {
               _buildSliverHeader(),
               SliverToBoxAdapter(child: _buildSearchBar()),
               SliverToBoxAdapter(child: _buildCategorySection()),
-              // Popular Picks — owns its own VendorsBloc, hides when empty
+              // Popular Picks - owns its own VendorsBloc, hides when empty
               SliverToBoxAdapter(
                 child: _PopularPicksSection(
                   selectedCategory: _selectedCategory,
@@ -240,7 +240,7 @@ class _StoresViewState extends State<StoresView> {
   }
 
   // ─── Search bar ────────────────────────────────────────
-  // Flat tinted field — no border, no shadow, unified look
+  // Flat tinted field - no border, no shadow, unified look
 
   Widget _buildSearchBar() {
     return Padding(
@@ -390,7 +390,7 @@ class _StoresViewState extends State<StoresView> {
             ),
           ),
           const SizedBox(height: 16),
-          // Circle icon row — horizontally scrollable
+          // Circle icon row - horizontally scrollable
           SizedBox(
             height: 82,
             child: ListView.separated(
@@ -893,7 +893,7 @@ class _StoresViewState extends State<StoresView> {
 }
 
 // ─────────────────────────────────────────────────────────
-// Popular Picks — owns its own VendorsBloc using LoadTopOfferVendors
+// Popular Picks - owns its own VendorsBloc using LoadTopOfferVendors
 // Filters by selectedCategory and hides itself when the result is empty
 // ─────────────────────────────────────────────────────────
 
@@ -1008,7 +1008,7 @@ class _PopularPicksSectionState extends State<_PopularPicksSection> {
 }
 
 // ─────────────────────────────────────────────────────────
-// Featured portrait card — horizontal scroll
+// Featured portrait card - horizontal scroll
 // ─────────────────────────────────────────────────────────
 
 class _FeaturedStoreCard extends StatefulWidget {

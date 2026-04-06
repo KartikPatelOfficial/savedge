@@ -15,7 +15,7 @@ class BottomNavItem {
   final VoidCallback? onTap;
 }
 
-/// Fluid bottom navigation bar — sliding pill indicator, icon + label
+/// Fluid bottom navigation bar - sliding pill indicator, icon + label
 class HomeBottomNavBar extends StatelessWidget {
   const HomeBottomNavBar({
     super.key,
