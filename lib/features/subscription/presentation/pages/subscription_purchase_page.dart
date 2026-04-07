@@ -110,8 +110,10 @@ class _State extends State<SubscriptionPurchasePage> {
                             children: [
                               _topBar(),
                               const SizedBox(height: 20),
-                              _heroSection(),
-                              const SizedBox(height: 12),
+                              if (plan.hasImage) ...[
+                                _planImageCard(),
+                                const SizedBox(height: 12),
+                              ],
                               _bentoGrid(),
                               const SizedBox(height: 12),
                               if (_feats.isNotEmpty) ...[
@@ -177,78 +179,22 @@ class _State extends State<SubscriptionPurchasePage> {
 
   // ── hero section ───────────────────────────────────────────────────────
 
-  Widget _heroSection() {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: _purple,
-        borderRadius: BorderRadius.circular(_radius),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Plan image - full width, prominent
-          if (plan.hasImage)
-            ClipRRect(
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(_radius),
-                topRight: Radius.circular(_radius),
-              ),
-              child: CachedNetworkImage(
-                imageUrl: plan.imageUrl!,
-                width: double.infinity,
-                height: 200,
-                fit: BoxFit.cover,
-                placeholder: (_, __) => Container(
-                  height: 200,
-                  color: Colors.white.withAlpha(15),
-                  child: const Center(child: CircularProgressIndicator(color: Colors.white54, strokeWidth: 2)),
-                ),
-                errorWidget: (_, __, ___) => Container(
-                  height: 200,
-                  color: Colors.white.withAlpha(15),
-                  child: const Icon(Icons.workspace_premium_rounded, color: Colors.white38, size: 64),
-                ),
-              ),
-            ),
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Duration badge
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withAlpha(25),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.workspace_premium_rounded, color: Colors.amber, size: 14),
-                      const SizedBox(width: 5),
-                      Text(
-                        plan.durationDisplay.toUpperCase(),
-                        style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Colors.white70, letterSpacing: 1),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  plan.name,
-                  style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900, color: Colors.white, letterSpacing: -0.5, height: 1.1),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  plan.description ?? 'Unlock exclusive coupons, priority deals, and save more on every purchase.',
-                  style: TextStyle(fontSize: 14, color: Colors.white.withAlpha(190), height: 1.5),
-                ),
-              ],
-            ),
+  Widget _planImageCard() {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(_radius),
+      child: CachedNetworkImage(
+        imageUrl: plan.imageUrl!,
+        width: double.infinity,
+        fit: BoxFit.fitWidth,
+        placeholder: (_, __) => Container(
+          height: 220,
+          decoration: BoxDecoration(
+            color: _lilac,
+            borderRadius: BorderRadius.circular(_radius),
           ),
-        ],
+          child: const Center(child: CircularProgressIndicator(color: _purple, strokeWidth: 2)),
+        ),
+        errorWidget: (_, __, ___) => const SizedBox.shrink(),
       ),
     );
   }
@@ -297,19 +243,30 @@ class _State extends State<SubscriptionPurchasePage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: _purple.withAlpha(25),
+                    if (plan.hasImage)
+                      ClipRRect(
                         borderRadius: BorderRadius.circular(10),
+                        child: CachedNetworkImage(
+                          imageUrl: plan.imageUrl!,
+                          width: double.infinity,
+                          height: 50,
+                          fit: BoxFit.cover,
+                        ),
+                      )
+                    else
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: _purple.withAlpha(25),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Icon(Icons.calendar_today_rounded, size: 18, color: _purple),
                       ),
-                      child: const Icon(Icons.calendar_today_rounded, size: 18, color: _purple),
-                    ),
                     const SizedBox(height: 10),
                     Text(plan.durationDisplay,
                         style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: _dark)),
                     const SizedBox(height: 2),
-                    const Text('validity', style: TextStyle(fontSize: 12, color: _grey)),
+                    Text(plan.name, style: const TextStyle(fontSize: 12, color: _grey)),
                   ],
                 ),
               ),
