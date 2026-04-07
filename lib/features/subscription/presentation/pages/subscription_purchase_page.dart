@@ -243,25 +243,14 @@ class _State extends State<SubscriptionPurchasePage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (plan.hasImage)
-                      ClipRRect(
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: _purple.withAlpha(25),
                         borderRadius: BorderRadius.circular(10),
-                        child: CachedNetworkImage(
-                          imageUrl: plan.imageUrl!,
-                          width: double.infinity,
-                          height: 50,
-                          fit: BoxFit.cover,
-                        ),
-                      )
-                    else
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: _purple.withAlpha(25),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: const Icon(Icons.calendar_today_rounded, size: 18, color: _purple),
                       ),
+                      child: const Icon(Icons.calendar_today_rounded, size: 18, color: _purple),
+                    ),
                     const SizedBox(height: 10),
                     Text(plan.durationDisplay,
                         style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: _dark)),
