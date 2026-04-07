@@ -100,144 +100,158 @@ class _RedeemedCouponPageState extends State<RedeemedCouponPage>
                   offset: Offset(0, _entrySlide.value),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        const SizedBox(height: 48),
-                        
-                        // Massive Icon
-                        Container(
-                          width: 120,
-                          height: 120,
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(Icons.check_rounded, size: 72, color: Color(0xFF22C55E)),
-                        ),
-                        const SizedBox(height: 32),
-                        
-                        // Joyful Text
-                        const Text(
-                          'WOOHOO!',
-                          style: TextStyle(
-                            fontSize: 48,
-                            fontWeight: FontWeight.w900,
-                            color: Colors.white,
-                            letterSpacing: -1.5,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'You just redeemed\n$discountDisplay at $vendorName',
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white70,
-                            height: 1.3,
-                          ),
-                        ),
-                        
-                        const SizedBox(height: 48),
-                        
-                        // The Code Card
-                        if (code != null) ...[
-                          Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.all(32),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(32),
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        final h = constraints.maxHeight;
+                        final isCompact = h < 700;
+                        final iconSize = isCompact ? 80.0 : 120.0;
+                        final titleSize = isCompact ? 36.0 : 48.0;
+                        final codeSize = isCompact ? 28.0 : 40.0;
+                        final cardPad = isCompact ? 20.0 : 32.0;
+
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            SizedBox(height: isCompact ? 24 : 48),
+
+                            // Icon
+                            Container(
+                              width: iconSize,
+                              height: iconSize,
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(Icons.check_rounded, size: iconSize * 0.6, color: const Color(0xFF22C55E)),
                             ),
-                            child: Column(
-                              children: [
-                                const Text(
-                                  'REDEMPTION CODE',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w800,
-                                    color: Color(0xFF94A3B8),
-                                    letterSpacing: 1.5,
-                                  ),
+                            SizedBox(height: isCompact ? 16 : 32),
+
+                            // Joyful Text
+                            Text(
+                              'WOOHOO!',
+                              style: TextStyle(
+                                fontSize: titleSize,
+                                fontWeight: FontWeight.w900,
+                                color: Colors.white,
+                                letterSpacing: -1.5,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'You just redeemed\n$discountDisplay at $vendorName',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: isCompact ? 15 : 18,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white70,
+                                height: 1.3,
+                              ),
+                            ),
+
+                            SizedBox(height: isCompact ? 24 : 48),
+
+                            // The Code Card
+                            if (code != null) ...[
+                              Container(
+                                width: double.infinity,
+                                padding: EdgeInsets.all(cardPad),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(32),
                                 ),
-                                const SizedBox(height: 16),
-                                Text(
-                                  code,
-                                  style: const TextStyle(
-                                    fontSize: 40,
-                                    fontWeight: FontWeight.w900,
-                                    color: Color(0xFF0F172A),
-                                    letterSpacing: 4,
-                                  ),
-                                ),
-                                const SizedBox(height: 24),
-                                ElevatedButton.icon(
-                                  onPressed: () {
-                                    Clipboard.setData(ClipboardData(text: code));
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: const Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
-                                            SizedBox(width: 10),
-                                            Text('Code copied!', style: TextStyle(fontWeight: FontWeight.w700)),
-                                          ],
-                                        ),
-                                        backgroundColor: const Color(0xFF0F172A),
-                                        behavior: SnackBarBehavior.floating,
-                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                        duration: const Duration(seconds: 2),
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      'REDEMPTION CODE',
+                                      style: TextStyle(
+                                        fontSize: isCompact ? 12 : 14,
+                                        fontWeight: FontWeight.w800,
+                                        color: const Color(0xFF94A3B8),
+                                        letterSpacing: 1.5,
                                       ),
-                                    );
-                                  },
-                                  icon: const Icon(Icons.copy_rounded, size: 20),
-                                  label: const Text('COPY CODE', style: TextStyle(fontWeight: FontWeight.w800)),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFFF1F5F9),
-                                    foregroundColor: const Color(0xFF0F172A),
-                                    elevation: 0,
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                                  ),
-                                )
-                              ],
+                                    ),
+                                    SizedBox(height: isCompact ? 10 : 16),
+                                    FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      child: Text(
+                                        code,
+                                        style: TextStyle(
+                                          fontSize: codeSize,
+                                          fontWeight: FontWeight.w900,
+                                          color: const Color(0xFF0F172A),
+                                          letterSpacing: 4,
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(height: isCompact ? 14 : 24),
+                                    ElevatedButton.icon(
+                                      onPressed: () {
+                                        Clipboard.setData(ClipboardData(text: code));
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(
+                                            content: const Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
+                                                SizedBox(width: 10),
+                                                Text('Code copied!', style: TextStyle(fontWeight: FontWeight.w700)),
+                                              ],
+                                            ),
+                                            backgroundColor: const Color(0xFF0F172A),
+                                            behavior: SnackBarBehavior.floating,
+                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                            duration: const Duration(seconds: 2),
+                                          ),
+                                        );
+                                      },
+                                      icon: const Icon(Icons.copy_rounded, size: 20),
+                                      label: const Text('COPY CODE', style: TextStyle(fontWeight: FontWeight.w800)),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: const Color(0xFFF1F5F9),
+                                        foregroundColor: const Color(0xFF0F172A),
+                                        elevation: 0,
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ],
+
+                            const Spacer(),
+
+                            if (redeemedAt != null) ...[
+                              Text(
+                                'Redeemed ${DateFormat("EEE, MMM dd 'at' hh:mm a").format(redeemedAt)}',
+                                style: const TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                            ],
+
+                            // Done
+                            SizedBox(
+                              width: double.infinity,
+                              height: 56,
+                              child: ElevatedButton(
+                                onPressed: () => Navigator.of(context).pop(),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  foregroundColor: const Color(0xFF22C55E),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                                  elevation: 0,
+                                ),
+                                child: const Text('DONE', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900)),
+                              ),
                             ),
-                          ),
-                        ],
-                        
-                        const Spacer(),
-                        
-                        if (redeemedAt != null) ...[
-                          Text(
-                            'Redeemed ${DateFormat("EEE, MMM dd 'at' hh:mm a").format(redeemedAt)}',
-                            style: const TextStyle(
-                              color: Colors.white70,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const SizedBox(height: 24),
-                        ],
-                        
-                        // Done
-                        SizedBox(
-                          width: double.infinity,
-                          height: 64,
-                          child: ElevatedButton(
-                            onPressed: () => Navigator.of(context).pop(),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.white,
-                              foregroundColor: const Color(0xFF22C55E),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-                              elevation: 0,
-                            ),
-                            child: const Text('DONE', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900)),
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-                      ],
+                            const SizedBox(height: 16),
+                          ],
+                        );
+                      },
                     ),
                   ),
                 ),
