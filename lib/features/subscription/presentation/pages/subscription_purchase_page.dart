@@ -180,7 +180,6 @@ class _State extends State<SubscriptionPurchasePage> {
   Widget _heroSection() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: _purple,
         borderRadius: BorderRadius.circular(_radius),
@@ -188,72 +187,69 @@ class _State extends State<SubscriptionPurchasePage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              // Plan image or icon
-              if (plan.hasImage)
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(14),
-                  child: CachedNetworkImage(
-                    imageUrl: plan.imageUrl!,
-                    width: 56, height: 56, fit: BoxFit.cover,
-                    placeholder: (_, __) => Container(
-                      width: 56, height: 56,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withAlpha(25),
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      child: const Icon(Icons.workspace_premium_rounded, color: Colors.white54, size: 28),
-                    ),
-                    errorWidget: (_, __, ___) => _planIcon(),
+          // Plan image - full width, prominent
+          if (plan.hasImage)
+            ClipRRect(
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(_radius),
+                topRight: Radius.circular(_radius),
+              ),
+              child: CachedNetworkImage(
+                imageUrl: plan.imageUrl!,
+                width: double.infinity,
+                height: 200,
+                fit: BoxFit.cover,
+                placeholder: (_, __) => Container(
+                  height: 200,
+                  color: Colors.white.withAlpha(15),
+                  child: const Center(child: CircularProgressIndicator(color: Colors.white54, strokeWidth: 2)),
+                ),
+                errorWidget: (_, __, ___) => Container(
+                  height: 200,
+                  color: Colors.white.withAlpha(15),
+                  child: const Icon(Icons.workspace_premium_rounded, color: Colors.white38, size: 64),
+                ),
+              ),
+            ),
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Duration badge
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withAlpha(25),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                )
-              else
-                _planIcon(),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withAlpha(25),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.workspace_premium_rounded, color: Colors.amber, size: 14),
+                      const SizedBox(width: 5),
+                      Text(
                         plan.durationDisplay.toUpperCase(),
                         style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Colors.white70, letterSpacing: 1),
                       ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      plan.name,
-                      style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w900, color: Colors.white, letterSpacing: -0.5, height: 1.1),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          Text(
-            plan.description ?? 'Get exclusive access to all premium coupons, priority deals, and save more on every purchase.',
-            style: TextStyle(fontSize: 14, color: Colors.white.withAlpha(200), height: 1.5),
+                const SizedBox(height: 10),
+                Text(
+                  plan.name,
+                  style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900, color: Colors.white, letterSpacing: -0.5, height: 1.1),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  plan.description ?? 'Unlock exclusive coupons, priority deals, and save more on every purchase.',
+                  style: TextStyle(fontSize: 14, color: Colors.white.withAlpha(190), height: 1.5),
+                ),
+              ],
+            ),
           ),
         ],
       ),
-    );
-  }
-
-  Widget _planIcon() {
-    return Container(
-      width: 56, height: 56,
-      decoration: BoxDecoration(
-        color: Colors.white.withAlpha(25),
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: const Icon(Icons.workspace_premium_rounded, color: Colors.amber, size: 28),
     );
   }
 
@@ -337,14 +333,20 @@ class _State extends State<SubscriptionPurchasePage> {
                       ),
                       child: const Icon(Icons.trending_down_rounded, size: 18, color: _mintDark),
                     ),
-                    const SizedBox(width: 12),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('₹${perDay.toStringAsFixed(1)}/day',
-                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _dark)),
-                        const Text('that\'s all it costs', style: TextStyle(fontSize: 11, color: _grey)),
-                      ],
+                    const SizedBox(width: 10),
+                    Flexible(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          FittedBox(
+                            fit: BoxFit.scaleDown,
+                            alignment: Alignment.centerLeft,
+                            child: Text('₹${perDay.toStringAsFixed(1)}/day',
+                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _dark)),
+                          ),
+                          const Text('that\'s it', style: TextStyle(fontSize: 11, color: _grey)),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -364,13 +366,17 @@ class _State extends State<SubscriptionPurchasePage> {
                       ),
                       child: const Icon(Icons.auto_awesome_rounded, size: 18, color: _peachDark),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 10),
                     Flexible(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('${_feats.isEmpty ? '10+' : _feats.length} perks',
-                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _dark)),
+                          FittedBox(
+                            fit: BoxFit.scaleDown,
+                            alignment: Alignment.centerLeft,
+                            child: Text('${_feats.isEmpty ? '10+' : _feats.length} perks',
+                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _dark)),
+                          ),
                           const Text('included', style: TextStyle(fontSize: 11, color: _grey)),
                         ],
                       ),
