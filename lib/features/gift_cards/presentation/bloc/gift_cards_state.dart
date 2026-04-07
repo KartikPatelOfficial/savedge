@@ -30,6 +30,16 @@ class GiftCardCategoriesError extends GiftCardsState {
   List<Object> get props => [message];
 }
 
+// Hot Deals
+class HotDealsLoaded extends GiftCardsState {
+  final List<GiftCardProductEntity> hotDeals;
+
+  const HotDealsLoaded(this.hotDeals);
+
+  @override
+  List<Object> get props => [hotDeals];
+}
+
 // Products
 class GiftCardProductsLoading extends GiftCardsState {}
 

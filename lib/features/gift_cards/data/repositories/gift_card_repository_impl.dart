@@ -62,6 +62,17 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
   }
 
   @override
+  Future<Either<Failure, List<GiftCardProductEntity>>> getHotDeals() async {
+    try {
+      final response = await _service.getHotDeals();
+      final entities = response.map(_mapProductToEntity).toList();
+      return Right(entities);
+    } catch (e) {
+      return Left(ServerFailure(_extractErrorMessage(e)));
+    }
+  }
+
+  @override
   Future<Either<Failure, List<GiftCardProductEntity>>> getProducts({
     int? categoryId,
     String? searchTerm,

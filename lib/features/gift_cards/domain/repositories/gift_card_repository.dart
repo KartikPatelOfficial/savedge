@@ -11,6 +11,8 @@ import '../entities/gift_card_entity.dart';
 abstract class GiftCardRepository {
   Future<Either<Failure, List<GiftCardCategoryEntity>>> getCategories();
 
+  Future<Either<Failure, List<GiftCardProductEntity>>> getHotDeals();
+
   Future<Either<Failure, List<GiftCardProductEntity>>> getProducts({
     int? categoryId,
     String? searchTerm,

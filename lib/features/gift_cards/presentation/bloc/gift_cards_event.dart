@@ -11,6 +11,10 @@ class LoadGiftCardCategories extends GiftCardsEvent {
   const LoadGiftCardCategories();
 }
 
+class LoadHotDeals extends GiftCardsEvent {
+  const LoadHotDeals();
+}
+
 class LoadGiftCardProducts extends GiftCardsEvent {
   final int? categoryId;
   final String? searchTerm;

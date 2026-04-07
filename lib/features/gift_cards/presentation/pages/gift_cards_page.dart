@@ -21,6 +21,7 @@ class GiftCardsPage extends StatelessWidget {
     return BlocProvider(
       create: (context) => getIt<GiftCardsBloc>()
         ..add(const LoadGiftCardCategories())
+        ..add(const LoadHotDeals())
         ..add(const LoadGiftCardProducts()),
       child: const GiftCardsView(),
     );
@@ -111,17 +112,16 @@ class _GiftCardsViewState extends State<GiftCardsView> {
           listener: (context, state) {
             if (state is GiftCardCategoriesLoaded) {
               setState(() => _categories = state.categories);
+            } else if (state is HotDealsLoaded) {
+              setState(() {
+                _featuredProducts = state.hotDeals;
+                _startAutoScroll();
+              });
             } else if (state is GiftCardProductsLoaded) {
               setState(() {
                 _products = state.products;
                 _isLoading = false;
                 _error = null;
-                // Cache featured products from first load (all products)
-                if (_featuredProducts.isEmpty && _selectedCategory == null) {
-                  _featuredProducts =
-                      state.products.where((p) => p.hasDiscount).take(5).toList();
-                  _startAutoScroll();
-                }
               });
             } else if (state is GiftCardProductsLoading) {
               setState(() => _isLoading = true);

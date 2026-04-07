@@ -15,6 +15,9 @@ abstract class GiftCardService {
   @GET('/api/gift-cards/categories')
   Future<List<GiftCardCategory>> getCategories();
 
+  @GET('/api/gift-cards/hot-deals')
+  Future<List<GiftCardProduct>> getHotDeals();
+
   @GET('/api/gift-cards/products')
   Future<PaginatedGiftCardProductResponse> getProducts({
     @Query('categoryId') int? categoryId,

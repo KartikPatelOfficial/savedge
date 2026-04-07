@@ -26,6 +26,7 @@ class GiftCardsBloc extends Bloc<GiftCardsEvent, GiftCardsState> {
     required this.giftCardRepository,
   }) : super(GiftCardsInitial()) {
     on<LoadGiftCardCategories>(_onLoadCategories);
+    on<LoadHotDeals>(_onLoadHotDeals);
     on<LoadGiftCardProducts>(_onLoadProducts);
     on<LoadGiftCardProduct>(_onLoadProduct);
     on<LoadPriceBreakdown>(_onLoadPriceBreakdown);
@@ -47,6 +48,17 @@ class GiftCardsBloc extends Bloc<GiftCardsEvent, GiftCardsState> {
     result.fold(
       (failure) => emit(GiftCardCategoriesError(failure.message ?? 'Failed to load categories')),
       (categories) => emit(GiftCardCategoriesLoaded(categories)),
+    );
+  }
+
+  Future<void> _onLoadHotDeals(
+    LoadHotDeals event,
+    Emitter<GiftCardsState> emit,
+  ) async {
+    final result = await giftCardRepository.getHotDeals();
+    result.fold(
+      (failure) => {}, // Silently fail - hot deals are non-critical
+      (hotDeals) => emit(HotDealsLoaded(hotDeals)),
     );
   }
 
