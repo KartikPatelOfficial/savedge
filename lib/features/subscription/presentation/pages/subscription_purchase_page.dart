@@ -1087,9 +1087,15 @@ class _SubscriptionPurchasePageState extends State<SubscriptionPurchasePage> {
       // 1. Create payment order on backend
       // 2. Open Razorpay native checkout
       // 3. On success callback, verify payment with backend
+      final userName = [_userProfile?.firstName, _userProfile?.lastName]
+          .where((s) => s != null && s.isNotEmpty)
+          .join(' ');
       final result = await _paymentService.processSubscriptionPayment(
         planId: plan.id,
         autoRenew: false,
+        userPhone: _userProfile?.phoneNumber,
+        userEmail: _userProfile?.email,
+        userName: userName.isNotEmpty ? userName : null,
       );
 
       if (!mounted) return;
