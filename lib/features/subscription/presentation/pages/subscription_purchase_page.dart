@@ -724,7 +724,8 @@ class _State extends State<SubscriptionPurchasePage> {
   }
 
   void _showSuccess(String msg) {
-    showDialog(context: context, barrierDismissible: false, builder: (ctx) => Dialog(
+    showDialog(context: context, barrierDismissible: false, barrierColor: Colors.black54, builder: (ctx) => Dialog(
+      backgroundColor: Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       child: Padding(padding: const EdgeInsets.all(28), child: Column(mainAxisSize: MainAxisSize.min, children: [
         Container(width: 72, height: 72, decoration: BoxDecoration(color: _mint, shape: BoxShape.circle),
@@ -744,7 +745,8 @@ class _State extends State<SubscriptionPurchasePage> {
   }
 
   void _showErr(String e) {
-    showDialog(context: context, builder: (ctx) => Dialog(
+    showDialog(context: context, barrierColor: Colors.black54, builder: (ctx) => Dialog(
+      backgroundColor: Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       child: Padding(padding: const EdgeInsets.all(28), child: Column(mainAxisSize: MainAxisSize.min, children: [
         Container(width: 72, height: 72, decoration: BoxDecoration(color: const Color(0xFFFEF2F2), shape: BoxShape.circle),
