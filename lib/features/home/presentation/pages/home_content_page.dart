@@ -322,7 +322,6 @@ class _HomeContentPageState extends State<HomeContentPage> {
               ],
             ),
             child: Row(
-              mainAxisSize: MainAxisSize.min,
               children: [
                 const Icon(
                   Icons.location_on_outlined,
@@ -330,8 +329,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
                   color: Color(0xFF1A202C),
                 ),
                 const SizedBox(width: 4),
-                ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 80),
+                Flexible(
                   child: Text(
                     cityName,
                     style: const TextStyle(
@@ -339,6 +337,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
                       fontWeight: FontWeight.w500,
                       color: Color(0xFF1A202C),
                     ),
+                    maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
