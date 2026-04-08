@@ -9,6 +9,12 @@ class GcTokens {
   static const Color primary = Color(0xFF6F3FCC);
   static const Color primaryDark = Color(0xFF5B21B6);
   static const Color secondary = Color(0xFF9F7AEA);
+
+  // Premium brand palette for gift cards
+  static const Color brandLime = Color(0xFFC0FF88);
+  static const Color brandLimeDark = Color(0xFF8FE13D);
+  static const Color brandBlack = Color(0xFF0A0B0F);
+  static const Color brandInk = Color(0xFF14161D);
   static const Color success = Color(0xFF059669);
   static const Color warning = Color(0xFFD97706);
   static const Color danger = Color(0xFFEF4444);

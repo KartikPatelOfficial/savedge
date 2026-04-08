@@ -12,6 +12,7 @@ import 'package:savedge/features/auth/domain/repositories/auth_repository.dart';
 import 'package:savedge/features/gift_cards/data/models/gift_card_models.dart'
     show GiftCardPriceBreakdown;
 import 'package:savedge/features/gift_cards/domain/entities/gift_card_entity.dart';
+import 'package:savedge/features/gift_cards/domain/repositories/gift_card_repository.dart';
 import 'package:savedge/features/gift_cards/presentation/bloc/gift_cards_bloc.dart';
 
 import '../theme/gc_tokens.dart';
@@ -250,7 +251,8 @@ class _CheckoutViewState extends State<_CheckoutView> {
             _showError(state.message);
           } else if (state is GiftCardRazorpayOrderCreated) {
             if (state.razorpayOrderId.isEmpty) {
-              _showSuccessSimple();
+              _currentOrderId = state.orderId;
+              _resolveAndShowSuccess();
             } else {
               _openRazorpayCheckout(state);
             }
@@ -258,7 +260,7 @@ class _CheckoutViewState extends State<_CheckoutView> {
             _showError(state.message);
           } else if (state is GiftCardPaymentVerified) {
             if (state.success) {
-              _showSuccessSimple(message: state.message);
+              _resolveAndShowSuccess(message: state.message);
             } else {
               _showFailureDialog(state.message);
             }
@@ -523,11 +525,22 @@ class _CheckoutViewState extends State<_CheckoutView> {
     );
   }
 
-  void _showSuccessSimple({String? message}) {
+  Future<void> _resolveAndShowSuccess({String? message}) async {
+    GiftCardOrderEntity? order;
+    if (_currentOrderId != null) {
+      try {
+        final result =
+            await getIt<GiftCardRepository>().getOrder(_currentOrderId!);
+        result.fold((_) => null, (o) => order = o);
+      } catch (_) {
+        // ignore — fall through to no-order success state
+      }
+    }
+    if (!mounted) return;
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => _SuccessDialog(message: message),
+      builder: (_) => _SuccessDialog(message: message, order: order),
     );
   }
 
@@ -536,8 +549,9 @@ class _CheckoutViewState extends State<_CheckoutView> {
       context: context,
       barrierDismissible: false,
       builder: (_) => _SuccessDialog(
+        order: order,
         message: order.isCompleted
-            ? 'Your gift card is ready. Check your orders to view the card details.'
+            ? 'Your gift card is ready. Tap below to reveal it.'
             : 'Your gift card order #${order.id} is being processed.',
       ),
     );
@@ -592,14 +606,14 @@ class _CheckoutViewState extends State<_CheckoutView> {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              Navigator.popUntil(context, (r) => r.isFirst);
+              _popToGiftCardsListing(context);
             },
             child: const Text('OK'),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              Navigator.popUntil(context, (r) => r.isFirst);
+              _popToGiftCardsListing(context);
               Navigator.pushNamed(context, '/gift-card-orders');
             },
             child: const Text('View Orders'),
@@ -610,9 +624,22 @@ class _CheckoutViewState extends State<_CheckoutView> {
   }
 }
 
+void _popToGiftCardsListing(BuildContext context) {
+  Navigator.popUntil(
+    context,
+    (r) => r.settings.name == '/gift-cards' || r.isFirst,
+  );
+}
+
 class _SuccessDialog extends StatelessWidget {
-  const _SuccessDialog({this.message});
+  const _SuccessDialog({this.message, this.order});
   final String? message;
+  final GiftCardOrderEntity? order;
+
+  bool get _canShowCard =>
+      order != null &&
+      (order!.woohooCardNumber != null &&
+          order!.woohooCardNumber!.isNotEmpty);
 
   @override
   Widget build(BuildContext context) {
@@ -662,17 +689,25 @@ class _SuccessDialog extends StatelessWidget {
         TextButton(
           onPressed: () {
             Navigator.pop(context);
-            Navigator.popUntil(context, (r) => r.isFirst);
+            _popToGiftCardsListing(context);
           },
           child: const Text('OK'),
         ),
         TextButton(
           onPressed: () {
             Navigator.pop(context);
-            Navigator.popUntil(context, (r) => r.isFirst);
-            Navigator.pushNamed(context, '/gift-card-orders');
+            _popToGiftCardsListing(context);
+            if (_canShowCard) {
+              Navigator.pushNamed(
+                context,
+                '/gift-card-view',
+                arguments: order,
+              );
+            } else {
+              Navigator.pushNamed(context, '/gift-card-orders');
+            }
           },
-          child: const Text('View Orders'),
+          child: Text(_canShowCard ? 'Show Card' : 'View Orders'),
         ),
       ],
     );
