@@ -1,12 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
-import '../../../../core/injection/injection.dart';
+import 'package:savedge/core/injection/injection.dart';
+
 import '../../domain/entities/gift_card_entity.dart';
 import '../bloc/gift_cards_bloc.dart';
-import '../widgets/gift_card_order_card.dart';
+import '../theme/gc_tokens.dart';
+import '../widgets/gc_empty_state.dart';
+import '../widgets/gc_order_detail_card.dart';
+import '../widgets/gc_skeleton.dart';
+
+enum _OrdersTab { all, active, processing, failed }
+
+extension on _OrdersTab {
+  String get label {
+    switch (this) {
+      case _OrdersTab.all:
+        return 'All';
+      case _OrdersTab.active:
+        return 'Active';
+      case _OrdersTab.processing:
+        return 'Processing';
+      case _OrdersTab.failed:
+        return 'Failed';
+    }
+  }
+
+  bool match(GiftCardOrderStatusEntity s) {
+    switch (this) {
+      case _OrdersTab.all:
+        return true;
+      case _OrdersTab.active:
+        return s == GiftCardOrderStatusEntity.completed;
+      case _OrdersTab.processing:
+        return s == GiftCardOrderStatusEntity.pending ||
+            s == GiftCardOrderStatusEntity.paymentCompleted ||
+            s == GiftCardOrderStatusEntity.issuing;
+      case _OrdersTab.failed:
+        return s == GiftCardOrderStatusEntity.failed ||
+            s == GiftCardOrderStatusEntity.cancelled ||
+            s == GiftCardOrderStatusEntity.refunded;
+    }
+  }
+}
 
 class GiftCardOrdersPage extends StatelessWidget {
   const GiftCardOrdersPage({super.key});
@@ -14,277 +51,162 @@ class GiftCardOrdersPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) =>
+      create: (_) =>
           getIt<GiftCardsBloc>()..add(const LoadGiftCardOrders()),
-      child: const GiftCardOrdersView(),
+      child: const _OrdersView(),
     );
   }
 }
 
-class GiftCardOrdersView extends StatefulWidget {
-  const GiftCardOrdersView({super.key});
+class _OrdersView extends StatefulWidget {
+  const _OrdersView();
 
   @override
-  State<GiftCardOrdersView> createState() => _GiftCardOrdersViewState();
+  State<_OrdersView> createState() => _OrdersViewState();
 }
 
-class _GiftCardOrdersViewState extends State<GiftCardOrdersView> {
-  GiftCardOrderStatusEntity? _selectedStatus;
-
-  static const _filters = <(String, GiftCardOrderStatusEntity?)>[
-    ('All', null),
-    ('Completed', GiftCardOrderStatusEntity.completed),
-    ('Pending', GiftCardOrderStatusEntity.pending),
-    ('Issuing', GiftCardOrderStatusEntity.issuing),
-    ('Failed', GiftCardOrderStatusEntity.failed),
-    ('Refunded', GiftCardOrderStatusEntity.refunded),
-  ];
-
-  void _filterByStatus(GiftCardOrderStatusEntity? status) {
-    HapticFeedback.selectionClick();
-    setState(() => _selectedStatus = status);
-    context.read<GiftCardsBloc>().add(LoadGiftCardOrders(status: status));
-  }
+class _OrdersViewState extends State<_OrdersView> {
+  _OrdersTab _tab = _OrdersTab.all;
 
   @override
   Widget build(BuildContext context) {
-    final topPad = MediaQuery.of(context).padding.top;
-
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F7FC),
-      body: Column(
-        children: [
-          // ── Custom header ─────────────────────────────────────────
-          Container(
-            padding: EdgeInsets.fromLTRB(20, topPad + 12, 20, 16),
-            color: Colors.white,
-            child: Column(
-              children: [
-                // Nav row
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () => Navigator.pop(context),
-                      child: Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF3F4F6),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Icon(Icons.arrow_back_ios_new_rounded,
-                            size: 18, color: Color(0xFF374151)),
-                      ),
-                    ),
-                    const Expanded(
-                      child: Text(
-                        'My Orders',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w800,
-                          color: Color(0xFF111827),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 40), // balance the back button
+      backgroundColor: GcTokens.background,
+      appBar: AppBar(
+        backgroundColor: GcTokens.background,
+        surfaceTintColor: GcTokens.background,
+        elevation: 0,
+        systemOverlayStyle: SystemUiOverlayStyle.dark,
+        title: const Text(
+          'My Gift Cards',
+          style: TextStyle(
+            fontSize: 17,
+            fontWeight: FontWeight.w900,
+            color: GcTokens.textPrimary,
+          ),
+        ),
+        leading: IconButton(
+          onPressed: () => Navigator.pop(context),
+          icon: const Icon(
+            Icons.arrow_back_ios_new_rounded,
+            size: 18,
+            color: GcTokens.textPrimary,
+          ),
+        ),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(56),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: SizedBox(
+              height: 44,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                children: [
+                  for (final t in _OrdersTab.values) ...[
+                    _tabPill(t),
+                    const SizedBox(width: 8),
                   ],
-                ),
-
-                const SizedBox(height: 14),
-
-                // ── Filter chips ──────────────────────────────────────
-                SizedBox(
-                  height: 38,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: _filters.length,
-                    separatorBuilder: (_, __) => const SizedBox(width: 8),
-                    itemBuilder: (context, index) {
-                      final (label, status) = _filters[index];
-                      final isSelected = _selectedStatus == status;
-                      return GestureDetector(
-                        onTap: () => _filterByStatus(status),
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 180),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: isSelected
-                                ? const Color(0xFF6F3FCC)
-                                : Colors.white,
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color: isSelected
-                                  ? const Color(0xFF6F3FCC)
-                                  : const Color(0xFFE5E7EB),
-                              width: 1.5,
-                            ),
-                          ),
-                          child: Row(
-                            children: [
-                              if (isSelected) ...[
-                                const Icon(Icons.check_rounded,
-                                    size: 14, color: Colors.white),
-                                const SizedBox(width: 4),
-                              ],
-                              Text(
-                                label,
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w700,
-                                  color: isSelected
-                                      ? Colors.white
-                                      : const Color(0xFF6B7280),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+      body: RefreshIndicator(
+        color: GcTokens.primary,
+        onRefresh: () async {
+          context
+              .read<GiftCardsBloc>()
+              .add(const LoadGiftCardOrders());
+        },
+        child: BlocBuilder<GiftCardsBloc, GiftCardsState>(
+          buildWhen: (_, s) =>
+              s is GiftCardOrdersLoading ||
+              s is GiftCardOrdersLoaded ||
+              s is GiftCardOrdersError,
+          builder: (context, state) {
+            if (state is GiftCardOrdersLoading) {
+              return ListView(
+                children: const [
+                  SizedBox(height: 12),
+                  GcListSkeleton(count: 5),
+                ],
+              );
+            }
+            if (state is GiftCardOrdersError) {
+              return ListView(
+                children: [
+                  GcEmptyState(
+                    icon: Icons.error_outline_rounded,
+                    title: 'Could not load your orders',
+                    message: state.message,
+                    actionLabel: 'Retry',
+                    onAction: () => context
+                        .read<GiftCardsBloc>()
+                        .add(const LoadGiftCardOrders()),
                   ),
-                ),
-              ],
-            ),
-          ),
-
-          // ── Orders list ───────────────────────────────────────────
-          Expanded(
-            child: BlocBuilder<GiftCardsBloc, GiftCardsState>(
-              buildWhen: (prev, curr) =>
-                  curr is GiftCardOrdersLoading ||
-                  curr is GiftCardOrdersLoaded ||
-                  curr is GiftCardOrdersError,
-              builder: (context, state) {
-                if (state is GiftCardOrdersLoading) {
-                  return const Center(
-                    child: CircularProgressIndicator(
-                        color: Color(0xFF6F3FCC)),
-                  );
-                }
-
-                if (state is GiftCardOrdersLoaded) {
-                  if (state.orders.isEmpty) {
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            width: 80,
-                            height: 80,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFF3EFFE),
-                              borderRadius: BorderRadius.circular(24),
-                            ),
-                            child: const Icon(Icons.receipt_long_rounded,
-                                size: 36, color: Color(0xFF7C3AED)),
-                          ),
-                          const SizedBox(height: 20),
-                          const Text(
-                            'No orders yet',
-                            style: TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.w700,
-                              color: Color(0xFF374151),
-                            ),
-                          ),
-                          const SizedBox(height: 6),
-                          const Text(
-                            'Your gift card orders will appear here',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: Color(0xFF9CA3AF),
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-
-                  return RefreshIndicator(
-                    onRefresh: () async {
-                      HapticFeedback.mediumImpact();
-                      context.read<GiftCardsBloc>().add(
-                          LoadGiftCardOrders(status: _selectedStatus));
-                    },
-                    color: const Color(0xFF6F3FCC),
-                    child: AnimationLimiter(
-                      child: ListView.builder(
-                        padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-                        itemCount: state.orders.length,
-                        itemBuilder: (context, index) {
-                          return AnimationConfiguration.staggeredList(
-                            position: index,
-                            duration: const Duration(milliseconds: 350),
-                            child: SlideAnimation(
-                              verticalOffset: 30,
-                              child: FadeInAnimation(
-                                child: GiftCardOrderCard(
-                                    order: state.orders[index]),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
+                ],
+              );
+            }
+            if (state is GiftCardOrdersLoaded) {
+              final filtered =
+                  state.orders.where((o) => _tab.match(o.status)).toList();
+              if (filtered.isEmpty) {
+                return ListView(
+                  children: const [
+                    GcEmptyState(
+                      icon: Icons.card_giftcard_rounded,
+                      title: 'No gift cards yet',
+                      message:
+                          'Your purchased gift cards will appear here so you can grab the codes anytime.',
                     ),
-                  );
-                }
+                  ],
+                );
+              }
+              return ListView.builder(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                itemCount: filtered.length,
+                itemBuilder: (_, i) => GcOrderDetailCard(order: filtered[i]),
+              );
+            }
+            return const SizedBox.shrink();
+          },
+        ),
+      ),
+    );
+  }
 
-                if (state is GiftCardOrdersError) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: 64,
-                          height: 64,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFFEF2F2),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: const Icon(Icons.error_outline_rounded,
-                              size: 28, color: Color(0xFFDC2626)),
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          state.message,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: Color(0xFF6B7280),
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 16),
-                        GestureDetector(
-                          onTap: () => _filterByStatus(_selectedStatus),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 10),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF6F3FCC),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: const Text(
-                              'Try Again',
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-
-                return const SizedBox.shrink();
-              },
-            ),
+  Widget _tabPill(_OrdersTab tab) {
+    final selected = _tab == tab;
+    return GestureDetector(
+      onTap: () => setState(() => _tab = tab),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+        decoration: BoxDecoration(
+          color: selected ? GcTokens.primary : Colors.white,
+          borderRadius: BorderRadius.circular(GcTokens.rPill),
+          border: Border.all(
+            color: selected ? GcTokens.primary : const Color(0xFFEFEAFB),
           ),
-        ],
+          boxShadow: selected
+              ? [
+                  BoxShadow(
+                    color: GcTokens.primary.withValues(alpha: 0.32),
+                    offset: const Offset(0, 6),
+                    blurRadius: 12,
+                  ),
+                ]
+              : null,
+        ),
+        child: Text(
+          tab.label,
+          style: TextStyle(
+            fontSize: 12.5,
+            fontWeight: FontWeight.w800,
+            color: selected ? Colors.white : GcTokens.textPrimary,
+          ),
+        ),
       ),
     );
   }

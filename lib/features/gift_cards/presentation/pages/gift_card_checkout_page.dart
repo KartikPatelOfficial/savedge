@@ -1,22 +1,24 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
+
 import 'package:savedge/core/injection/injection.dart';
+import 'package:savedge/core/storage/secure_storage_service.dart';
+import 'package:savedge/core/widgets/login_prompt.dart';
 import 'package:savedge/features/auth/data/models/user_profile_models.dart';
 import 'package:savedge/features/auth/domain/repositories/auth_repository.dart';
 import 'package:savedge/features/gift_cards/data/models/gift_card_models.dart'
     show GiftCardPriceBreakdown;
 import 'package:savedge/features/gift_cards/domain/entities/gift_card_entity.dart';
-import 'package:savedge/core/storage/secure_storage_service.dart';
-import 'package:savedge/core/widgets/login_prompt.dart';
 import 'package:savedge/features/gift_cards/presentation/bloc/gift_cards_bloc.dart';
 
-class GiftCardCheckoutPage extends StatelessWidget {
-  final GiftCardProductEntity product;
-  final double amount;
-  final String? themeSku;
+import '../theme/gc_tokens.dart';
+import '../widgets/gc_payment_method_tile.dart';
+import '../widgets/gc_price_breakdown_card.dart';
 
+class GiftCardCheckoutPage extends StatelessWidget {
   const GiftCardCheckoutPage({
     super.key,
     required this.product,
@@ -24,45 +26,54 @@ class GiftCardCheckoutPage extends StatelessWidget {
     this.themeSku,
   });
 
-  @override
-  Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => getIt<GiftCardsBloc>(),
-      child: GiftCardCheckoutView(product: product, amount: amount, themeSku: themeSku),
-    );
-  }
-}
-
-class GiftCardCheckoutView extends StatefulWidget {
   final GiftCardProductEntity product;
   final double amount;
   final String? themeSku;
 
-  const GiftCardCheckoutView({
-    super.key,
-    required this.product,
-    required this.amount,
-    this.themeSku,
-  });
-
   @override
-  State<GiftCardCheckoutView> createState() => _GiftCardCheckoutViewState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => getIt<GiftCardsBloc>(),
+      child: _CheckoutView(
+        product: product,
+        amount: amount,
+        themeSku: themeSku,
+      ),
+    );
+  }
 }
 
-class _GiftCardCheckoutViewState extends State<GiftCardCheckoutView> {
-  bool _isEmployee = false;
-  bool _isLoadingProfile = true;
-  UserProfileResponse3? _userProfile;
-  bool _usePoints = false;
+enum _PayMethod { points, online }
+
+class _CheckoutView extends StatefulWidget {
+  const _CheckoutView({
+    required this.product,
+    required this.amount,
+    required this.themeSku,
+  });
+
+  final GiftCardProductEntity product;
+  final double amount;
+  final String? themeSku;
+
+  @override
+  State<_CheckoutView> createState() => _CheckoutViewState();
+}
+
+class _CheckoutViewState extends State<_CheckoutView> {
   Razorpay? _razorpay;
-  int? _currentOrderId;
+  bool _loadingProfile = true;
+  UserProfileResponse3? _profile;
+  bool _isEmployee = false;
   GiftCardPriceBreakdown? _breakdown;
+  _PayMethod _method = _PayMethod.online;
+  int? _currentOrderId;
 
   @override
   void initState() {
     super.initState();
-    _loadUserProfile();
     _initRazorpay();
+    _loadProfile();
   }
 
   @override
@@ -78,37 +89,44 @@ class _GiftCardCheckoutViewState extends State<GiftCardCheckoutView> {
     _razorpay!.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
   }
 
-  Future<void> _loadUserProfile() async {
+  Future<void> _loadProfile() async {
     try {
-      final authRepository = getIt<AuthRepository>();
-      final profile = await authRepository.getCurrentUserProfile();
+      final repo = getIt<AuthRepository>();
+      final profile = await repo.getCurrentUserProfile();
       setState(() {
-        _userProfile = profile;
+        _profile = profile;
         _isEmployee = profile.isEmployee;
-        _isLoadingProfile = false;
+        _loadingProfile = false;
+        if (_isEmployee && (profile.pointsBalance) > 0) {
+          _method = _PayMethod.points;
+        }
       });
-      _fetchPriceBreakdown();
-    } catch (e) {
-      setState(() => _isLoadingProfile = false);
-      _fetchPriceBreakdown();
+      _fetchBreakdown();
+    } catch (_) {
+      setState(() => _loadingProfile = false);
+      _fetchBreakdown();
     }
   }
 
-  void _fetchPriceBreakdown() {
-    final pointsToUse = _usePoints ? (_userProfile?.pointsBalance ?? 0) : 0;
+  void _fetchBreakdown() {
+    final usePoints = _method == _PayMethod.points;
+    final pts = usePoints ? (_profile?.pointsBalance ?? 0) : 0;
     context.read<GiftCardsBloc>().add(
-      LoadPriceBreakdown(
-        productId: widget.product.id,
-        amount: widget.amount,
-        pointsToUse: pointsToUse,
-      ),
-    );
+          LoadPriceBreakdown(
+            productId: widget.product.id,
+            amount: widget.amount,
+            pointsToUse: pts,
+          ),
+        );
   }
 
-  void _togglePoints(bool value) {
-    setState(() => _usePoints = value);
-    _fetchPriceBreakdown();
+  void _selectMethod(_PayMethod m) {
+    if (_method == m) return;
+    setState(() => _method = m);
+    _fetchBreakdown();
   }
+
+  // ── Razorpay handlers (preserved verbatim from original) ───────────────
 
   void _handlePaymentSuccess(PaymentSuccessResponse response) {
     if (_currentOrderId != null &&
@@ -116,13 +134,13 @@ class _GiftCardCheckoutViewState extends State<GiftCardCheckoutView> {
         response.orderId != null &&
         response.signature != null) {
       context.read<GiftCardsBloc>().add(
-        VerifyGiftCardPayment(
-          orderId: _currentOrderId!,
-          razorpayOrderId: response.orderId!,
-          razorpayPaymentId: response.paymentId!,
-          razorpaySignature: response.signature!,
-        ),
-      );
+            VerifyGiftCardPayment(
+              orderId: _currentOrderId!,
+              razorpayOrderId: response.orderId!,
+              razorpayPaymentId: response.paymentId!,
+              razorpaySignature: response.signature!,
+            ),
+          );
     }
   }
 
@@ -130,7 +148,7 @@ class _GiftCardCheckoutViewState extends State<GiftCardCheckoutView> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(response.message ?? 'Payment failed. Please try again.'),
-        backgroundColor: const Color(0xFFEF4444),
+        backgroundColor: GcTokens.danger,
       ),
     );
   }
@@ -139,7 +157,6 @@ class _GiftCardCheckoutViewState extends State<GiftCardCheckoutView> {
 
   void _openRazorpayCheckout(GiftCardRazorpayOrderCreated state) {
     _currentOrderId = state.orderId;
-
     final options = {
       'key': state.razorpayKeyId,
       'amount': state.razorpayAmountInPaise,
@@ -149,443 +166,167 @@ class _GiftCardCheckoutViewState extends State<GiftCardCheckoutView> {
       'description':
           '${state.productName} - \u20B9${state.requestedAmount.toStringAsFixed(0)}',
       'prefill': {
-        'contact': _userProfile?.phoneNumber ?? '',
-        'email': _userProfile?.email ?? '',
+        'contact': _profile?.phoneNumber ?? '',
+        'email': _profile?.email ?? '',
       },
       'theme': {'color': '#6F3FCC'},
     };
-
     _razorpay?.open(options);
   }
 
-  Future<void> _handlePurchase() async {
-    // Check authentication before proceeding
+  Future<void> _onPay() async {
     final secureStorage = getIt<SecureStorageService>();
-    final isAuthenticated = await secureStorage.isAuthenticated();
-    if (!isAuthenticated) {
+    final isAuth = await secureStorage.isAuthenticated();
+    if (!isAuth) {
       if (!mounted) return;
       LoginPrompt.show(context, message: 'Please sign in to purchase gift cards');
       return;
     }
 
-    final pointsToUse = _usePoints ? (_userProfile?.pointsBalance ?? 0) : 0;
+    final usePoints = _method == _PayMethod.points;
+    final pts = usePoints ? (_profile?.pointsBalance ?? 0) : 0;
     final breakdown = _breakdown;
 
-    // If points cover everything, use points payment
-    if (_usePoints && breakdown != null && breakdown.finalPayableAmount <= 0) {
+    if (usePoints && breakdown != null && breakdown.finalPayableAmount <= 0) {
       context.read<GiftCardsBloc>().add(
-        CreateGiftCardOrder(
-          giftCardProductId: widget.product.id,
-          amount: widget.amount,
-          paymentMethod: GiftCardPaymentMethodEntity.points,
-          themeSku: widget.themeSku,
-        ),
-      );
+            CreateGiftCardOrder(
+              giftCardProductId: widget.product.id,
+              amount: widget.amount,
+              paymentMethod: GiftCardPaymentMethodEntity.points,
+              themeSku: widget.themeSku,
+            ),
+          );
     } else {
       context.read<GiftCardsBloc>().add(
-        CreateGiftCardPaymentOrder(
-          giftCardProductId: widget.product.id,
-          amount: widget.amount,
-          pointsToUse: pointsToUse,
-          themeSku: widget.themeSku,
-        ),
-      );
+            CreateGiftCardPaymentOrder(
+              giftCardProductId: widget.product.id,
+              amount: widget.amount,
+              pointsToUse: pts,
+              themeSku: widget.themeSku,
+            ),
+          );
     }
   }
 
+  // ── UI ────────────────────────────────────────────────────────────────
+
   @override
   Widget build(BuildContext context) {
+    final p = widget.product;
+    final currency = p.currencySymbol ?? '\u20B9';
+    final pointsBalance = _profile?.pointsBalance ?? 0;
+    final pointsAvailable = _isEmployee && pointsBalance > 0;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: GcTokens.background,
       appBar: AppBar(
+        backgroundColor: GcTokens.background,
+        surfaceTintColor: GcTokens.background,
         elevation: 0,
-        backgroundColor: const Color(0xFF6F3FCC),
-        surfaceTintColor: const Color(0xFF6F3FCC),
-        systemOverlayStyle: SystemUiOverlayStyle.light,
-        leading: IconButton(
-          onPressed: () => Navigator.pop(context),
-          icon: const Icon(
-            Icons.arrow_back_ios_rounded,
-            color: Colors.white,
-            size: 18,
-          ),
-        ),
+        systemOverlayStyle: SystemUiOverlayStyle.dark,
         title: const Text(
           'Checkout',
           style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
+            fontSize: 17,
+            fontWeight: FontWeight.w900,
+            color: GcTokens.textPrimary,
           ),
         ),
         centerTitle: true,
+        leading: IconButton(
+          onPressed: () => Navigator.pop(context),
+          icon: const Icon(
+            Icons.arrow_back_ios_new_rounded,
+            size: 18,
+            color: GcTokens.textPrimary,
+          ),
+        ),
       ),
       body: BlocConsumer<GiftCardsBloc, GiftCardsState>(
         listener: (context, state) {
           if (state is GiftCardOrderCreated) {
             _showSuccessDialog(context, state.order);
           } else if (state is GiftCardOrderError) {
-            _showError(context, state.message);
+            _showError(state.message);
           } else if (state is GiftCardRazorpayOrderCreated) {
             if (state.razorpayOrderId.isEmpty) {
-              // Points-only payment completed via createPaymentOrder
-              _showSuccessDialogSimple(context);
+              _showSuccessSimple();
             } else {
               _openRazorpayCheckout(state);
             }
           } else if (state is GiftCardRazorpayOrderError) {
-            _showError(context, state.message);
+            _showError(state.message);
           } else if (state is GiftCardPaymentVerified) {
             if (state.success) {
-              _showSuccessDialogSimple(context, message: state.message);
+              _showSuccessSimple(message: state.message);
             } else {
-              _showFailureDialog(context, state.message);
+              _showFailureDialog(state.message);
             }
           } else if (state is GiftCardPaymentError) {
-            _showError(context, state.message);
+            _showError(state.message);
           } else if (state is PriceBreakdownLoaded) {
             setState(() => _breakdown = state.breakdown);
           }
         },
         builder: (context, state) {
-          if (_isLoadingProfile) {
+          if (_loadingProfile) {
             return const Center(
-              child: CircularProgressIndicator(color: Color(0xFF6F3FCC)),
+              child: CircularProgressIndicator(color: GcTokens.primary),
             );
           }
 
-          final discountAmount = widget.product.calculateDiscount(
-            widget.amount,
-          );
           final breakdown = _breakdown;
+          final payable = breakdown?.finalPayableAmount ??
+              widget.product.calculatePayable(widget.amount);
+          final discount = breakdown?.discountAmount ??
+              widget.product.calculateDiscount(widget.amount);
+          final pointsDiscount = breakdown?.pointsDiscount ?? 0;
+          final isLoading = state is GiftCardOrderCreating ||
+              state is GiftCardRazorpayOrderCreating ||
+              state is GiftCardPaymentVerifying;
 
           return Column(
             children: [
-              // Purple header summary
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [Color(0xFF6F3FCC), Color(0xFF5B21B6)],
-                  ),
-                  borderRadius: BorderRadius.vertical(
-                    bottom: Radius.circular(24),
-                  ),
-                ),
-                child: Column(
+              Expanded(
+                child: ListView(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
                   children: [
-                    Text(
-                      '${widget.product.currencySymbol ?? '\u20B9'}${widget.amount.toStringAsFixed(0)}',
-                      style: const TextStyle(
-                        fontSize: 36,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white,
+                    _buildOrderSummary(p, currency),
+                    const SizedBox(height: 18),
+                    if (pointsAvailable)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: GcPaymentMethodTile(
+                          icon: Icons.stars_rounded,
+                          title: 'Pay with magicPoints',
+                          subtitle: 'Balance: $pointsBalance pts',
+                          selected: _method == _PayMethod.points,
+                          onTap: () => _selectMethod(_PayMethod.points),
+                        ),
                       ),
+                    GcPaymentMethodTile(
+                      icon: Icons.credit_card_rounded,
+                      title: 'Pay online',
+                      subtitle: 'Cards, UPI, Net banking, Wallets',
+                      selected: _method == _PayMethod.online,
+                      onTap: () => _selectMethod(_PayMethod.online),
                     ),
-                    Text(
-                      widget.product.name,
-                      style: TextStyle(
-                        fontSize: 15,
-                        color: Colors.white.withOpacity(0.8),
-                      ),
+                    const SizedBox(height: 18),
+                    GcPriceBreakdownCard(
+                      amount: widget.amount,
+                      discountPercentage: widget.product.discountPercentage ?? 0,
+                      discountAmount: discount,
+                      pointsDiscount: pointsDiscount,
+                      totalPayable: payable,
+                      currencySymbol: currency,
                     ),
-                    if (widget.product.hasDiscount ||
-                        (breakdown != null &&
-                            breakdown.pointsDiscount > 0)) ...[
-                      const SizedBox(height: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF059669),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Text(
-                              'Saved ',
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
-                              ),
-                            ),
-                            Text(
-                              '\u20B9${((breakdown?.discountAmount ?? discountAmount) + (breakdown?.pointsDiscount ?? 0)).toStringAsFixed(0)}',
-                              style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
-                              ),
-                            ),
-                            const SizedBox(width: 4),
-                            const Text(
-                              '\uD83C\uDF89',
-                              style: TextStyle(fontSize: 13),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
                   ],
                 ),
               ),
-
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Points toggle (for employees)
-                      if (_isEmployee &&
-                          (_userProfile?.pointsBalance ?? 0) > 0) ...[
-                        Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: _usePoints
-                                ? const Color(0xFFFFF7ED)
-                                : const Color(0xFFFAFAFA),
-                            borderRadius: BorderRadius.circular(14),
-                            border: Border.all(
-                              color: _usePoints
-                                  ? const Color(0xFFF59E0B)
-                                  : Colors.grey[200]!,
-                              width: _usePoints ? 1.5 : 1,
-                            ),
-                          ),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 40,
-                                height: 40,
-                                decoration: BoxDecoration(
-                                  color: const Color(
-                                    0xFFF59E0B,
-                                  ).withOpacity(0.15),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: const Icon(
-                                  Icons.stars_rounded,
-                                  color: Color(0xFFF59E0B),
-                                  size: 22,
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text(
-                                      'Save using magicPoints',
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w600,
-                                        color: Color(0xFF1A202C),
-                                      ),
-                                    ),
-                                    Text(
-                                      'You have: ${_userProfile?.pointsBalance ?? 0} points',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.grey[600],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Switch.adaptive(
-                                value: _usePoints,
-                                onChanged: _togglePoints,
-                                activeColor: const Color(0xFFF59E0B),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                      ],
-
-                      // Payment Details breakdown
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFAFAFA),
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: Colors.grey[200]!),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Payment Details',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF1A202C),
-                              ),
-                            ),
-                            if (breakdown != null &&
-                                breakdown.availablePoints > 0) ...[
-                              const SizedBox(height: 2),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 2,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey[100],
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Text(
-                                          'You have: ${breakdown.availablePoints}',
-                                          style: TextStyle(
-                                            fontSize: 11,
-                                            color: Colors.grey[600],
-                                          ),
-                                        ),
-                                        const SizedBox(width: 3),
-                                        const Icon(
-                                          Icons.stars_rounded,
-                                          size: 13,
-                                          color: Color(0xFFF59E0B),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                            const SizedBox(height: 12),
-                            _buildRow(
-                              'Bill amount',
-                              '\u20B9${widget.amount.toStringAsFixed(0)}',
-                            ),
-                            if (_usePoints &&
-                                breakdown != null &&
-                                breakdown.pointsDiscount > 0) ...[
-                              const SizedBox(height: 8),
-                              _buildRow(
-                                'Save using magicPoints',
-                                '-\u20B9${breakdown.pointsDiscount.toStringAsFixed(0)}',
-                                valueColor: const Color(0xFF059669),
-                                labelColor: const Color(0xFF059669),
-                              ),
-                            ],
-                            if (widget.product.hasDiscount) ...[
-                              const SizedBox(height: 8),
-                              _buildRow(
-                                'Discount (${widget.product.discountPercentage!.toStringAsFixed(0)}%)',
-                                '-\u20B9${(breakdown?.discountAmount ?? discountAmount).toStringAsFixed(0)}',
-                                valueColor: const Color(0xFF059669),
-                              ),
-                            ],
-                            const Divider(height: 20),
-                            _buildRow(
-                              'To Pay',
-                              '\u20B9${(breakdown?.finalPayableAmount ?? widget.product.calculatePayable(widget.amount)).toStringAsFixed(1)}',
-                              isBold: true,
-                              valueColor: const Color(0xFF6F3FCC),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-
-                      // Payment method (only if there's an amount to pay online)
-                      if (!_isEmployee ||
-                          (breakdown != null &&
-                              breakdown.finalPayableAmount > 0 &&
-                              !_usePoints)) ...[
-                        const Text(
-                          'Payment Method',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF1A202C),
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        _buildPaymentOption(
-                          isSelected: true,
-                          icon: Icons.payment_rounded,
-                          title: 'Pay Online',
-                          subtitle: 'Credit/Debit/UPI',
-                          onTap: () {},
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-              ),
-
-              // Bottom CTA
-              SafeArea(
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    border: Border(
-                      top: BorderSide(color: Color(0xFFF3F4F6), width: 1.5),
-                    ),
-                  ),
-                  child: BlocBuilder<GiftCardsBloc, GiftCardsState>(
-                    builder: (context, state) {
-                      final isLoading =
-                          state is GiftCardOrderCreating ||
-                          state is GiftCardRazorpayOrderCreating ||
-                          state is GiftCardPaymentVerifying;
-
-                      final payAmount =
-                          breakdown?.finalPayableAmount ??
-                          widget.product.calculatePayable(widget.amount);
-                      final isFullyPoints = _usePoints && payAmount <= 0;
-
-                      return ElevatedButton(
-                        onPressed: isLoading ? null : _handlePurchase,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF6F3FCC),
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                          elevation: 0,
-                          minimumSize: const Size(double.infinity, 52),
-                        ),
-                        child: isLoading
-                            ? const SizedBox(
-                                height: 20,
-                                width: 20,
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : Text(
-                                isFullyPoints
-                                    ? 'Pay with Points'
-                                    : 'Pay \u20B9${payAmount.toStringAsFixed(1)}',
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                      );
-                    },
-                  ),
-                ),
+              _buildBottomBar(
+                isLoading: isLoading,
+                payable: payable,
+                currency: currency,
               ),
             ],
           );
@@ -594,89 +335,199 @@ class _GiftCardCheckoutViewState extends State<GiftCardCheckoutView> {
     );
   }
 
-  Widget _buildRow(
-    String label,
-    String value, {
-    bool isBold = false,
-    Color? valueColor,
-    Color? labelColor,
-  }) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: isBold ? 15 : 14,
-            fontWeight: isBold ? FontWeight.w700 : FontWeight.w500,
-            color:
-                labelColor ??
-                (isBold ? const Color(0xFF1A202C) : Colors.grey[600]),
-          ),
-        ),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: isBold ? 16 : 14,
-            fontWeight: isBold ? FontWeight.w700 : FontWeight.w600,
-            color: valueColor ?? const Color(0xFF1A202C),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPaymentOption({
-    required bool isSelected,
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? const Color(0xFF6F3FCC).withOpacity(0.08)
-              : const Color(0xFFFAFAFA),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isSelected ? const Color(0xFF6F3FCC) : Colors.grey[200]!,
-            width: isSelected ? 2 : 1,
-          ),
-        ),
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              size: 28,
-              color: isSelected ? const Color(0xFF6F3FCC) : Colors.grey[600],
+  Widget _buildOrderSummary(GiftCardProductEntity p, String currency) {
+    final accent = GcTokens.accentFor(p.id);
+    final bg = GcTokens.bgFor(p.id);
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(GcTokens.rCard),
+        border: Border.all(color: const Color(0xFFEFEAFB)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 70,
+            height: 70,
+            decoration: BoxDecoration(
+              color: bg,
+              borderRadius: BorderRadius.circular(14),
             ),
-            const SizedBox(width: 12),
-            Column(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(14),
+              child: p.imageUrl != null
+                  ? CachedNetworkImage(
+                      imageUrl: p.imageUrl!,
+                      fit: BoxFit.cover,
+                      errorWidget: (_, __, ___) => Container(color: bg),
+                    )
+                  : Container(color: bg),
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  title,
-                  style: TextStyle(
+                  p.brandName ?? p.name,
+                  style: const TextStyle(
                     fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: isSelected
-                        ? const Color(0xFF6F3FCC)
-                        : const Color(0xFF1A202C),
+                    fontWeight: FontWeight.w900,
+                    color: GcTokens.textPrimary,
                   ),
                 ),
+                const SizedBox(height: 4),
                 Text(
-                  subtitle,
-                  style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+                  'E-Voucher · Instant delivery',
+                  style: TextStyle(
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w600,
+                    color: accent,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 5,
+                  ),
+                  decoration: BoxDecoration(
+                    color: accent.withValues(alpha: 0.10),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    '$currency${widget.amount.toStringAsFixed(0)}',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w900,
+                      color: accent,
+                    ),
+                  ),
                 ),
               ],
             ),
-          ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBottomBar({
+    required bool isLoading,
+    required double payable,
+    required String currency,
+  }) {
+    final isPointsOnly = _method == _PayMethod.points && payable <= 0;
+    final label = isPointsOnly
+        ? 'Pay with Points'
+        : 'Pay $currency${payable.toStringAsFixed(0)}';
+
+    return Material(
+      color: Colors.white,
+      elevation: 12,
+      shadowColor: Colors.black.withValues(alpha: 0.08),
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                width: double.infinity,
+                height: 56,
+                child: ElevatedButton(
+                  onPressed: isLoading ? null : _onPay,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: GcTokens.primary,
+                    disabledBackgroundColor:
+                        GcTokens.primary.withValues(alpha: 0.45),
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    padding: EdgeInsets.zero,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                  child: isLoading
+                      ? const SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2.4,
+                          ),
+                        )
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.lock_rounded,
+                              size: 16,
+                              color: Colors.white,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              label,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 0.2,
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            const Icon(
+                              Icons.arrow_forward_rounded,
+                              size: 18,
+                              color: Colors.white,
+                            ),
+                          ],
+                        ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.verified_user_rounded,
+                    size: 12,
+                    color: GcTokens.textTertiary.withValues(alpha: 0.7),
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    '256-bit secure  ·  Powered by Razorpay',
+                    style: TextStyle(
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w700,
+                      color: GcTokens.textTertiary.withValues(alpha: 0.85),
+                      letterSpacing: 0.2,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
+    );
+  }
+
+  // ── Dialogs / errors ───────────────────────────────────────────────────
+
+  void _showError(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(msg), backgroundColor: GcTokens.danger),
+    );
+  }
+
+  void _showSuccessSimple({String? message}) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => _SuccessDialog(message: message),
     );
   }
 
@@ -684,166 +535,56 @@ class _GiftCardCheckoutViewState extends State<GiftCardCheckoutView> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 60,
-              height: 60,
-              decoration: BoxDecoration(
-                color: const Color(0xFF059669).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(30),
-              ),
-              child: const Icon(
-                Icons.check_circle_rounded,
-                size: 40,
-                color: Color(0xFF059669),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              order.isCompleted
-                  ? 'Gift Card Issued!'
-                  : 'Order Placed Successfully!',
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF1A202C),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              order.isCompleted
-                  ? 'Your gift card is ready. Check your orders to view the card details.'
-                  : 'Your gift card order #${order.id} is being processed.',
-              style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              Navigator.popUntil(context, (route) => route.isFirst);
-            },
-            child: const Text('OK'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              Navigator.popUntil(context, (route) => route.isFirst);
-              Navigator.pushNamed(context, '/gift-card-orders');
-            },
-            child: const Text('View Orders'),
-          ),
-        ],
+      builder: (_) => _SuccessDialog(
+        message: order.isCompleted
+            ? 'Your gift card is ready. Check your orders to view the card details.'
+            : 'Your gift card order #${order.id} is being processed.',
       ),
     );
   }
 
-  void _showSuccessDialogSimple(BuildContext context, {String? message}) {
+  void _showFailureDialog(String message) {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
+      builder: (_) => AlertDialog(
         backgroundColor: Colors.white,
-        surfaceTintColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 60,
-              height: 60,
-              decoration: BoxDecoration(
-                color: const Color(0xFF059669).withAlpha(25),
-                borderRadius: BorderRadius.circular(30),
-              ),
-              child: const Icon(
-                Icons.check_circle_rounded,
-                size: 40,
-                color: Color(0xFF059669),
-              ),
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'Order Placed!',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF1A202C),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              message ?? 'Your gift card is being issued. Check your orders for details.',
-              style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-              textAlign: TextAlign.center,
-            ),
-          ],
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
         ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              Navigator.popUntil(context, (route) => route.isFirst);
-            },
-            child: const Text('OK'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              Navigator.popUntil(context, (route) => route.isFirst);
-              Navigator.pushNamed(context, '/gift-card-orders');
-            },
-            child: const Text('View Orders'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showFailureDialog(BuildContext context, String message) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 60,
-              height: 60,
+              width: 64,
+              height: 64,
               decoration: BoxDecoration(
-                color: const Color(0xFFEF4444).withAlpha(25),
-                borderRadius: BorderRadius.circular(30),
+                color: GcTokens.danger.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(32),
               ),
               child: const Icon(
                 Icons.error_outline_rounded,
-                size: 40,
-                color: Color(0xFFEF4444),
+                color: GcTokens.danger,
+                size: 36,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 14),
             const Text(
               'Order Failed',
               style: TextStyle(
                 fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF1A202C),
+                fontWeight: FontWeight.w900,
+                color: GcTokens.textPrimary,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             Text(
               message,
-              style: TextStyle(fontSize: 14, color: Colors.grey[600]),
               textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: GcTokens.textTertiary,
+                fontSize: 13,
+              ),
             ),
           ],
         ),
@@ -851,14 +592,14 @@ class _GiftCardCheckoutViewState extends State<GiftCardCheckoutView> {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              Navigator.popUntil(context, (route) => route.isFirst);
+              Navigator.popUntil(context, (r) => r.isFirst);
             },
             child: const Text('OK'),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              Navigator.popUntil(context, (route) => route.isFirst);
+              Navigator.popUntil(context, (r) => r.isFirst);
               Navigator.pushNamed(context, '/gift-card-orders');
             },
             child: const Text('View Orders'),
@@ -867,13 +608,73 @@ class _GiftCardCheckoutViewState extends State<GiftCardCheckoutView> {
       ),
     );
   }
+}
 
-  void _showError(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: const Color(0xFFEF4444),
+class _SuccessDialog extends StatelessWidget {
+  const _SuccessDialog({this.message});
+  final String? message;
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 72,
+            height: 72,
+            decoration: BoxDecoration(
+              color: GcTokens.success.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(36),
+            ),
+            child: const Icon(
+              Icons.check_circle_rounded,
+              color: GcTokens.success,
+              size: 42,
+            ),
+          ),
+          const SizedBox(height: 14),
+          const Text(
+            'Order placed!',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w900,
+              color: GcTokens.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            message ??
+                'Your gift card is being issued. Check your orders for details.',
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: GcTokens.textTertiary,
+              fontSize: 13,
+              height: 1.4,
+            ),
+          ),
+        ],
       ),
+      actionsPadding: const EdgeInsets.symmetric(horizontal: 12),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context);
+            Navigator.popUntil(context, (r) => r.isFirst);
+          },
+          child: const Text('OK'),
+        ),
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context);
+            Navigator.popUntil(context, (r) => r.isFirst);
+            Navigator.pushNamed(context, '/gift-card-orders');
+          },
+          child: const Text('View Orders'),
+        ),
+      ],
     );
   }
 }
