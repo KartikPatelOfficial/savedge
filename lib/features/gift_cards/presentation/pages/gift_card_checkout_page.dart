@@ -16,6 +16,7 @@ import 'package:savedge/features/gift_cards/domain/repositories/gift_card_reposi
 import 'package:savedge/features/gift_cards/presentation/bloc/gift_cards_bloc.dart';
 
 import '../theme/gc_tokens.dart';
+import '../widgets/gc_palette_extractor.dart';
 import '../widgets/gc_payment_method_tile.dart';
 import '../widgets/gc_price_breakdown_card.dart';
 
@@ -69,12 +70,23 @@ class _CheckoutViewState extends State<_CheckoutView> {
   GiftCardPriceBreakdown? _breakdown;
   _PayMethod _method = _PayMethod.online;
   int? _currentOrderId;
+  Color _accent = GcTokens.primary;
 
   @override
   void initState() {
     super.initState();
     _initRazorpay();
     _loadProfile();
+    _accent = GcTokens.accentFor(widget.product.id);
+    _resolvePalette();
+  }
+
+  Future<void> _resolvePalette() async {
+    final picked = await GcPaletteExtractor.resolve(
+      widget.product.imageUrl,
+      _accent,
+    );
+    if (mounted && picked != _accent) setState(() => _accent = picked);
   }
 
   @override
@@ -304,6 +316,7 @@ class _CheckoutViewState extends State<_CheckoutView> {
                           subtitle: 'Balance: $pointsBalance pts',
                           selected: _method == _PayMethod.points,
                           onTap: () => _selectMethod(_PayMethod.points),
+                          accent: _accent,
                         ),
                       ),
                     GcPaymentMethodTile(
@@ -312,6 +325,7 @@ class _CheckoutViewState extends State<_CheckoutView> {
                       subtitle: 'Cards, UPI, Net banking, Wallets',
                       selected: _method == _PayMethod.online,
                       onTap: () => _selectMethod(_PayMethod.online),
+                      accent: _accent,
                     ),
                     const SizedBox(height: 18),
                     GcPriceBreakdownCard(
@@ -321,6 +335,7 @@ class _CheckoutViewState extends State<_CheckoutView> {
                       pointsDiscount: pointsDiscount,
                       totalPayable: payable,
                       currencySymbol: currency,
+                      accent: _accent,
                     ),
                   ],
                 ),
@@ -338,8 +353,8 @@ class _CheckoutViewState extends State<_CheckoutView> {
   }
 
   Widget _buildOrderSummary(GiftCardProductEntity p, String currency) {
-    final accent = GcTokens.accentFor(p.id);
-    final bg = GcTokens.bgFor(p.id);
+    final accent = _accent;
+    final bg = Color.lerp(_accent, Colors.white, 0.85)!;
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -443,9 +458,9 @@ class _CheckoutViewState extends State<_CheckoutView> {
                 child: ElevatedButton(
                   onPressed: isLoading ? null : _onPay,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: GcTokens.primary,
+                    backgroundColor: _accent,
                     disabledBackgroundColor:
-                        GcTokens.primary.withValues(alpha: 0.45),
+                        _accent.withValues(alpha: 0.45),
                     foregroundColor: Colors.white,
                     elevation: 0,
                     padding: EdgeInsets.zero,

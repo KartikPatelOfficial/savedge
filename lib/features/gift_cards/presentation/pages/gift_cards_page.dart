@@ -4,6 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/injection/injection.dart';
 import '../../data/services/gift_card_favorites_service.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+
 import '../../domain/entities/gift_card_entity.dart';
 import '../bloc/gift_cards_bloc.dart';
 import '../theme/gc_tokens.dart';
@@ -14,7 +16,7 @@ import '../widgets/gc_quick_filter_chips.dart';
 import '../widgets/gc_search_bar.dart';
 import '../widgets/gc_section_header.dart';
 import '../widgets/gc_skeleton.dart';
-import '../widgets/gc_sort_filter_sheet.dart';
+import '../widgets/gc_palette_extractor.dart';
 import '../widgets/gc_trending_brand_tile.dart';
 import '../widgets/gift_card_product_card.dart';
 
@@ -27,7 +29,8 @@ class GiftCardsPage extends StatelessWidget {
       create: (_) => getIt<GiftCardsBloc>()
         ..add(const LoadGiftCardCategories())
         ..add(const LoadHotDeals())
-        ..add(const LoadGiftCardProducts()),
+        ..add(const LoadGiftCardProducts())
+        ..add(const LoadGiftCardOrders(pageSize: 10)),
       child: const _GiftCardsView(),
     );
   }
@@ -47,11 +50,10 @@ class _GiftCardsViewState extends State<_GiftCardsView> {
   List<GiftCardCategoryEntity> _categories = [];
   List<GiftCardProductEntity> _products = [];
   List<GiftCardProductEntity> _hotDeals = [];
+  List<GiftCardOrderEntity> _myOrders = [];
 
   GiftCardCategoryEntity? _selectedCategory;
   GcQuickFilter? _quickFilter;
-  GcSort _sort = GcSort.relevance;
-  double _minDiscount = 0;
 
   bool _loadingCategories = true;
   bool _loadingProducts = true;
@@ -69,44 +71,27 @@ class _GiftCardsViewState extends State<_GiftCardsView> {
 
     if (_quickFilter != null) {
       switch (_quickFilter!) {
-        case GcQuickFilter.topBrands:
+        case GcQuickFilter.onSale:
           list = list.where((p) => p.hasDiscount);
           break;
-        case GcQuickFilter.save20:
+        case GcQuickFilter.under500:
+          list = list.where((p) => p.minPrice < 500);
+          break;
+        case GcQuickFilter.from500to2000:
           list = list.where(
-            (p) => (p.discountPercentage ?? 0) >= 20,
+            (p) => p.minPrice >= 500 && p.minPrice <= 2000,
           );
           break;
-        case GcQuickFilter.save30:
-          list = list.where(
-            (p) => (p.discountPercentage ?? 0) >= 30,
-          );
+        case GcQuickFilter.above2000:
+          list = list.where((p) => p.minPrice > 2000);
           break;
-        case GcQuickFilter.trending:
-          list = list.where((p) => p.hasDiscount);
+        case GcQuickFilter.bigSaver:
+          list = list.where((p) => (p.discountPercentage ?? 0) >= 10);
           break;
       }
     }
 
-    if (_minDiscount > 0) {
-      list = list.where(
-        (p) => (p.discountPercentage ?? 0) >= _minDiscount,
-      );
-    }
-
-    final out = list.toList();
-    switch (_sort) {
-      case GcSort.relevance:
-        break;
-      case GcSort.discountDesc:
-        out.sort((a, b) =>
-            (b.discountPercentage ?? 0).compareTo(a.discountPercentage ?? 0));
-        break;
-      case GcSort.priceAsc:
-        out.sort((a, b) => a.minPrice.compareTo(b.minPrice));
-        break;
-    }
-    return out;
+    return list.toList();
   }
 
   void _onSearchSubmitted(String value) {
@@ -123,20 +108,6 @@ class _GiftCardsViewState extends State<_GiftCardsView> {
     context
         .read<GiftCardsBloc>()
         .add(LoadGiftCardProducts(categoryId: category?.id));
-  }
-
-  Future<void> _openSortSheet() async {
-    final result = await GcSortFilterSheet.show(
-      context,
-      sort: _sort,
-      minDiscount: _minDiscount,
-    );
-    if (result != null) {
-      setState(() {
-        _sort = result.sort;
-        _minDiscount = result.minDiscount;
-      });
-    }
   }
 
   void _openDetail(GiftCardProductEntity p) {
@@ -171,6 +142,14 @@ class _GiftCardsViewState extends State<_GiftCardsView> {
               listener: (_, s) {
                 if (s is HotDealsLoaded) {
                   setState(() => _hotDeals = s.hotDeals);
+                }
+              },
+            ),
+            BlocListener<GiftCardsBloc, GiftCardsState>(
+              listenWhen: (_, s) => s is GiftCardOrdersLoaded,
+              listener: (_, s) {
+                if (s is GiftCardOrdersLoaded) {
+                  setState(() => _myOrders = s.orders);
                 }
               },
             ),
@@ -224,13 +203,20 @@ class _GiftCardsViewState extends State<_GiftCardsView> {
                       ),
                     ),
                     SliverToBoxAdapter(child: _buildCategoryGrid()),
-                    const SliverToBoxAdapter(
-                      child: GcSectionHeader(
-                        title: 'Newly added brands',
-                        subtitle: 'Fresh on SavEdge',
+                    if (_myOrders.isNotEmpty) ...[
+                      SliverToBoxAdapter(
+                        child: GcSectionHeader(
+                          title: 'My cards',
+                          subtitle: 'Your latest gift card purchases',
+                          actionLabel: 'View all',
+                          onAction: () => Navigator.pushNamed(
+                            context,
+                            '/gift-card-orders',
+                          ),
+                        ),
                       ),
-                    ),
-                    SliverToBoxAdapter(child: _buildNewlyAdded()),
+                      SliverToBoxAdapter(child: _buildMyCards()),
+                    ],
                     SliverToBoxAdapter(child: const SizedBox(height: 18)),
                     SliverToBoxAdapter(child: _buildQuickFilters()),
                     SliverToBoxAdapter(
@@ -272,38 +258,73 @@ class _GiftCardsViewState extends State<_GiftCardsView> {
 
   Widget _buildAppBar() {
     return SliverAppBar(
+      expandedHeight: 150,
+      backgroundColor: Colors.transparent,
       pinned: true,
-      backgroundColor: GcTokens.background,
-      surfaceTintColor: GcTokens.background,
       elevation: 0,
+      scrolledUnderElevation: 0,
+      surfaceTintColor: Colors.transparent,
       systemOverlayStyle: SystemUiOverlayStyle.dark,
-      toolbarHeight: 64,
+      iconTheme: const IconThemeData(color: GcTokens.textPrimary),
       leading: IconButton(
         onPressed: () => Navigator.pop(context),
         icon: const Icon(Icons.arrow_back_ios_new_rounded,
             size: 18, color: GcTokens.textPrimary),
       ),
       titleSpacing: 0,
-      title: const Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Gift Vouchers',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w900,
-              color: GcTokens.textPrimary,
+      flexibleSpace: LayoutBuilder(
+        builder: (context, constraints) {
+          const expandedHeight = 150.0;
+          final minHeight =
+              kToolbarHeight + MediaQuery.of(context).padding.top;
+          final t = ((constraints.maxHeight - minHeight) /
+                  (expandedHeight - minHeight))
+              .clamp(0.0, 1.0);
+          final leftPadding = 20.0 + (52.0 * (1 - t));
+          return Container(
+            decoration: BoxDecoration(
+              color: Color.lerp(Colors.white, Colors.transparent, t),
             ),
-          ),
-          Text(
-            'Save on every brand you love',
-            style: TextStyle(
-              fontSize: 11,
-              color: GcTokens.textTertiary,
-              fontWeight: FontWeight.w600,
+            child: Stack(
+              children: [
+                if (t > 0.05)
+                  Positioned(
+                    bottom: 52,
+                    left: 20,
+                    child: Opacity(
+                      opacity: t.clamp(0.0, 1.0),
+                      child: const Text(
+                        'Save on every brand you love',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                          color: Color(0xFF9CA3AF),
+                        ),
+                      ),
+                    ),
+                  ),
+                FlexibleSpaceBar(
+                  titlePadding: EdgeInsets.only(
+                    left: leftPadding,
+                    bottom: 16,
+                    right: 20,
+                  ),
+                  centerTitle: false,
+                  title: Text(
+                    'Gift Vouchers',
+                    style: TextStyle(
+                      color: const Color(0xFF1A202C),
+                      fontSize: t > 0.5 ? 24 : 20,
+                      fontWeight:
+                          t > 0.5 ? FontWeight.w800 : FontWeight.w700,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
+          );
+        },
       ),
       actions: [
         Padding(
@@ -320,7 +341,10 @@ class _GiftCardsViewState extends State<_GiftCardsView> {
                     elevation: 0,
                     child: InkWell(
                       customBorder: const CircleBorder(),
-                      onTap: () {},
+                      onTap: () => Navigator.pushNamed(
+                        context,
+                        '/gift-card-favorites',
+                      ),
                       child: Container(
                         width: 40,
                         height: 40,
@@ -368,26 +392,6 @@ class _GiftCardsViewState extends State<_GiftCardsView> {
             },
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.only(right: 12),
-          child: GestureDetector(
-            onTap: () => Navigator.pushNamed(context, '/gift-card-orders'),
-            child: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-                border: Border.all(color: const Color(0xFFEFEAFB)),
-              ),
-              child: const Icon(
-                Icons.receipt_long_rounded,
-                size: 18,
-                color: GcTokens.textPrimary,
-              ),
-            ),
-          ),
-        ),
       ],
     );
   }
@@ -420,33 +424,29 @@ class _GiftCardsViewState extends State<_GiftCardsView> {
     );
   }
 
-  Widget _buildNewlyAdded() {
-    if (_loadingProducts) {
-      return const SizedBox(
-        height: 130,
-        child: GcListSkeleton(count: 1),
-      );
-    }
-    if (_products.isEmpty) return const SizedBox.shrink();
-    final items = _products.take(8).toList();
+  Widget _buildMyCards() {
+    final items = _myOrders.take(5).toList();
     return SizedBox(
-      height: 180,
+      height: 116,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 16),
         itemCount: items.length,
         separatorBuilder: (_, __) => const SizedBox(width: 12),
-        itemBuilder: (_, i) {
-          final p = items[i];
-          return SizedBox(
-            width: 150,
-            child: GiftCardProductCard(
-              product: p,
-              favorites: _favorites,
-              onTap: () => _openDetail(p),
-            ),
-          );
-        },
+        itemBuilder: (_, i) => _MyCardTile(
+          order: items[i],
+          onTap: () {
+            if (items[i].hasCardDetails) {
+              Navigator.pushNamed(
+                context,
+                '/gift-card-view',
+                arguments: items[i],
+              );
+            } else {
+              Navigator.pushNamed(context, '/gift-card-orders');
+            }
+          },
+        ),
       ),
     );
   }
@@ -474,8 +474,6 @@ class _GiftCardsViewState extends State<_GiftCardsView> {
             setState(() {
               _quickFilter = null;
               _selectedCategory = null;
-              _minDiscount = 0;
-              _sort = GcSort.relevance;
               _searchController.clear();
             });
             context
@@ -540,49 +538,42 @@ class _GiftCardsViewState extends State<_GiftCardsView> {
       bottom: 22,
       child: Center(
         child: Material(
-          color: const Color(0xFF1A1124),
+          color: GcTokens.brandBlack,
           borderRadius: BorderRadius.circular(GcTokens.rPill),
-          elevation: 8,
-          shadowColor: Colors.black54,
+          elevation: 10,
+          shadowColor: Colors.black.withValues(alpha: 0.4),
           child: InkWell(
             borderRadius: BorderRadius.circular(GcTokens.rPill),
-            onTap: _openSortSheet,
+            onTap: () =>
+                Navigator.pushNamed(context, '/gift-card-orders'),
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 24,
+                vertical: 14,
+              ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.swap_vert_rounded,
-                      size: 18, color: Colors.white),
-                  const SizedBox(width: 6),
+                children: const [
+                  Icon(
+                    Icons.account_balance_wallet_rounded,
+                    size: 17,
+                    color: GcTokens.brandLime,
+                  ),
+                  SizedBox(width: 8),
                   Text(
-                    _sort == GcSort.relevance
-                        ? 'Relevance'
-                        : (_sort == GcSort.discountDesc
-                            ? 'Discount'
-                            : 'Price'),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w800,
-                      fontSize: 13,
-                    ),
-                  ),
-                  Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 12),
-                    width: 1,
-                    height: 14,
-                    color: Colors.white24,
-                  ),
-                  const Icon(Icons.tune_rounded,
-                      size: 18, color: Colors.white),
-                  const SizedBox(width: 6),
-                  const Text(
-                    'Filters',
+                    'My cards',
                     style: TextStyle(
                       color: Colors.white,
-                      fontWeight: FontWeight.w800,
+                      fontWeight: FontWeight.w900,
                       fontSize: 13,
+                      letterSpacing: 0.4,
                     ),
+                  ),
+                  SizedBox(width: 8),
+                  Icon(
+                    Icons.arrow_forward_rounded,
+                    size: 16,
+                    color: GcTokens.brandLime,
                   ),
                 ],
               ),
@@ -590,6 +581,211 @@ class _GiftCardsViewState extends State<_GiftCardsView> {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Light, voucher-style "my card" tile shown in the horizontal rail.
+/// Different from the hero (which is a full brand card) and different from
+/// the orders-list ticket (which is a full-width perforated pass).
+class _MyCardTile extends StatelessWidget {
+  const _MyCardTile({required this.order, required this.onTap});
+
+  final GiftCardOrderEntity order;
+  final VoidCallback onTap;
+
+  Color get _statusColor {
+    switch (order.status) {
+      case GiftCardOrderStatusEntity.completed:
+        return GcTokens.success;
+      case GiftCardOrderStatusEntity.failed:
+      case GiftCardOrderStatusEntity.cancelled:
+        return GcTokens.danger;
+      case GiftCardOrderStatusEntity.refunded:
+        return Colors.blueGrey;
+      default:
+        return GcTokens.warning;
+    }
+  }
+
+  String get _statusLabel {
+    switch (order.status) {
+      case GiftCardOrderStatusEntity.completed:
+        return 'ACTIVE';
+      case GiftCardOrderStatusEntity.failed:
+        return 'FAILED';
+      case GiftCardOrderStatusEntity.cancelled:
+        return 'CANCELLED';
+      case GiftCardOrderStatusEntity.refunded:
+        return 'REFUNDED';
+      case GiftCardOrderStatusEntity.pending:
+        return 'PENDING';
+      case GiftCardOrderStatusEntity.paymentCompleted:
+        return 'PROCESSING';
+      case GiftCardOrderStatusEntity.issuing:
+        return 'ISSUING';
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final hasImg =
+        order.productImageUrl != null && order.productImageUrl!.isNotEmpty;
+
+    return GcPaletteExtractor(
+      imageUrl: order.productImageUrl,
+      fallback: GcTokens.accentFor(order.giftCardProductId),
+      builder: (context, brand) {
+        final tintWell = Color.lerp(brand, Colors.white, 0.85)!;
+        final ink = Color.lerp(brand, Colors.black, 0.55)!;
+        return GestureDetector(
+          onTap: onTap,
+          child: Container(
+            width: 256,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: brand.withValues(alpha: 0.20),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: brand.withValues(alpha: 0.10),
+                  offset: const Offset(0, 8),
+                  blurRadius: 16,
+                ),
+              ],
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Brand image well
+                Container(
+                  width: 88,
+                  decoration: BoxDecoration(
+                    color: tintWell,
+                    border: Border(
+                      right: BorderSide(
+                        color: brand.withValues(alpha: 0.18),
+                      ),
+                    ),
+                  ),
+                  padding: const EdgeInsets.all(12),
+                  child: hasImg
+                      ? CachedNetworkImage(
+                          imageUrl: order.productImageUrl!,
+                          fit: BoxFit.contain,
+                          errorWidget: (_, __, ___) =>
+                              Icon(Icons.card_giftcard_rounded, color: ink),
+                        )
+                      : Icon(Icons.card_giftcard_rounded, color: ink),
+                ),
+                // Info
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          order.productName,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w900,
+                            color: GcTokens.textPrimary,
+                            height: 1.2,
+                          ),
+                        ),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 4),
+                              child: Text(
+                                '\u20B9',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w900,
+                                  color: ink,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 1),
+                            Text(
+                              (order.woohooActivatedAmount ??
+                                      order.requestedAmount)
+                                  .toStringAsFixed(0),
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.w900,
+                                color: ink,
+                                height: 1.0,
+                                letterSpacing: -0.5,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 7,
+                                vertical: 3,
+                              ),
+                              decoration: BoxDecoration(
+                                color:
+                                    _statusColor.withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Container(
+                                    width: 5,
+                                    height: 5,
+                                    decoration: BoxDecoration(
+                                      color: _statusColor,
+                                      shape: BoxShape.circle,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    _statusLabel,
+                                    style: TextStyle(
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.w900,
+                                      color: _statusColor,
+                                      letterSpacing: 0.5,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const Spacer(),
+                            Text(
+                              '#${order.id}',
+                              style: TextStyle(
+                                fontSize: 9.5,
+                                fontWeight: FontWeight.w900,
+                                color: GcTokens.textTertiary
+                                    .withValues(alpha: 0.85),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

@@ -2,7 +2,13 @@ import 'package:flutter/material.dart';
 
 import '../theme/gc_tokens.dart';
 
-enum GcQuickFilter { topBrands, save20, save30, trending }
+enum GcQuickFilter {
+  onSale,
+  under500,
+  from500to2000,
+  above2000,
+  bigSaver,
+}
 
 class GcQuickFilterChips extends StatelessWidget {
   const GcQuickFilterChips({
@@ -16,19 +22,21 @@ class GcQuickFilterChips extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 38,
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      clipBehavior: Clip.none,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Row(
         children: [
-          _chip(GcQuickFilter.topBrands, 'Top Brands'),
+          _chip(GcQuickFilter.onSale, 'On sale'),
           const SizedBox(width: 8),
-          _chip(GcQuickFilter.save20, 'Save 20%+'),
+          _chip(GcQuickFilter.under500, 'Under \u20B9500'),
           const SizedBox(width: 8),
-          _chip(GcQuickFilter.save30, 'Save 30%+'),
+          _chip(GcQuickFilter.from500to2000, '\u20B9500 – \u20B92000'),
           const SizedBox(width: 8),
-          _chip(GcQuickFilter.trending, 'Trending'),
+          _chip(GcQuickFilter.above2000, 'Above \u20B92000'),
+          const SizedBox(width: 8),
+          _chip(GcQuickFilter.bigSaver, 'Big savers'),
         ],
       ),
     );

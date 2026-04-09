@@ -12,6 +12,7 @@ import 'package:savedge/features/gift_cards/presentation/pages/gift_cards_page.d
 import 'package:savedge/features/gift_cards/presentation/pages/gift_card_detail_page.dart';
 import 'package:savedge/features/gift_cards/presentation/pages/gift_card_checkout_page.dart';
 import 'package:savedge/features/gift_cards/presentation/pages/gift_card_orders_page.dart';
+import 'package:savedge/features/gift_cards/presentation/pages/gift_card_favorites_page.dart';
 import 'package:savedge/features/gift_cards/presentation/pages/gift_card_view_page.dart';
 import 'package:savedge/features/gift_cards/domain/entities/gift_card_entity.dart';
 import 'package:savedge/features/city/presentation/bloc/city_bloc.dart';
@@ -120,6 +121,11 @@ class SavedgeApp extends StatelessWidget {
         final order = settings.arguments as GiftCardOrderEntity;
         return MaterialPageRoute(
           builder: (_) => GiftCardViewPage(order: order),
+          settings: settings,
+        );
+      case '/gift-card-favorites':
+        return MaterialPageRoute(
+          builder: (_) => const GiftCardFavoritesPage(),
           settings: settings,
         );
       default:

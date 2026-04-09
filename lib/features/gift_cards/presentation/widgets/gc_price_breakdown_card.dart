@@ -11,6 +11,7 @@ class GcPriceBreakdownCard extends StatelessWidget {
     required this.pointsDiscount,
     required this.totalPayable,
     required this.currencySymbol,
+    this.accent = GcTokens.primary,
   });
 
   final double amount;
@@ -19,6 +20,7 @@ class GcPriceBreakdownCard extends StatelessWidget {
   final double pointsDiscount;
   final double totalPayable;
   final String currencySymbol;
+  final Color accent;
 
   @override
   Widget build(BuildContext context) {
@@ -98,7 +100,7 @@ class GcPriceBreakdownCard extends StatelessWidget {
             fontSize: isBold ? 16 : 13.5,
             fontWeight: isBold ? FontWeight.w900 : FontWeight.w800,
             color: valueColor ??
-                (isBold ? GcTokens.primary : GcTokens.textPrimary),
+                (isBold ? accent : GcTokens.textPrimary),
           ),
         ),
       ],

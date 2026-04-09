@@ -12,6 +12,7 @@ class GcPaymentMethodTile extends StatelessWidget {
     required this.onTap,
     this.disabled = false,
     this.trailing,
+    this.accent = GcTokens.primary,
   });
 
   final IconData icon;
@@ -21,6 +22,7 @@ class GcPaymentMethodTile extends StatelessWidget {
   final bool disabled;
   final VoidCallback onTap;
   final Widget? trailing;
+  final Color accent;
 
   @override
   Widget build(BuildContext context) {
@@ -36,13 +38,11 @@ class GcPaymentMethodTile extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
             decoration: BoxDecoration(
               color: selected
-                  ? GcTokens.primary.withValues(alpha: 0.06)
+                  ? accent.withValues(alpha: 0.06)
                   : Colors.white,
               borderRadius: BorderRadius.circular(GcTokens.rCard),
               border: Border.all(
-                color: selected
-                    ? GcTokens.primary
-                    : const Color(0xFFEFEAFB),
+                color: selected ? accent : const Color(0xFFEFEAFB),
                 width: selected ? 1.6 : 1,
               ),
             ),
@@ -52,10 +52,10 @@ class GcPaymentMethodTile extends StatelessWidget {
                   width: 42,
                   height: 42,
                   decoration: BoxDecoration(
-                    color: GcTokens.primary.withValues(alpha: 0.12),
+                    color: accent.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(icon, color: GcTokens.primary, size: 20),
+                  child: Icon(icon, color: accent, size: 20),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -89,9 +89,7 @@ class GcPaymentMethodTile extends StatelessWidget {
                     selected
                         ? Icons.radio_button_checked_rounded
                         : Icons.radio_button_unchecked_rounded,
-                    color: selected
-                        ? GcTokens.primary
-                        : GcTokens.textTertiary,
+                    color: selected ? accent : GcTokens.textTertiary,
                   ),
               ],
             ),

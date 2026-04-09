@@ -33,6 +33,7 @@ import 'package:savedge/features/brand_vouchers/domain/usecases/get_voucher_orde
 import 'package:savedge/features/brand_vouchers/presentation/bloc/brand_vouchers_bloc.dart';
 // Gift card imports
 import 'package:savedge/features/gift_cards/data/services/gift_card_favorites_service.dart';
+import 'package:savedge/features/gift_cards/data/services/gift_card_local_actions_service.dart';
 import 'package:savedge/features/gift_cards/data/services/gift_card_recently_viewed_service.dart';
 import 'package:savedge/features/gift_cards/data/services/gift_card_service.dart';
 import 'package:savedge/features/gift_cards/data/repositories/gift_card_repository_impl.dart';
@@ -443,6 +444,9 @@ Future<void> configureDependencies() async {
   );
   getIt.registerSingleton<GiftCardRecentlyViewedService>(
     GiftCardRecentlyViewedService(getIt<SharedPreferences>()),
+  );
+  getIt.registerSingleton<GiftCardLocalActionsService>(
+    GiftCardLocalActionsService(getIt<SharedPreferences>()),
   );
 
   // Gift card BLoC

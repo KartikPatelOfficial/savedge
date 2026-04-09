@@ -15,6 +15,7 @@ import '../theme/gc_tokens.dart';
 import '../widgets/gc_amount_chip_picker.dart';
 import '../widgets/gc_how_to_redeem_sheet.dart';
 import '../widgets/gc_how_to_save_steps.dart';
+import '../widgets/gc_palette_extractor.dart';
 import '../widgets/gc_terms_bottom_sheet.dart';
 import '../widgets/related_product_card.dart';
 
@@ -36,7 +37,7 @@ class _GiftCardDetailPageState extends State<GiftCardDetailPage> {
   late final GiftCardFavoritesService _favorites;
 
   GiftCardProductEntity get _p => widget.product;
-  Color get _accent => GcTokens.accentFor(_p.id);
+  Color _accent = GcTokens.primary;
 
   String get _currency => _p.currencySymbol ?? '\u20B9';
   bool get _hasImage =>
@@ -55,7 +56,15 @@ class _GiftCardDetailPageState extends State<GiftCardDetailPage> {
     );
     _selectedThemeSku = _p.themes.isNotEmpty ? _p.themes.first.sku : null;
 
+    _accent = GcTokens.accentFor(_p.id);
+    _resolvePalette();
+
     getIt<GiftCardRecentlyViewedService>().record(_p.id);
+  }
+
+  Future<void> _resolvePalette() async {
+    final picked = await GcPaletteExtractor.resolve(_p.imageUrl, _accent);
+    if (mounted && picked != _accent) setState(() => _accent = picked);
   }
 
   @override

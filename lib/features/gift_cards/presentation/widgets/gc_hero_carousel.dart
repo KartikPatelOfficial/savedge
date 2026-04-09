@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../../domain/entities/gift_card_entity.dart';
 import '../theme/gc_tokens.dart';
+import 'gc_palette_extractor.dart';
 
 class GcHeroCarousel extends StatefulWidget {
   const GcHeroCarousel({
@@ -58,15 +59,19 @@ class _GcHeroCarouselState extends State<GcHeroCarousel> {
     return Column(
       children: [
         SizedBox(
-          height: 180,
+          height: 210,
           child: PageView.builder(
             controller: _controller,
             itemCount: widget.items.length,
+            clipBehavior: Clip.none,
             onPageChanged: (i) => setState(() => _index = i),
-            itemBuilder: (_, i) => _slide(widget.items[i]),
+            itemBuilder: (_, i) => Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              child: _slide(widget.items[i]),
+            ),
           ),
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 6),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: List.generate(
@@ -90,158 +95,180 @@ class _GcHeroCarouselState extends State<GcHeroCarousel> {
   }
 
   Widget _slide(GiftCardProductEntity p) {
-    final accent = GcTokens.accentFor(p.id);
-    final bg = GcTokens.bgFor(p.id);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8),
-      child: GestureDetector(
-        onTap: () => widget.onTap(p),
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(GcTokens.rHero),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [accent, accent.withValues(alpha: 0.78)],
-            ),
-          ),
-          child: Stack(
-            children: [
-              Positioned(
-                right: -20,
-                top: -20,
-                child: Container(
-                  width: 160,
-                  height: 160,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.10),
-                    shape: BoxShape.circle,
-                  ),
+      child: GcPaletteExtractor(
+        imageUrl: p.imageUrl,
+        fallback: GcTokens.accentFor(p.id),
+        builder: (context, brand) {
+          final tint = Color.lerp(brand, Colors.white, 0.78)!;
+          final tintStrong = Color.lerp(brand, Colors.white, 0.55)!;
+          final ink = Color.lerp(brand, Colors.black, 0.65)!;
+          return GestureDetector(
+            onTap: () => widget.onTap(p),
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(GcTokens.rHero),
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Colors.white, tint],
                 ),
-              ),
-              Positioned(
-                left: -30,
-                bottom: -30,
-                child: Container(
-                  width: 110,
-                  height: 110,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.06),
-                    shape: BoxShape.circle,
+                border: Border.all(color: tintStrong.withValues(alpha: 0.45)),
+                boxShadow: [
+                  BoxShadow(
+                    color: brand.withValues(alpha: 0.20),
+                    offset: const Offset(0, 14),
+                    blurRadius: 26,
                   ),
-                ),
+                ],
               ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 22, 20, 18),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 5,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Text(
-                              'BRAND OF THE WEEK',
-                              style: TextStyle(
-                                fontSize: 9.5,
-                                fontWeight: FontWeight.w900,
-                                color: accent,
-                                letterSpacing: 0.8,
-                              ),
-                            ),
-                          ),
-                          Column(
+              clipBehavior: Clip.antiAlias,
+              child: Stack(
+                children: [
+                  // Soft brand glow top-right
+                  Positioned(
+                    right: -60,
+                    top: -60,
+                    child: Container(
+                      width: 200,
+                      height: 200,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: RadialGradient(
+                          colors: [
+                            brand.withValues(alpha: 0.22),
+                            brand.withValues(alpha: 0.0),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 22, 20, 20),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              if (p.hasDiscount)
-                                Text(
-                                  'Flat ${p.discountPercentage!.toStringAsFixed(0)}% off',
-                                  style: const TextStyle(
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.w900,
-                                    color: Colors.white,
-                                    height: 1.0,
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 5,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(
+                                    color: brand.withValues(alpha: 0.30),
                                   ),
                                 ),
-                              const SizedBox(height: 4),
-                              Text(
-                                p.brandName ?? p.name,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w700,
-                                  color: Colors.white.withValues(alpha: 0.92),
+                                child: Text(
+                                  'BRAND OF THE WEEK',
+                                  style: TextStyle(
+                                    fontSize: 9.5,
+                                    fontWeight: FontWeight.w900,
+                                    color: ink,
+                                    letterSpacing: 0.8,
+                                  ),
+                                ),
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  if (p.hasDiscount)
+                                    Text(
+                                      'Flat ${p.discountPercentage!.toStringAsFixed(0)}% off',
+                                      style: TextStyle(
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.w900,
+                                        color: ink,
+                                        height: 1.0,
+                                        letterSpacing: -0.4,
+                                      ),
+                                    ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    p.brandName ?? p.name,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: 12.5,
+                                      fontWeight: FontWeight.w800,
+                                      color: ink.withValues(alpha: 0.65),
+                                      letterSpacing: 0.4,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                  vertical: 9,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: ink,
+                                  borderRadius:
+                                      BorderRadius.circular(GcTokens.rPill),
+                                ),
+                                child: const Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      'Explore now',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w900,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    SizedBox(width: 4),
+                                    Icon(
+                                      Icons.arrow_forward_rounded,
+                                      size: 14,
+                                      color: Colors.white,
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],
                           ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 8,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(GcTokens.rPill),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  'Explore now',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w900,
-                                    color: accent,
-                                  ),
-                                ),
-                                const SizedBox(width: 4),
-                                Icon(
-                                  Icons.arrow_forward_rounded,
-                                  size: 14,
-                                  color: accent,
-                                ),
-                              ],
-                            ),
+                        ),
+                        const SizedBox(width: 12),
+                        Container(
+                          width: 130,
+                          height: 130,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(18),
+                            boxShadow: [
+                              BoxShadow(
+                                color: brand.withValues(alpha: 0.18),
+                                offset: const Offset(0, 8),
+                                blurRadius: 16,
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
+                          padding: const EdgeInsets.all(10),
+                          child: p.imageUrl != null && p.imageUrl!.isNotEmpty
+                              ? CachedNetworkImage(
+                                  imageUrl: p.imageUrl!,
+                                  fit: BoxFit.contain,
+                                  errorWidget: (_, __, ___) =>
+                                      Container(color: tint),
+                                )
+                              : Container(color: tint),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 12),
-                    Container(
-                      width: 130,
-                      height: 130,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(18),
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(18),
-                        child: p.imageUrl != null
-                            ? CachedNetworkImage(
-                                imageUrl: p.imageUrl!,
-                                fit: BoxFit.cover,
-                                errorWidget: (_, __, ___) => Container(color: bg),
-                              )
-                            : Container(color: bg),
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }
