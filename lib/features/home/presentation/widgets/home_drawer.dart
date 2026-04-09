@@ -132,57 +132,48 @@ class HomeDrawer extends StatelessWidget {
     return items;
   }
 
+  /// Close drawer first, wait for animation, then navigate.
+  Future<void> _closeAndNavigate(BuildContext context, Widget page) async {
+    onMenuItemTap?.call('');
+    // Wait for the drawer close animation to finish (300ms + buffer)
+    await Future.delayed(const Duration(milliseconds: 350));
+    if (!context.mounted) return;
+    Navigator.push(context, MaterialPageRoute(builder: (_) => page));
+  }
+
+  Future<void> _closeAndNavigateNamed(BuildContext context, String route) async {
+    onMenuItemTap?.call('');
+    await Future.delayed(const Duration(milliseconds: 350));
+    if (!context.mounted) return;
+    Navigator.pushNamed(context, route);
+  }
+
   void _navigateToSignIn(BuildContext context) {
-    onMenuItemTap?.call('Sign In');
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const PhoneVerificationPage()),
-    );
+    _closeAndNavigate(context, const PhoneVerificationPage());
   }
 
   void _navigateToRedemptionHistory(BuildContext context) {
-    onMenuItemTap?.call('Redemption History');
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const RedemptionHistoryPage()),
-    );
+    _closeAndNavigate(context, const RedemptionHistoryPage());
   }
 
   void _navigateToStores(BuildContext context) {
-    onMenuItemTap?.call('Stores');
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const StoresPage()),
-    );
+    _closeAndNavigate(context, const StoresPage());
   }
 
   void _navigateToAboutUs(BuildContext context) {
-    onMenuItemTap?.call('About Us');
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const AboutUsPage()),
-    );
+    _closeAndNavigate(context, const AboutUsPage());
   }
 
   void _navigateToContactUs(BuildContext context) {
-    onMenuItemTap?.call('Contact Us');
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const ContactUsPage()),
-    );
+    _closeAndNavigate(context, const ContactUsPage());
   }
 
   void _navigateToFollowUs(BuildContext context) {
-    onMenuItemTap?.call('Follow Us');
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const FollowUsPage()),
-    );
+    _closeAndNavigate(context, const FollowUsPage());
   }
 
   void _navigateToGiftCards(BuildContext context) {
-    onMenuItemTap?.call('Gift Cards');
-    Navigator.pushNamed(context, '/gift-cards');
+    _closeAndNavigateNamed(context, '/gift-cards');
   }
 }
 
