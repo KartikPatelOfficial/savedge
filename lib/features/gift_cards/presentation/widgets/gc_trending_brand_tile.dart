@@ -45,9 +45,9 @@ class GcTrendingBrandTile extends StatelessWidget {
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(14),
-                  child: product.imageUrl != null
+                  child: product.squareImageUrl != null
                       ? CachedNetworkImage(
-                          imageUrl: product.imageUrl!,
+                          imageUrl: product.squareImageUrl!,
                           fit: BoxFit.cover,
                           errorWidget: (_, __, ___) => Container(color: bg),
                         )

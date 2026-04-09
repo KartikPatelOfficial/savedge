@@ -83,7 +83,7 @@ class _CheckoutViewState extends State<_CheckoutView> {
 
   Future<void> _resolvePalette() async {
     final picked = await GcPaletteExtractor.resolve(
-      widget.product.imageUrl,
+      widget.product.heroImageUrl,
       _accent,
     );
     if (mounted && picked != _accent) setState(() => _accent = picked);
@@ -373,9 +373,9 @@ class _CheckoutViewState extends State<_CheckoutView> {
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(14),
-              child: p.imageUrl != null
+              child: p.squareImageUrl != null
                   ? CachedNetworkImage(
-                      imageUrl: p.imageUrl!,
+                      imageUrl: p.squareImageUrl!,
                       fit: BoxFit.cover,
                       errorWidget: (_, __, ___) => Container(color: bg),
                     )

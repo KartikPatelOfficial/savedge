@@ -40,8 +40,9 @@ class _GiftCardDetailPageState extends State<GiftCardDetailPage> {
   Color _accent = GcTokens.primary;
 
   String get _currency => _p.currencySymbol ?? '\u20B9';
+  String? get _heroImage => _p.heroImageUrl;
   bool get _hasImage =>
-      _p.imageUrl != null && _p.imageUrl!.trim().isNotEmpty;
+      _heroImage != null && _heroImage!.trim().isNotEmpty;
 
   @override
   void initState() {
@@ -63,7 +64,7 @@ class _GiftCardDetailPageState extends State<GiftCardDetailPage> {
   }
 
   Future<void> _resolvePalette() async {
-    final picked = await GcPaletteExtractor.resolve(_p.imageUrl, _accent);
+    final picked = await GcPaletteExtractor.resolve(_heroImage, _accent);
     if (mounted && picked != _accent) setState(() => _accent = picked);
   }
 
@@ -248,7 +249,7 @@ class _GiftCardDetailPageState extends State<GiftCardDetailPage> {
           alignment: Alignment.center,
           child: _hasImage
               ? CachedNetworkImage(
-                  imageUrl: _p.imageUrl!,
+                  imageUrl: _heroImage!,
                   fit: BoxFit.contain,
                   placeholder: (_, __) => _heroFallback(),
                   errorWidget: (_, __, ___) => _heroFallback(),

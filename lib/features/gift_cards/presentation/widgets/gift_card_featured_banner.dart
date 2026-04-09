@@ -129,10 +129,9 @@ class GiftCardFeaturedBanner extends StatelessWidget {
                   borderRadius: BorderRadius.circular(16),
                 ),
                 clipBehavior: Clip.antiAlias,
-                child: product.imageUrl != null || product.thumbnailUrl != null
+                child: product.heroImageUrl != null
                     ? CachedNetworkImage(
-                        imageUrl:
-                            product.imageUrl ?? product.thumbnailUrl ?? '',
+                        imageUrl: product.heroImageUrl!,
                         fit: BoxFit.contain,
                         placeholder: (_, __) => Center(
                           child: Icon(Icons.card_giftcard_rounded,

@@ -504,13 +504,14 @@ class _FavoriteTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final hasImg = product.imageUrl != null && product.imageUrl!.isNotEmpty;
+    final imgUrl = product.squareImageUrl;
+    final hasImg = imgUrl != null && imgUrl.isNotEmpty;
     final base = product.minPrice;
     final payable = product.calculatePayable(base);
     final currency = product.currencySymbol ?? '\u20B9';
 
     return GcPaletteExtractor(
-      imageUrl: product.imageUrl,
+      imageUrl: imgUrl,
       fallback: GcTokens.accentFor(product.id),
       builder: (context, brand) {
         final tintWell = Color.lerp(brand, Colors.white, 0.85)!;
@@ -556,7 +557,7 @@ class _FavoriteTile extends StatelessWidget {
                       padding: const EdgeInsets.all(14),
                       child: hasImg
                           ? CachedNetworkImage(
-                              imageUrl: product.imageUrl!,
+                              imageUrl: imgUrl,
                               fit: BoxFit.contain,
                               errorWidget: (_, __, ___) => Icon(
                                 Icons.card_giftcard_rounded,

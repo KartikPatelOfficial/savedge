@@ -56,8 +56,10 @@ class GiftCardProductEntity extends Equatable {
   final String name;
   final String? description;
   final String sku;
-  final String? imageUrl;
-  final String? thumbnailUrl;
+  final String? imageUrl; // 450x158 main banner
+  final String? thumbnailUrl; // 22x32 — too small, do not display
+  final String? mobileImageUrl; // ~500x500 square
+  final String? smallImageUrl; // 200x120 landscape
   final String priceType;
   final double minPrice;
   final double maxPrice;
@@ -81,6 +83,8 @@ class GiftCardProductEntity extends Equatable {
     required this.sku,
     this.imageUrl,
     this.thumbnailUrl,
+    this.mobileImageUrl,
+    this.smallImageUrl,
     required this.priceType,
     required this.minPrice,
     required this.maxPrice,
@@ -101,6 +105,40 @@ class GiftCardProductEntity extends Equatable {
   bool get hasDiscount =>
       discountPercentage != null && discountPercentage! > 0;
 
+  /// Whether the product has any usable image at all (excludes the
+  /// near-useless 22×32 thumbnail).
+  bool get hasAnyImage =>
+      _isUsable(imageUrl) ||
+      _isUsable(mobileImageUrl) ||
+      _isUsable(smallImageUrl);
+
+  /// Best image for the **hero/banner** spot — large landscape areas.
+  /// Prefers the wide main banner (450×158), falls back to the square
+  /// mobile image, then the small landscape image.
+  String? get heroImageUrl =>
+      _firstUsable([imageUrl, mobileImageUrl, smallImageUrl]);
+
+  /// Best image for **square card slots** (grid tiles, my-cards rail).
+  /// Prefers the square mobile image (500×500), falls back to the wide
+  /// main banner, then small.
+  String? get squareImageUrl =>
+      _firstUsable([mobileImageUrl, imageUrl, smallImageUrl]);
+
+  /// Best image for **small list/row thumbnails** (e.g., trending tile).
+  /// Prefers the small landscape image, falls back to mobile, then main.
+  String? get listImageUrl =>
+      _firstUsable([smallImageUrl, mobileImageUrl, imageUrl]);
+
+  static String? _firstUsable(List<String?> candidates) {
+    for (final c in candidates) {
+      if (_isUsable(c)) return c;
+    }
+    return null;
+  }
+
+  static bool _isUsable(String? url) =>
+      url != null && url.trim().isNotEmpty;
+
   double calculatePayable(double amount) {
     if (!hasDiscount) return amount;
     return amount - (amount * discountPercentage! / 100);
@@ -119,6 +157,8 @@ class GiftCardProductEntity extends Equatable {
         sku,
         imageUrl,
         thumbnailUrl,
+        mobileImageUrl,
+        smallImageUrl,
         priceType,
         minPrice,
         maxPrice,

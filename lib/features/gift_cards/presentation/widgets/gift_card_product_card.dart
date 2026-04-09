@@ -183,14 +183,15 @@ class _ProductImage extends StatelessWidget {
   final GiftCardProductEntity product;
   final Color accent;
 
+  String? get _bestUrl => product.squareImageUrl;
   bool get _hasUrl =>
-      product.imageUrl != null && product.imageUrl!.trim().isNotEmpty;
+      _bestUrl != null && _bestUrl!.trim().isNotEmpty;
 
   @override
   Widget build(BuildContext context) {
     if (!_hasUrl) return _fallback();
     return CachedNetworkImage(
-      imageUrl: product.imageUrl!,
+      imageUrl: _bestUrl!,
       fit: BoxFit.contain,
       placeholder: (_, __) => _fallback(),
       errorWidget: (_, __, ___) => _fallback(),

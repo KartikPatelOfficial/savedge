@@ -95,10 +95,11 @@ class _GcHeroCarouselState extends State<GcHeroCarousel> {
   }
 
   Widget _slide(GiftCardProductEntity p) {
+    final heroUrl = p.heroImageUrl;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8),
       child: GcPaletteExtractor(
-        imageUrl: p.imageUrl,
+        imageUrl: heroUrl,
         fallback: GcTokens.accentFor(p.id),
         builder: (context, brand) {
           final tint = Color.lerp(brand, Colors.white, 0.78)!;
@@ -252,9 +253,9 @@ class _GcHeroCarouselState extends State<GcHeroCarousel> {
                             ],
                           ),
                           padding: const EdgeInsets.all(10),
-                          child: p.imageUrl != null && p.imageUrl!.isNotEmpty
+                          child: heroUrl != null && heroUrl.isNotEmpty
                               ? CachedNetworkImage(
-                                  imageUrl: p.imageUrl!,
+                                  imageUrl: heroUrl,
                                   fit: BoxFit.contain,
                                   errorWidget: (_, __, ___) =>
                                       Container(color: tint),

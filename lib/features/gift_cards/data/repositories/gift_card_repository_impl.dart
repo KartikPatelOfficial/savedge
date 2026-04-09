@@ -237,6 +237,8 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
       sku: model.sku,
       imageUrl: model.imageUrl,
       thumbnailUrl: model.thumbnailUrl,
+      mobileImageUrl: model.mobileImageUrl,
+      smallImageUrl: model.smallImageUrl,
       priceType: model.priceType,
       minPrice: model.minPrice,
       maxPrice: model.maxPrice,
