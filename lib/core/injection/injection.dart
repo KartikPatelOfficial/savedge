@@ -446,7 +446,10 @@ Future<void> configureDependencies() async {
     GiftCardRecentlyViewedService(getIt<SharedPreferences>()),
   );
   getIt.registerSingleton<GiftCardLocalActionsService>(
-    GiftCardLocalActionsService(getIt<SharedPreferences>()),
+    GiftCardLocalActionsService(
+      getIt<SharedPreferences>(),
+      getIt<Dio>(),
+    ),
   );
 
   // Gift card BLoC

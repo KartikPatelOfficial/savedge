@@ -1,51 +1,39 @@
-import 'dart:convert';
-
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// Frontend-only registry for two pending features that the backend does
-/// not yet expose:
+/// Stateful registry for two gift-card-order actions:
 ///
-/// 1. **Hidden orders** — a user can "delete" a pending gift card order from
-///    their list. Until the backend ships a real cancel endpoint, we just
-///    hide it locally and the deletion is reversible by reinstalling.
+/// 1. **Hidden orders** — frontend-only "delete" for pending orders. The
+///    backend has no cancel endpoint yet, so we hide locally via
+///    [SharedPreferences].
 ///
-/// 2. **Open support tickets** — a user can raise a support query for a
-///    failed order. We track which orders already have an open ticket so we
-///    don't create duplicates. The actual ticket payload is stashed locally;
-///    when the backend ships the real endpoint, swap [_persistTicket] for
-///    a network call.
+/// 2. **Support tickets** — backed by the real API at
+///    `/api/gift-card-support/tickets`. We mirror the user's open tickets
+///    in memory so [hasOpenTicket] / [ticketFor] are synchronous lookups.
+///    Call [refreshTickets] on app start (or page mount) to hydrate.
 class GiftCardLocalActionsService extends ChangeNotifier {
-  GiftCardLocalActionsService(this._prefs) {
-    _load();
+  GiftCardLocalActionsService(this._prefs, this._dio) {
+    _loadHidden();
   }
 
   static const _hiddenKey = 'gift_card_hidden_order_ids';
-  static const _ticketsKey = 'gift_card_support_tickets';
 
   final SharedPreferences _prefs;
+  final Dio _dio;
   final Set<int> _hidden = <int>{};
   final Map<int, SupportTicket> _tickets = {};
+  bool _ticketsLoaded = false;
 
   Set<int> get hiddenOrderIds => Set.unmodifiable(_hidden);
   Map<int, SupportTicket> get tickets => Map.unmodifiable(_tickets);
+  bool get ticketsLoaded => _ticketsLoaded;
 
-  void _load() {
+  void _loadHidden() {
     final h = _prefs.getStringList(_hiddenKey) ?? const <String>[];
     _hidden
       ..clear()
       ..addAll(h.map(int.tryParse).whereType<int>());
-
-    final raw = _prefs.getString(_ticketsKey);
-    if (raw != null && raw.isNotEmpty) {
-      try {
-        final list = jsonDecode(raw) as List<dynamic>;
-        for (final j in list) {
-          final t = SupportTicket.fromJson(j as Map<String, dynamic>);
-          _tickets[t.orderId] = t;
-        }
-      } catch (_) {}
-    }
   }
 
   // ── Hide / unhide orders ──────────────────────────────────────────────
@@ -72,21 +60,72 @@ class GiftCardLocalActionsService extends ChangeNotifier {
     }
   }
 
-  // ── Support tickets ───────────────────────────────────────────────────
+  // ── Support tickets (backed by /api/gift-card-support/tickets) ────────
 
   bool hasOpenTicket(int orderId) => _tickets.containsKey(orderId);
 
   SupportTicket? ticketFor(int orderId) => _tickets[orderId];
 
-  Future<void> createTicket(SupportTicket ticket) async {
-    _tickets[ticket.orderId] = ticket;
-    await _persistTickets();
-    notifyListeners();
+  /// Hydrate the in-memory ticket cache from the backend. Safe to call
+  /// repeatedly — only fetches once per app session unless [force] is true.
+  Future<void> refreshTickets({bool force = false}) async {
+    if (_ticketsLoaded && !force) return;
+    try {
+      final response = await _dio.get('/api/gift-card-support/tickets');
+      final data = response.data;
+      if (data is List) {
+        _tickets.clear();
+        for (final raw in data) {
+          if (raw is Map<String, dynamic>) {
+            final t = SupportTicket.fromBackendJson(raw);
+            // Only mirror tickets the user can see as "open" in the UI
+            if (t.status == 'Open' || t.status == 'InProgress') {
+              _tickets[t.orderId] = t;
+            }
+          }
+        }
+        _ticketsLoaded = true;
+        notifyListeners();
+      }
+    } catch (_) {
+      // Silently ignore — tickets are non-critical for UI rendering.
+    }
   }
 
-  Future<void> _persistTickets() async {
-    final list = _tickets.values.map((t) => t.toJson()).toList();
-    await _prefs.setString(_ticketsKey, jsonEncode(list));
+  /// POST a new ticket to the backend. The server prevents duplicates by
+  /// (user, order, open|inProgress) and may return an existing ticket id.
+  Future<bool> createTicket({
+    required int orderId,
+    required String tag,
+    required String subject,
+    required String body,
+  }) async {
+    try {
+      await _dio.post(
+        '/api/gift-card-support/tickets',
+        data: {
+          'giftCardOrderId': orderId,
+          'tag': tag,
+          'subject': subject,
+          'body': body,
+        },
+      );
+      // Mirror locally so the UI updates instantly without a refetch.
+      _tickets[orderId] = SupportTicket(
+        orderId: orderId,
+        tag: tag,
+        subject: subject,
+        body: body,
+        createdAt: DateTime.now(),
+      );
+      notifyListeners();
+      return true;
+    } on DioException catch (e) {
+      debugPrint('createTicket failed: ${e.message}');
+      return false;
+    } catch (_) {
+      return false;
+    }
   }
 }
 
@@ -124,5 +163,18 @@ class SupportTicket {
         createdAt: DateTime.tryParse(json['createdAt'] as String? ?? '') ??
             DateTime.now(),
         status: json['status'] as String? ?? 'OPEN',
+      );
+
+  /// Backend DTO uses `giftCardOrderId` and a CamelCase status enum.
+  factory SupportTicket.fromBackendJson(Map<String, dynamic> json) =>
+      SupportTicket(
+        orderId: (json['giftCardOrderId'] as num?)?.toInt() ?? 0,
+        tag: json['tag'] as String? ?? 'OTHER',
+        subject: json['subject'] as String? ?? '',
+        body: json['body'] as String? ?? '',
+        createdAt:
+            DateTime.tryParse(json['createdAt'] as String? ?? '') ??
+                DateTime.now(),
+        status: json['status'] as String? ?? 'Open',
       );
 }

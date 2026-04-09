@@ -80,15 +80,24 @@ class _GcSupportSheetState extends State<GcSupportSheet> {
       return;
     }
     setState(() => _submitting = true);
-    final ticket = SupportTicket(
+    final ok = await widget.actions.createTicket(
       orderId: widget.order.id,
       tag: _tag,
       subject: '${_prettyTag(_tag)} · Order #${widget.order.id}',
       body: _bodyCtrl.text.trim(),
-      createdAt: DateTime.now(),
     );
-    await widget.actions.createTicket(ticket);
     if (!mounted) return;
+    setState(() => _submitting = false);
+    if (!ok) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            "Couldn't submit your ticket. Please try again.",
+          ),
+        ),
+      );
+      return;
+    }
     Navigator.pop(context, true);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(

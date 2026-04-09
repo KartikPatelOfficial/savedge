@@ -92,6 +92,7 @@ class _OrdersViewState extends State<_OrdersView> {
   void initState() {
     super.initState();
     _actions.addListener(_onActionsChanged);
+    _actions.refreshTickets();
     _loadUser();
     _gyroSub = gyroscopeEventStream().listen((e) {
       if (!mounted) return;
