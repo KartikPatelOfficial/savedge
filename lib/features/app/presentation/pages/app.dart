@@ -20,6 +20,7 @@ import 'package:savedge/features/city/presentation/bloc/city_event.dart';
 import 'package:savedge/features/notifications/presentation/bloc/notification_bloc.dart';
 import 'package:savedge/features/invoices/presentation/pages/invoices_page.dart';
 import 'package:savedge/features/notifications/presentation/pages/notification_center_page.dart';
+import 'package:savedge/features/notifications/presentation/pages/notification_preferences_page.dart';
 import 'package:savedge/core/widgets/animated_blur_background.dart';
 
 /// Main application widget
@@ -84,6 +85,11 @@ class SavedgeApp extends StatelessWidget {
       case '/notifications':
         return MaterialPageRoute(
           builder: (_) => const NotificationCenterPage(),
+          settings: settings,
+        );
+      case '/notification-preferences':
+        return MaterialPageRoute(
+          builder: (_) => const NotificationPreferencesPage(),
           settings: settings,
         );
       case '/invoices':

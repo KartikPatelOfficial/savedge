@@ -653,7 +653,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _onNotificationsTap() {
-    Navigator.of(context).pushNamed('/notifications');
+    Navigator.of(context).pushNamed('/notification-preferences');
   }
 
   void _onOrderHistoryTap() {

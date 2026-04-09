@@ -27,6 +27,10 @@ abstract class AuthRepository {
     String? pinCode,
     DateTime? dateOfBirth,
     DateTime? anniversaryDate,
+    bool? emailNotifications,
+    bool? smsNotifications,
+    bool? pushNotifications,
+    bool? whatsAppNotifications,
   });
   Future<void> deleteAccount();
 
