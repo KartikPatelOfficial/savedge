@@ -49,10 +49,13 @@ class GcHowToRedeemSheet extends StatelessWidget {
     ];
 
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(
+      decoration: BoxDecoration(
+        color: GcTokens.brandBlack,
+        borderRadius: const BorderRadius.vertical(
           top: Radius.circular(GcTokens.rSheet),
+        ),
+        border: Border.all(
+          color: GcTokens.primary.withValues(alpha: 0.18),
         ),
       ),
       child: SafeArea(
@@ -68,7 +71,7 @@ class GcHowToRedeemSheet extends StatelessWidget {
                   width: 44,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFE5E1F1),
+                    color: Colors.white.withValues(alpha: 0.18),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -78,25 +81,25 @@ class GcHowToRedeemSheet extends StatelessWidget {
                 'How to redeem your gift card',
                 style: TextStyle(
                   fontSize: 20,
-                  fontWeight: FontWeight.w800,
-                  color: GcTokens.textPrimary,
+                  fontWeight: FontWeight.w900,
+                  color: Colors.white,
                 ),
               ),
               const SizedBox(height: 6),
               Text(
                 'Quick steps to use your $brandName gift card.',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
-                  color: GcTokens.textTertiary,
+                  color: Colors.white.withValues(alpha: 0.55),
                 ),
               ),
-              const SizedBox(height: 18),
+              const SizedBox(height: 22),
               for (var i = 0; i < steps.length; i++) ...[
                 _StepRow(index: i + 1, step: steps[i]),
-                if (i < steps.length - 1) const SizedBox(height: 14),
+                if (i < steps.length - 1) const SizedBox(height: 16),
               ],
               if (brandUrl != null && brandUrl!.isNotEmpty) ...[
-                const SizedBox(height: 22),
+                const SizedBox(height: 24),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton.icon(
@@ -104,11 +107,21 @@ class GcHowToRedeemSheet extends StatelessWidget {
                       Uri.parse(brandUrl!),
                       mode: LaunchMode.externalApplication,
                     ),
-                    icon: const Icon(Icons.open_in_new_rounded, size: 18),
-                    label: Text('Open $brandName'),
+                    icon: const Icon(
+                      Icons.open_in_new_rounded,
+                      size: 18,
+                      color: GcTokens.brandBlack,
+                    ),
+                    label: Text(
+                      'Open $brandName',
+                      style: const TextStyle(
+                        color: GcTokens.brandBlack,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: GcTokens.primary,
-                      foregroundColor: Colors.white,
+                      backgroundColor: GcTokens.brandLime,
+                      foregroundColor: GcTokens.brandBlack,
                       elevation: 0,
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
@@ -143,23 +156,26 @@ class _StepRow extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          width: 32,
-          height: 32,
+          width: 34,
+          height: 34,
           decoration: BoxDecoration(
-            gradient: GcTokens.primaryGradient,
-            borderRadius: BorderRadius.circular(10),
+            color: GcTokens.brandLime.withValues(alpha: 0.14),
+            borderRadius: BorderRadius.circular(11),
+            border: Border.all(
+              color: GcTokens.brandLime.withValues(alpha: 0.45),
+            ),
           ),
           alignment: Alignment.center,
           child: Text(
             '$index',
             style: const TextStyle(
               fontSize: 14,
-              fontWeight: FontWeight.w800,
-              color: Colors.white,
+              fontWeight: FontWeight.w900,
+              color: GcTokens.brandLime,
             ),
           ),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: 14),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -168,17 +184,17 @@ class _StepRow extends StatelessWidget {
                 step.title,
                 style: const TextStyle(
                   fontSize: 14.5,
-                  fontWeight: FontWeight.w800,
-                  color: GcTokens.textPrimary,
+                  fontWeight: FontWeight.w900,
+                  color: Colors.white,
                 ),
               ),
               const SizedBox(height: 3),
               Text(
                 step.body,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
                   height: 1.45,
-                  color: GcTokens.textSecondary,
+                  color: Colors.white.withValues(alpha: 0.65),
                 ),
               ),
             ],

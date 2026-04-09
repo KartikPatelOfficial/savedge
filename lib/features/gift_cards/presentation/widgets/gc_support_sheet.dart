@@ -5,11 +5,7 @@ import '../../domain/entities/gift_card_entity.dart';
 import '../theme/gc_tokens.dart';
 
 class GcSupportSheet extends StatefulWidget {
-  const GcSupportSheet({
-    super.key,
-    required this.order,
-    required this.actions,
-  });
+  const GcSupportSheet({super.key, required this.order, required this.actions});
 
   final GiftCardOrderEntity order;
   final GiftCardLocalActionsService actions;
@@ -64,11 +60,10 @@ class _GcSupportSheetState extends State<GcSupportSheet> {
     super.dispose();
   }
 
-  String _prettyTag(String t) =>
-      t.replaceAll('_', ' ').toLowerCase().replaceFirstMapped(
-            RegExp(r'^.'),
-            (m) => m.group(0)!.toUpperCase(),
-          );
+  String _prettyTag(String t) => t
+      .replaceAll('_', ' ')
+      .toLowerCase()
+      .replaceFirstMapped(RegExp(r'^.'), (m) => m.group(0)!.toUpperCase());
 
   Future<void> _submit() async {
     if (_bodyCtrl.text.trim().length < 10) {
@@ -91,9 +86,7 @@ class _GcSupportSheetState extends State<GcSupportSheet> {
     if (!ok) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text(
-            "Couldn't submit your ticket. Please try again.",
-          ),
+          content: Text("Couldn't submit your ticket. Please try again."),
         ),
       );
       return;
@@ -155,15 +148,15 @@ class _GcSupportSheetState extends State<GcSupportSheet> {
                   width: 38,
                   height: 38,
                   decoration: BoxDecoration(
-                    color: GcTokens.primary.withValues(alpha: 0.10),
+                    color: GcTokens.brandLimeDark.withValues(alpha: 0.10),
                     borderRadius: BorderRadius.circular(11),
                     border: Border.all(
-                      color: GcTokens.primary.withValues(alpha: 0.30),
+                      color: GcTokens.brandLimeDark.withValues(alpha: 0.30),
                     ),
                   ),
                   child: const Icon(
                     Icons.support_agent_rounded,
-                    color: GcTokens.primary,
+                    color: GcTokens.brandLimeDark,
                     size: 20,
                   ),
                 ),
@@ -197,10 +190,7 @@ class _GcSupportSheetState extends State<GcSupportSheet> {
               ],
             ),
             const SizedBox(height: 18),
-            if (existing != null)
-              _existingTicketBlock(existing)
-            else
-              _form(),
+            if (existing != null) _existingTicketBlock(existing) else _form(),
           ],
         ),
       ),
@@ -214,10 +204,10 @@ class _GcSupportSheetState extends State<GcSupportSheet> {
         Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: GcTokens.primary.withValues(alpha: 0.05),
+            color: GcTokens.brandLimeDark.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
-              color: GcTokens.primary.withValues(alpha: 0.20),
+              color: GcTokens.brandLimeDark.withValues(alpha: 0.20),
             ),
           ),
           child: Column(
@@ -231,10 +221,10 @@ class _GcSupportSheetState extends State<GcSupportSheet> {
                       vertical: 3,
                     ),
                     decoration: BoxDecoration(
-                      color: GcTokens.primary.withValues(alpha: 0.12),
+                      color: GcTokens.brandLimeDark.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color: GcTokens.primary.withValues(alpha: 0.30),
+                        color: GcTokens.brandLimeDark.withValues(alpha: 0.30),
                       ),
                     ),
                     child: Text(
@@ -242,7 +232,7 @@ class _GcSupportSheetState extends State<GcSupportSheet> {
                       style: const TextStyle(
                         fontSize: 9.5,
                         fontWeight: FontWeight.w900,
-                        color: GcTokens.primary,
+                        color: GcTokens.brandLimeDark,
                         letterSpacing: 0.8,
                       ),
                     ),
@@ -342,12 +332,12 @@ class _GcSupportSheetState extends State<GcSupportSheet> {
                   ),
                   decoration: BoxDecoration(
                     color: _tag == tag
-                        ? GcTokens.primary.withValues(alpha: 0.10)
+                        ? GcTokens.brandLimeDark.withValues(alpha: 0.10)
                         : Colors.white,
                     borderRadius: BorderRadius.circular(GcTokens.rPill),
                     border: Border.all(
                       color: _tag == tag
-                          ? GcTokens.primary
+                          ? GcTokens.brandLimeDark
                           : const Color(0xFFE5E1F1),
                       width: _tag == tag ? 1.5 : 1,
                     ),
@@ -357,9 +347,7 @@ class _GcSupportSheetState extends State<GcSupportSheet> {
                     style: TextStyle(
                       fontSize: 11.5,
                       fontWeight: FontWeight.w800,
-                      color: _tag == tag
-                          ? GcTokens.primary
-                          : GcTokens.textPrimary,
+                      color: GcTokens.textPrimary,
                     ),
                   ),
                 ),
@@ -386,17 +374,11 @@ class _GcSupportSheetState extends State<GcSupportSheet> {
           child: TextField(
             controller: _bodyCtrl,
             maxLines: 4,
-            cursorColor: GcTokens.primary,
-            style: const TextStyle(
-              color: GcTokens.textPrimary,
-              fontSize: 14,
-            ),
+            cursorColor: GcTokens.brandLimeDark,
+            style: const TextStyle(color: GcTokens.textPrimary, fontSize: 14),
             decoration: const InputDecoration(
               hintText: 'Tell us what happened…',
-              hintStyle: TextStyle(
-                color: GcTokens.textTertiary,
-                fontSize: 13,
-              ),
+              hintStyle: TextStyle(color: GcTokens.textTertiary, fontSize: 13),
               border: InputBorder.none,
               contentPadding: EdgeInsets.all(14),
             ),
@@ -437,10 +419,11 @@ class _GcSupportSheetState extends State<GcSupportSheet> {
           child: ElevatedButton(
             onPressed: _submitting ? null : _submit,
             style: ElevatedButton.styleFrom(
-              backgroundColor: GcTokens.primary,
-              foregroundColor: Colors.white,
-              disabledBackgroundColor:
-                  GcTokens.primary.withValues(alpha: 0.45),
+              backgroundColor: GcTokens.brandLimeDark,
+              foregroundColor: GcTokens.textPrimary,
+              disabledBackgroundColor: GcTokens.brandLimeDark.withValues(
+                alpha: 0.45,
+              ),
               elevation: 0,
               padding: const EdgeInsets.symmetric(vertical: 14),
               shape: RoundedRectangleBorder(
@@ -458,10 +441,7 @@ class _GcSupportSheetState extends State<GcSupportSheet> {
                   )
                 : const Text(
                     'Submit ticket',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w900,
-                    ),
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900),
                   ),
           ),
         ),
