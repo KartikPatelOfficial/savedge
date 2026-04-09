@@ -16,21 +16,27 @@ class _PointsTransactionListState extends State<PointsTransactionList> {
   String _selectedTimeFilter = 'All Time';
   String _searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
+  List<PointTransaction>? _cachedFiltered;
 
   List<PointTransaction> get _filteredTransactions {
+    return _cachedFiltered ??= _computeFiltered();
+  }
+
+  void _invalidateCache() {
+    _cachedFiltered = null;
+  }
+
+  List<PointTransaction> _computeFiltered() {
     var filtered = widget.transactions;
 
     // Apply search filter
     if (_searchQuery.isNotEmpty) {
+      final query = _searchQuery.toLowerCase();
       filtered = filtered
           .where(
             (t) =>
-                t.description.toLowerCase().contains(
-                  _searchQuery.toLowerCase(),
-                ) ||
-                t.transactionType.displayName.toLowerCase().contains(
-                  _searchQuery.toLowerCase(),
-                ),
+                t.description.toLowerCase().contains(query) ||
+                t.transactionType.displayName.toLowerCase().contains(query),
           )
           .toList();
     }
@@ -79,6 +85,14 @@ class _PointsTransactionListState extends State<PointsTransactionList> {
   }
 
   @override
+  void didUpdateWidget(covariant PointsTransactionList oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.transactions != widget.transactions) {
+      _invalidateCache();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final filteredTransactions = _filteredTransactions;
 
@@ -104,7 +118,10 @@ class _PointsTransactionListState extends State<PointsTransactionList> {
                 ),
                 child: TextField(
                   controller: _searchController,
-                  onChanged: (value) => setState(() => _searchQuery = value),
+                  onChanged: (value) {
+                      _invalidateCache();
+                      setState(() => _searchQuery = value);
+                    },
                   decoration: InputDecoration(
                     hintText: 'Search transactions...',
                     hintStyle: TextStyle(color: Colors.grey[500], fontSize: 14),
@@ -122,6 +139,7 @@ class _PointsTransactionListState extends State<PointsTransactionList> {
                             ),
                             onPressed: () {
                               _searchController.clear();
+                              _invalidateCache();
                               setState(() => _searchQuery = '');
                             },
                           )
@@ -228,7 +246,10 @@ class _PointsTransactionListState extends State<PointsTransactionList> {
   Widget _buildFilterChip(String label, IconData icon) {
     final isSelected = _selectedFilter == label;
     return GestureDetector(
-      onTap: () => setState(() => _selectedFilter = label),
+      onTap: () {
+        _invalidateCache();
+        setState(() => _selectedFilter = label);
+      },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
@@ -283,7 +304,10 @@ class _PointsTransactionListState extends State<PointsTransactionList> {
           items: ['All Time', 'This Week', 'This Month', 'Last 3 Months']
               .map((time) => DropdownMenuItem(value: time, child: Text(time)))
               .toList(),
-          onChanged: (value) => setState(() => _selectedTimeFilter = value!),
+          onChanged: (value) {
+              _invalidateCache();
+              setState(() => _selectedTimeFilter = value!);
+            },
         ),
       ),
     );
@@ -354,6 +378,7 @@ class _PointsTransactionListState extends State<PointsTransactionList> {
             const SizedBox(height: 16),
             TextButton(
               onPressed: () {
+                _invalidateCache();
                 setState(() {
                   _selectedFilter = 'All';
                   _selectedTimeFilter = 'All Time';

@@ -107,25 +107,23 @@ class _BrandVouchersViewState extends State<BrandVouchersView> {
         ),
 
         // Vouchers Content
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            child: GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                mainAxisSpacing: 16,
-                crossAxisSpacing: 16,
-                childAspectRatio: 0.8,
-              ),
-              itemCount: vouchers.length,
-              itemBuilder: (context, index) {
+        SliverPadding(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+          sliver: SliverGrid(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              mainAxisSpacing: 16,
+              crossAxisSpacing: 16,
+              childAspectRatio: 0.8,
+            ),
+            delegate: SliverChildBuilderDelegate(
+              (context, index) {
                 return BrandVoucherCard(
                   voucher: vouchers[index],
                   onTap: () => _showVoucherDetails(context, vouchers[index]),
                 );
               },
+              childCount: vouchers.length,
             ),
           ),
         ),

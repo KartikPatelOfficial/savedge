@@ -59,20 +59,7 @@ class _CouponStackCardState extends State<CouponStackCard>
       vsync: this,
       duration: const Duration(milliseconds: 300),
     );
-    _cycleController.addListener(() => setState(() {}));
-    _cycleController.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        final count = widget.coupons.length;
-        setState(() {
-          _currentIndex = (_currentIndex + _swipeDirection) % count;
-          if (_currentIndex < 0) _currentIndex += count;
-          _dragX = 0;
-          _dragY = 0;
-          _isCycling = false;
-        });
-        _cycleController.reset();
-      }
-    });
+    _cycleController.addStatusListener(_onCycleStatus);
   }
 
   void _onReturnTick() {
@@ -83,9 +70,24 @@ class _CouponStackCardState extends State<CouponStackCard>
     });
   }
 
+  void _onCycleStatus(AnimationStatus status) {
+    if (status == AnimationStatus.completed) {
+      final count = widget.coupons.length;
+      setState(() {
+        _currentIndex = (_currentIndex + _swipeDirection) % count;
+        if (_currentIndex < 0) _currentIndex += count;
+        _dragX = 0;
+        _dragY = 0;
+        _isCycling = false;
+      });
+      _cycleController.reset();
+    }
+  }
+
   @override
   void dispose() {
     _returnController.removeListener(_onReturnTick);
+    _cycleController.removeStatusListener(_onCycleStatus);
     _returnController.dispose();
     _cycleController.dispose();
     super.dispose();
@@ -174,33 +176,41 @@ class _CouponStackCardState extends State<CouponStackCard>
   }
 
   Widget _buildTopCard(UserCouponDetailModel coupon) {
-    double tx = _dragX;
-    double ty = _dragY;
-
-    if (_isCycling) {
-      final t = Curves.easeInCubic.transform(_cycleController.value);
-      tx = _dragX + (_swipeOutTargetX - _dragX) * t;
-      ty = _dragY * (1 - t);
-    }
-
-    final rotation = (tx / 600) * _maxRotation;
-
     return Positioned(
       top: 0,
       left: 0,
       right: 0,
-      child: GestureDetector(
-        onHorizontalDragStart: _onDragStart,
-        onHorizontalDragUpdate: _onDragUpdate,
-        onHorizontalDragEnd: _onDragEnd,
-        child: Transform(
-          alignment: Alignment.center,
-          transform: Matrix4.translationValues(tx, ty, 0)
-            ..rotateZ(rotation),
-          child: Opacity(
-            opacity: _isCycling
-                ? (1 - _cycleController.value * 0.5).clamp(0.4, 1.0)
-                : 1.0,
+      child: RepaintBoundary(
+        child: GestureDetector(
+          onHorizontalDragStart: _onDragStart,
+          onHorizontalDragUpdate: _onDragUpdate,
+          onHorizontalDragEnd: _onDragEnd,
+          child: AnimatedBuilder(
+            animation: _cycleController,
+            builder: (context, child) {
+              double tx = _dragX;
+              double ty = _dragY;
+
+              if (_isCycling) {
+                final t = Curves.easeInCubic.transform(_cycleController.value);
+                tx = _dragX + (_swipeOutTargetX - _dragX) * t;
+                ty = _dragY * (1 - t);
+              }
+
+              final rotation = (tx / 600) * _maxRotation;
+
+              return Transform(
+                alignment: Alignment.center,
+                transform: Matrix4.translationValues(tx, ty, 0)
+                  ..rotateZ(rotation),
+                child: Opacity(
+                  opacity: _isCycling
+                      ? (1 - _cycleController.value * 0.5).clamp(0.4, 1.0)
+                      : 1.0,
+                  child: child,
+                ),
+              );
+            },
             child: CouponCard(
               coupon: coupon,
               onTap: () => widget.onTap(coupon),

@@ -12,7 +12,7 @@ class CustomImageCacheManager extends CacheManager with ImageCacheManager {
         Config(
           key,
           stalePeriod: const Duration(days: 7),
-          maxNrOfCacheObjects: 100,
+          maxNrOfCacheObjects: 500,
           repo: JsonCacheInfoRepository(databaseName: key),
           fileService: _createHttpFileService(),
         ),

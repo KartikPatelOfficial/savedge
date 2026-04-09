@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
+import 'package:savedge/core/widgets/animated_blur_background.dart';
 import 'package:savedge/features/auth/data/models/user_profile_models.dart';
 import 'package:savedge/features/auth/domain/repositories/auth_repository.dart';
 import 'package:savedge/features/city/domain/entities/city.dart';
@@ -35,8 +36,8 @@ class _MainNavigationPageState extends State<MainNavigationPage> with SingleTick
   bool _citySelectionShown = false;
   UserProfileResponse3? _userProfile;
   late List<Widget> _pages;
-  bool _isNavBarVisible = true;
-  
+  final ValueNotifier<bool> _isNavBarVisible = ValueNotifier<bool>(true);
+
   bool _isDrawerOpen = false;
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
@@ -76,6 +77,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> with SingleTick
 
   @override
   void dispose() {
+    _isNavBarVisible.dispose();
     _animationController.dispose();
     super.dispose();
   }
@@ -221,9 +223,9 @@ class _MainNavigationPageState extends State<MainNavigationPage> with SingleTick
                 NotificationListener<UserScrollNotification>(
                   onNotification: (notification) {
                     if (notification.direction == ScrollDirection.forward) {
-                      if (!_isNavBarVisible) setState(() => _isNavBarVisible = true);
+                      if (!_isNavBarVisible.value) _isNavBarVisible.value = true;
                     } else if (notification.direction == ScrollDirection.reverse) {
-                      if (_isNavBarVisible) setState(() => _isNavBarVisible = false);
+                      if (_isNavBarVisible.value) _isNavBarVisible.value = false;
                     }
                     return false;
                   },
@@ -233,10 +235,16 @@ class _MainNavigationPageState extends State<MainNavigationPage> with SingleTick
                   left: 0,
                   right: 0,
                   bottom: 0,
-                  child: AnimatedSlide(
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeOutCubic,
-                    offset: _isNavBarVisible ? Offset.zero : const Offset(0, 1.5),
+                  child: ValueListenableBuilder<bool>(
+                    valueListenable: _isNavBarVisible,
+                    builder: (context, visible, child) {
+                      return AnimatedSlide(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeOutCubic,
+                        offset: visible ? Offset.zero : const Offset(0, 1.5),
+                        child: child!,
+                      );
+                    },
                     child: widget.isGuest
                         ? _buildGuestBottomBar()
                         : HomeBottomNavBar(
@@ -316,6 +324,9 @@ class _MainNavigationPageState extends State<MainNavigationPage> with SingleTick
   void _onBottomNavTap(int index) {
     if (_isDrawerOpen) {
       _toggleDrawer();
+    }
+    if (_currentIndex != index) {
+      AnimatedBlurBackground.triggerAnimation();
     }
     setState(() {
       _currentIndex = index;

@@ -198,8 +198,8 @@ Future<void> configureDependencies() async {
   );
 
   // Brand voucher layer
-  getIt.registerSingleton<BrandVoucherService>(
-    BrandVoucherService(getIt<Dio>()),
+  getIt.registerLazySingleton<BrandVoucherService>(
+    () => BrandVoucherService(getIt<Dio>()),
   );
 
   // Repositories
@@ -225,13 +225,13 @@ Future<void> configureDependencies() async {
     ),
   );
 
-  getIt.registerSingleton<BrandVoucherRepository>(
-    BrandVoucherRepositoryImpl(getIt<BrandVoucherService>()),
+  getIt.registerLazySingleton<BrandVoucherRepository>(
+    () => BrandVoucherRepositoryImpl(getIt<BrandVoucherService>()),
   );
 
   // Free trial layer
-  getIt.registerSingleton<FreeTrialRepository>(
-    FreeTrialRepositoryImpl(getIt<Dio>()),
+  getIt.registerLazySingleton<FreeTrialRepository>(
+    () => FreeTrialRepositoryImpl(getIt<Dio>()),
   );
 
   // Favorites layer
@@ -335,16 +335,16 @@ Future<void> configureDependencies() async {
   );
 
   // Brand voucher Use Cases
-  getIt.registerSingleton<GetBrandVouchersUseCase>(
-    GetBrandVouchersUseCase(getIt<BrandVoucherRepository>()),
+  getIt.registerLazySingleton<GetBrandVouchersUseCase>(
+    () => GetBrandVouchersUseCase(getIt<BrandVoucherRepository>()),
   );
 
-  getIt.registerSingleton<CreateVoucherOrderUseCase>(
-    CreateVoucherOrderUseCase(getIt<BrandVoucherRepository>()),
+  getIt.registerLazySingleton<CreateVoucherOrderUseCase>(
+    () => CreateVoucherOrderUseCase(getIt<BrandVoucherRepository>()),
   );
 
-  getIt.registerSingleton<GetVoucherOrdersUseCase>(
-    GetVoucherOrdersUseCase(getIt<BrandVoucherRepository>()),
+  getIt.registerLazySingleton<GetVoucherOrdersUseCase>(
+    () => GetVoucherOrdersUseCase(getIt<BrandVoucherRepository>()),
   );
 
   getIt.registerFactory<VendorsBloc>(
@@ -417,36 +417,36 @@ Future<void> configureDependencies() async {
   );
 
   // Gift card layer
-  getIt.registerSingleton<GiftCardService>(
-    GiftCardService(getIt<Dio>()),
+  getIt.registerLazySingleton<GiftCardService>(
+    () => GiftCardService(getIt<Dio>()),
   );
 
-  getIt.registerSingleton<GiftCardRepository>(
-    GiftCardRepositoryImpl(getIt<GiftCardService>()),
+  getIt.registerLazySingleton<GiftCardRepository>(
+    () => GiftCardRepositoryImpl(getIt<GiftCardService>()),
   );
 
   // Gift card Use Cases
-  getIt.registerSingleton<GetGiftCardProductsUseCase>(
-    GetGiftCardProductsUseCase(getIt<GiftCardRepository>()),
+  getIt.registerLazySingleton<GetGiftCardProductsUseCase>(
+    () => GetGiftCardProductsUseCase(getIt<GiftCardRepository>()),
   );
 
-  getIt.registerSingleton<CreateGiftCardOrderUseCase>(
-    CreateGiftCardOrderUseCase(getIt<GiftCardRepository>()),
+  getIt.registerLazySingleton<CreateGiftCardOrderUseCase>(
+    () => CreateGiftCardOrderUseCase(getIt<GiftCardRepository>()),
   );
 
-  getIt.registerSingleton<GetGiftCardOrdersUseCase>(
-    GetGiftCardOrdersUseCase(getIt<GiftCardRepository>()),
+  getIt.registerLazySingleton<GetGiftCardOrdersUseCase>(
+    () => GetGiftCardOrdersUseCase(getIt<GiftCardRepository>()),
   );
 
   // Gift card frontend-only services (favorites + recently viewed)
-  getIt.registerSingleton<GiftCardFavoritesService>(
-    GiftCardFavoritesService(getIt<SharedPreferences>()),
+  getIt.registerLazySingleton<GiftCardFavoritesService>(
+    () => GiftCardFavoritesService(getIt<SharedPreferences>()),
   );
-  getIt.registerSingleton<GiftCardRecentlyViewedService>(
-    GiftCardRecentlyViewedService(getIt<SharedPreferences>()),
+  getIt.registerLazySingleton<GiftCardRecentlyViewedService>(
+    () => GiftCardRecentlyViewedService(getIt<SharedPreferences>()),
   );
-  getIt.registerSingleton<GiftCardLocalActionsService>(
-    GiftCardLocalActionsService(
+  getIt.registerLazySingleton<GiftCardLocalActionsService>(
+    () => GiftCardLocalActionsService(
       getIt<SharedPreferences>(),
       getIt<Dio>(),
     ),
@@ -478,8 +478,8 @@ Future<void> configureDependencies() async {
   );
 
   // Promotion layer
-  getIt.registerSingleton<PromotionRepository>(
-    PromotionRepositoryImpl(getIt<Dio>()),
+  getIt.registerLazySingleton<PromotionRepository>(
+    () => PromotionRepositoryImpl(getIt<Dio>()),
   );
 
   getIt.registerLazySingleton<PromotionBloc>(
@@ -498,25 +498,27 @@ Future<void> configureDependencies() async {
   );
 
   // Contact us services
-  getIt.registerSingleton<ContactMessageService>(
-    ContactMessageService(getIt<Dio>()),
+  getIt.registerLazySingleton<ContactMessageService>(
+    () => ContactMessageService(getIt<Dio>()),
   );
 
   // Invoice services
-  getIt.registerSingleton<InvoiceService>(
-    InvoiceService(getIt<Dio>()),
+  getIt.registerLazySingleton<InvoiceService>(
+    () => InvoiceService(getIt<Dio>()),
   );
 
   // Enhanced coupon services
-  getIt.registerSingleton<EnhancedCouponService>(
-    EnhancedCouponService(getIt<Dio>()),
+  getIt.registerLazySingleton<EnhancedCouponService>(
+    () => EnhancedCouponService(getIt<Dio>()),
   );
 
-  getIt.registerSingleton<GiftingService>(GiftingService(getIt<Dio>()));
+  getIt.registerLazySingleton<GiftingService>(
+    () => GiftingService(getIt<Dio>()),
+  );
 
   // Points payment service
-  getIt.registerSingleton<PointsPaymentService>(
-    PointsPaymentService(getIt<Dio>()),
+  getIt.registerLazySingleton<PointsPaymentService>(
+    () => PointsPaymentService(getIt<Dio>()),
   );
 
   // Auth cubits

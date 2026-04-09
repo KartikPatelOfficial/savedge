@@ -14,6 +14,7 @@ abstract class HttpClient {
     String path, {
     Map<String, dynamic>? queryParameters,
     Options? options,
+    CancelToken? cancelToken,
   });
 
   Future<Response> post(
@@ -21,6 +22,7 @@ abstract class HttpClient {
     dynamic data,
     Map<String, dynamic>? queryParameters,
     Options? options,
+    CancelToken? cancelToken,
   });
 
   Future<Response> put(
@@ -28,6 +30,7 @@ abstract class HttpClient {
     dynamic data,
     Map<String, dynamic>? queryParameters,
     Options? options,
+    CancelToken? cancelToken,
   });
 
   Future<Response> delete(
@@ -35,6 +38,7 @@ abstract class HttpClient {
     dynamic data,
     Map<String, dynamic>? queryParameters,
     Options? options,
+    CancelToken? cancelToken,
   });
 }
 
@@ -50,12 +54,14 @@ class DioHttpClient implements HttpClient {
     String path, {
     Map<String, dynamic>? queryParameters,
     Options? options,
+    CancelToken? cancelToken,
   }) async {
     try {
       return await _dio.get(
         path,
         queryParameters: queryParameters,
         options: options,
+        cancelToken: cancelToken,
       );
     } on DioException catch (e) {
       throw _handleError(e);
@@ -68,6 +74,7 @@ class DioHttpClient implements HttpClient {
     dynamic data,
     Map<String, dynamic>? queryParameters,
     Options? options,
+    CancelToken? cancelToken,
   }) async {
     try {
       return await _dio.post(
@@ -75,6 +82,7 @@ class DioHttpClient implements HttpClient {
         data: data,
         queryParameters: queryParameters,
         options: options,
+        cancelToken: cancelToken,
       );
     } on DioException catch (e) {
       throw _handleError(e);
@@ -87,6 +95,7 @@ class DioHttpClient implements HttpClient {
     dynamic data,
     Map<String, dynamic>? queryParameters,
     Options? options,
+    CancelToken? cancelToken,
   }) async {
     try {
       return await _dio.put(
@@ -94,6 +103,7 @@ class DioHttpClient implements HttpClient {
         data: data,
         queryParameters: queryParameters,
         options: options,
+        cancelToken: cancelToken,
       );
     } on DioException catch (e) {
       throw _handleError(e);
@@ -106,6 +116,7 @@ class DioHttpClient implements HttpClient {
     dynamic data,
     Map<String, dynamic>? queryParameters,
     Options? options,
+    CancelToken? cancelToken,
   }) async {
     try {
       return await _dio.delete(
@@ -113,6 +124,7 @@ class DioHttpClient implements HttpClient {
         data: data,
         queryParameters: queryParameters,
         options: options,
+        cancelToken: cancelToken,
       );
     } on DioException catch (e) {
       throw _handleError(e);
