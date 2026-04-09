@@ -18,6 +18,7 @@ class GcPaletteExtractor extends StatefulWidget {
   final Widget Function(BuildContext context, Color color) builder;
 
   static final Map<String, Color> _cache = {};
+  static final Map<String, GcPaletteColors> _pairCache = {};
 
   /// Resolve the dominant brand color for an image URL. Returns the cached
   /// value when available, otherwise computes it via [PaletteGenerator] and
@@ -40,6 +41,41 @@ class GcPaletteExtractor extends StatefulWidget {
           fallback;
       _cache[url] = picked;
       return picked;
+    } catch (_) {
+      return fallback;
+    }
+  }
+
+  /// Resolve TWO complementary brand colors for an image URL. Returns
+  /// `(primary, secondary)`. Used for cards that need a two-color glow.
+  static Future<GcPaletteColors> resolvePair(
+    String? url,
+    GcPaletteColors fallback,
+  ) async {
+    if (url == null || url.isEmpty) return fallback;
+    final cached = _pairCache[url];
+    if (cached != null) return cached;
+    try {
+      final palette = await PaletteGenerator.fromImageProvider(
+        CachedNetworkImageProvider(url),
+        size: const Size(150, 150),
+        maximumColorCount: 16,
+      );
+      final primary = palette.vibrantColor?.color ??
+          palette.dominantColor?.color ??
+          palette.lightVibrantColor?.color ??
+          fallback.primary;
+      final secondary = palette.darkVibrantColor?.color ??
+          palette.mutedColor?.color ??
+          palette.lightMutedColor?.color ??
+          palette.darkMutedColor?.color ??
+          (palette.lightVibrantColor?.color != primary
+              ? palette.lightVibrantColor?.color
+              : null) ??
+          fallback.secondary;
+      final pair = GcPaletteColors(primary: primary, secondary: secondary);
+      _pairCache[url] = pair;
+      return pair;
     } catch (_) {
       return fallback;
     }
@@ -85,3 +121,11 @@ class _GcPaletteExtractorState extends State<GcPaletteExtractor> {
   @override
   Widget build(BuildContext context) => widget.builder(context, _color);
 }
+
+/// Pair of complementary colors extracted from a brand image.
+class GcPaletteColors {
+  const GcPaletteColors({required this.primary, required this.secondary});
+  final Color primary;
+  final Color secondary;
+}
+

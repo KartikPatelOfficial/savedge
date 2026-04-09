@@ -12,9 +12,14 @@ import 'package:sensors_plus/sensors_plus.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'package:savedge/core/injection/injection.dart';
+import 'package:savedge/features/auth/data/models/user_profile_models.dart';
+import 'package:savedge/features/auth/domain/repositories/auth_repository.dart';
+
 import '../../domain/entities/gift_card_entity.dart';
 import '../theme/gc_tokens.dart';
 import '../widgets/gc_how_to_redeem_sheet.dart';
+import '../widgets/gc_palette_extractor.dart';
 
 /// Premium single-card view shown after a successful purchase or when the
 /// user opens an active card from "My Gift Cards".
@@ -55,9 +60,25 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
   GiftCardOrderEntity get order => widget.order;
   Color get _accent => GcTokens.accentFor(order.giftCardProductId);
 
+  // Two-color brand glow extracted from the product image
+  GcPaletteColors _glowColors = const GcPaletteColors(
+    primary: GcTokens.primary,
+    secondary: GcTokens.brandLime,
+  );
+
+  // Cardholder name
+  String? _userName;
+
   @override
   void initState() {
     super.initState();
+
+    _glowColors = GcPaletteColors(
+      primary: GcTokens.accentFor(order.giftCardProductId),
+      secondary: GcTokens.brandLime,
+    );
+    _resolvePalette();
+    _loadUser();
 
     _glowCtrl = AnimationController(
       vsync: this,
@@ -118,6 +139,92 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
     }
     _showingBack = !_showingBack;
     HapticFeedback.lightImpact();
+  }
+
+  Future<void> _resolvePalette() async {
+    final pair = await GcPaletteExtractor.resolvePair(
+      order.productImageUrl,
+      _glowColors,
+    );
+    if (mounted &&
+        (pair.primary != _glowColors.primary ||
+            pair.secondary != _glowColors.secondary)) {
+      setState(() => _glowColors = pair);
+    }
+  }
+
+  Future<void> _loadUser() async {
+    try {
+      final UserProfileResponse3 profile =
+          await getIt<AuthRepository>().getCurrentUserProfile();
+      if (!mounted) return;
+      setState(() => _userName = profile.displayName);
+    } catch (_) {
+      // ignore
+    }
+  }
+
+  void _copy(String label, String value) {
+    Clipboard.setData(ClipboardData(text: value));
+    HapticFeedback.selectionClick();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: GcTokens.brandBlack,
+        duration: const Duration(milliseconds: 1500),
+        content: Row(
+          children: [
+            const Icon(
+              Icons.check_circle_rounded,
+              color: GcTokens.brandLime,
+              size: 16,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                '$label copied',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Subtle glass copy button (white-tinted) for the dark card front.
+  Widget _copyChip({
+    required VoidCallback onTap,
+    Color? iconColor,
+    Color? bgColor,
+    Color? borderColor,
+  }) {
+    return Material(
+      color: bgColor ?? Colors.white.withValues(alpha: 0.10),
+      shape: const CircleBorder(),
+      child: InkWell(
+        customBorder: const CircleBorder(),
+        onTap: onTap,
+        child: Container(
+          width: 30,
+          height: 30,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: borderColor ?? Colors.white.withValues(alpha: 0.20),
+            ),
+          ),
+          child: Icon(
+            Icons.copy_rounded,
+            size: 14,
+            color: iconColor ?? Colors.white.withValues(alpha: 0.85),
+          ),
+        ),
+      ),
+    );
   }
 
   Future<void> _share() async {
@@ -334,28 +441,33 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
             _animatedGlows(),
             Positioned.fill(child: CustomPaint(painter: _CardGridPainter())),
 
-            // SAVEDGE wordmark — top right
+            // Cardholder name — top right
             Positioned(
               top: 22,
               right: 22,
-              child: Row(
+              left: 80,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Container(
-                    width: 6,
-                    height: 6,
-                    decoration: const BoxDecoration(
-                      color: GcTokens.brandLime,
-                      shape: BoxShape.circle,
+                  Text(
+                    'CARDHOLDER',
+                    style: TextStyle(
+                      fontSize: 8.5,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 1.4,
+                      color: Colors.white.withValues(alpha: 0.45),
                     ),
                   ),
-                  const SizedBox(width: 6),
+                  const SizedBox(height: 4),
                   Text(
-                    'SAVEDGE',
-                    style: TextStyle(
-                      fontSize: 11,
+                    (_userName ?? 'CARD HOLDER').toUpperCase(),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 13,
                       fontWeight: FontWeight.w900,
-                      color: GcTokens.brandLime.withValues(alpha: 0.95),
-                      letterSpacing: 2.4,
+                      color: Colors.white,
+                      letterSpacing: 1.2,
                     ),
                   ),
                 ],
@@ -492,14 +604,29 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
                     ),
                   ),
                   const SizedBox(height: 4),
-                  Text(
-                    _maskedNumber,
-                    style: const TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w900,
-                      color: Colors.white,
-                      letterSpacing: 2.4,
-                    ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          _maskedNumber,
+                          style: const TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w900,
+                            color: Colors.white,
+                            letterSpacing: 2.4,
+                          ),
+                        ),
+                      ),
+                      if (order.woohooCardNumber != null &&
+                          order.woohooCardNumber!.isNotEmpty) ...[
+                        const SizedBox(width: 10),
+                        _copyChip(
+                          onTap: () =>
+                              _copy('Card number', order.woohooCardNumber!),
+                        ),
+                      ],
+                    ],
                   ),
                 ],
               ),
@@ -546,27 +673,27 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
                   if (order.productImageUrl != null &&
                       order.productImageUrl!.isNotEmpty)
                     Container(
-                      width: 64,
-                      height: 44,
+                      width: 96,
+                      height: 64,
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.30),
-                            offset: const Offset(0, 6),
-                            blurRadius: 12,
+                            color: Colors.black.withValues(alpha: 0.35),
+                            offset: const Offset(0, 8),
+                            blurRadius: 16,
                           ),
                         ],
                       ),
-                      padding: const EdgeInsets.all(6),
+                      padding: const EdgeInsets.all(8),
                       child: CachedNetworkImage(
                         imageUrl: order.productImageUrl!,
                         fit: BoxFit.contain,
                         errorWidget: (_, __, ___) => Icon(
                           Icons.card_giftcard_rounded,
                           color: _accent,
-                          size: 22,
+                          size: 28,
                         ),
                       ),
                     ),
@@ -684,22 +811,73 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
                   ),
                   const SizedBox(height: 8),
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 18,
-                      vertical: 14,
-                    ),
+                    padding: const EdgeInsets.fromLTRB(18, 12, 12, 10),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Text(
-                      order.woohooCardPin ?? '••••••',
-                      style: const TextStyle(
-                        fontSize: 26,
-                        fontWeight: FontWeight.w900,
-                        color: GcTokens.brandBlack,
-                        letterSpacing: 6,
-                      ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            order.woohooCardPin ?? '••••••',
+                            style: const TextStyle(
+                              fontSize: 26,
+                              fontWeight: FontWeight.w900,
+                              color: GcTokens.brandBlack,
+                              letterSpacing: 6,
+                            ),
+                          ),
+                        ),
+                        if (order.woohooCardPin != null &&
+                            order.woohooCardPin!.isNotEmpty)
+                          Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(10),
+                              onTap: () =>
+                                  _copy('PIN', order.woohooCardPin!),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                  vertical: 4,
+                                ),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Container(
+                                      width: 32,
+                                      height: 32,
+                                      decoration: BoxDecoration(
+                                        color: GcTokens.brandBlack
+                                            .withValues(alpha: 0.06),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      alignment: Alignment.center,
+                                      child: const Icon(
+                                        Icons.copy_rounded,
+                                        size: 15,
+                                        color: GcTokens.brandBlack,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 3),
+                                    Text(
+                                      'COPY',
+                                      style: TextStyle(
+                                        fontSize: 8,
+                                        fontWeight: FontWeight.w900,
+                                        letterSpacing: 0.8,
+                                        color: GcTokens.brandBlack
+                                            .withValues(alpha: 0.65),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
                   ),
                   const SizedBox(height: 22),
@@ -748,27 +926,17 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
                     ),
                   ),
                   const SizedBox(width: 10),
-                  Row(
-                    children: [
-                      Container(
-                        width: 6,
-                        height: 6,
-                        decoration: const BoxDecoration(
-                          color: GcTokens.brandLime,
-                          shape: BoxShape.circle,
-                        ),
+                  SizedBox(
+                    width: 36,
+                    height: 36,
+                    child: Image.asset(
+                      'assets/images/logo_transparant.png',
+                      fit: BoxFit.contain,
+                      errorBuilder: (_, __, ___) => Image.asset(
+                        'assets/images/logo.png',
+                        fit: BoxFit.contain,
                       ),
-                      const SizedBox(width: 6),
-                      Text(
-                        'SAVEDGE',
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w900,
-                          color: GcTokens.brandLime.withValues(alpha: 0.85),
-                          letterSpacing: 2,
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ],
               ),
@@ -793,8 +961,8 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
               shape: BoxShape.circle,
               gradient: RadialGradient(
                 colors: [
-                  GcTokens.primary.withValues(alpha: 0.45 + t * 0.20),
-                  GcTokens.primary.withValues(alpha: 0.0),
+                  _glowColors.primary.withValues(alpha: 0.45 + t * 0.20),
+                  _glowColors.primary.withValues(alpha: 0.0),
                 ],
               ),
             ),
@@ -810,8 +978,8 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
               shape: BoxShape.circle,
               gradient: RadialGradient(
                 colors: [
-                  GcTokens.brandLime.withValues(alpha: 0.22 + t * 0.18),
-                  GcTokens.brandLime.withValues(alpha: 0.0),
+                  _glowColors.secondary.withValues(alpha: 0.30 + t * 0.18),
+                  _glowColors.secondary.withValues(alpha: 0.0),
                 ],
               ),
             ),

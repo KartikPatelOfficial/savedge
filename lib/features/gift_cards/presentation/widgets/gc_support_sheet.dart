@@ -100,11 +100,11 @@ class _GcSupportSheetState extends State<GcSupportSheet> {
     }
     Navigator.pop(context, true);
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        backgroundColor: GcTokens.brandBlack,
+      const SnackBar(
+        backgroundColor: GcTokens.success,
         content: Row(
-          children: const [
-            Icon(Icons.check_circle_rounded, color: GcTokens.brandLime),
+          children: [
+            Icon(Icons.check_circle_rounded, color: Colors.white),
             SizedBox(width: 10),
             Expanded(
               child: Text(
@@ -128,7 +128,7 @@ class _GcSupportSheetState extends State<GcSupportSheet> {
       ),
       child: Container(
         decoration: const BoxDecoration(
-          color: GcTokens.brandBlack,
+          color: Colors.white,
           borderRadius: BorderRadius.vertical(
             top: Radius.circular(GcTokens.rSheet),
           ),
@@ -143,7 +143,7 @@ class _GcSupportSheetState extends State<GcSupportSheet> {
                 width: 44,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.18),
+                  color: const Color(0xFFE5E1F1),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -155,15 +155,15 @@ class _GcSupportSheetState extends State<GcSupportSheet> {
                   width: 38,
                   height: 38,
                   decoration: BoxDecoration(
-                    color: GcTokens.brandLime.withValues(alpha: 0.16),
+                    color: GcTokens.primary.withValues(alpha: 0.10),
                     borderRadius: BorderRadius.circular(11),
                     border: Border.all(
-                      color: GcTokens.brandLime.withValues(alpha: 0.40),
+                      color: GcTokens.primary.withValues(alpha: 0.30),
                     ),
                   ),
                   child: const Icon(
                     Icons.support_agent_rounded,
-                    color: GcTokens.brandLime,
+                    color: GcTokens.primary,
                     size: 20,
                   ),
                 ),
@@ -179,15 +179,15 @@ class _GcSupportSheetState extends State<GcSupportSheet> {
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w900,
-                          color: Colors.white,
+                          color: GcTokens.textPrimary,
                         ),
                       ),
                       Text(
                         'Order #${widget.order.id}',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w800,
-                          color: Colors.white.withValues(alpha: 0.55),
+                          color: GcTokens.textTertiary,
                           letterSpacing: 0.4,
                         ),
                       ),
@@ -214,10 +214,10 @@ class _GcSupportSheetState extends State<GcSupportSheet> {
         Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: GcTokens.brandLime.withValues(alpha: 0.08),
+            color: GcTokens.primary.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
-              color: GcTokens.brandLime.withValues(alpha: 0.30),
+              color: GcTokens.primary.withValues(alpha: 0.20),
             ),
           ),
           child: Column(
@@ -231,10 +231,10 @@ class _GcSupportSheetState extends State<GcSupportSheet> {
                       vertical: 3,
                     ),
                     decoration: BoxDecoration(
-                      color: GcTokens.brandLime.withValues(alpha: 0.18),
+                      color: GcTokens.primary.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color: GcTokens.brandLime.withValues(alpha: 0.45),
+                        color: GcTokens.primary.withValues(alpha: 0.30),
                       ),
                     ),
                     child: Text(
@@ -242,7 +242,7 @@ class _GcSupportSheetState extends State<GcSupportSheet> {
                       style: const TextStyle(
                         fontSize: 9.5,
                         fontWeight: FontWeight.w900,
-                        color: GcTokens.brandLime,
+                        color: GcTokens.primary,
                         letterSpacing: 0.8,
                       ),
                     ),
@@ -250,10 +250,10 @@ class _GcSupportSheetState extends State<GcSupportSheet> {
                   const Spacer(),
                   Text(
                     t.status,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.w900,
-                      color: Colors.white.withValues(alpha: 0.6),
+                      color: GcTokens.textTertiary,
                       letterSpacing: 1,
                     ),
                   ),
@@ -264,29 +264,29 @@ class _GcSupportSheetState extends State<GcSupportSheet> {
                 t.body,
                 style: const TextStyle(
                   fontSize: 13,
-                  color: Colors.white,
+                  color: GcTokens.textPrimary,
                   height: 1.45,
                 ),
               ),
               const SizedBox(height: 10),
               Text(
                 'Submitted ${_fmtDate(t.createdAt)}',
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w800,
-                  color: Colors.white.withValues(alpha: 0.55),
+                  color: GcTokens.textTertiary,
                 ),
               ),
             ],
           ),
         ),
         const SizedBox(height: 16),
-        Text(
+        const Text(
           "Our team will reach out shortly. You'll get a notification when there's an update.",
           style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w700,
-            color: Colors.white.withValues(alpha: 0.65),
+            color: GcTokens.textSecondary,
             height: 1.4,
           ),
         ),
@@ -296,10 +296,8 @@ class _GcSupportSheetState extends State<GcSupportSheet> {
           child: OutlinedButton(
             onPressed: () => Navigator.pop(context),
             style: OutlinedButton.styleFrom(
-              foregroundColor: Colors.white,
-              side: BorderSide(
-                color: Colors.white.withValues(alpha: 0.20),
-              ),
+              foregroundColor: GcTokens.textPrimary,
+              side: const BorderSide(color: Color(0xFFE5E1F1)),
               padding: const EdgeInsets.symmetric(vertical: 14),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(GcTokens.rPill),
@@ -319,13 +317,13 @@ class _GcSupportSheetState extends State<GcSupportSheet> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           'WHAT WENT WRONG?',
           style: TextStyle(
             fontSize: 10,
             fontWeight: FontWeight.w900,
             letterSpacing: 1.4,
-            color: GcTokens.brandLime.withValues(alpha: 0.85),
+            color: GcTokens.textTertiary,
           ),
         ),
         const SizedBox(height: 10),
@@ -344,13 +342,14 @@ class _GcSupportSheetState extends State<GcSupportSheet> {
                   ),
                   decoration: BoxDecoration(
                     color: _tag == tag
-                        ? GcTokens.brandLime.withValues(alpha: 0.18)
-                        : Colors.white.withValues(alpha: 0.06),
+                        ? GcTokens.primary.withValues(alpha: 0.10)
+                        : Colors.white,
                     borderRadius: BorderRadius.circular(GcTokens.rPill),
                     border: Border.all(
                       color: _tag == tag
-                          ? GcTokens.brandLime.withValues(alpha: 0.55)
-                          : Colors.white.withValues(alpha: 0.10),
+                          ? GcTokens.primary
+                          : const Color(0xFFE5E1F1),
+                      width: _tag == tag ? 1.5 : 1,
                     ),
                   ),
                   child: Text(
@@ -359,8 +358,8 @@ class _GcSupportSheetState extends State<GcSupportSheet> {
                       fontSize: 11.5,
                       fontWeight: FontWeight.w800,
                       color: _tag == tag
-                          ? GcTokens.brandLime
-                          : Colors.white.withValues(alpha: 0.85),
+                          ? GcTokens.primary
+                          : GcTokens.textPrimary,
                     ),
                   ),
                 ),
@@ -368,32 +367,34 @@ class _GcSupportSheetState extends State<GcSupportSheet> {
           ],
         ),
         const SizedBox(height: 18),
-        Text(
+        const Text(
           'DESCRIBE THE ISSUE',
           style: TextStyle(
             fontSize: 10,
             fontWeight: FontWeight.w900,
             letterSpacing: 1.4,
-            color: GcTokens.brandLime.withValues(alpha: 0.85),
+            color: GcTokens.textTertiary,
           ),
         ),
         const SizedBox(height: 10),
         Container(
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.05),
+            color: const Color(0xFFF5F5F8),
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.10),
-            ),
+            border: Border.all(color: const Color(0xFFE5E1F1)),
           ),
           child: TextField(
             controller: _bodyCtrl,
             maxLines: 4,
-            style: const TextStyle(color: Colors.white, fontSize: 14),
+            cursorColor: GcTokens.primary,
+            style: const TextStyle(
+              color: GcTokens.textPrimary,
+              fontSize: 14,
+            ),
             decoration: const InputDecoration(
               hintText: 'Tell us what happened…',
               hintStyle: TextStyle(
-                color: Colors.white38,
+                color: GcTokens.textTertiary,
                 fontSize: 13,
               ),
               border: InputBorder.none,
@@ -405,24 +406,25 @@ class _GcSupportSheetState extends State<GcSupportSheet> {
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.04),
+            color: const Color(0xFFF7F6FB),
             borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color(0xFFEFEAFB)),
           ),
           child: Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.info_outline_rounded,
                 size: 14,
-                color: Colors.white.withValues(alpha: 0.65),
+                color: GcTokens.textTertiary,
               ),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   'We\'ll attach order #${widget.order.id} (${widget.order.productName}) automatically.',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 11.5,
                     fontWeight: FontWeight.w700,
-                    color: Colors.white.withValues(alpha: 0.65),
+                    color: GcTokens.textSecondary,
                   ),
                 ),
               ),
@@ -435,10 +437,10 @@ class _GcSupportSheetState extends State<GcSupportSheet> {
           child: ElevatedButton(
             onPressed: _submitting ? null : _submit,
             style: ElevatedButton.styleFrom(
-              backgroundColor: GcTokens.brandLime,
-              foregroundColor: GcTokens.brandBlack,
+              backgroundColor: GcTokens.primary,
+              foregroundColor: Colors.white,
               disabledBackgroundColor:
-                  GcTokens.brandLime.withValues(alpha: 0.35),
+                  GcTokens.primary.withValues(alpha: 0.45),
               elevation: 0,
               padding: const EdgeInsets.symmetric(vertical: 14),
               shape: RoundedRectangleBorder(
@@ -450,7 +452,7 @@ class _GcSupportSheetState extends State<GcSupportSheet> {
                     width: 18,
                     height: 18,
                     child: CircularProgressIndicator(
-                      color: GcTokens.brandBlack,
+                      color: Colors.white,
                       strokeWidth: 2,
                     ),
                   )
