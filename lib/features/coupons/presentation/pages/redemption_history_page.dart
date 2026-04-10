@@ -133,13 +133,12 @@ class _RedemptionHistoryView extends StatelessWidget {
   }
 
   List<Widget> _buildLoaded(BuildContext context, UserCouponsLoaded state) {
-    final redeemed =
-        state.coupons.where((c) => c.isUsed).toList()
-          ..sort((a, b) {
-            final aDate = DateTime.tryParse(a.usedAt ?? '') ?? DateTime(2000);
-            final bDate = DateTime.tryParse(b.usedAt ?? '') ?? DateTime(2000);
-            return bDate.compareTo(aDate);
-          });
+    final redeemed = state.coupons.where((c) => c.isUsed).toList()
+      ..sort((a, b) {
+        final aDate = DateTime.tryParse(a.usedAt ?? '') ?? DateTime(2000);
+        final bDate = DateTime.tryParse(b.usedAt ?? '') ?? DateTime(2000);
+        return bDate.compareTo(aDate);
+      });
 
     if (redeemed.isEmpty) {
       return [
@@ -157,16 +156,15 @@ class _RedemptionHistoryView extends StatelessWidget {
     final grouped = <String, List<UserCouponModel>>{};
     for (final c in redeemed) {
       final date = DateTime.tryParse(c.usedAt ?? '');
-      final key = date != null
-          ? DateFormat('MMMM yyyy').format(date)
-          : 'Unknown';
+      final key =
+          date != null ? DateFormat('MMMM yyyy').format(date) : 'Unknown';
       grouped.putIfAbsent(key, () => []).add(c);
     }
 
     return [
-      // Stats strip
+      // Hero stats card
       SliverToBoxAdapter(
-        child: _StatsStrip(
+        child: _HeroStatsCard(
           totalRedeemed: redeemed.length,
           totalSavings: totalSavings,
         ),
@@ -174,10 +172,9 @@ class _RedemptionHistoryView extends StatelessWidget {
 
       // Grouped list
       for (final entry in grouped.entries) ...[
-        // Month header
         SliverToBoxAdapter(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 22, 20, 8),
+            padding: const EdgeInsets.fromLTRB(20, 22, 20, 10),
             child: Row(
               children: [
                 Text(
@@ -191,7 +188,8 @@ class _RedemptionHistoryView extends StatelessWidget {
                 ),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: Container(height: 1, color: const Color(0xFFF0F0F0)),
+                  child:
+                      Container(height: 1, color: const Color(0xFFF0F0F0)),
                 ),
                 const SizedBox(width: 10),
                 Container(
@@ -214,21 +212,20 @@ class _RedemptionHistoryView extends StatelessWidget {
             ),
           ),
         ),
-        // Cards for this month
         SliverList.separated(
           itemCount: entry.value.length,
-          separatorBuilder: (_, __) => const SizedBox(height: 10),
-          itemBuilder: (_, i) => _HistoryCard(coupon: entry.value[i]),
+          separatorBuilder: (_, __) => const SizedBox(height: 12),
+          itemBuilder: (_, i) => _TicketCard(coupon: entry.value[i]),
         ),
       ],
     ];
   }
 }
 
-// ─── Stats Strip ────────────────────────────────────────────
+// ─── Hero Stats Card ────────────────────────────────────────
 
-class _StatsStrip extends StatelessWidget {
-  const _StatsStrip({
+class _HeroStatsCard extends StatelessWidget {
+  const _HeroStatsCard({
     required this.totalRedeemed,
     required this.totalSavings,
   });
@@ -240,252 +237,395 @@ class _StatsStrip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 4, 20, 0),
-      child: Row(
-        children: [
-          Expanded(child: _StatChip(
-            label: 'Redeemed',
-            value: totalRedeemed.toString(),
-            color: const Color(0xFF6F3FCC),
-          )),
-          const SizedBox(width: 12),
-          Expanded(child: _StatChip(
-            label: 'Total saved',
-            value: '₹${totalSavings.toInt()}',
-            color: const Color(0xFF10B981),
-          )),
-        ],
+      child: AspectRatio(
+        aspectRatio: 2.3,
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(24),
+            color: const Color(0xFFFCFBFF),
+            border: Border.all(
+              color: const Color(0xFF6F3FCC).withValues(alpha: 0.10),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF6F3FCC).withValues(alpha: 0.08),
+                offset: const Offset(0, 10),
+                blurRadius: 28,
+                spreadRadius: -6,
+              ),
+            ],
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: Stack(
+            children: [
+              // Aurora — top-left, emerald
+              Positioned(
+                left: -45,
+                top: -50,
+                child: _GlowOrb(
+                  size: 170,
+                  color: const Color(0xFF10B981),
+                  opacity: 0.35,
+                ),
+              ),
+              // Aurora — right, purple
+              Positioned(
+                right: -35,
+                top: -25,
+                child: _GlowOrb(
+                  size: 190,
+                  color: const Color(0xFF9F7AEA),
+                  opacity: 0.30,
+                ),
+              ),
+              // Aurora — bottom-center, amber
+              Positioned(
+                left: 70,
+                bottom: -55,
+                child: _GlowOrb(
+                  size: 160,
+                  color: const Color(0xFFF59E0B),
+                  opacity: 0.22,
+                ),
+              ),
+              // Aurora — bottom-right, blue
+              Positioned(
+                right: 15,
+                bottom: -30,
+                child: _GlowOrb(
+                  size: 120,
+                  color: const Color(0xFF3B82F6),
+                  opacity: 0.20,
+                ),
+              ),
+              // Content
+              Padding(
+                padding: const EdgeInsets.fromLTRB(24, 18, 24, 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // Label
+                    Text(
+                      'Your savings so far',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color:
+                            const Color(0xFF1A202C).withValues(alpha: 0.40),
+                        letterSpacing: 0.2,
+                      ),
+                    ),
+                    // Stats row
+                    Row(
+                      children: [
+                        // Savings
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '₹${totalSavings.toInt()}',
+                                style: const TextStyle(
+                                  fontSize: 34,
+                                  fontWeight: FontWeight.w900,
+                                  color: Color(0xFF1A202C),
+                                  height: 1.0,
+                                  letterSpacing: -1.5,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              const Text(
+                                'total saved',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF9CA3AF),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        // Vertical divider
+                        Container(
+                          width: 1,
+                          height: 40,
+                          margin: const EdgeInsets.symmetric(horizontal: 16),
+                          color: const Color(0xFF6F3FCC).withValues(alpha: 0.10),
+                        ),
+                        // Redeemed count
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 6,
+                              ),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF6F3FCC)
+                                    .withValues(alpha: 0.07),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                totalRedeemed.toString(),
+                                style: const TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w900,
+                                  color: Color(0xFF6F3FCC),
+                                  height: 1.0,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            const Text(
+                              'redeemed',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF9CA3AF),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
 }
 
-class _StatChip extends StatelessWidget {
-  const _StatChip({
-    required this.label,
-    required this.value,
+class _GlowOrb extends StatelessWidget {
+  const _GlowOrb({
+    required this.size,
     required this.color,
+    required this.opacity,
   });
 
-  final String label;
-  final String value;
+  final double size;
   final Color color;
+  final double opacity;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.06),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withValues(alpha: 0.10)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-              color: color.withValues(alpha: 0.7),
-            ),
+    return SizedBox(
+      width: size,
+      height: size,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: RadialGradient(
+            colors: [
+              color.withValues(alpha: opacity),
+              color.withValues(alpha: opacity * 0.25),
+              color.withValues(alpha: 0),
+            ],
+            stops: const [0.0, 0.45, 1.0],
           ),
-          const SizedBox(height: 4),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.w900,
-              color: color,
-              height: 1.0,
-              letterSpacing: -0.5,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
 }
 
-// ─── History Card ───────────────────────────────────────────
+// ─── Ticket Card ────────────────────────────────────────────
 
-class _HistoryCard extends StatelessWidget {
-  const _HistoryCard({required this.coupon});
+class _TicketCard extends StatelessWidget {
+  const _TicketCard({required this.coupon});
 
   final UserCouponModel coupon;
 
+  static const _accents = [
+    Color(0xFF6F3FCC),
+    Color(0xFFFF6B6B),
+    Color(0xFF10B981),
+    Color(0xFF3B82F6),
+    Color(0xFFEC407A),
+    Color(0xFFF59E0B),
+    Color(0xFF00BCD4),
+    Color(0xFFAB47BC),
+  ];
+
+  Color get _accent => _accents[coupon.vendorId.abs() % _accents.length];
+
   @override
   Widget build(BuildContext context) {
+    final accent = _accent;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Material(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        child: InkWell(
-          onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => RedeemedCouponPage(userCoupon: coupon),
-            ),
+      child: GestureDetector(
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => RedeemedCouponPage(userCoupon: coupon),
           ),
-          borderRadius: BorderRadius.circular(18),
+        ),
+        child: PhysicalShape(
+          clipper: const _TicketClipper(),
+          color: Colors.white,
+          elevation: 2,
+          shadowColor: Colors.black.withValues(alpha: 0.08),
           child: Container(
-            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: const Color(0xFFF0F0F0)),
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0x08000000),
-                  offset: Offset(0, 3),
-                  blurRadius: 10,
-                ),
-              ],
+              border: Border.all(color: const Color(0xFFF0EEF5)),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Top row: vendor + discount
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Vendor initial
-                    Container(
-                      width: 42,
-                      height: 42,
+            child: IntrinsicHeight(
+              child: Row(
+                children: [
+                  // Left stub — discount
+                  SizedBox(
+                    width: 80,
+                    child: Container(
                       decoration: BoxDecoration(
-                        color: _accentForVendor.withValues(alpha: 0.08),
-                        borderRadius: BorderRadius.circular(12),
+                        color: accent.withValues(alpha: 0.06),
                       ),
-                      alignment: Alignment.center,
-                      child: Text(
-                        coupon.vendorName.isNotEmpty
-                            ? coupon.vendorName[0].toUpperCase()
-                            : '?',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w900,
-                          color: _accentForVendor,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    // Name + title
-                    Expanded(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            coupon.vendorName,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w800,
-                              color: Color(0xFF1A202C),
+                            _discountValue(),
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w900,
+                              color: accent,
+                              height: 1.0,
                             ),
                           ),
-                          const SizedBox(height: 2),
+                          const SizedBox(height: 4),
                           Text(
-                            coupon.title,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xFF9CA3AF),
+                            _discountSuffix(),
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              color: accent.withValues(alpha: 0.7),
+                              letterSpacing: 0.5,
                             ),
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    // Discount badge
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 5,
-                      ),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF10B981).withValues(alpha: 0.08),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Text(
-                        coupon.discountDisplay,
-                        style: const TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w800,
-                          color: Color(0xFF10B981),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-
-                // Divider
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  child: Container(
-                    height: 1,
-                    color: const Color(0xFFF5F5F5),
                   ),
-                ),
-
-                // Bottom row: date + code
-                Row(
-                  children: [
-                    // Date
-                    Text(
-                      _formatDate(coupon.usedAt),
-                      style: const TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w500,
-                        color: Color(0xFFB0B7C3),
+                  // Dashed divider
+                  SizedBox(
+                    width: 1,
+                    child: CustomPaint(
+                      painter: _DashedDividerPainter(
+                        color: const Color(0xFFE0E0E0),
                       ),
+                      child: const SizedBox.expand(),
                     ),
-                    const Spacer(),
-                    // Code chip
-                    if (coupon.redemptionCode != null)
-                      GestureDetector(
-                        onTap: () => _copyCode(context, coupon.redemptionCode!),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 5,
-                          ),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF7F7F8),
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(
-                              color: const Color(0xFFEEEEEE),
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
+                  ),
+                  // Right content
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // Vendor + date row
+                          Row(
                             children: [
-                              Text(
-                                _truncateCode(coupon.redemptionCode!),
-                                style: const TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w700,
-                                  fontFamily: 'monospace',
-                                  color: Color(0xFF6B7280),
-                                  letterSpacing: 0.5,
+                              Expanded(
+                                child: Text(
+                                  coupon.vendorName,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w800,
+                                    color: Color(0xFF1A202C),
+                                  ),
                                 ),
                               ),
-                              const SizedBox(width: 6),
-                              const Icon(
-                                Icons.copy_rounded,
-                                size: 11,
-                                color: Color(0xFFB0B7C3),
+                              Text(
+                                _formatDate(coupon.usedAt),
+                                style: const TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w500,
+                                  color: Color(0xFFB0B7C3),
+                                ),
                               ),
                             ],
                           ),
-                        ),
+                          const SizedBox(height: 3),
+                          // Title
+                          Text(
+                            coupon.title,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xFF9CA3AF),
+                            ),
+                          ),
+                          if (coupon.redemptionCode != null) ...[
+                            const SizedBox(height: 10),
+                            // Full code — tappable to copy
+                            GestureDetector(
+                              onTap: () =>
+                                  _copyCode(context, coupon.redemptionCode!),
+                              child: Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 8,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF8F7FA),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(
+                                    color: const Color(0xFFEEECF2),
+                                  ),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        coupon.redemptionCode!,
+                                        style: const TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w700,
+                                          fontFamily: 'monospace',
+                                          color: Color(0xFF1A202C),
+                                          letterSpacing: 1.0,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Container(
+                                      padding: const EdgeInsets.all(4),
+                                      decoration: BoxDecoration(
+                                        color: accent.withValues(alpha: 0.08),
+                                        borderRadius:
+                                            BorderRadius.circular(6),
+                                      ),
+                                      child: Icon(
+                                        Icons.copy_rounded,
+                                        size: 13,
+                                        color: accent,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
                       ),
-                  ],
-                ),
-              ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -493,30 +633,22 @@ class _HistoryCard extends StatelessWidget {
     );
   }
 
-  Color get _accentForVendor {
-    const accents = [
-      Color(0xFF6F3FCC),
-      Color(0xFFFF6B6B),
-      Color(0xFF10B981),
-      Color(0xFF3B82F6),
-      Color(0xFFEC407A),
-      Color(0xFFF59E0B),
-      Color(0xFF00BCD4),
-      Color(0xFFAB47BC),
-    ];
-    return accents[coupon.vendorId.abs() % accents.length];
+  String _discountValue() {
+    if (coupon.discountType.toLowerCase() == 'percentage') {
+      return '${coupon.discountValue.toInt()}%';
+    }
+    return '₹${coupon.discountValue.toInt()}';
   }
 
-  String _truncateCode(String code) {
-    if (code.length <= 10) return code;
-    return '${code.substring(0, 10)}…';
+  String _discountSuffix() {
+    return 'OFF';
   }
 
   String _formatDate(String? dateString) {
     if (dateString == null) return '';
     try {
       final date = DateTime.parse(dateString);
-      return DateFormat('dd MMM yyyy').format(date);
+      return DateFormat('dd MMM').format(date);
     } catch (e) {
       return '';
     }
@@ -534,6 +666,77 @@ class _HistoryCard extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Clips the ticket with semicircle notches at the divider line (x ≈ 80).
+class _TicketClipper extends CustomClipper<Path> {
+  const _TicketClipper();
+
+  static const double _notchRadius = 10.0;
+  static const double _notchX = 80.0;
+  static const double _cornerRadius = 16.0;
+
+  @override
+  Path getClip(Size size) {
+    final path = Path()
+      ..addRRect(
+        RRect.fromLTRBR(
+          0, 0, size.width, size.height,
+          const Radius.circular(_cornerRadius),
+        ),
+      );
+
+    final topNotch = Path()
+      ..addOval(Rect.fromCircle(
+        center: Offset(_notchX, 0),
+        radius: _notchRadius,
+      ));
+
+    final bottomNotch = Path()
+      ..addOval(Rect.fromCircle(
+        center: Offset(_notchX, size.height),
+        radius: _notchRadius,
+      ));
+
+    return Path.combine(
+      PathOperation.difference,
+      Path.combine(PathOperation.difference, path, topNotch),
+      bottomNotch,
+    );
+  }
+
+  @override
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
+}
+
+/// Dashed vertical line between notches.
+class _DashedDividerPainter extends CustomPainter {
+  const _DashedDividerPainter({required this.color});
+
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 1.2
+      ..style = PaintingStyle.stroke;
+
+    const dash = 4.0;
+    const gap = 4.0;
+    double y = 12;
+    while (y < size.height - 12) {
+      canvas.drawLine(
+        Offset(size.width / 2, y),
+        Offset(size.width / 2, y + dash),
+        paint,
+      );
+      y += dash + gap;
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 // ─── Empty State ────────────────────────────────────────────
@@ -695,41 +898,25 @@ class _Skeleton extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       child: Column(
         children: [
-          // Stats row
-          Row(
-            children: [
-              Expanded(
-                child: Container(
-                  height: 72,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF3F4F6),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Container(
-                  height: 72,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF3F4F6),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-              ),
-            ],
+          // Hero card skeleton
+          Container(
+            height: 130,
+            decoration: BoxDecoration(
+              color: const Color(0xFFF3F4F6),
+              borderRadius: BorderRadius.circular(24),
+            ),
           ),
           const SizedBox(height: 24),
-          // Card skeletons
+          // Ticket skeletons
           for (int i = 0; i < 5; i++) ...[
             Container(
-              height: 105,
+              height: 110,
               decoration: BoxDecoration(
                 color: const Color(0xFFF3F4F6),
-                borderRadius: BorderRadius.circular(18),
+                borderRadius: BorderRadius.circular(16),
               ),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
           ],
         ],
       ),
