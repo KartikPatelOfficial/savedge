@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_blurhash/flutter_blurhash.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:savedge/core/injection/injection.dart';
 import 'package:savedge/features/stores/presentation/pages/vendor_detail_page.dart';
@@ -412,10 +414,15 @@ class _StackedDealsCardsState extends State<StackedDealsCards>
 
   Widget _buildSpecialOfferImage(Coupon coupon) {
     // If special image exists, render image only. On error, fallback to current UI.
-    return Image.network(
-      coupon.specialOfferImageUrl!,
+    return CachedNetworkImage(
+      imageUrl: coupon.specialOfferImageUrl!,
       fit: BoxFit.cover,
-      errorBuilder: (context, error, stackTrace) {
+      width: double.infinity,
+      height: double.infinity,
+      placeholder: (context, url) => coupon.specialOfferBlurHash != null
+          ? BlurHash(hash: coupon.specialOfferBlurHash!)
+          : Container(color: Colors.grey[300]),
+      errorWidget: (context, url, error) {
         return Stack(
           children: [
             _buildGradientBackground(coupon, _currentIndex),

@@ -8,6 +8,7 @@ class SubscriptionPlan {
     required this.durationMonths,
     this.features,
     this.imageUrl,
+    this.blurHash,
     required this.isActive,
   });
 
@@ -18,6 +19,7 @@ class SubscriptionPlan {
   final int durationMonths;
   final String? features;
   final String? imageUrl;
+  final String? blurHash;
   final bool isActive;
 
   /// Get formatted price display

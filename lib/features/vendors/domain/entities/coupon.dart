@@ -27,6 +27,7 @@ class Coupon extends Equatable {
     this.specialOfferEndDate,
     this.specialOfferPriority = 0,
     this.specialOfferImageUrl,
+    this.specialOfferBlurHash,
     this.occasionType = CouponOccasionType.regular,
     this.daysBeforeOccasion,
     this.daysAfterOccasion,
@@ -56,6 +57,7 @@ class Coupon extends Equatable {
   final DateTime? specialOfferEndDate;
   final int specialOfferPriority;
   final String? specialOfferImageUrl;
+  final String? specialOfferBlurHash;
   final CouponOccasionType occasionType;
   final int? daysBeforeOccasion;
   final int? daysAfterOccasion;
@@ -125,6 +127,7 @@ class Coupon extends Equatable {
     specialOfferEndDate,
     specialOfferPriority,
     specialOfferImageUrl,
+    specialOfferBlurHash,
     occasionType,
     daysBeforeOccasion,
     daysAfterOccasion,

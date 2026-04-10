@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_blurhash/flutter_blurhash.dart';
 
 import '../../domain/entities/gift_card_entity.dart';
 import '../theme/gc_tokens.dart';
@@ -68,6 +69,12 @@ class GcCategoryGrid extends StatelessWidget {
                               ? CachedNetworkImage(
                                   imageUrl: c.imageUrl!,
                                   fit: BoxFit.cover,
+                                  placeholder: (_, __) => c.blurHash != null
+                                      ? ClipOval(child: BlurHash(hash: c.blurHash!))
+                                      : Icon(
+                                          Icons.card_giftcard_rounded,
+                                          color: accent,
+                                        ),
                                   errorWidget: (_, __, ___) => Icon(
                                     Icons.card_giftcard_rounded,
                                     color: accent,

@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_blurhash/flutter_blurhash.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:savedge/core/injection/injection.dart';
@@ -559,6 +560,13 @@ class _FavoriteTile extends StatelessWidget {
                           ? CachedNetworkImage(
                               imageUrl: imgUrl,
                               fit: BoxFit.contain,
+                              placeholder: (_, __) => product.blurHash != null
+                                  ? BlurHash(hash: product.blurHash!)
+                                  : Icon(
+                                      Icons.card_giftcard_rounded,
+                                      color: ink,
+                                      size: 32,
+                                    ),
                               errorWidget: (_, __, ___) => Icon(
                                 Icons.card_giftcard_rounded,
                                 color: ink,

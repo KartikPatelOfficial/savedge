@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_blurhash/flutter_blurhash.dart';
 
 import '../../data/services/gift_card_favorites_service.dart';
 import '../../domain/entities/gift_card_entity.dart';
@@ -194,7 +195,9 @@ class _ProductImage extends StatelessWidget {
       imageUrl: _bestUrl!,
       fit: BoxFit.contain,
       memCacheWidth: 300,
-      placeholder: (_, __) => _fallback(),
+      placeholder: (_, __) => product.blurHash != null
+          ? BlurHash(hash: product.blurHash!)
+          : _fallback(),
       errorWidget: (_, __, ___) => _fallback(),
     );
   }

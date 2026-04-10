@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_blurhash/flutter_blurhash.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:savedge/core/injection/injection.dart';
@@ -251,7 +252,9 @@ class _GiftCardDetailPageState extends State<GiftCardDetailPage> {
               ? CachedNetworkImage(
                   imageUrl: _heroImage!,
                   fit: BoxFit.contain,
-                  placeholder: (_, __) => _heroFallback(),
+                  placeholder: (_, __) => _p.blurHash != null
+                      ? BlurHash(hash: _p.blurHash!)
+                      : _heroFallback(),
                   errorWidget: (_, __, ___) => _heroFallback(),
                 )
               : _heroFallback(),

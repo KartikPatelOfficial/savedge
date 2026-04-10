@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter_blurhash/flutter_blurhash.dart';
 
 import '../../domain/entities/gift_card_entity.dart';
 
@@ -133,10 +134,12 @@ class GiftCardFeaturedBanner extends StatelessWidget {
                     ? CachedNetworkImage(
                         imageUrl: product.heroImageUrl!,
                         fit: BoxFit.contain,
-                        placeholder: (_, __) => Center(
-                          child: Icon(Icons.card_giftcard_rounded,
-                              size: 40, color: accent.withAlpha(80)),
-                        ),
+                        placeholder: (_, __) => product.blurHash != null
+                            ? BlurHash(hash: product.blurHash!)
+                            : Center(
+                                child: Icon(Icons.card_giftcard_rounded,
+                                    size: 40, color: accent.withAlpha(80)),
+                              ),
                         errorWidget: (_, __, ___) => Center(
                           child: Icon(Icons.card_giftcard_rounded,
                               size: 40, color: accent.withAlpha(80)),

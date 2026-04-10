@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_blurhash/flutter_blurhash.dart';
 
 import '../../domain/entities/gift_card_entity.dart';
 import '../theme/gc_tokens.dart';
@@ -49,6 +50,9 @@ class GcTrendingBrandTile extends StatelessWidget {
                       ? CachedNetworkImage(
                           imageUrl: product.squareImageUrl!,
                           fit: BoxFit.cover,
+                          placeholder: (_, __) => product.blurHash != null
+                              ? BlurHash(hash: product.blurHash!)
+                              : Container(color: bg),
                           errorWidget: (_, __, ___) => Container(color: bg),
                         )
                       : Center(

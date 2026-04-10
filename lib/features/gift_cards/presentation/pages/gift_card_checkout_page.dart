@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_blurhash/flutter_blurhash.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 
@@ -377,6 +378,12 @@ class _CheckoutViewState extends State<_CheckoutView> {
                   ? CachedNetworkImage(
                       imageUrl: p.squareImageUrl!,
                       fit: BoxFit.cover,
+                      placeholder: (_, __) => p.blurHash != null
+                          ? ClipRRect(
+                              borderRadius: BorderRadius.circular(14),
+                              child: BlurHash(hash: p.blurHash!),
+                            )
+                          : Container(color: bg),
                       errorWidget: (_, __, ___) => Container(color: bg),
                     )
                   : Container(color: bg),

@@ -5,6 +5,7 @@ class GiftCardCategoryEntity extends Equatable {
   final String name;
   final String? description;
   final String? imageUrl;
+  final String? blurHash;
   final bool isActive;
   final int productCount;
   final int? parentCategoryId;
@@ -15,6 +16,7 @@ class GiftCardCategoryEntity extends Equatable {
     required this.name,
     this.description,
     this.imageUrl,
+    this.blurHash,
     required this.isActive,
     required this.productCount,
     this.parentCategoryId,
@@ -27,6 +29,7 @@ class GiftCardCategoryEntity extends Equatable {
         name,
         description,
         imageUrl,
+        blurHash,
         isActive,
         productCount,
         parentCategoryId,
@@ -60,6 +63,7 @@ class GiftCardProductEntity extends Equatable {
   final String? thumbnailUrl; // 22x32 — too small, do not display
   final String? mobileImageUrl; // ~500x500 square
   final String? smallImageUrl; // 200x120 landscape
+  final String? blurHash;
   final String priceType;
   final double minPrice;
   final double maxPrice;
@@ -85,6 +89,7 @@ class GiftCardProductEntity extends Equatable {
     this.thumbnailUrl,
     this.mobileImageUrl,
     this.smallImageUrl,
+    this.blurHash,
     required this.priceType,
     required this.minPrice,
     required this.maxPrice,
@@ -159,6 +164,7 @@ class GiftCardProductEntity extends Equatable {
         thumbnailUrl,
         mobileImageUrl,
         smallImageUrl,
+        blurHash,
         priceType,
         minPrice,
         maxPrice,

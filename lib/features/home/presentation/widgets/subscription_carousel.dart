@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:math' as math;
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_blurhash/flutter_blurhash.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:savedge/core/injection/injection.dart';
@@ -388,30 +390,23 @@ class _OfferCardState extends State<_OfferCard> with SingleTickerProviderStateMi
       },
       child: ClipRRect(
         borderRadius: BorderRadius.circular(24),
-        child: Image.network(
-          widget.imageUrl!,
+        child: CachedNetworkImage(
+          imageUrl: widget.imageUrl!,
           fit: BoxFit.fill,
           width: double.infinity,
           height: double.infinity,
-          loadingBuilder: (context, child, loadingProgress) {
-            if (loadingProgress == null) return child;
-            return Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(24),
-                color: const Color(0xFFF3F0FF),
+          placeholder: (context, url) => Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(24),
+              color: const Color(0xFFF3F0FF),
+            ),
+            child: const Center(
+              child: CircularProgressIndicator(
+                color: Color(0xFF6F3FCC),
               ),
-              child: Center(
-                child: CircularProgressIndicator(
-                  color: const Color(0xFF6F3FCC),
-                  value: loadingProgress.expectedTotalBytes != null
-                      ? loadingProgress.cumulativeBytesLoaded /
-                          loadingProgress.expectedTotalBytes!
-                      : null,
-                ),
-              ),
-            );
-          },
-          errorBuilder: (context, error, stackTrace) {
+            ),
+          ),
+          errorWidget: (context, url, error) {
             return _buildDefaultCard();
           },
         ),
@@ -1195,19 +1190,19 @@ class _SubscriptionPlanCard extends StatelessWidget {
   }
 
   Widget _buildImageCard() {
-    return Image.network(
-      plan.imageUrl!,
+    return CachedNetworkImage(
+      imageUrl: plan.imageUrl!,
       fit: BoxFit.cover,
-      errorBuilder: (context, error, stackTrace) {
+      width: double.infinity,
+      placeholder: (context, url) => plan.blurHash != null
+          ? BlurHash(hash: plan.blurHash!)
+          : Container(
+              height: 200,
+              color: Colors.grey[200],
+              child: const Center(child: CircularProgressIndicator()),
+            ),
+      errorWidget: (context, url, error) {
         return _buildFallbackCard();
-      },
-      loadingBuilder: (context, child, loadingProgress) {
-        if (loadingProgress == null) return child;
-        return Container(
-          height: 200,
-          color: Colors.grey[200],
-          child: const Center(child: CircularProgressIndicator()),
-        );
       },
     );
   }

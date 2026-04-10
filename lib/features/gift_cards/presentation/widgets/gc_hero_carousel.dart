@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_blurhash/flutter_blurhash.dart';
 
 import '../../domain/entities/gift_card_entity.dart';
 import '../theme/gc_tokens.dart';
@@ -257,6 +258,9 @@ class _GcHeroCarouselState extends State<GcHeroCarousel> {
                               ? CachedNetworkImage(
                                   imageUrl: heroUrl,
                                   fit: BoxFit.contain,
+                                  placeholder: (_, __) => p.blurHash != null
+                                      ? BlurHash(hash: p.blurHash!)
+                                      : Container(color: tint),
                                   errorWidget: (_, __, ___) =>
                                       Container(color: tint),
                                 )

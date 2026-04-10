@@ -16,6 +16,7 @@ abstract class SubscriptionPlanModel with _$SubscriptionPlanModel {
     @JsonKey(name: 'durationMonths') required int durationMonths,
     String? features,
     @JsonKey(name: 'imageUrl') String? imageUrl,
+    String? blurHash,
     @Default(true) bool isActive,
   }) = _SubscriptionPlanModel;
 
@@ -34,6 +35,7 @@ extension SubscriptionPlanModelX on SubscriptionPlanModel {
       durationMonths: durationMonths,
       features: features,
       imageUrl: imageUrl,
+      blurHash: blurHash,
       isActive: isActive,
     );
   }

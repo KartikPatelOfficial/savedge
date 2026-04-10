@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter_blurhash/flutter_blurhash.dart';
 
 import '../../domain/entities/gift_card_entity.dart';
 
@@ -69,11 +70,16 @@ class GiftCardCategoryCard extends StatelessWidget {
                     width: 40,
                     height: 40,
                     fit: BoxFit.cover,
-                    placeholder: (_, __) => Icon(
-                      Icons.category_rounded,
-                      size: 28,
-                      color: accent,
-                    ),
+                    placeholder: (_, __) => category.blurHash != null
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: BlurHash(hash: category.blurHash!),
+                          )
+                        : Icon(
+                            Icons.category_rounded,
+                            size: 28,
+                            color: accent,
+                          ),
                     errorWidget: (_, __, ___) => Icon(
                       Icons.category_rounded,
                       size: 28,
