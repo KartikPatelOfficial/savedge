@@ -344,7 +344,7 @@ as List<VendorSocialMediaDto>,
 /// @nodoc
 mixin _$VendorImageDto {
 
- int get id; String get imageUrl; String? get altText; int get displayOrder; bool get isPrimary; ImageType get imageType; String get imageTypeName;
+ int get id; String get imageUrl; String? get altText; int get displayOrder; bool get isPrimary; String? get blurHash; ImageType get imageType; String get imageTypeName;
 /// Create a copy of VendorImageDto
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -357,16 +357,16 @@ $VendorImageDtoCopyWith<VendorImageDto> get copyWith => _$VendorImageDtoCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is VendorImageDto&&(identical(other.id, id) || other.id == id)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.altText, altText) || other.altText == altText)&&(identical(other.displayOrder, displayOrder) || other.displayOrder == displayOrder)&&(identical(other.isPrimary, isPrimary) || other.isPrimary == isPrimary)&&(identical(other.imageType, imageType) || other.imageType == imageType)&&(identical(other.imageTypeName, imageTypeName) || other.imageTypeName == imageTypeName));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is VendorImageDto&&(identical(other.id, id) || other.id == id)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.altText, altText) || other.altText == altText)&&(identical(other.displayOrder, displayOrder) || other.displayOrder == displayOrder)&&(identical(other.isPrimary, isPrimary) || other.isPrimary == isPrimary)&&(identical(other.blurHash, blurHash) || other.blurHash == blurHash)&&(identical(other.imageType, imageType) || other.imageType == imageType)&&(identical(other.imageTypeName, imageTypeName) || other.imageTypeName == imageTypeName));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,imageUrl,altText,displayOrder,isPrimary,imageType,imageTypeName);
+int get hashCode => Object.hash(runtimeType,id,imageUrl,altText,displayOrder,isPrimary,blurHash,imageType,imageTypeName);
 
 @override
 String toString() {
-  return 'VendorImageDto(id: $id, imageUrl: $imageUrl, altText: $altText, displayOrder: $displayOrder, isPrimary: $isPrimary, imageType: $imageType, imageTypeName: $imageTypeName)';
+  return 'VendorImageDto(id: $id, imageUrl: $imageUrl, altText: $altText, displayOrder: $displayOrder, isPrimary: $isPrimary, blurHash: $blurHash, imageType: $imageType, imageTypeName: $imageTypeName)';
 }
 
 
@@ -377,7 +377,7 @@ abstract mixin class $VendorImageDtoCopyWith<$Res>  {
   factory $VendorImageDtoCopyWith(VendorImageDto value, $Res Function(VendorImageDto) _then) = _$VendorImageDtoCopyWithImpl;
 @useResult
 $Res call({
- int id, String imageUrl, String? altText, int displayOrder, bool isPrimary, ImageType imageType, String imageTypeName
+ int id, String imageUrl, String? altText, int displayOrder, bool isPrimary, String? blurHash, ImageType imageType, String imageTypeName
 });
 
 
@@ -394,14 +394,15 @@ class _$VendorImageDtoCopyWithImpl<$Res>
 
 /// Create a copy of VendorImageDto
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? imageUrl = null,Object? altText = freezed,Object? displayOrder = null,Object? isPrimary = null,Object? imageType = null,Object? imageTypeName = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? imageUrl = null,Object? altText = freezed,Object? displayOrder = null,Object? isPrimary = null,Object? blurHash = freezed,Object? imageType = null,Object? imageTypeName = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,imageUrl: null == imageUrl ? _self.imageUrl : imageUrl // ignore: cast_nullable_to_non_nullable
 as String,altText: freezed == altText ? _self.altText : altText // ignore: cast_nullable_to_non_nullable
 as String?,displayOrder: null == displayOrder ? _self.displayOrder : displayOrder // ignore: cast_nullable_to_non_nullable
 as int,isPrimary: null == isPrimary ? _self.isPrimary : isPrimary // ignore: cast_nullable_to_non_nullable
-as bool,imageType: null == imageType ? _self.imageType : imageType // ignore: cast_nullable_to_non_nullable
+as bool,blurHash: freezed == blurHash ? _self.blurHash : blurHash // ignore: cast_nullable_to_non_nullable
+as String?,imageType: null == imageType ? _self.imageType : imageType // ignore: cast_nullable_to_non_nullable
 as ImageType,imageTypeName: null == imageTypeName ? _self.imageTypeName : imageTypeName // ignore: cast_nullable_to_non_nullable
 as String,
   ));
@@ -488,10 +489,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String imageUrl,  String? altText,  int displayOrder,  bool isPrimary,  ImageType imageType,  String imageTypeName)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String imageUrl,  String? altText,  int displayOrder,  bool isPrimary,  String? blurHash,  ImageType imageType,  String imageTypeName)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _VendorImageDto() when $default != null:
-return $default(_that.id,_that.imageUrl,_that.altText,_that.displayOrder,_that.isPrimary,_that.imageType,_that.imageTypeName);case _:
+return $default(_that.id,_that.imageUrl,_that.altText,_that.displayOrder,_that.isPrimary,_that.blurHash,_that.imageType,_that.imageTypeName);case _:
   return orElse();
 
 }
@@ -509,10 +510,10 @@ return $default(_that.id,_that.imageUrl,_that.altText,_that.displayOrder,_that.i
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String imageUrl,  String? altText,  int displayOrder,  bool isPrimary,  ImageType imageType,  String imageTypeName)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String imageUrl,  String? altText,  int displayOrder,  bool isPrimary,  String? blurHash,  ImageType imageType,  String imageTypeName)  $default,) {final _that = this;
 switch (_that) {
 case _VendorImageDto():
-return $default(_that.id,_that.imageUrl,_that.altText,_that.displayOrder,_that.isPrimary,_that.imageType,_that.imageTypeName);case _:
+return $default(_that.id,_that.imageUrl,_that.altText,_that.displayOrder,_that.isPrimary,_that.blurHash,_that.imageType,_that.imageTypeName);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -529,10 +530,10 @@ return $default(_that.id,_that.imageUrl,_that.altText,_that.displayOrder,_that.i
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String imageUrl,  String? altText,  int displayOrder,  bool isPrimary,  ImageType imageType,  String imageTypeName)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String imageUrl,  String? altText,  int displayOrder,  bool isPrimary,  String? blurHash,  ImageType imageType,  String imageTypeName)?  $default,) {final _that = this;
 switch (_that) {
 case _VendorImageDto() when $default != null:
-return $default(_that.id,_that.imageUrl,_that.altText,_that.displayOrder,_that.isPrimary,_that.imageType,_that.imageTypeName);case _:
+return $default(_that.id,_that.imageUrl,_that.altText,_that.displayOrder,_that.isPrimary,_that.blurHash,_that.imageType,_that.imageTypeName);case _:
   return null;
 
 }
@@ -544,7 +545,7 @@ return $default(_that.id,_that.imageUrl,_that.altText,_that.displayOrder,_that.i
 @JsonSerializable()
 
 class _VendorImageDto implements VendorImageDto {
-  const _VendorImageDto({this.id = 0, required this.imageUrl, this.altText, this.displayOrder = 0, required this.isPrimary, this.imageType = ImageType.gallery, this.imageTypeName = 'Gallery'});
+  const _VendorImageDto({this.id = 0, required this.imageUrl, this.altText, this.displayOrder = 0, required this.isPrimary, this.blurHash, this.imageType = ImageType.gallery, this.imageTypeName = 'Gallery'});
   factory _VendorImageDto.fromJson(Map<String, dynamic> json) => _$VendorImageDtoFromJson(json);
 
 @override@JsonKey() final  int id;
@@ -552,6 +553,7 @@ class _VendorImageDto implements VendorImageDto {
 @override final  String? altText;
 @override@JsonKey() final  int displayOrder;
 @override final  bool isPrimary;
+@override final  String? blurHash;
 @override@JsonKey() final  ImageType imageType;
 @override@JsonKey() final  String imageTypeName;
 
@@ -568,16 +570,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _VendorImageDto&&(identical(other.id, id) || other.id == id)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.altText, altText) || other.altText == altText)&&(identical(other.displayOrder, displayOrder) || other.displayOrder == displayOrder)&&(identical(other.isPrimary, isPrimary) || other.isPrimary == isPrimary)&&(identical(other.imageType, imageType) || other.imageType == imageType)&&(identical(other.imageTypeName, imageTypeName) || other.imageTypeName == imageTypeName));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _VendorImageDto&&(identical(other.id, id) || other.id == id)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.altText, altText) || other.altText == altText)&&(identical(other.displayOrder, displayOrder) || other.displayOrder == displayOrder)&&(identical(other.isPrimary, isPrimary) || other.isPrimary == isPrimary)&&(identical(other.blurHash, blurHash) || other.blurHash == blurHash)&&(identical(other.imageType, imageType) || other.imageType == imageType)&&(identical(other.imageTypeName, imageTypeName) || other.imageTypeName == imageTypeName));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,imageUrl,altText,displayOrder,isPrimary,imageType,imageTypeName);
+int get hashCode => Object.hash(runtimeType,id,imageUrl,altText,displayOrder,isPrimary,blurHash,imageType,imageTypeName);
 
 @override
 String toString() {
-  return 'VendorImageDto(id: $id, imageUrl: $imageUrl, altText: $altText, displayOrder: $displayOrder, isPrimary: $isPrimary, imageType: $imageType, imageTypeName: $imageTypeName)';
+  return 'VendorImageDto(id: $id, imageUrl: $imageUrl, altText: $altText, displayOrder: $displayOrder, isPrimary: $isPrimary, blurHash: $blurHash, imageType: $imageType, imageTypeName: $imageTypeName)';
 }
 
 
@@ -588,7 +590,7 @@ abstract mixin class _$VendorImageDtoCopyWith<$Res> implements $VendorImageDtoCo
   factory _$VendorImageDtoCopyWith(_VendorImageDto value, $Res Function(_VendorImageDto) _then) = __$VendorImageDtoCopyWithImpl;
 @override @useResult
 $Res call({
- int id, String imageUrl, String? altText, int displayOrder, bool isPrimary, ImageType imageType, String imageTypeName
+ int id, String imageUrl, String? altText, int displayOrder, bool isPrimary, String? blurHash, ImageType imageType, String imageTypeName
 });
 
 
@@ -605,14 +607,15 @@ class __$VendorImageDtoCopyWithImpl<$Res>
 
 /// Create a copy of VendorImageDto
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? imageUrl = null,Object? altText = freezed,Object? displayOrder = null,Object? isPrimary = null,Object? imageType = null,Object? imageTypeName = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? imageUrl = null,Object? altText = freezed,Object? displayOrder = null,Object? isPrimary = null,Object? blurHash = freezed,Object? imageType = null,Object? imageTypeName = null,}) {
   return _then(_VendorImageDto(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,imageUrl: null == imageUrl ? _self.imageUrl : imageUrl // ignore: cast_nullable_to_non_nullable
 as String,altText: freezed == altText ? _self.altText : altText // ignore: cast_nullable_to_non_nullable
 as String?,displayOrder: null == displayOrder ? _self.displayOrder : displayOrder // ignore: cast_nullable_to_non_nullable
 as int,isPrimary: null == isPrimary ? _self.isPrimary : isPrimary // ignore: cast_nullable_to_non_nullable
-as bool,imageType: null == imageType ? _self.imageType : imageType // ignore: cast_nullable_to_non_nullable
+as bool,blurHash: freezed == blurHash ? _self.blurHash : blurHash // ignore: cast_nullable_to_non_nullable
+as String?,imageType: null == imageType ? _self.imageType : imageType // ignore: cast_nullable_to_non_nullable
 as ImageType,imageTypeName: null == imageTypeName ? _self.imageTypeName : imageTypeName // ignore: cast_nullable_to_non_nullable
 as String,
   ));

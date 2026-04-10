@@ -73,6 +73,7 @@ _VendorImageDto _$VendorImageDtoFromJson(Map<String, dynamic> json) =>
       altText: json['altText'] as String?,
       displayOrder: (json['displayOrder'] as num?)?.toInt() ?? 0,
       isPrimary: json['isPrimary'] as bool,
+      blurHash: json['blurHash'] as String?,
       imageType:
           $enumDecodeNullable(_$ImageTypeEnumMap, json['imageType']) ??
           ImageType.gallery,
@@ -86,6 +87,7 @@ Map<String, dynamic> _$VendorImageDtoToJson(_VendorImageDto instance) =>
       'altText': instance.altText,
       'displayOrder': instance.displayOrder,
       'isPrimary': instance.isPrimary,
+      'blurHash': instance.blurHash,
       'imageType': _$ImageTypeEnumMap[instance.imageType]!,
       'imageTypeName': instance.imageTypeName,
     };

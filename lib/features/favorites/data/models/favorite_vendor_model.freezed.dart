@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$FavoriteVendorModel {
 
-@HiveField(0) String get id;@HiveField(1) int get vendorId;@HiveField(2) String get businessName;@HiveField(3) String get category;@HiveField(4) String? get description;@HiveField(5) String? get imageUrl;@HiveField(6) String? get address;@HiveField(7) String? get city;@HiveField(8) String? get state;@HiveField(9) DateTime get addedAt;
+@HiveField(0) String get id;@HiveField(1) int get vendorId;@HiveField(2) String get businessName;@HiveField(3) String get category;@HiveField(4) String? get description;@HiveField(5) String? get imageUrl;@HiveField(10) String? get blurHash;@HiveField(6) String? get address;@HiveField(7) String? get city;@HiveField(8) String? get state;@HiveField(9) DateTime get addedAt;
 /// Create a copy of FavoriteVendorModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $FavoriteVendorModelCopyWith<FavoriteVendorModel> get copyWith => _$FavoriteVend
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is FavoriteVendorModel&&(identical(other.id, id) || other.id == id)&&(identical(other.vendorId, vendorId) || other.vendorId == vendorId)&&(identical(other.businessName, businessName) || other.businessName == businessName)&&(identical(other.category, category) || other.category == category)&&(identical(other.description, description) || other.description == description)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.address, address) || other.address == address)&&(identical(other.city, city) || other.city == city)&&(identical(other.state, state) || other.state == state)&&(identical(other.addedAt, addedAt) || other.addedAt == addedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is FavoriteVendorModel&&(identical(other.id, id) || other.id == id)&&(identical(other.vendorId, vendorId) || other.vendorId == vendorId)&&(identical(other.businessName, businessName) || other.businessName == businessName)&&(identical(other.category, category) || other.category == category)&&(identical(other.description, description) || other.description == description)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.blurHash, blurHash) || other.blurHash == blurHash)&&(identical(other.address, address) || other.address == address)&&(identical(other.city, city) || other.city == city)&&(identical(other.state, state) || other.state == state)&&(identical(other.addedAt, addedAt) || other.addedAt == addedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,vendorId,businessName,category,description,imageUrl,address,city,state,addedAt);
+int get hashCode => Object.hash(runtimeType,id,vendorId,businessName,category,description,imageUrl,blurHash,address,city,state,addedAt);
 
 @override
 String toString() {
-  return 'FavoriteVendorModel(id: $id, vendorId: $vendorId, businessName: $businessName, category: $category, description: $description, imageUrl: $imageUrl, address: $address, city: $city, state: $state, addedAt: $addedAt)';
+  return 'FavoriteVendorModel(id: $id, vendorId: $vendorId, businessName: $businessName, category: $category, description: $description, imageUrl: $imageUrl, blurHash: $blurHash, address: $address, city: $city, state: $state, addedAt: $addedAt)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $FavoriteVendorModelCopyWith<$Res>  {
   factory $FavoriteVendorModelCopyWith(FavoriteVendorModel value, $Res Function(FavoriteVendorModel) _then) = _$FavoriteVendorModelCopyWithImpl;
 @useResult
 $Res call({
-@HiveField(0) String id,@HiveField(1) int vendorId,@HiveField(2) String businessName,@HiveField(3) String category,@HiveField(4) String? description,@HiveField(5) String? imageUrl,@HiveField(6) String? address,@HiveField(7) String? city,@HiveField(8) String? state,@HiveField(9) DateTime addedAt
+@HiveField(0) String id,@HiveField(1) int vendorId,@HiveField(2) String businessName,@HiveField(3) String category,@HiveField(4) String? description,@HiveField(5) String? imageUrl,@HiveField(10) String? blurHash,@HiveField(6) String? address,@HiveField(7) String? city,@HiveField(8) String? state,@HiveField(9) DateTime addedAt
 });
 
 
@@ -65,7 +65,7 @@ class _$FavoriteVendorModelCopyWithImpl<$Res>
 
 /// Create a copy of FavoriteVendorModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? vendorId = null,Object? businessName = null,Object? category = null,Object? description = freezed,Object? imageUrl = freezed,Object? address = freezed,Object? city = freezed,Object? state = freezed,Object? addedAt = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? vendorId = null,Object? businessName = null,Object? category = null,Object? description = freezed,Object? imageUrl = freezed,Object? blurHash = freezed,Object? address = freezed,Object? city = freezed,Object? state = freezed,Object? addedAt = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,vendorId: null == vendorId ? _self.vendorId : vendorId // ignore: cast_nullable_to_non_nullable
@@ -73,6 +73,7 @@ as int,businessName: null == businessName ? _self.businessName : businessName //
 as String,category: null == category ? _self.category : category // ignore: cast_nullable_to_non_nullable
 as String,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String?,imageUrl: freezed == imageUrl ? _self.imageUrl : imageUrl // ignore: cast_nullable_to_non_nullable
+as String?,blurHash: freezed == blurHash ? _self.blurHash : blurHash // ignore: cast_nullable_to_non_nullable
 as String?,address: freezed == address ? _self.address : address // ignore: cast_nullable_to_non_nullable
 as String?,city: freezed == city ? _self.city : city // ignore: cast_nullable_to_non_nullable
 as String?,state: freezed == state ? _self.state : state // ignore: cast_nullable_to_non_nullable
@@ -162,10 +163,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@HiveField(0)  String id, @HiveField(1)  int vendorId, @HiveField(2)  String businessName, @HiveField(3)  String category, @HiveField(4)  String? description, @HiveField(5)  String? imageUrl, @HiveField(6)  String? address, @HiveField(7)  String? city, @HiveField(8)  String? state, @HiveField(9)  DateTime addedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@HiveField(0)  String id, @HiveField(1)  int vendorId, @HiveField(2)  String businessName, @HiveField(3)  String category, @HiveField(4)  String? description, @HiveField(5)  String? imageUrl, @HiveField(10)  String? blurHash, @HiveField(6)  String? address, @HiveField(7)  String? city, @HiveField(8)  String? state, @HiveField(9)  DateTime addedAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _FavoriteVendorModel() when $default != null:
-return $default(_that.id,_that.vendorId,_that.businessName,_that.category,_that.description,_that.imageUrl,_that.address,_that.city,_that.state,_that.addedAt);case _:
+return $default(_that.id,_that.vendorId,_that.businessName,_that.category,_that.description,_that.imageUrl,_that.blurHash,_that.address,_that.city,_that.state,_that.addedAt);case _:
   return orElse();
 
 }
@@ -183,10 +184,10 @@ return $default(_that.id,_that.vendorId,_that.businessName,_that.category,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@HiveField(0)  String id, @HiveField(1)  int vendorId, @HiveField(2)  String businessName, @HiveField(3)  String category, @HiveField(4)  String? description, @HiveField(5)  String? imageUrl, @HiveField(6)  String? address, @HiveField(7)  String? city, @HiveField(8)  String? state, @HiveField(9)  DateTime addedAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@HiveField(0)  String id, @HiveField(1)  int vendorId, @HiveField(2)  String businessName, @HiveField(3)  String category, @HiveField(4)  String? description, @HiveField(5)  String? imageUrl, @HiveField(10)  String? blurHash, @HiveField(6)  String? address, @HiveField(7)  String? city, @HiveField(8)  String? state, @HiveField(9)  DateTime addedAt)  $default,) {final _that = this;
 switch (_that) {
 case _FavoriteVendorModel():
-return $default(_that.id,_that.vendorId,_that.businessName,_that.category,_that.description,_that.imageUrl,_that.address,_that.city,_that.state,_that.addedAt);case _:
+return $default(_that.id,_that.vendorId,_that.businessName,_that.category,_that.description,_that.imageUrl,_that.blurHash,_that.address,_that.city,_that.state,_that.addedAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -203,10 +204,10 @@ return $default(_that.id,_that.vendorId,_that.businessName,_that.category,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@HiveField(0)  String id, @HiveField(1)  int vendorId, @HiveField(2)  String businessName, @HiveField(3)  String category, @HiveField(4)  String? description, @HiveField(5)  String? imageUrl, @HiveField(6)  String? address, @HiveField(7)  String? city, @HiveField(8)  String? state, @HiveField(9)  DateTime addedAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@HiveField(0)  String id, @HiveField(1)  int vendorId, @HiveField(2)  String businessName, @HiveField(3)  String category, @HiveField(4)  String? description, @HiveField(5)  String? imageUrl, @HiveField(10)  String? blurHash, @HiveField(6)  String? address, @HiveField(7)  String? city, @HiveField(8)  String? state, @HiveField(9)  DateTime addedAt)?  $default,) {final _that = this;
 switch (_that) {
 case _FavoriteVendorModel() when $default != null:
-return $default(_that.id,_that.vendorId,_that.businessName,_that.category,_that.description,_that.imageUrl,_that.address,_that.city,_that.state,_that.addedAt);case _:
+return $default(_that.id,_that.vendorId,_that.businessName,_that.category,_that.description,_that.imageUrl,_that.blurHash,_that.address,_that.city,_that.state,_that.addedAt);case _:
   return null;
 
 }
@@ -218,7 +219,7 @@ return $default(_that.id,_that.vendorId,_that.businessName,_that.category,_that.
 @JsonSerializable()
 
 class _FavoriteVendorModel extends FavoriteVendorModel {
-  const _FavoriteVendorModel({@HiveField(0) required this.id, @HiveField(1) required this.vendorId, @HiveField(2) required this.businessName, @HiveField(3) required this.category, @HiveField(4) this.description, @HiveField(5) this.imageUrl, @HiveField(6) this.address, @HiveField(7) this.city, @HiveField(8) this.state, @HiveField(9) required this.addedAt}): super._();
+  const _FavoriteVendorModel({@HiveField(0) required this.id, @HiveField(1) required this.vendorId, @HiveField(2) required this.businessName, @HiveField(3) required this.category, @HiveField(4) this.description, @HiveField(5) this.imageUrl, @HiveField(10) this.blurHash, @HiveField(6) this.address, @HiveField(7) this.city, @HiveField(8) this.state, @HiveField(9) required this.addedAt}): super._();
   factory _FavoriteVendorModel.fromJson(Map<String, dynamic> json) => _$FavoriteVendorModelFromJson(json);
 
 @override@HiveField(0) final  String id;
@@ -227,6 +228,7 @@ class _FavoriteVendorModel extends FavoriteVendorModel {
 @override@HiveField(3) final  String category;
 @override@HiveField(4) final  String? description;
 @override@HiveField(5) final  String? imageUrl;
+@override@HiveField(10) final  String? blurHash;
 @override@HiveField(6) final  String? address;
 @override@HiveField(7) final  String? city;
 @override@HiveField(8) final  String? state;
@@ -245,16 +247,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FavoriteVendorModel&&(identical(other.id, id) || other.id == id)&&(identical(other.vendorId, vendorId) || other.vendorId == vendorId)&&(identical(other.businessName, businessName) || other.businessName == businessName)&&(identical(other.category, category) || other.category == category)&&(identical(other.description, description) || other.description == description)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.address, address) || other.address == address)&&(identical(other.city, city) || other.city == city)&&(identical(other.state, state) || other.state == state)&&(identical(other.addedAt, addedAt) || other.addedAt == addedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FavoriteVendorModel&&(identical(other.id, id) || other.id == id)&&(identical(other.vendorId, vendorId) || other.vendorId == vendorId)&&(identical(other.businessName, businessName) || other.businessName == businessName)&&(identical(other.category, category) || other.category == category)&&(identical(other.description, description) || other.description == description)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.blurHash, blurHash) || other.blurHash == blurHash)&&(identical(other.address, address) || other.address == address)&&(identical(other.city, city) || other.city == city)&&(identical(other.state, state) || other.state == state)&&(identical(other.addedAt, addedAt) || other.addedAt == addedAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,vendorId,businessName,category,description,imageUrl,address,city,state,addedAt);
+int get hashCode => Object.hash(runtimeType,id,vendorId,businessName,category,description,imageUrl,blurHash,address,city,state,addedAt);
 
 @override
 String toString() {
-  return 'FavoriteVendorModel(id: $id, vendorId: $vendorId, businessName: $businessName, category: $category, description: $description, imageUrl: $imageUrl, address: $address, city: $city, state: $state, addedAt: $addedAt)';
+  return 'FavoriteVendorModel(id: $id, vendorId: $vendorId, businessName: $businessName, category: $category, description: $description, imageUrl: $imageUrl, blurHash: $blurHash, address: $address, city: $city, state: $state, addedAt: $addedAt)';
 }
 
 
@@ -265,7 +267,7 @@ abstract mixin class _$FavoriteVendorModelCopyWith<$Res> implements $FavoriteVen
   factory _$FavoriteVendorModelCopyWith(_FavoriteVendorModel value, $Res Function(_FavoriteVendorModel) _then) = __$FavoriteVendorModelCopyWithImpl;
 @override @useResult
 $Res call({
-@HiveField(0) String id,@HiveField(1) int vendorId,@HiveField(2) String businessName,@HiveField(3) String category,@HiveField(4) String? description,@HiveField(5) String? imageUrl,@HiveField(6) String? address,@HiveField(7) String? city,@HiveField(8) String? state,@HiveField(9) DateTime addedAt
+@HiveField(0) String id,@HiveField(1) int vendorId,@HiveField(2) String businessName,@HiveField(3) String category,@HiveField(4) String? description,@HiveField(5) String? imageUrl,@HiveField(10) String? blurHash,@HiveField(6) String? address,@HiveField(7) String? city,@HiveField(8) String? state,@HiveField(9) DateTime addedAt
 });
 
 
@@ -282,7 +284,7 @@ class __$FavoriteVendorModelCopyWithImpl<$Res>
 
 /// Create a copy of FavoriteVendorModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? vendorId = null,Object? businessName = null,Object? category = null,Object? description = freezed,Object? imageUrl = freezed,Object? address = freezed,Object? city = freezed,Object? state = freezed,Object? addedAt = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? vendorId = null,Object? businessName = null,Object? category = null,Object? description = freezed,Object? imageUrl = freezed,Object? blurHash = freezed,Object? address = freezed,Object? city = freezed,Object? state = freezed,Object? addedAt = null,}) {
   return _then(_FavoriteVendorModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,vendorId: null == vendorId ? _self.vendorId : vendorId // ignore: cast_nullable_to_non_nullable
@@ -290,6 +292,7 @@ as int,businessName: null == businessName ? _self.businessName : businessName //
 as String,category: null == category ? _self.category : category // ignore: cast_nullable_to_non_nullable
 as String,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String?,imageUrl: freezed == imageUrl ? _self.imageUrl : imageUrl // ignore: cast_nullable_to_non_nullable
+as String?,blurHash: freezed == blurHash ? _self.blurHash : blurHash // ignore: cast_nullable_to_non_nullable
 as String?,address: freezed == address ? _self.address : address // ignore: cast_nullable_to_non_nullable
 as String?,city: freezed == city ? _self.city : city // ignore: cast_nullable_to_non_nullable
 as String?,state: freezed == state ? _self.state : state // ignore: cast_nullable_to_non_nullable

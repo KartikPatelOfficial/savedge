@@ -1,5 +1,7 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_blurhash/flutter_blurhash.dart';
 import 'package:savedge/core/constants/categories_constants.dart';
 import 'package:savedge/core/injection/injection.dart';
 import 'package:savedge/features/vendors/domain/entities/vendor.dart';
@@ -454,10 +456,13 @@ class _TopVendorCard extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(18),
         child: primaryImage.imageUrl.isNotEmpty
-            ? Image.network(
-                primaryImage.imageUrl,
+            ? CachedNetworkImage(
+                imageUrl: primaryImage.imageUrl,
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => _buildFallbackIcon(),
+                placeholder: (context, url) => primaryImage.blurHash != null
+                    ? BlurHash(hash: primaryImage.blurHash!)
+                    : Container(color: const Color(0xFF1A202C)),
+                errorWidget: (_, __, ___) => _buildFallbackIcon(),
               )
             : _buildFallbackIcon(),
       ),
