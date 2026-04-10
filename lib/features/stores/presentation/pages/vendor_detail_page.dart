@@ -102,99 +102,7 @@ class _VendorDetailPageState extends State<VendorDetailPage> {
       child: BlocBuilder<VendorDetailBloc, VendorDetailState>(
         builder: (context, state) {
           if (state is VendorDetailLoading) {
-            return Scaffold(
-              backgroundColor: Colors.white,
-              body: SafeArea(
-                child: Column(
-                  children: [
-                    // Minimal header
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 16,
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 44,
-                            height: 44,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFF8F9FA),
-                              borderRadius: BorderRadius.circular(14),
-                              border: Border.all(
-                                color: const Color(0xFFE2E8F0),
-                              ),
-                            ),
-                            child: Material(
-                              color: Colors.transparent,
-                              child: InkWell(
-                                onTap: () => Navigator.pop(context),
-                                borderRadius: BorderRadius.circular(14),
-                                child: const Icon(
-                                  Icons.arrow_back_ios_new,
-                                  color: Color(0xFF1A202C),
-                                  size: 18,
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          const Text(
-                            'Loading store...',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFF1A202C),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    // Loading content
-                    Expanded(
-                      child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              width: 80,
-                              height: 80,
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF6F3FCC).withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(40),
-                              ),
-                              child: const Center(
-                                child: CircularProgressIndicator(
-                                  color: Color(0xFF6F3FCC),
-                                  strokeWidth: 3,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 32),
-                            const Text(
-                              'Loading store details...',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF1A202C),
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            const Text(
-                              'Getting the best offers for you',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Color(0xFF6B7280),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
+            return const _VendorDetailSkeleton();
           } else if (state is VendorDetailLoaded) {
             return _VendorDetailView(
               vendor: state.vendor,
@@ -357,27 +265,7 @@ class _VendorDetailPageState extends State<VendorDetailPage> {
           }
 
           // Initial state
-          return Scaffold(
-            backgroundColor: Colors.white,
-            body: SafeArea(
-              child: Center(
-                child: Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF6F3FCC).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(40),
-                  ),
-                  child: const Center(
-                    child: CircularProgressIndicator(
-                      color: Color(0xFF6F3FCC),
-                      strokeWidth: 3,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          );
+          return const _VendorDetailSkeleton();
         },
       ),
     );
@@ -966,8 +854,10 @@ class _VendorDetailViewState extends State<_VendorDetailView> {
             _buildSocialMediaSection(),
           ],
 
-          // Points Payment Banner (only for authenticated users)
-          if (widget.isAuthenticated) ...[
+          // Points Payment Banner (only for employees who have points)
+          if (widget.isAuthenticated &&
+              widget.userProfile != null &&
+              widget.userProfile!.isEmployee) ...[
             const SizedBox(height: 20),
             _buildPointsPaymentCard(context),
           ],
@@ -1787,4 +1677,160 @@ class PaymentCardPatternPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(CustomPainter oldDelegate) => false;
+}
+
+/// Shimmer skeleton shown while the vendor detail loads.
+class _VendorDetailSkeleton extends StatelessWidget {
+  const _VendorDetailSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          physics: const NeverScrollableScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Back button row
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF8F9FA),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: const Color(0xFFE2E8F0)),
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: () => Navigator.pop(context),
+                          borderRadius: BorderRadius.circular(14),
+                          child: const Icon(
+                            Icons.arrow_back_ios_new,
+                            color: Color(0xFF1A202C),
+                            size: 18,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Image carousel skeleton
+              const _ShimmerBox(height: 220, margin: EdgeInsets.symmetric(horizontal: 24)),
+              const SizedBox(height: 20),
+
+              // Vendor name skeleton
+              const _ShimmerBox(
+                height: 22,
+                width: 200,
+                margin: EdgeInsets.symmetric(horizontal: 24),
+              ),
+              const SizedBox(height: 10),
+
+              // Category & location
+              const _ShimmerBox(
+                height: 14,
+                width: 140,
+                margin: EdgeInsets.symmetric(horizontal: 24),
+              ),
+              const SizedBox(height: 6),
+              const _ShimmerBox(
+                height: 14,
+                width: 180,
+                margin: EdgeInsets.symmetric(horizontal: 24),
+              ),
+              const SizedBox(height: 20),
+
+              // Action pills row
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Row(
+                  children: [
+                    _ShimmerBox(height: 36, width: 80, borderRadius: 20),
+                    const SizedBox(width: 10),
+                    _ShimmerBox(height: 36, width: 90, borderRadius: 20),
+                    const SizedBox(width: 10),
+                    _ShimmerBox(height: 36, width: 80, borderRadius: 20),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // Description skeleton
+              const _ShimmerBox(
+                height: 12,
+                margin: EdgeInsets.symmetric(horizontal: 24),
+              ),
+              const SizedBox(height: 6),
+              const _ShimmerBox(
+                height: 12,
+                width: 280,
+                margin: EdgeInsets.symmetric(horizontal: 24),
+              ),
+              const SizedBox(height: 6),
+              const _ShimmerBox(
+                height: 12,
+                width: 220,
+                margin: EdgeInsets.symmetric(horizontal: 24),
+              ),
+              const SizedBox(height: 28),
+
+              // "Offers" section header
+              const _ShimmerBox(
+                height: 18,
+                width: 100,
+                margin: EdgeInsets.symmetric(horizontal: 24),
+              ),
+              const SizedBox(height: 14),
+
+              // Offer cards skeleton
+              for (int i = 0; i < 3; i++) ...[
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: _ShimmerBox(height: 90, borderRadius: 16),
+                ),
+                const SizedBox(height: 12),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// A single shimmer placeholder rectangle.
+class _ShimmerBox extends StatelessWidget {
+  const _ShimmerBox({
+    required this.height,
+    this.width,
+    this.margin,
+    this.borderRadius = 12,
+  });
+
+  final double height;
+  final double? width;
+  final EdgeInsets? margin;
+  final double borderRadius;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: height,
+      width: width ?? double.infinity,
+      margin: margin,
+      decoration: BoxDecoration(
+        color: const Color(0xFFF0F0F0),
+        borderRadius: BorderRadius.circular(borderRadius),
+      ),
+    );
+  }
 }
