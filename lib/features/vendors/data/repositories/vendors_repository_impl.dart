@@ -230,6 +230,7 @@ class VendorsRepositoryImpl implements VendorsRepository {
       id: dto.id,
       imageUrl: dto.imageUrl,
       altText: dto.altText,
+      blurHash: dto.blurHash,
       displayOrder: dto.displayOrder,
       isPrimary: dto.isPrimary,
       imageType: dto.imageTypeName,

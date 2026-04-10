@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_blurhash/flutter_blurhash.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:savedge/core/enums/coupon_enums.dart';
@@ -590,27 +591,29 @@ class _VendorDetailViewState extends State<_VendorDetailView> {
                         imageUrl: image.imageUrl,
                         fit: BoxFit.cover,
                         cacheManager: CustomImageCacheManager(),
-                        placeholder: (context, url) => Container(
-                          color: Colors.grey[300],
-                          child: Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                CircularProgressIndicator(
-                                  color: const Color(0xFF6F3FCC),
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  'Loading image...',
-                                  style: TextStyle(
-                                    color: Colors.grey[600],
-                                    fontSize: 12,
+                        placeholder: (context, url) => image.blurHash != null
+                            ? BlurHash(hash: image.blurHash!)
+                            : Container(
+                                color: Colors.grey[300],
+                                child: Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      CircularProgressIndicator(
+                                        color: const Color(0xFF6F3FCC),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        'Loading image...',
+                                        style: TextStyle(
+                                          color: Colors.grey[600],
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              ],
-                            ),
-                          ),
-                        ),
+                              ),
                         errorWidget: (context, url, error) => Container(
                           color: Colors.grey[300],
                           child: Center(

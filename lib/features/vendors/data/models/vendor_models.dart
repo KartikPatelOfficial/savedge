@@ -41,6 +41,7 @@ abstract class VendorImageDto with _$VendorImageDto {
     String? altText,
     @Default(0) int displayOrder,
     required bool isPrimary,
+    String? blurHash,
     @Default(ImageType.gallery) ImageType imageType,
     @Default('Gallery') String imageTypeName,
   }) = _VendorImageDto;

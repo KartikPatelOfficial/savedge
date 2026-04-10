@@ -21,6 +21,7 @@ class FavoriteVendorModelAdapter extends TypeAdapter<FavoriteVendorModel> {
       category: fields[3] as String,
       description: fields[4] as String?,
       imageUrl: fields[5] as String?,
+      blurHash: fields[10] as String?,
       address: fields[6] as String?,
       city: fields[7] as String?,
       state: fields[8] as String?,
@@ -31,7 +32,7 @@ class FavoriteVendorModelAdapter extends TypeAdapter<FavoriteVendorModel> {
   @override
   void write(BinaryWriter writer, FavoriteVendorModel obj) {
     writer
-      ..writeByte(10)
+      ..writeByte(11)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -51,7 +52,9 @@ class FavoriteVendorModelAdapter extends TypeAdapter<FavoriteVendorModel> {
       ..writeByte(8)
       ..write(obj.state)
       ..writeByte(9)
-      ..write(obj.addedAt);
+      ..write(obj.addedAt)
+      ..writeByte(10)
+      ..write(obj.blurHash);
   }
 
   @override

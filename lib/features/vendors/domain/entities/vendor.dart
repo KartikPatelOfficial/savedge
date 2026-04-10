@@ -79,6 +79,7 @@ class VendorImage extends Equatable {
     required this.id,
     required this.imageUrl,
     this.altText,
+    this.blurHash,
     required this.displayOrder,
     required this.isPrimary,
     required this.imageType,
@@ -88,6 +89,7 @@ class VendorImage extends Equatable {
   final int id;
   final String imageUrl;
   final String? altText;
+  final String? blurHash;
   final int displayOrder;
   final bool isPrimary;
   final String imageType;
@@ -98,6 +100,7 @@ class VendorImage extends Equatable {
     id,
     imageUrl,
     altText,
+    blurHash,
     displayOrder,
     isPrimary,
     imageType,
