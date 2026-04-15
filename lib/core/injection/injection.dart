@@ -23,14 +23,6 @@ import 'package:savedge/features/auth/domain/usecases/send_otp_usecase.dart';
 import 'package:savedge/features/auth/domain/usecases/sync_user_usecase.dart';
 import 'package:savedge/features/auth/domain/usecases/verify_otp_usecase.dart';
 import 'package:savedge/features/auth/presentation/bloc/otp_auth_cubit.dart';
-import 'package:savedge/features/brand_vouchers/data/repositories/brand_voucher_repository_impl.dart';
-// Brand voucher imports
-import 'package:savedge/features/brand_vouchers/data/services/brand_voucher_service.dart';
-import 'package:savedge/features/brand_vouchers/domain/repositories/brand_voucher_repository.dart';
-import 'package:savedge/features/brand_vouchers/domain/usecases/create_voucher_order_usecase.dart';
-import 'package:savedge/features/brand_vouchers/domain/usecases/get_brand_vouchers_usecase.dart';
-import 'package:savedge/features/brand_vouchers/domain/usecases/get_voucher_orders_usecase.dart';
-import 'package:savedge/features/brand_vouchers/presentation/bloc/brand_vouchers_bloc.dart';
 // Gift card imports
 import 'package:savedge/features/gift_cards/data/services/gift_card_favorites_service.dart';
 import 'package:savedge/features/gift_cards/data/services/gift_card_local_actions_service.dart';
@@ -197,11 +189,6 @@ Future<void> configureDependencies() async {
     SubscriptionRemoteDataSource(getIt<Dio>()),
   );
 
-  // Brand voucher layer
-  getIt.registerLazySingleton<BrandVoucherService>(
-    () => BrandVoucherService(getIt<Dio>()),
-  );
-
   // Repositories
   getIt.registerSingleton<VendorsRepository>(
     VendorsRepositoryImpl(remoteDataSource: getIt<VendorsRemoteDataSource>()),
@@ -223,10 +210,6 @@ Future<void> configureDependencies() async {
     SubscriptionRepositoryImpl(
       remoteDataSource: getIt<SubscriptionRemoteDataSource>(),
     ),
-  );
-
-  getIt.registerLazySingleton<BrandVoucherRepository>(
-    () => BrandVoucherRepositoryImpl(getIt<BrandVoucherService>()),
   );
 
   // Free trial layer
@@ -334,19 +317,6 @@ Future<void> configureDependencies() async {
     CancelSubscriptionUseCase(getIt<SubscriptionRepository>()),
   );
 
-  // Brand voucher Use Cases
-  getIt.registerLazySingleton<GetBrandVouchersUseCase>(
-    () => GetBrandVouchersUseCase(getIt<BrandVoucherRepository>()),
-  );
-
-  getIt.registerLazySingleton<CreateVoucherOrderUseCase>(
-    () => CreateVoucherOrderUseCase(getIt<BrandVoucherRepository>()),
-  );
-
-  getIt.registerLazySingleton<GetVoucherOrdersUseCase>(
-    () => GetVoucherOrdersUseCase(getIt<BrandVoucherRepository>()),
-  );
-
   getIt.registerFactory<VendorsBloc>(
     () => VendorsBloc(getVendorsUseCase: getIt<GetVendorsUseCase>()),
   );
@@ -403,16 +373,6 @@ Future<void> configureDependencies() async {
       verifyPaymentUseCase: getIt<VerifyPaymentUseCase>(),
       getPaymentHistoryUseCase: getIt<GetPaymentHistoryUseCase>(),
       cancelSubscriptionUseCase: getIt<CancelSubscriptionUseCase>(),
-    ),
-  );
-
-  // Brand voucher BLoC
-  getIt.registerFactory<BrandVouchersBloc>(
-    () => BrandVouchersBloc(
-      getBrandVouchersUseCase: getIt<GetBrandVouchersUseCase>(),
-      createVoucherOrderUseCase: getIt<CreateVoucherOrderUseCase>(),
-      getVoucherOrdersUseCase: getIt<GetVoucherOrdersUseCase>(),
-      brandVoucherRepository: getIt<BrandVoucherRepository>(),
     ),
   );
 

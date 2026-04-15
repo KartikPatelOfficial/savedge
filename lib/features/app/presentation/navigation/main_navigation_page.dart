@@ -197,16 +197,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> with SingleTick
         // If "Other" city is selected, show region unavailable page
         if (cityState is CitiesLoaded &&
             cityState.selectedCityId == City.otherCityId) {
-          return RegionUnavailablePage(
-            onNavigateToGiftVouchers: () {
-              // Navigate to gift vouchers - this will be handled by the page
-              Navigator.pushNamed(context, '/voucher-orders');
-            },
-            onNavigateToBrandVouchers: () {
-              // Navigate to brand vouchers - this will be handled by the page
-              Navigator.pushNamed(context, '/voucher-orders');
-            },
-          );
+          return const RegionUnavailablePage();
         }
 
         // Check if city selection is needed

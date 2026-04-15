@@ -5,9 +5,6 @@ import 'package:savedge/core/themes/app_theme.dart';
 import 'package:savedge/features/auth/presentation/bloc/otp_auth_cubit.dart';
 import 'package:savedge/features/auth/presentation/widgets/auth_wrapper.dart';
 import 'package:savedge/features/app/presentation/navigation/main_navigation_page.dart';
-import 'package:savedge/features/brand_vouchers/presentation/pages/voucher_purchase_page.dart';
-import 'package:savedge/features/brand_vouchers/presentation/pages/voucher_orders_page.dart';
-import 'package:savedge/features/brand_vouchers/domain/entities/brand_voucher_entity.dart';
 import 'package:savedge/features/gift_cards/presentation/pages/gift_cards_page.dart';
 import 'package:savedge/features/gift_cards/presentation/pages/gift_card_detail_page.dart';
 import 'package:savedge/features/gift_cards/presentation/pages/gift_card_checkout_page.dart';
@@ -70,17 +67,6 @@ class SavedgeApp extends StatelessWidget {
         final initialTab = settings.arguments is int ? settings.arguments as int : 0;
         return MaterialPageRoute(
           builder: (_) => MainNavigationPage(initialTab: initialTab),
-        );
-      case '/voucher-purchase':
-        final voucher = settings.arguments as BrandVoucherEntity;
-        return MaterialPageRoute(
-          builder: (_) => VoucherPurchasePage(voucher: voucher),
-          settings: settings,
-        );
-      case '/voucher-orders':
-        return MaterialPageRoute(
-          builder: (_) => const VoucherOrdersPage(),
-          settings: settings,
         );
       case '/notifications':
         return MaterialPageRoute(

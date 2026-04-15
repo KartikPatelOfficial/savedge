@@ -55,8 +55,6 @@ class InvoiceListItem {
         return 'Renewal';
       case 3:
         return 'Coupon Purchase';
-      case 4:
-        return 'Voucher Order';
       case 5:
         return 'Gift Card Order';
       case 6:
