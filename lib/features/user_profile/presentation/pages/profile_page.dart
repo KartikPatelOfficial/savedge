@@ -658,7 +658,9 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _onOrderHistoryTap() {
-    Navigator.of(context).pushNamed('/voucher-orders');
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) => const RedemptionHistoryPage()),
+    );
   }
 
   void _onInvoicesTap() {
