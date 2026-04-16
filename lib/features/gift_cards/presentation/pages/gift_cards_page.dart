@@ -30,7 +30,7 @@ class GiftCardsPage extends StatelessWidget {
         ..add(const LoadGiftCardCategories())
         ..add(const LoadHotDeals())
         ..add(const LoadGiftCardProducts())
-        ..add(const LoadGiftCardOrders(pageSize: 10)),
+        ..add(const LoadGiftCardOrders(status: GiftCardOrderStatusEntity.completed, pageSize: 10)),
       child: const _GiftCardsView(),
     );
   }

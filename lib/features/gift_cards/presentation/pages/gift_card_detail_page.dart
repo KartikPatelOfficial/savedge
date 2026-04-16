@@ -42,8 +42,7 @@ class _GiftCardDetailPageState extends State<GiftCardDetailPage> {
 
   String get _currency => _p.currencySymbol ?? '\u20B9';
   String? get _heroImage => _p.heroImageUrl;
-  bool get _hasImage =>
-      _heroImage != null && _heroImage!.trim().isNotEmpty;
+  bool get _hasImage => _heroImage != null && _heroImage!.trim().isNotEmpty;
 
   @override
   void initState() {
@@ -83,11 +82,12 @@ class _GiftCardDetailPageState extends State<GiftCardDetailPage> {
     try {
       if (raw.startsWith('[')) {
         final list = List<dynamic>.from(jsonDecode(raw) as List);
-        final out = list
-            .map((v) => double.tryParse(v.toString()) ?? 0)
-            .where((d) => d > 0)
-            .toList()
-          ..sort();
+        final out =
+            list
+                .map((v) => double.tryParse(v.toString()) ?? 0)
+                .where((d) => d > 0)
+                .toList()
+              ..sort();
         return out;
       }
     } catch (_) {}
@@ -137,9 +137,9 @@ class _GiftCardDetailPageState extends State<GiftCardDetailPage> {
         text: 'Check out the ${_p.brandName ?? _p.name} gift card on SavEdge!',
       ),
     );
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Link copied to clipboard')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Link copied to clipboard')));
   }
 
   // ── Build ──────────────────────────────────────────────────────────────
@@ -354,24 +354,28 @@ class _GiftCardDetailPageState extends State<GiftCardDetailPage> {
               _p.offerDescription!.isNotEmpty) ...[
             const SizedBox(height: 12),
             Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 8,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
                 color: _accent.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Icon(Icons.local_offer_rounded, size: 16, color: _accent),
                   const SizedBox(width: 8),
                   Expanded(
-                    child: Text(
-                      _p.offerDescription!,
-                      style: TextStyle(
+                    child: _ExpandableText(
+                      text: _p.offerDescription!,
+                      collapsedMaxLines: 2,
+                      textStyle: TextStyle(
                         fontSize: 12.5,
                         fontWeight: FontWeight.w700,
+                        color: _accent,
+                      ),
+                      toggleStyle: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w800,
                         color: _accent,
                       ),
                     ),
@@ -383,14 +387,18 @@ class _GiftCardDetailPageState extends State<GiftCardDetailPage> {
           // Description (inline, no separate card)
           if (_p.description != null && _p.description!.trim().isNotEmpty) ...[
             const SizedBox(height: 14),
-            Text(
-              _p.description!,
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
+            _ExpandableText(
+              text: _p.description!,
+              collapsedMaxLines: 3,
+              textStyle: const TextStyle(
                 fontSize: 13,
                 height: 1.5,
                 color: GcTokens.textSecondary,
+              ),
+              toggleStyle: const TextStyle(
+                fontSize: 12.5,
+                fontWeight: FontWeight.w800,
+                color: GcTokens.primary,
               ),
             ),
           ],
@@ -759,16 +767,75 @@ class _GiftCardDetailPageState extends State<GiftCardDetailPage> {
                 ),
                 child: const Text(
                   'Proceed to Pay',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w800,
-                  ),
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800),
                 ),
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+class _ExpandableText extends StatefulWidget {
+  const _ExpandableText({
+    required this.text,
+    required this.collapsedMaxLines,
+    required this.textStyle,
+    required this.toggleStyle,
+  });
+
+  final String text;
+  final int collapsedMaxLines;
+  final TextStyle textStyle;
+  final TextStyle toggleStyle;
+
+  @override
+  State<_ExpandableText> createState() => _ExpandableTextState();
+}
+
+class _ExpandableTextState extends State<_ExpandableText> {
+  bool _isExpanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final textDirection = Directionality.of(context);
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final textPainter = TextPainter(
+          text: TextSpan(text: widget.text.trim(), style: widget.textStyle),
+          textDirection: textDirection,
+          maxLines: widget.collapsedMaxLines,
+        )..layout(maxWidth: constraints.maxWidth);
+
+        final hasOverflow = textPainter.didExceedMaxLines;
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              widget.text.trim(),
+              maxLines: _isExpanded ? null : widget.collapsedMaxLines,
+              overflow: _isExpanded
+                  ? TextOverflow.visible
+                  : TextOverflow.ellipsis,
+              style: widget.textStyle,
+            ),
+            if (hasOverflow || _isExpanded) ...[
+              const SizedBox(height: 6),
+              GestureDetector(
+                onTap: () => setState(() => _isExpanded = !_isExpanded),
+                child: Text(
+                  _isExpanded ? 'Show less' : 'Show more',
+                  style: widget.toggleStyle,
+                ),
+              ),
+            ],
+          ],
+        );
+      },
     );
   }
 }
