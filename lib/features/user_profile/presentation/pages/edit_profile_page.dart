@@ -1,9 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
+import 'package:intl/intl.dart';
 import 'package:savedge/features/auth/data/models/user_profile_models.dart';
 import 'package:savedge/features/auth/domain/repositories/auth_repository.dart';
 
-/// Edit profile page for updating user information
+const Color _primary = Color(0xFF6F3FCC);
+const Color _secondary = Color(0xFF8B5CF6);
+const Color _mint = Color(0xFF10B981);
+const Color _teal = Color(0xFF14B8A6);
+const Color _amber = Color(0xFFF59E0B);
+const Color _coral = Color(0xFFEF6C35);
+const Color _textPrimary = Color(0xFF1A202C);
+const Color _textMuted = Color(0xFF6B7280);
+const Color _pageBackground = Color(0xFFF8FAFD);
+const Color _border = Color(0xFFE7EAF1);
+const Color _inputSurface = Color(0xFFF7F9FC);
+
+/// Edit profile page for updating user information.
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({super.key, required this.userProfile});
 
@@ -15,18 +29,22 @@ class EditProfilePage extends StatefulWidget {
 
 class _EditProfilePageState extends State<EditProfilePage>
     with SingleTickerProviderStateMixin {
-  final _formKey = GlobalKey<FormState>();
-  final _firstNameController = TextEditingController();
-  final _lastNameController = TextEditingController();
-  final _emailController = TextEditingController();
-  final _phoneController = TextEditingController();
-  final _addressController = TextEditingController();
-  final _cityController = TextEditingController();
-  final _pinCodeController = TextEditingController();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  late AnimationController _animationController;
-  late Animation<double> _fadeAnimation;
-  late Animation<Offset> _slideAnimation;
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _cityController = TextEditingController();
+  final TextEditingController _pinCodeController = TextEditingController();
+
+  late final AnimationController _animationController;
+  late final Animation<double> _fadeAnimation;
+  late final Animation<Offset> _slideAnimation;
+
+  final DateFormat _dateFormat = DateFormat('dd MMM yyyy');
+  final DateFormat _monthYearFormat = DateFormat('MMM yyyy');
 
   bool _isLoading = false;
   bool _isEmployee = false;
@@ -36,18 +54,48 @@ class _EditProfilePageState extends State<EditProfilePage>
   DateTime? _anniversaryDate;
   String? _selectedState;
 
-  static const _indianStates = [
-    'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
-    'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka',
-    'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya',
-    'Mizoram', 'Nagaland', 'Odisha', 'Punjab', 'Rajasthan', 'Sikkim',
-    'Tamil Nadu', 'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand',
-    'West Bengal', 'Andaman and Nicobar Islands', 'Chandigarh',
-    'Dadra and Nagar Haveli and Daman and Diu', 'Delhi', 'Jammu and Kashmir',
-    'Ladakh', 'Lakshadweep', 'Puducherry',
+  static const List<String> _indianStates = [
+    'Andhra Pradesh',
+    'Arunachal Pradesh',
+    'Assam',
+    'Bihar',
+    'Chhattisgarh',
+    'Goa',
+    'Gujarat',
+    'Haryana',
+    'Himachal Pradesh',
+    'Jharkhand',
+    'Karnataka',
+    'Kerala',
+    'Madhya Pradesh',
+    'Maharashtra',
+    'Manipur',
+    'Meghalaya',
+    'Mizoram',
+    'Nagaland',
+    'Odisha',
+    'Punjab',
+    'Rajasthan',
+    'Sikkim',
+    'Tamil Nadu',
+    'Telangana',
+    'Tripura',
+    'Uttar Pradesh',
+    'Uttarakhand',
+    'West Bengal',
+    'Andaman and Nicobar Islands',
+    'Chandigarh',
+    'Dadra and Nagar Haveli and Daman and Diu',
+    'Delhi',
+    'Jammu and Kashmir',
+    'Ladakh',
+    'Lakshadweep',
+    'Puducherry',
   ];
 
   AuthRepository get _authRepository => GetIt.I<AuthRepository>();
+
+  UserProfileResponse3 get _profile => widget.userProfile;
 
   @override
   void initState() {
@@ -57,85 +105,210 @@ class _EditProfilePageState extends State<EditProfilePage>
   }
 
   void _initializeControllers() {
-    _firstNameController.text = widget.userProfile.firstName;
-    _lastNameController.text = widget.userProfile.lastName;
-    _emailController.text = widget.userProfile.email;
-    _phoneController.text = widget.userProfile.phoneNumber;
-    _addressController.text = widget.userProfile.residentialAddress ?? '';
-    _cityController.text = widget.userProfile.city ?? '';
-    _pinCodeController.text = widget.userProfile.pinCode ?? '';
-    _selectedState = _indianStates.contains(widget.userProfile.state)
-        ? widget.userProfile.state
+    _firstNameController.text = _profile.firstName;
+    _lastNameController.text = _profile.lastName;
+    _emailController.text = _profile.email;
+    _phoneController.text = _profile.phoneNumber;
+    _addressController.text = _profile.residentialAddress ?? '';
+    _cityController.text = _profile.city ?? '';
+    _pinCodeController.text = _profile.pinCode ?? '';
+    _selectedState = _indianStates.contains(_profile.state)
+        ? _profile.state
         : null;
-    _isEmployee = widget.userProfile.isEmployee;
-    _dateOfBirth = widget.userProfile.dateOfBirth;
-    _anniversaryDate = widget.userProfile.anniversaryDate;
+    _isEmployee = _profile.isEmployee;
+    _dateOfBirth = _profile.dateOfBirth;
+    _anniversaryDate = _profile.anniversaryDate;
 
-    // Listen for changes
-    _firstNameController.addListener(_checkForChanges);
-    _lastNameController.addListener(_checkForChanges);
-    _phoneController.addListener(_checkForChanges);
-    _addressController.addListener(_checkForChanges);
-    _cityController.addListener(_checkForChanges);
-    _pinCodeController.addListener(_checkForChanges);
+    for (final TextEditingController controller in [
+      _firstNameController,
+      _lastNameController,
+      _phoneController,
+      _addressController,
+      _cityController,
+      _pinCodeController,
+    ]) {
+      controller.addListener(_checkForChanges);
+    }
   }
 
   void _setupAnimations() {
     _animationController = AnimationController(
-      duration: const Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 650),
       vsync: this,
     );
 
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
+    _fadeAnimation = CurvedAnimation(
       parent: _animationController,
-      curve: const Interval(0.0, 0.6, curve: Curves.easeOut),
-    ));
+      curve: Curves.easeOut,
+    );
 
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.1),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: const Interval(0.2, 1.0, curve: Curves.easeOutCubic),
-    ));
+    _slideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.04), end: Offset.zero).animate(
+          CurvedAnimation(
+            parent: _animationController,
+            curve: Curves.easeOutCubic,
+          ),
+        );
 
     _animationController.forward();
   }
 
   void _checkForChanges() {
-    final hasChanges = _firstNameController.text != (widget.userProfile.firstName ?? '') ||
-        _lastNameController.text != (widget.userProfile.lastName ?? '') ||
-        _phoneController.text != (widget.userProfile.phoneNumber) ||
-        _addressController.text != (widget.userProfile.residentialAddress ?? '') ||
-        _cityController.text != (widget.userProfile.city ?? '') ||
-        _selectedState != widget.userProfile.state ||
-        _pinCodeController.text != (widget.userProfile.pinCode ?? '');
+    final bool hasChanges =
+        _firstNameController.text.trim() != _profile.firstName.trim() ||
+        _lastNameController.text.trim() != _profile.lastName.trim() ||
+        _phoneController.text.trim() != _profile.phoneNumber.trim() ||
+        _addressController.text.trim() !=
+            (_profile.residentialAddress ?? '').trim() ||
+        _cityController.text.trim() != (_profile.city ?? '').trim() ||
+        (_selectedState ?? '').trim() != (_profile.state ?? '').trim() ||
+        _pinCodeController.text.trim() != (_profile.pinCode ?? '').trim() ||
+        !_sameDate(_dateOfBirth, _profile.dateOfBirth) ||
+        !_sameDate(_anniversaryDate, _profile.anniversaryDate);
 
     if (hasChanges != _hasChanges) {
-      setState(() {
-        _hasChanges = hasChanges;
-      });
+      setState(() => _hasChanges = hasChanges);
     }
   }
 
+  bool _sameDate(DateTime? left, DateTime? right) {
+    if (left == null && right == null) {
+      return true;
+    }
+
+    if (left == null || right == null) {
+      return false;
+    }
+
+    return left.year == right.year &&
+        left.month == right.month &&
+        left.day == right.day;
+  }
+
+  int get _occasionCount => [
+    _dateOfBirth,
+    _anniversaryDate,
+  ].where((DateTime? date) => date != null).length;
+
+  int get _filledDetailsCount {
+    int count = 0;
+
+    for (final String value in [
+      _firstNameController.text.trim(),
+      _lastNameController.text.trim(),
+      _phoneController.text.trim(),
+      _addressController.text.trim(),
+      _cityController.text.trim(),
+      (_selectedState ?? '').trim(),
+      _pinCodeController.text.trim(),
+    ]) {
+      if (value.isNotEmpty) {
+        count++;
+      }
+    }
+
+    return count + _occasionCount;
+  }
+
+  double get _completionRatio => _filledDetailsCount / 9;
+
+  int get _missingFieldCount => 9 - _filledDetailsCount;
+
+  int get _changedFieldCount {
+    int count = 0;
+
+    if (_firstNameController.text.trim() != _profile.firstName.trim()) {
+      count++;
+    }
+    if (_lastNameController.text.trim() != _profile.lastName.trim()) {
+      count++;
+    }
+    if (_phoneController.text.trim() != _profile.phoneNumber.trim()) {
+      count++;
+    }
+    if (_addressController.text.trim() !=
+        (_profile.residentialAddress ?? '').trim()) {
+      count++;
+    }
+    if (_cityController.text.trim() != (_profile.city ?? '').trim()) {
+      count++;
+    }
+    if ((_selectedState ?? '').trim() != (_profile.state ?? '').trim()) {
+      count++;
+    }
+    if (_pinCodeController.text.trim() != (_profile.pinCode ?? '').trim()) {
+      count++;
+    }
+    if (!_sameDate(_dateOfBirth, _profile.dateOfBirth)) {
+      count++;
+    }
+    if (!_sameDate(_anniversaryDate, _profile.anniversaryDate)) {
+      count++;
+    }
+
+    return count;
+  }
+
+  String get _memberSince => _monthYearFormat.format(_profile.createdAt);
+
+  String get _locationCardValue {
+    if (_cityController.text.trim().isNotEmpty) {
+      return _cityController.text.trim();
+    }
+
+    if ((_selectedState ?? '').trim().isNotEmpty) {
+      return _selectedState!.trim();
+    }
+
+    return 'Add';
+  }
+
+  String get _locationCardSubtitle {
+    final List<String> parts = [
+      if ((_selectedState ?? '').trim().isNotEmpty) _selectedState!.trim(),
+      if (_pinCodeController.text.trim().isNotEmpty)
+        'PIN ${_pinCodeController.text.trim()}',
+    ];
+
+    if (parts.isEmpty) {
+      return 'Set your city and state';
+    }
+
+    return parts.join(' • ');
+  }
+
+  String get _fullLocation {
+    final List<String> parts = [
+      _addressController.text.trim(),
+      _cityController.text.trim(),
+      (_selectedState ?? '').trim(),
+      _pinCodeController.text.trim(),
+    ].where((String value) => value.isNotEmpty).toList();
+
+    if (parts.isEmpty) {
+      return 'No address added yet';
+    }
+
+    return parts.join(', ');
+  }
+
+  Color get _heroAccent => _isEmployee ? _amber : _primary;
+
   @override
   void dispose() {
-    _firstNameController.removeListener(_checkForChanges);
-    _lastNameController.removeListener(_checkForChanges);
-    _phoneController.removeListener(_checkForChanges);
-    _addressController.removeListener(_checkForChanges);
-    _cityController.removeListener(_checkForChanges);
-    _pinCodeController.removeListener(_checkForChanges);
-    _firstNameController.dispose();
-    _lastNameController.dispose();
+    for (final TextEditingController controller in [
+      _firstNameController,
+      _lastNameController,
+      _phoneController,
+      _addressController,
+      _cityController,
+      _pinCodeController,
+    ]) {
+      controller.removeListener(_checkForChanges);
+      controller.dispose();
+    }
+
     _emailController.dispose();
-    _phoneController.dispose();
-    _addressController.dispose();
-    _cityController.dispose();
-    _pinCodeController.dispose();
     _animationController.dispose();
     super.dispose();
   }
@@ -143,1021 +316,1147 @@ class _EditProfilePageState extends State<EditProfilePage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
-      body: CustomScrollView(
-        slivers: [
-          // Modern Sliver App Bar
-          SliverAppBar(
-            expandedHeight: 200,
-            floating: false,
-            pinned: true,
-            elevation: 0,
-            backgroundColor: Colors.white,
-            flexibleSpace: FlexibleSpaceBar(
-              background: Container(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Color(0xFF6366F1),
-                      Color(0xFF8B5CF6),
-                    ],
+      backgroundColor: _pageBackground,
+      bottomNavigationBar: _isEmployee ? null : _buildBottomActionBar(),
+      body: SafeArea(
+        bottom: false,
+        child: CustomScrollView(
+          physics: const BouncingScrollPhysics(
+            parent: AlwaysScrollableScrollPhysics(),
+          ),
+          slivers: [
+            _buildSliverAppBar(context),
+            SliverToBoxAdapter(
+              child: FadeTransition(
+                opacity: _fadeAnimation,
+                child: SlideTransition(
+                  position: _slideAnimation,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
+                    child: _buildPageBody(),
                   ),
                 ),
-                child: Stack(
-                  children: [
-                    // Pattern overlay
-                    CustomPaint(
-                      painter: ProfilePatternPainter(),
-                      child: Container(),
-                    ),
-                    // Profile Avatar
-                    Center(
-                      child: FadeTransition(
-                        opacity: _fadeAnimation,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              width: 80,
-                              height: 80,
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.2),
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: Colors.white.withOpacity(0.3),
-                                  width: 3,
-                                ),
-                              ),
-                              child: Icon(
-                                _isEmployee ? Icons.badge_rounded : Icons.person_rounded,
-                                size: 40,
-                                color: Colors.white,
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            Text(
-                              '${widget.userProfile.firstName ?? ''} ${widget.userProfile.lastName ?? ''}',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              _isEmployee ? 'Employee Account' : 'Individual Account',
-                              style: TextStyle(
-                                color: Colors.white.withOpacity(0.9),
-                                fontSize: 14,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
               ),
             ),
-            leading: IconButton(
-              icon: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.9),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(
-                  Icons.arrow_back_rounded,
-                  color: Color(0xFF6366F1),
-                  size: 20,
-                ),
-              ),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-          ),
-
-          // Content
-          SliverToBoxAdapter(
-            child: FadeTransition(
-              opacity: _fadeAnimation,
-              child: SlideTransition(
-                position: _slideAnimation,
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: _isEmployee ? _buildEmployeeView() : _buildEditableForm(),
-                ),
-              ),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildEmployeeView() {
+  Widget _buildSliverAppBar(BuildContext context) {
+    return SliverAppBar(
+      expandedHeight: 148,
+      backgroundColor: Colors.transparent,
+      pinned: true,
+      elevation: 0,
+      scrolledUnderElevation: 0,
+      surfaceTintColor: Colors.transparent,
+      systemOverlayStyle: SystemUiOverlayStyle.dark,
+      iconTheme: const IconThemeData(color: _textPrimary),
+      leading: IconButton(
+        onPressed: () => Navigator.of(context).pop(),
+        icon: const Icon(
+          Icons.arrow_back_ios_new_rounded,
+          size: 18,
+          color: _textPrimary,
+        ),
+      ),
+      flexibleSpace: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+          const double expandedHeight = 148;
+          final double minHeight =
+              kToolbarHeight + MediaQuery.of(context).padding.top;
+          final double t =
+              ((constraints.maxHeight - minHeight) /
+                      (expandedHeight - minHeight))
+                  .clamp(0.0, 1.0);
+          final double leftPadding = 20 + (52 * (1 - t));
+
+          return Container(
+            decoration: BoxDecoration(
+              color: Color.lerp(Colors.white, Colors.transparent, t),
+            ),
+            child: Stack(
+              children: [
+                if (t > 0.05)
+                  Positioned(
+                    bottom: 52,
+                    left: 20,
+                    child: Opacity(
+                      opacity: t,
+                      child: Text(
+                        _isEmployee
+                            ? 'Read-only profile managed by your organization'
+                            : 'Refresh the details your account depends on',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                          color: Color(0xFF9CA3AF),
+                        ),
+                      ),
+                    ),
+                  ),
+                FlexibleSpaceBar(
+                  centerTitle: false,
+                  titlePadding: EdgeInsets.only(
+                    left: leftPadding,
+                    bottom: 16,
+                    right: 20,
+                  ),
+                  title: Text(
+                    _isEmployee ? 'Profile Details' : 'Edit Profile',
+                    style: TextStyle(
+                      color: _textPrimary,
+                      fontSize: t > 0.5 ? 24 : 20,
+                      fontWeight: t > 0.5 ? FontWeight.w800 : FontWeight.w700,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildPageBody() {
     return Column(
       children: [
-        // Info Card
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.orange.withOpacity(0.1),
-                Colors.orange.withOpacity(0.05),
+        _buildHeroCard(),
+        const SizedBox(height: 16),
+        if (_isEmployee) ...[
+          _buildEmployeeLayout(),
+        ] else ...[
+          _buildOverviewGrid(),
+          const SizedBox(height: 16),
+          Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                _buildIdentityPanel(),
+                const SizedBox(height: 16),
+                _buildAddressPanel(),
+                const SizedBox(height: 16),
+                _buildOccasionPanel(),
+                const SizedBox(height: 120),
               ],
             ),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: Colors.orange.withOpacity(0.2),
-              width: 1.5,
-            ),
           ),
-          child: Column(
-            children: [
-              Container(
-                width: 56,
-                height: 56,
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFFF59E0B), Color(0xFFFBBF24)],
-                  ),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: const Icon(
-                  Icons.business_rounded,
-                  color: Colors.white,
-                  size: 28,
-                ),
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                'Organization Managed',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.black87,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Your profile is managed by ${widget.userProfile.employeeInfo?.organizationName ?? "your organization"}. Contact HR for any changes.',
-                style: TextStyle(
-                  color: Colors.grey[700],
-                  fontSize: 14,
-                  height: 1.4,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 24),
-        _buildReadOnlyProfileInfo(),
+        ],
       ],
     );
   }
 
-  Widget _buildReadOnlyProfileInfo() {
+  Widget _buildHeroCard() {
+    final String title = _profile.displayName.isNotEmpty
+        ? _profile.displayName
+        : 'Your profile';
+
     return Container(
-      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(28),
+        color: const Color(0xFFFCFBFF),
+        border: Border.all(color: _heroAccent.withValues(alpha: 0.10)),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      clipBehavior: Clip.antiAlias,
+      child: Stack(
         children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
-                  ),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(
-                  Icons.person_outline_rounded,
-                  color: Colors.white,
-                  size: 20,
-                ),
-              ),
-              const SizedBox(width: 12),
-              const Text(
-                'Profile Information',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.black87,
+          Positioned(
+            left: -42,
+            top: -58,
+            child: Container(
+              width: 180,
+              height: 180,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: [
+                    _heroAccent.withValues(alpha: 0.24),
+                    _heroAccent.withValues(alpha: 0),
+                  ],
                 ),
               ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          _buildInfoRow(
-            icon: Icons.badge_outlined,
-            label: 'Employee ID',
-            value: widget.userProfile.employeeInfo?.employeeCode ?? 'Not set',
-          ),
-          const SizedBox(height: 16),
-          _buildInfoRow(
-            icon: Icons.person_outline,
-            label: 'First Name',
-            value: widget.userProfile.firstName.isNotEmpty ? widget.userProfile.firstName : 'Not set',
-          ),
-          const SizedBox(height: 16),
-          _buildInfoRow(
-            icon: Icons.person_outline,
-            label: 'Last Name',
-            value: widget.userProfile.lastName.isNotEmpty ? widget.userProfile.lastName : 'Not set',
-          ),
-          const SizedBox(height: 16),
-          _buildInfoRow(
-            icon: Icons.phone_outlined,
-            label: 'Mobile Number',
-            value: widget.userProfile.phoneNumber.isNotEmpty ? widget.userProfile.phoneNumber : 'Not set',
-          ),
-          const SizedBox(height: 16),
-          _buildInfoRow(
-            icon: Icons.email_outlined,
-            label: 'Email Address',
-            value: widget.userProfile.email,
-          ),
-          if (widget.userProfile.residentialAddress != null) ...[
-            const SizedBox(height: 16),
-            _buildInfoRow(
-              icon: Icons.home_outlined,
-              label: 'Residential Address',
-              value: widget.userProfile.residentialAddress!,
             ),
-          ],
-          if (widget.userProfile.city != null || widget.userProfile.state != null || widget.userProfile.pinCode != null) ...[
-            const SizedBox(height: 16),
-            _buildInfoRow(
-              icon: Icons.location_on_outlined,
-              label: 'Location',
-              value: [
-                widget.userProfile.city,
-                widget.userProfile.state,
-                widget.userProfile.pinCode,
-              ].where((e) => e != null && e.isNotEmpty).join(', '),
-            ),
-          ],
-          if (widget.userProfile.employeeInfo?.organizationName != null) ...[
-            const SizedBox(height: 16),
-            _buildInfoRow(
-              icon: Icons.business_outlined,
-              label: 'Organization',
-              value: widget.userProfile.employeeInfo!.organizationName,
-            ),
-          ],
-          if (widget.userProfile.employeeInfo?.department != null) ...[
-            const SizedBox(height: 16),
-            _buildInfoRow(
-              icon: Icons.category_outlined,
-              label: 'Department',
-              value: widget.userProfile.employeeInfo!.department!,
-            ),
-          ],
-          if (widget.userProfile.employeeInfo?.position != null) ...[
-            const SizedBox(height: 16),
-            _buildInfoRow(
-              icon: Icons.work_outline,
-              label: 'Position',
-              value: widget.userProfile.employeeInfo!.position!,
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildInfoRow({
-    required IconData icon,
-    required String label,
-    required String value,
-  }) {
-    return Row(
-      children: [
-        Container(
-          width: 36,
-          height: 36,
-          decoration: BoxDecoration(
-            color: const Color(0xFF6366F1).withOpacity(0.1),
-            borderRadius: BorderRadius.circular(8),
           ),
-          child: Icon(
-            icon,
-            size: 18,
-            color: const Color(0xFF6366F1),
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey[600],
-                  fontWeight: FontWeight.w500,
+          Positioned(
+            right: -54,
+            bottom: -68,
+            child: Container(
+              width: 210,
+              height: 210,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: [
+                    (_isEmployee ? _coral : _secondary).withValues(alpha: 0.22),
+                    (_isEmployee ? _coral : _secondary).withValues(alpha: 0),
+                  ],
                 ),
               ),
-              const SizedBox(height: 2),
-              Text(
-                value,
-                style: const TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black87,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildEditableForm() {
-    return Form(
-      key: _formKey,
-      child: Column(
-        children: [
-          // Form Card
-          Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.04),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
             ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
-                        ),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Icon(
-                        Icons.edit_rounded,
-                        color: Colors.white,
-                        size: 20,
+                    Text(
+                      _isEmployee ? 'Managed profile' : 'Profile studio',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.3,
+                        color: _textPrimary.withValues(alpha: 0.45),
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    const Text(
-                      'Personal Information',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.black87,
-                      ),
+                    const Spacer(),
+                    _CapsuleBadge(
+                      label: _profile.primaryRole,
+                      accent: _heroAccent,
                     ),
                   ],
                 ),
-                const SizedBox(height: 24),
-
-                // First Name Field
-                _buildTextField(
-                  controller: _firstNameController,
-                  label: 'First Name',
-                  icon: Icons.person_outline,
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'First name is required';
-                    }
-                    return null;
-                  },
-                ),
-
-                const SizedBox(height: 20),
-
-                // Last Name Field
-                _buildTextField(
-                  controller: _lastNameController,
-                  label: 'Last Name',
-                  icon: Icons.person_outline,
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Last name is required';
-                    }
-                    return null;
-                  },
-                ),
-
-                const SizedBox(height: 20),
-
-                // Mobile Number Field
-                _buildTextField(
-                  controller: _phoneController,
-                  label: 'Mobile Number',
-                  icon: Icons.phone_outlined,
-                  keyboardType: TextInputType.phone,
-                  validator: (value) {
-                    if (value != null && value.isNotEmpty && value.length < 10) {
-                      return 'Enter a valid mobile number';
-                    }
-                    return null;
-                  },
-                ),
-
-                const SizedBox(height: 20),
-
-                // Email Field (Read-only)
-                _buildTextField(
-                  controller: _emailController,
-                  label: 'Email Address',
-                  icon: Icons.email_outlined,
-                  enabled: false,
-                  helperText: 'Email cannot be changed',
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 24),
-
-          // Residential Address Section
-          Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.04),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+                const SizedBox(height: 18),
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF10B981), Color(0xFF34D399)],
-                        ),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Icon(
-                        Icons.home_outlined,
-                        color: Colors.white,
-                        size: 20,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    const Text(
-                      'Residential Address',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.black87,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 24),
-
-                _buildTextField(
-                  controller: _addressController,
-                  label: 'Address',
-                  icon: Icons.location_on_outlined,
-                  maxLines: 2,
-                ),
-
-                const SizedBox(height: 20),
-
-                _buildTextField(
-                  controller: _cityController,
-                  label: 'City',
-                  icon: Icons.location_city_outlined,
-                ),
-
-                const SizedBox(height: 20),
-
-                _buildStateDropdown(),
-
-                const SizedBox(height: 20),
-
-                _buildTextField(
-                  controller: _pinCodeController,
-                  label: 'Pin Code',
-                  icon: Icons.pin_drop_outlined,
-                  keyboardType: TextInputType.number,
-                  validator: (value) {
-                    if (value != null && value.isNotEmpty && value.length != 6) {
-                      return 'Enter a valid 6-digit pin code';
-                    }
-                    return null;
-                  },
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 24),
-
-          // Occasion Dates Section
-          Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  const Color(0xFF6366F1).withOpacity(0.05),
-                  const Color(0xFF8B5CF6).withOpacity(0.05),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: const Color(0xFF6366F1).withOpacity(0.2),
-                width: 1.5,
-              ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFFF59E0B), Color(0xFFFBBF24)],
-                        ),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Icon(
-                        Icons.cake_outlined,
-                        color: Colors.white,
-                        size: 20,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    const Expanded(
+                    _buildAvatar(),
+                    const SizedBox(width: 14),
+                    Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Special Occasions',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.black87,
+                            title,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 26,
+                              fontWeight: FontWeight.w900,
+                              color: _textPrimary,
+                              height: 1.05,
+                              letterSpacing: -0.8,
                             ),
                           ),
-                          SizedBox(height: 2),
+                          const SizedBox(height: 6),
                           Text(
-                            'Get exclusive deals on your special days',
+                            _profile.email,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.black54,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: _textPrimary.withValues(alpha: 0.54),
                             ),
+                          ),
+                          const SizedBox(height: 12),
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: [
+                              _InlinePill(
+                                icon: _profile.isActive
+                                    ? Icons.verified_outlined
+                                    : Icons.pause_circle_outline_rounded,
+                                label: _profile.isActive
+                                    ? 'Active account'
+                                    : 'Inactive',
+                                accent: _profile.isActive ? _mint : Colors.grey,
+                              ),
+                              _InlinePill(
+                                icon: _isEmployee
+                                    ? Icons.apartment_rounded
+                                    : (_hasChanges
+                                          ? Icons.edit_note_rounded
+                                          : Icons.cloud_done_outlined),
+                                label: _isEmployee
+                                    ? (_profile.organizationName ??
+                                          'Organization managed')
+                                    : (_hasChanges
+                                          ? '$_changedFieldCount draft change${_changedFieldCount == 1 ? '' : 's'}'
+                                          : 'Live profile'),
+                                accent: _isEmployee
+                                    ? _amber
+                                    : (_hasChanges ? _coral : _mint),
+                              ),
+                            ],
                           ),
                         ],
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
-
-                // Birthday Field
-                _buildDateField(
-                  label: 'Birthday',
-                  icon: Icons.cake,
-                  value: _dateOfBirth,
-                  onTap: () => _selectDate(context, true),
-                  helperText: 'Receive birthday coupons',
+                const SizedBox(height: 18),
+                _buildResponsivePair(
+                  _HeroMetricTile(
+                    value: _isEmployee
+                        ? (_profile.employeeInfo?.employeeCode ?? 'N/A')
+                        : '${(_completionRatio * 100).round()}%',
+                    label: _isEmployee ? 'employee code' : 'completion',
+                    accent: _heroAccent,
+                  ),
+                  _HeroMetricTile(
+                    value: _isEmployee
+                        ? '${_profile.pointsBalance}'
+                        : '$_occasionCount/2',
+                    label: _isEmployee ? 'points ready' : 'special dates',
+                    accent: _isEmployee ? _mint : _amber,
+                  ),
+                  rightFlex: 1,
+                  leftFlex: 1,
                 ),
-
-                const SizedBox(height: 16),
-
-                // Anniversary Field
-                _buildDateField(
-                  label: 'Anniversary',
-                  icon: Icons.favorite,
-                  value: _anniversaryDate,
-                  onTap: () => _selectDate(context, false),
-                  helperText: 'Receive anniversary coupons',
+                const SizedBox(height: 10),
+                _buildResponsivePair(
+                  _HeroMetricTile(
+                    value: _memberSince,
+                    label: 'member since',
+                    accent: _teal,
+                  ),
+                  _HeroMetricTile(
+                    value: _isEmployee
+                        ? (_profile.employeeInfo?.department ?? 'Team')
+                        : (_hasChanges ? '$_changedFieldCount' : '0'),
+                    label: _isEmployee ? 'department' : 'pending edits',
+                    accent: _isEmployee ? _coral : _mint,
+                  ),
+                  rightFlex: 1,
+                  leftFlex: 1,
                 ),
               ],
             ),
           ),
-
-          const SizedBox(height: 24),
-
-          // Action Buttons
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    side: BorderSide(color: Colors.grey[300]!),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: Text(
-                    'Cancel',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.grey[700],
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                flex: 2,
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  decoration: BoxDecoration(
-                    gradient: _hasChanges
-                        ? const LinearGradient(
-                            colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
-                          )
-                        : null,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: _hasChanges
-                        ? [
-                            BoxShadow(
-                              color: const Color(0xFF6366F1).withOpacity(0.3),
-                              blurRadius: 12,
-                              offset: const Offset(0, 4),
-                            ),
-                          ]
-                        : null,
-                  ),
-                  child: ElevatedButton(
-                    onPressed: (_isLoading || !_hasChanges) ? null : _saveProfile,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: _hasChanges
-                          ? Colors.transparent
-                          : Colors.grey[300],
-                      foregroundColor: _hasChanges
-                          ? Colors.white
-                          : Colors.grey[600],
-                      shadowColor: Colors.transparent,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: _isLoading
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 2,
-                            ),
-                          )
-                        : Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.save_rounded,
-                                size: 20,
-                                color: _hasChanges ? Colors.white : Colors.grey[600],
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                'Save Changes',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  color: _hasChanges ? Colors.white : Colors.grey[600],
-                                ),
-                              ),
-                            ],
-                          ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 100), // Bottom padding
         ],
       ),
     );
   }
 
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String label,
-    required IconData icon,
-    bool enabled = true,
-    String? helperText,
-    String? Function(String?)? validator,
-    TextInputType? keyboardType,
-    int maxLines = 1,
-  }) {
-    return TextFormField(
-      controller: controller,
-      enabled: enabled,
-      validator: validator,
-      keyboardType: keyboardType,
-      maxLines: maxLines,
-      style: TextStyle(
-        fontSize: 15,
-        fontWeight: FontWeight.w500,
-        color: enabled ? Colors.black87 : Colors.grey[600],
-      ),
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: TextStyle(
-          color: Colors.grey[600],
-          fontSize: 14,
-        ),
-        prefixIcon: Container(
-          margin: const EdgeInsets.all(12),
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: enabled
-                ? const Color(0xFF6366F1).withOpacity(0.1)
-                : Colors.grey[100],
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Icon(
-            icon,
-            size: 18,
-            color: enabled
-                ? const Color(0xFF6366F1)
-                : Colors.grey[400],
-          ),
-        ),
-        helperText: helperText,
-        helperStyle: TextStyle(
-          color: Colors.grey[500],
-          fontSize: 12,
-        ),
-        filled: true,
-        fillColor: enabled ? Colors.grey[50] : Colors.grey[100],
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(
-            color: Colors.grey[200]!,
-            width: 1,
-          ),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(
-            color: Color(0xFF6366F1),
-            width: 2,
-          ),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(
-            color: Colors.red,
-            width: 1,
-          ),
-        ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(
-            color: Colors.red,
-            width: 2,
-          ),
-        ),
-        disabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(
-            color: Colors.grey[200]!,
-            width: 1,
-          ),
-        ),
-      ),
-    );
-  }
+  Widget _buildAvatar() {
+    final String initials = [
+      if (_profile.firstName.isNotEmpty) _profile.firstName.trim()[0],
+      if (_profile.lastName.isNotEmpty) _profile.lastName.trim()[0],
+    ].join().toUpperCase();
 
-  Widget _buildDateField({
-    required String label,
-    required IconData icon,
-    required DateTime? value,
-    required VoidCallback onTap,
-    String? helperText,
-  }) {
-    final displayText = value != null
-        ? '${value.day}/${value.month}/${value.year}'
-        : 'Not set';
-
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.grey[50],
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: Colors.grey[200]!,
-            width: 1,
+    return Container(
+      width: 76,
+      height: 76,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [_heroAccent, (_isEmployee ? _coral : _secondary)],
+        ),
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: _heroAccent.withValues(alpha: 0.20),
+            blurRadius: 24,
+            spreadRadius: -12,
+            offset: const Offset(0, 14),
           ),
-        ),
-        child: Row(
-          children: [
-            Container(
-              margin: const EdgeInsets.only(right: 12),
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: const Color(0xFF6366F1).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(
-                icon,
-                size: 18,
-                color: const Color(0xFF6366F1),
-              ),
-            ),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    label,
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontSize: 14,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    displayText,
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
-                      color: value != null ? Colors.black87 : Colors.grey[400],
-                    ),
-                  ),
-                  if (helperText != null) ...[
-                    const SizedBox(height: 2),
-                    Text(
-                      helperText,
-                      style: TextStyle(
-                        color: Colors.grey[500],
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-            Icon(
-              Icons.calendar_today_outlined,
-              size: 18,
-              color: Colors.grey[400],
-            ),
-          ],
-        ),
+        ],
       ),
-    );
-  }
-
-  Widget _buildStateDropdown() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Container(
-              margin: const EdgeInsets.only(right: 12),
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: const Color(0xFF6366F1).withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Icon(
-                Icons.map_outlined,
-                size: 18,
-                color: Color(0xFF6366F1),
-              ),
-            ),
-            const Text(
-              'State',
-              style: TextStyle(
-                fontSize: 14,
-                color: Color(0xFF374151),
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        DropdownButtonFormField<String>(
-          value: _selectedState,
-          isExpanded: true,
-          icon: Icon(
-            Icons.keyboard_arrow_down_rounded,
-            color: Colors.grey[400],
-            size: 22,
-          ),
-          decoration: InputDecoration(
-            hintText: 'Select your state',
-            hintStyle: TextStyle(
-              color: Colors.grey[400],
-              fontSize: 15,
-            ),
-            filled: true,
-            fillColor: Colors.grey[50],
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.grey[200]!, width: 1),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFF6366F1), width: 2),
-            ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            isDense: true,
-          ),
+      child: Center(
+        child: Text(
+          initials.isNotEmpty ? initials : 'SE',
           style: const TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w500,
-            color: Colors.black87,
+            fontSize: 24,
+            fontWeight: FontWeight.w900,
+            color: Colors.white,
+            letterSpacing: 0.5,
           ),
-          dropdownColor: Colors.white,
-          menuMaxHeight: 300,
-          items: _indianStates.map((state) {
-            return DropdownMenuItem<String>(
-              value: state,
-              child: Text(state),
-            );
-          }).toList(),
-          onChanged: (value) {
-            setState(() {
-              _selectedState = value;
-              _hasChanges = true;
-            });
-          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOverviewGrid() {
+    return Column(
+      children: [
+        _buildResponsivePair(
+          _InsightTile(
+            accent: _primary,
+            icon: Icons.checklist_rounded,
+            title: 'Profile completion',
+            value: '${(_completionRatio * 100).round()}%',
+            subtitle: _missingFieldCount == 0
+                ? 'Everything important looks filled in'
+                : '$_missingFieldCount optional detail${_missingFieldCount == 1 ? '' : 's'} left',
+          ),
+          _InsightTile(
+            accent: _amber,
+            icon: Icons.celebration_outlined,
+            title: 'Occasion perks',
+            value: '$_occasionCount/2',
+            subtitle: _occasionCount == 0
+                ? 'Add dates for birthday and anniversary offers'
+                : 'Dates are ready for special-day promos',
+          ),
+          leftFlex: 6,
+          rightFlex: 5,
+        ),
+        const SizedBox(height: 12),
+        _buildResponsivePair(
+          _InsightTile(
+            accent: _teal,
+            icon: Icons.place_outlined,
+            title: 'Location',
+            value: _locationCardValue,
+            subtitle: _locationCardSubtitle,
+          ),
+          _InsightTile(
+            accent: _hasChanges ? _coral : _mint,
+            icon: _hasChanges
+                ? Icons.edit_note_rounded
+                : Icons.cloud_done_outlined,
+            title: _hasChanges ? 'Draft changes' : 'Save state',
+            value: _hasChanges
+                ? '$_changedFieldCount field${_changedFieldCount == 1 ? '' : 's'} edited'
+                : 'Everything saved',
+            subtitle: _hasChanges
+                ? 'Use the action bar below when you are ready'
+                : 'Your current profile is already in sync',
+          ),
+          leftFlex: 5,
+          rightFlex: 6,
         ),
       ],
     );
   }
 
+  Widget _buildIdentityPanel() {
+    return _BentoPanel(
+      accent: _primary,
+      icon: Icons.badge_outlined,
+      eyebrow: 'Identity',
+      title: 'Personal details',
+      subtitle:
+          'These basics show up across your account, invoices, and support conversations.',
+      child: Column(
+        children: [
+          _buildResponsivePair(
+            _buildInputTile(
+              controller: _firstNameController,
+              label: 'First name',
+              icon: Icons.person_outline_rounded,
+              validator: (String? value) {
+                if (value == null || value.trim().isEmpty) {
+                  return 'First name is required';
+                }
+                return null;
+              },
+            ),
+            _buildInputTile(
+              controller: _lastNameController,
+              label: 'Last name',
+              icon: Icons.person_2_outlined,
+              validator: (String? value) {
+                if (value == null || value.trim().isEmpty) {
+                  return 'Last name is required';
+                }
+                return null;
+              },
+            ),
+          ),
+          const SizedBox(height: 12),
+          _buildResponsivePair(
+            _buildInputTile(
+              controller: _phoneController,
+              label: 'Mobile number',
+              icon: Icons.call_outlined,
+              keyboardType: TextInputType.phone,
+              validator: (String? value) {
+                if (value != null &&
+                    value.isNotEmpty &&
+                    value.trim().length < 10) {
+                  return 'Enter a valid mobile number';
+                }
+                return null;
+              },
+            ),
+            _ReadonlyTile(
+              accent: _secondary,
+              icon: Icons.lock_outline_rounded,
+              label: 'Email address',
+              value: _profile.email,
+              hint: 'Locked for security. Contact support if it must change.',
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAddressPanel() {
+    return _BentoPanel(
+      accent: _teal,
+      icon: Icons.home_work_outlined,
+      eyebrow: 'Reach',
+      title: 'Address and locality',
+      subtitle:
+          'Location helps us tailor communication, nearby offers, and region-specific experiences.',
+      child: Column(
+        children: [
+          _buildInputTile(
+            controller: _addressController,
+            label: 'Residential address',
+            icon: Icons.home_outlined,
+            keyboardType: TextInputType.streetAddress,
+            maxLines: 3,
+          ),
+          const SizedBox(height: 12),
+          _buildResponsivePair(
+            _buildInputTile(
+              controller: _cityController,
+              label: 'City',
+              icon: Icons.location_city_outlined,
+            ),
+            _buildStateDropdownTile(),
+          ),
+          const SizedBox(height: 12),
+          _buildResponsivePair(
+            _buildInputTile(
+              controller: _pinCodeController,
+              label: 'PIN code',
+              icon: Icons.pin_drop_outlined,
+              keyboardType: TextInputType.number,
+              validator: (String? value) {
+                if (value != null &&
+                    value.isNotEmpty &&
+                    value.trim().length != 6) {
+                  return 'Enter a valid 6-digit pin code';
+                }
+                return null;
+              },
+            ),
+            _ReadonlyTile(
+              accent: _teal,
+              icon: Icons.explore_outlined,
+              label: 'Location preview',
+              value: _fullLocation,
+              hint: 'How this part of the profile currently reads.',
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildOccasionPanel() {
+    return _BentoPanel(
+      accent: _amber,
+      icon: Icons.cake_outlined,
+      eyebrow: 'Perks',
+      title: 'Dates that matter',
+      subtitle:
+          'Birthday and anniversary dates unlock timely rewards and special-day nudges.',
+      child: Column(
+        children: [
+          _buildResponsivePair(
+            _buildDateTile(
+              label: 'Birthday',
+              icon: Icons.cake_rounded,
+              value: _dateOfBirth,
+              helperText: 'Birthday offers and reminders',
+              onTap: () => _selectDate(context, true),
+            ),
+            _buildDateTile(
+              label: 'Anniversary',
+              icon: Icons.favorite_outline_rounded,
+              value: _anniversaryDate,
+              helperText: 'Anniversary coupons and surprises',
+              onTap: () => _selectDate(context, false),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.72),
+              borderRadius: BorderRadius.circular(22),
+              border: Border.all(color: _amber.withValues(alpha: 0.14)),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 38,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    color: _amber.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: const Icon(
+                    Icons.auto_awesome_rounded,
+                    size: 18,
+                    color: _amber,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    _occasionCount == 0
+                        ? 'Add one or both dates to make the app feel more personal and unlock special-day drops.'
+                        : 'Great. Your profile is ready to receive occasion-based offers when those dates come around.',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      height: 1.4,
+                      color: _textPrimary.withValues(alpha: 0.68),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmployeeLayout() {
+    final EmployeeInfo? employee = _profile.employeeInfo;
+
+    return Column(
+      children: [
+        _BentoPanel(
+          accent: _amber,
+          icon: Icons.business_center_outlined,
+          eyebrow: 'Managed',
+          title: employee?.organizationName ?? 'Organization managed',
+          subtitle:
+              'Your official profile is controlled by your organization. Reach out to HR or your admin for changes.',
+          child: Column(
+            children: [
+              _buildResponsivePair(
+                _ReadonlyTile(
+                  accent: _amber,
+                  icon: Icons.badge_outlined,
+                  label: 'Employee code',
+                  value: employee?.employeeCode ?? 'Not available',
+                  hint: 'Unique ID assigned by your organization.',
+                ),
+                _ReadonlyTile(
+                  accent: _mint,
+                  icon: Icons.stars_rounded,
+                  label: 'Available points',
+                  value: '${_profile.pointsBalance}',
+                  hint: 'Current reward balance linked to your account.',
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        _buildResponsivePair(
+          _InsightTile(
+            accent: _primary,
+            icon: Icons.account_tree_outlined,
+            title: 'Department',
+            value: employee?.department ?? 'Not set',
+            subtitle: 'Your current team or unit',
+          ),
+          _InsightTile(
+            accent: _teal,
+            icon: Icons.work_outline_rounded,
+            title: 'Position',
+            value: employee?.position ?? 'Not set',
+            subtitle: 'Your role in the organization',
+          ),
+          leftFlex: 1,
+          rightFlex: 1,
+        ),
+        const SizedBox(height: 16),
+        _BentoPanel(
+          accent: _primary,
+          icon: Icons.contact_page_outlined,
+          eyebrow: 'Snapshot',
+          title: 'Contact details',
+          subtitle:
+              'These are the contact points currently registered against your managed profile.',
+          child: Column(
+            children: [
+              _ReadonlyTile(
+                accent: _primary,
+                icon: Icons.person_outline_rounded,
+                label: 'Full name',
+                value: _profile.displayName,
+                hint: 'Used across your account and activity.',
+              ),
+              const SizedBox(height: 12),
+              _buildResponsivePair(
+                _ReadonlyTile(
+                  accent: _secondary,
+                  icon: Icons.call_outlined,
+                  label: 'Mobile number',
+                  value: _profile.phoneNumber,
+                ),
+                _ReadonlyTile(
+                  accent: _secondary,
+                  icon: Icons.email_outlined,
+                  label: 'Email address',
+                  value: _profile.email,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        _BentoPanel(
+          accent: _teal,
+          icon: Icons.place_outlined,
+          eyebrow: 'Location',
+          title: 'Address overview',
+          subtitle: 'Your current address and locality details on record.',
+          child: Column(
+            children: [
+              _ReadonlyTile(
+                accent: _teal,
+                icon: Icons.home_outlined,
+                label: 'Address',
+                value: _fullLocation,
+                hint:
+                    'Contact your organization if any part of this needs updating.',
+              ),
+              if (_profile.dateOfBirth != null ||
+                  _profile.anniversaryDate != null) ...[
+                const SizedBox(height: 12),
+                _buildResponsivePair(
+                  _ReadonlyTile(
+                    accent: _amber,
+                    icon: Icons.cake_outlined,
+                    label: 'Birthday',
+                    value: _profile.dateOfBirth != null
+                        ? _dateFormat.format(_profile.dateOfBirth!)
+                        : 'Not added',
+                  ),
+                  _ReadonlyTile(
+                    accent: _coral,
+                    icon: Icons.favorite_outline_rounded,
+                    label: 'Anniversary',
+                    value: _profile.anniversaryDate != null
+                        ? _dateFormat.format(_profile.anniversaryDate!)
+                        : 'Not added',
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+        const SizedBox(height: 28),
+      ],
+    );
+  }
+
+  Widget _buildBottomActionBar() {
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
+        child: Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: _border),
+            boxShadow: [
+              BoxShadow(
+                color: _primary.withValues(alpha: 0.10),
+                blurRadius: 26,
+                spreadRadius: -16,
+                offset: const Offset(0, 18),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 10,
+                    height: 10,
+                    decoration: BoxDecoration(
+                      color: _hasChanges ? _amber : _mint,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      _hasChanges
+                          ? '$_changedFieldCount pending change${_changedFieldCount == 1 ? '' : 's'} ready to save'
+                          : 'No pending changes right now',
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: _textPrimary,
+                      ),
+                    ),
+                  ),
+                  Text(
+                    _hasChanges ? 'Draft' : 'Synced',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800,
+                      color: (_hasChanges ? _amber : _mint).withValues(
+                        alpha: 0.95,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: _isLoading
+                          ? null
+                          : () => Navigator.of(context).pop(),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 15),
+                        foregroundColor: _textPrimary,
+                        side: const BorderSide(color: _border),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                      ),
+                      child: const Text(
+                        'Cancel',
+                        style: TextStyle(fontWeight: FontWeight.w700),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    flex: 2,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: _hasChanges ? null : const Color(0xFFE5E7EB),
+                        gradient: _hasChanges
+                            ? const LinearGradient(
+                                colors: [_primary, _secondary],
+                              )
+                            : null,
+                        borderRadius: BorderRadius.circular(18),
+                        boxShadow: _hasChanges
+                            ? [
+                                BoxShadow(
+                                  color: _primary.withValues(alpha: 0.25),
+                                  blurRadius: 22,
+                                  spreadRadius: -14,
+                                  offset: const Offset(0, 14),
+                                ),
+                              ]
+                            : null,
+                      ),
+                      child: ElevatedButton(
+                        onPressed: (_isLoading || !_hasChanges)
+                            ? null
+                            : _saveProfile,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.transparent,
+                          disabledBackgroundColor: Colors.transparent,
+                          shadowColor: Colors.transparent,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 15),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(18),
+                          ),
+                        ),
+                        child: _isLoading
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    _hasChanges
+                                        ? Icons.save_outlined
+                                        : Icons.cloud_done_outlined,
+                                    size: 18,
+                                    color: _hasChanges
+                                        ? Colors.white
+                                        : _textMuted,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    _hasChanges
+                                        ? 'Save ${_changedFieldCount == 0 ? '' : _changedFieldCount} change${_changedFieldCount == 1 ? '' : 's'}'
+                                        : 'Save changes',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w800,
+                                      color: _hasChanges
+                                          ? Colors.white
+                                          : _textMuted,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInputTile({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+    String? hintText,
+    String? Function(String?)? validator,
+    TextInputType? keyboardType,
+    int maxLines = 1,
+  }) {
+    final bool isMultiline = maxLines > 1;
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.78),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: _border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _FieldHeader(icon: icon, label: label, accent: _primary),
+          const SizedBox(height: 12),
+          TextFormField(
+            controller: controller,
+            validator: validator,
+            keyboardType: keyboardType,
+            minLines: isMultiline ? maxLines : 1,
+            maxLines: maxLines,
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w700,
+              color: _textPrimary,
+            ),
+            decoration: _buildInputDecoration(
+              hintText: hintText,
+              isMultiline: isMultiline,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStateDropdownTile() {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.78),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: _border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const _FieldHeader(
+            icon: Icons.map_outlined,
+            label: 'State',
+            accent: _teal,
+          ),
+          const SizedBox(height: 12),
+          DropdownButtonFormField<String>(
+            value: _selectedState,
+            isExpanded: true,
+            icon: Icon(
+              Icons.keyboard_arrow_down_rounded,
+              color: _textPrimary.withValues(alpha: 0.40),
+            ),
+            decoration: _buildInputDecoration(hintText: 'Choose a state'),
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w700,
+              color: _textPrimary,
+            ),
+            dropdownColor: Colors.white,
+            menuMaxHeight: 320,
+            items: _indianStates
+                .map(
+                  (String state) => DropdownMenuItem<String>(
+                    value: state,
+                    child: Text(state, overflow: TextOverflow.ellipsis),
+                  ),
+                )
+                .toList(),
+            onChanged: (String? value) {
+              setState(() => _selectedState = value);
+              _checkForChanges();
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDateTile({
+    required String label,
+    required IconData icon,
+    required DateTime? value,
+    required String helperText,
+    required VoidCallback onTap,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(22),
+        child: Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.78),
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(color: _border),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _FieldHeader(icon: icon, label: label, accent: _amber),
+              const SizedBox(height: 12),
+              Text(
+                value != null ? _dateFormat.format(value) : 'Add date',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w800,
+                  color: value != null
+                      ? _textPrimary
+                      : _textPrimary.withValues(alpha: 0.34),
+                ),
+              ),
+              const SizedBox(height: 6),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      helperText,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        height: 1.35,
+                        color: _textPrimary.withValues(alpha: 0.46),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Icon(
+                    Icons.arrow_forward_rounded,
+                    size: 18,
+                    color: _textPrimary.withValues(alpha: 0.38),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildResponsivePair(
+    Widget left,
+    Widget right, {
+    int leftFlex = 1,
+    int rightFlex = 1,
+  }) {
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        if (constraints.maxWidth < 340) {
+          return Column(children: [left, const SizedBox(height: 12), right]);
+        }
+
+        return IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(flex: leftFlex, child: left),
+              const SizedBox(width: 12),
+              Expanded(flex: rightFlex, child: right),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  InputDecoration _buildInputDecoration({
+    String? hintText,
+    bool isMultiline = false,
+  }) {
+    return InputDecoration(
+      hintText: hintText,
+      hintStyle: TextStyle(
+        fontSize: 15,
+        fontWeight: FontWeight.w600,
+        color: _textPrimary.withValues(alpha: 0.28),
+      ),
+      filled: true,
+      fillColor: _inputSurface,
+      isDense: true,
+      contentPadding: EdgeInsets.symmetric(
+        horizontal: 14,
+        vertical: isMultiline ? 14 : 12,
+      ),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(18),
+        borderSide: BorderSide.none,
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(18),
+        borderSide: const BorderSide(color: _border),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(18),
+        borderSide: const BorderSide(color: _primary, width: 1.8),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(18),
+        borderSide: const BorderSide(color: Color(0xFFE53E3E)),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(18),
+        borderSide: const BorderSide(color: Color(0xFFE53E3E), width: 1.8),
+      ),
+      errorStyle: const TextStyle(height: 1.2),
+    );
+  }
+
   Future<void> _selectDate(BuildContext context, bool isBirthday) async {
-    final DateTime? initialDate = isBirthday ? _dateOfBirth : _anniversaryDate;
+    final DateTime? currentValue = isBirthday ? _dateOfBirth : _anniversaryDate;
+
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: initialDate ?? DateTime(2000, 1, 1),
+      initialDate: currentValue ?? DateTime(2000, 1, 1),
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
-      builder: (context, child) {
+      builder: (BuildContext context, Widget? child) {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: const ColorScheme.light(
-              primary: Color(0xFF6366F1),
+              primary: _primary,
               onPrimary: Colors.white,
               surface: Colors.white,
-              onSurface: Colors.black87,
+              onSurface: _textPrimary,
             ),
           ),
           child: child!,
@@ -1172,8 +1471,8 @@ class _EditProfilePageState extends State<EditProfilePage>
         } else {
           _anniversaryDate = picked;
         }
-        _hasChanges = true;
       });
+      _checkForChanges();
     }
   }
 
@@ -1188,85 +1487,94 @@ class _EditProfilePageState extends State<EditProfilePage>
       await _authRepository.updateCurrentUserProfile(
         firstName: _firstNameController.text.trim(),
         lastName: _lastNameController.text.trim(),
-        phoneNumber: _phoneController.text.trim().isNotEmpty ? _phoneController.text.trim() : null,
-        residentialAddress: _addressController.text.trim().isNotEmpty ? _addressController.text.trim() : null,
-        city: _cityController.text.trim().isNotEmpty ? _cityController.text.trim() : null,
-        state: _selectedState,
-        pinCode: _pinCodeController.text.trim().isNotEmpty ? _pinCodeController.text.trim() : null,
+        phoneNumber: _phoneController.text.trim().isNotEmpty
+            ? _phoneController.text.trim()
+            : null,
+        residentialAddress: _addressController.text.trim().isNotEmpty
+            ? _addressController.text.trim()
+            : null,
+        city: _cityController.text.trim().isNotEmpty
+            ? _cityController.text.trim()
+            : null,
+        state: (_selectedState ?? '').trim().isNotEmpty ? _selectedState : null,
+        pinCode: _pinCodeController.text.trim().isNotEmpty
+            ? _pinCodeController.text.trim()
+            : null,
         dateOfBirth: _dateOfBirth,
         anniversaryDate: _anniversaryDate,
       );
 
-      if (mounted) {
-        // Success message - with special occasion note if dates were added
-        final hasNewOccasionDates = (_dateOfBirth != null || _anniversaryDate != null) &&
-            (widget.userProfile.dateOfBirth == null && widget.userProfile.anniversaryDate == null);
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.check_rounded,
-                    color: Colors.green,
-                    size: 16,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    hasNewOccasionDates
-                        ? 'Profile updated! You\'ll now receive special occasion coupons 🎉'
-                        : 'Profile updated successfully!',
-                  ),
-                ),
-              ],
-            ),
-            backgroundColor: Colors.green,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            margin: const EdgeInsets.all(16),
-            duration: const Duration(seconds: 4),
-          ),
-        );
-
-        // Return true to indicate profile was updated
-        Navigator.of(context).pop(true);
+      if (!mounted) {
+        return;
       }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                const Icon(
-                  Icons.error_outline_rounded,
+
+      final bool hasNewOccasionDates =
+          (_dateOfBirth != null || _anniversaryDate != null) &&
+          (_profile.dateOfBirth == null && _profile.anniversaryDate == null);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(4),
+                decoration: const BoxDecoration(
                   color: Colors.white,
-                  size: 20,
+                  shape: BoxShape.circle,
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text('Error: ${e.toString()}'),
+                child: const Icon(
+                  Icons.check_rounded,
+                  color: Colors.green,
+                  size: 16,
                 ),
-              ],
-            ),
-            backgroundColor: Colors.red,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            margin: const EdgeInsets.all(16),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  hasNewOccasionDates
+                      ? 'Profile updated. Special-day offers are now unlocked for your account.'
+                      : 'Profile updated successfully.',
+                ),
+              ),
+            ],
           ),
-        );
+          backgroundColor: Colors.green,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+          margin: const EdgeInsets.all(16),
+          duration: const Duration(seconds: 4),
+        ),
+      );
+
+      Navigator.of(context).pop(true);
+    } catch (e) {
+      if (!mounted) {
+        return;
       }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const Icon(
+                Icons.error_outline_rounded,
+                color: Colors.white,
+                size: 20,
+              ),
+              const SizedBox(width: 12),
+              Expanded(child: Text('Error: $e')),
+            ],
+          ),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+          margin: const EdgeInsets.all(16),
+        ),
+      );
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
@@ -1275,49 +1583,425 @@ class _EditProfilePageState extends State<EditProfilePage>
   }
 }
 
-// Custom painter for profile header pattern
-class ProfilePatternPainter extends CustomPainter {
+class _BentoPanel extends StatelessWidget {
+  const _BentoPanel({
+    required this.accent,
+    required this.icon,
+    required this.eyebrow,
+    required this.title,
+    required this.subtitle,
+    required this.child,
+  });
+
+  final Color accent;
+  final IconData icon;
+  final String eyebrow;
+  final String title;
+  final String subtitle;
+  final Widget child;
+
   @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.white.withOpacity(0.1)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1;
-
-    // Draw decorative circles
-    canvas.drawCircle(
-      Offset(size.width * 0.1, size.height * 0.3),
-      30,
-      paint,
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(28),
+        color: Colors.white,
+        border: Border.all(color: accent.withValues(alpha: 0.12)),
+        boxShadow: [
+          BoxShadow(
+            color: accent.withValues(alpha: 0.08),
+            blurRadius: 24,
+            spreadRadius: -16,
+            offset: const Offset(0, 18),
+          ),
+        ],
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Stack(
+        children: [
+          Positioned(
+            right: -36,
+            top: -42,
+            child: Container(
+              width: 140,
+              height: 140,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: [
+                    accent.withValues(alpha: 0.14),
+                    accent.withValues(alpha: 0),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(18),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 42,
+                      height: 42,
+                      decoration: BoxDecoration(
+                        color: accent.withValues(alpha: 0.10),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: Icon(icon, size: 20, color: accent),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            eyebrow.toUpperCase(),
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 0.8,
+                              color: accent.withValues(alpha: 0.90),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            title,
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w800,
+                              color: _textPrimary,
+                              letterSpacing: -0.4,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            subtitle,
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              height: 1.45,
+                              color: _textPrimary.withValues(alpha: 0.56),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 18),
+                child,
+              ],
+            ),
+          ),
+        ],
+      ),
     );
-    
-    canvas.drawCircle(
-      Offset(size.width * 0.9, size.height * 0.7),
-      40,
-      paint,
-    );
-    
-    canvas.drawCircle(
-      Offset(size.width * 0.85, size.height * 0.2),
-      20,
-      paint,
-    );
-
-    // Draw lines
-    final linePaint = Paint()
-      ..color = Colors.white.withOpacity(0.05)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 0.5;
-
-    for (var i = 0; i < 5; i++) {
-      canvas.drawLine(
-        Offset(0, size.height * (0.2 + i * 0.15)),
-        Offset(size.width * 0.3, size.height * (0.2 + i * 0.15)),
-        linePaint,
-      );
-    }
   }
+}
+
+class _InsightTile extends StatelessWidget {
+  const _InsightTile({
+    required this.accent,
+    required this.icon,
+    required this.title,
+    required this.value,
+    required this.subtitle,
+  });
+
+  final Color accent;
+  final IconData icon;
+  final String title;
+  final String value;
+  final String subtitle;
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: accent.withValues(alpha: 0.12)),
+        boxShadow: [
+          BoxShadow(
+            color: accent.withValues(alpha: 0.08),
+            blurRadius: 22,
+            spreadRadius: -16,
+            offset: const Offset(0, 14),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+              color: accent.withValues(alpha: 0.10),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Icon(icon, size: 18, color: accent),
+          ),
+          const SizedBox(height: 14),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w800,
+              color: _textPrimary.withValues(alpha: 0.46),
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            value,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w900,
+              color: _textPrimary,
+              height: 1.1,
+              letterSpacing: -0.4,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            subtitle,
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              height: 1.35,
+              color: _textPrimary.withValues(alpha: 0.50),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _HeroMetricTile extends StatelessWidget {
+  const _HeroMetricTile({
+    required this.value,
+    required this.label,
+    required this.accent,
+  });
+
+  final String value;
+  final String label;
+  final Color accent;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.68),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: accent.withValues(alpha: 0.12)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            value,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w900,
+              color: _textPrimary,
+              height: 1.05,
+              letterSpacing: -0.4,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            label.toUpperCase(),
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 0.8,
+              color: accent.withValues(alpha: 0.90),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CapsuleBadge extends StatelessWidget {
+  const _CapsuleBadge({required this.label, required this.accent});
+
+  final String label;
+  final Color accent;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: accent.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w800,
+          color: accent,
+        ),
+      ),
+    );
+  }
+}
+
+class _InlinePill extends StatelessWidget {
+  const _InlinePill({
+    required this.icon,
+    required this.label,
+    required this.accent,
+  });
+
+  final IconData icon;
+  final String label;
+  final Color accent;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      decoration: BoxDecoration(
+        color: accent.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: accent),
+          const SizedBox(width: 6),
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 180),
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w800,
+                color: accent,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FieldHeader extends StatelessWidget {
+  const _FieldHeader({
+    required this.icon,
+    required this.label,
+    required this.accent,
+  });
+
+  final IconData icon;
+  final String label;
+  final Color accent;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          width: 34,
+          height: 34,
+          decoration: BoxDecoration(
+            color: accent.withValues(alpha: 0.10),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(icon, size: 17, color: accent),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Text(
+            label,
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w800,
+              color: _textPrimary,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ReadonlyTile extends StatelessWidget {
+  const _ReadonlyTile({
+    required this.accent,
+    required this.icon,
+    required this.label,
+    required this.value,
+    this.hint,
+  });
+
+  final Color accent;
+  final IconData icon;
+  final String label;
+  final String value;
+  final String? hint;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.78),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: _border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _FieldHeader(icon: icon, label: label, accent: accent),
+          const SizedBox(height: 12),
+          Text(
+            value,
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w800,
+              color: _textPrimary,
+              height: 1.3,
+            ),
+          ),
+          if (hint != null) ...[
+            const SizedBox(height: 6),
+            Text(
+              hint!,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                height: 1.4,
+                color: _textPrimary.withValues(alpha: 0.46),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
 }

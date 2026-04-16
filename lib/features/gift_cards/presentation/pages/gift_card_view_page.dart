@@ -47,14 +47,11 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
   double _tiltX = 0;
   double _tiltY = 0;
 
-  // Glow pulse + slow ambient time
-  late final AnimationController _glowCtrl;
-  late final AnimationController _ambientCtrl;
-
   // Flip
   late final AnimationController _flipCtrl;
   late final Animation<double> _flipAnim;
   bool _showingBack = false;
+  bool _showScrolledAppBar = false;
 
   GiftCardOrderEntity get order => widget.order;
 
@@ -66,16 +63,6 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
     super.initState();
 
     _loadUser();
-
-    _glowCtrl = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 3),
-    )..repeat(reverse: true);
-
-    _ambientCtrl = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 24),
-    )..repeat();
 
     _flipCtrl = AnimationController(
       vsync: this,
@@ -99,8 +86,6 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
   @override
   void dispose() {
     _gyroSub?.cancel();
-    _glowCtrl.dispose();
-    _ambientCtrl.dispose();
     _flipCtrl.dispose();
     super.dispose();
   }
@@ -132,6 +117,12 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
     }
     _showingBack = !_showingBack;
     HapticFeedback.lightImpact();
+  }
+
+  void _updateScrolledAppBar(double offset) {
+    final shouldShow = offset > 6;
+    if (!mounted || shouldShow == _showScrolledAppBar) return;
+    setState(() => _showScrolledAppBar = shouldShow);
   }
 
   Future<void> _loadUser() async {
@@ -183,7 +174,7 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
     Color? borderColor,
   }) {
     return Material(
-      color: bgColor ?? Colors.white.withValues(alpha: 0.10),
+      color: bgColor ?? const Color(0xFFE9ECF1),
       shape: const CircleBorder(),
       child: InkWell(
         customBorder: const CircleBorder(),
@@ -194,14 +185,13 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
           alignment: Alignment.center,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            border: Border.all(
-              color: borderColor ?? Colors.white.withValues(alpha: 0.20),
-            ),
+            color: bgColor ?? const Color(0xFFE9ECF1),
+            border: Border.all(color: borderColor ?? const Color(0xFFD6DCE5)),
           ),
           child: Icon(
             Icons.copy_rounded,
             size: 14,
-            color: iconColor ?? Colors.white.withValues(alpha: 0.85),
+            color: iconColor ?? const Color(0xFF6B7280),
           ),
         ),
       ),
@@ -249,7 +239,7 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F8F1),
+      backgroundColor: Colors.white,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -257,6 +247,27 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
         elevation: 0,
         scrolledUnderElevation: 0,
         systemOverlayStyle: SystemUiOverlayStyle.dark,
+        flexibleSpace: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 220),
+          child: _showScrolledAppBar
+              ? ClipRect(
+                  key: const ValueKey('scrolled-app-bar'),
+                  child: BackdropFilter(
+                    filter: ui.ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.72),
+                        border: Border(
+                          bottom: BorderSide(
+                            color: GcTokens.primary.withValues(alpha: 0.06),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                )
+              : const SizedBox(key: ValueKey('idle-app-bar')),
+        ),
         leading: Padding(
           padding: const EdgeInsets.only(left: 12),
           child: _lightCircleButton(
@@ -285,22 +296,30 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
       body: Stack(
         children: [
           Positioned.fill(child: _buildPageBackground()),
-          ListView(
-            padding: EdgeInsets.fromLTRB(
-              20,
-              MediaQuery.of(context).padding.top + kToolbarHeight + 12,
-              20,
-              32,
+          NotificationListener<ScrollNotification>(
+            onNotification: (notification) {
+              if (notification.metrics.axis == Axis.vertical) {
+                _updateScrolledAppBar(notification.metrics.pixels);
+              }
+              return false;
+            },
+            child: ListView(
+              padding: EdgeInsets.fromLTRB(
+                20,
+                MediaQuery.of(context).padding.top + kToolbarHeight + 12,
+                20,
+                32,
+              ),
+              children: [
+                _buildFlippableCard(),
+                const SizedBox(height: 14),
+                _buildFlipHint(),
+                const SizedBox(height: 24),
+                _buildActions(),
+                const SizedBox(height: 18),
+                _buildOrderMeta(),
+              ],
             ),
-            children: [
-              _buildFlippableCard(),
-              const SizedBox(height: 14),
-              _buildFlipHint(),
-              const SizedBox(height: 24),
-              _buildActions(),
-              const SizedBox(height: 18),
-              _buildOrderMeta(),
-            ],
           ),
         ],
       ),
@@ -308,89 +327,7 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
   }
 
   Widget _buildPageBackground() {
-    return IgnorePointer(
-      child: Stack(
-        children: [
-          Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Color(0xFFFFFEFC),
-                  Color(0xFFF8FCEC),
-                  Color(0xFFF9F5FF),
-                ],
-                stops: [0.0, 0.54, 1.0],
-              ),
-            ),
-          ),
-          Positioned(
-            top: -90,
-            left: -86,
-            child: _backgroundOrb(
-              size: 260,
-              colors: [
-                GcTokens.brandLime.withValues(alpha: 0.18),
-                GcTokens.brandLime.withValues(alpha: 0.0),
-              ],
-            ),
-          ),
-          Positioned(
-            top: 120,
-            right: -72,
-            child: _backgroundOrb(
-              size: 240,
-              colors: [
-                GcTokens.primary.withValues(alpha: 0.10),
-                GcTokens.secondary.withValues(alpha: 0.0),
-              ],
-            ),
-          ),
-          Positioned(
-            bottom: 120,
-            left: -64,
-            child: _backgroundOrb(
-              size: 220,
-              colors: [
-                GcTokens.secondary.withValues(alpha: 0.09),
-                GcTokens.secondary.withValues(alpha: 0.0),
-              ],
-            ),
-          ),
-          Positioned(
-            bottom: -88,
-            right: -44,
-            child: _backgroundOrb(
-              size: 280,
-              colors: [
-                GcTokens.brandLimeDark.withValues(alpha: 0.14),
-                GcTokens.brandLimeDark.withValues(alpha: 0.0),
-              ],
-            ),
-          ),
-          Positioned.fill(
-            child: CustomPaint(
-              painter: _PageBackdropPainter(
-                lime: GcTokens.brandLimeDark,
-                purple: GcTokens.primary,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _backgroundOrb({required double size, required List<Color> colors}) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: RadialGradient(colors: colors),
-      ),
-    );
+    return IgnorePointer(child: Container(color: Colors.white));
   }
 
   BoxDecoration _cardDecoration() {
@@ -399,18 +336,42 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
       borderRadius: BorderRadius.circular(28),
       border: Border.all(
         color: Color.lerp(
-          GcTokens.primary.withValues(alpha: 0.08),
-          GcTokens.brandLimeDark.withValues(alpha: 0.12),
-          0.30,
+          GcTokens.primary.withValues(alpha: 0.14),
+          GcTokens.brandLimeDark.withValues(alpha: 0.18),
+          0.5,
         )!,
         width: 1.2,
       ),
       boxShadow: [
         BoxShadow(
-          color: GcTokens.primary.withValues(alpha: 0.035),
+          color: GcTokens.primary.withValues(alpha: 0.34),
+          offset: const Offset(0, 34),
+          blurRadius: 82,
+          spreadRadius: -6,
+        ),
+        BoxShadow(
+          color: GcTokens.brandLime.withValues(alpha: 0.18),
+          offset: const Offset(0, -20),
+          blurRadius: 64,
+          spreadRadius: 2,
+        ),
+        BoxShadow(
+          color: GcTokens.primary.withValues(alpha: 0.16),
           offset: const Offset(0, 18),
-          blurRadius: 28,
-          spreadRadius: -18,
+          blurRadius: 92,
+          spreadRadius: 16,
+        ),
+        BoxShadow(
+          color: GcTokens.brandLimeDark.withValues(alpha: 0.05),
+          offset: const Offset(0, -8),
+          blurRadius: 54,
+          spreadRadius: 2,
+        ),
+        BoxShadow(
+          color: Colors.white.withValues(alpha: 0.78),
+          offset: const Offset(0, -6),
+          blurRadius: 18,
+          spreadRadius: -12,
         ),
       ],
     );
@@ -420,30 +381,193 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
     return [
       Positioned.fill(
         child: DecoratedBox(
+          decoration: const BoxDecoration(color: Color(0xFFFFFEFD)),
+        ),
+      ),
+      Positioned(
+        top: -74,
+        left: -42,
+        child: _softGlowBlob(
+          width: 320,
+          height: 220,
+          color: GcTokens.brandLime.withValues(alpha: 0.15),
+          blurRadius: 120,
+          spreadRadius: 24,
+        ),
+      ),
+      Positioned(
+        top: 14,
+        right: -34,
+        child: _softGlowBlob(
+          width: 220,
+          height: 170,
+          color: GcTokens.brandLime.withValues(alpha: 0.08),
+          blurRadius: 92,
+          spreadRadius: 12,
+        ),
+      ),
+      Positioned(
+        bottom: -88,
+        left: -34,
+        right: -34,
+        child: Align(
+          alignment: Alignment.bottomCenter,
+          child: _softGlowBlob(
+            width: 460,
+            height: 280,
+            color: GcTokens.primary.withValues(alpha: 0.12),
+            blurRadius: 132,
+            spreadRadius: 30,
+          ),
+        ),
+      ),
+      Positioned(
+        top: 76,
+        right: 18,
+        child: Icon(
+          Icons.card_giftcard_rounded,
+          size: 98,
+          color: GcTokens.brandLimeDark.withValues(alpha: 0.10),
+        ),
+      ),
+      Positioned(
+        top: 170,
+        left: 18,
+        child: Transform.rotate(
+          angle: -0.2,
+          child: Icon(
+            Icons.redeem_rounded,
+            size: 78,
+            color: GcTokens.brandLimeDark.withValues(alpha: 0.05),
+          ),
+        ),
+      ),
+      Positioned(
+        bottom: 152,
+        right: 34,
+        child: Transform.rotate(
+          angle: 0.22,
+          child: Icon(
+            Icons.local_offer_rounded,
+            size: 54,
+            color: GcTokens.primary.withValues(alpha: 0.10),
+          ),
+        ),
+      ),
+      Positioned(
+        left: 22,
+        right: 22,
+        top: 142,
+        child: Container(
+          height: 1,
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
               colors: [
-                Colors.white.withValues(alpha: 0.65),
-                Colors.white.withValues(alpha: 0.0),
-                GcTokens.brandLime.withValues(alpha: 0.02),
+                GcTokens.brandLimeDark.withValues(alpha: 0.20),
+                GcTokens.primary.withValues(alpha: 0.18),
+                Colors.transparent,
               ],
-              stops: const [0.0, 0.42, 1.0],
             ),
           ),
         ),
       ),
-      Positioned.fill(
-        child: CustomPaint(
-          painter: _AbstractCardWatermarkPainter(
-            lime: GcTokens.brandLimeDark,
-            purple: GcTokens.primary,
+      Positioned(
+        left: 22,
+        right: 22,
+        bottom: 116,
+        child: Container(
+          height: 1,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Colors.transparent,
+                GcTokens.primary.withValues(alpha: 0.18),
+                GcTokens.brandLimeDark.withValues(alpha: 0.18),
+              ],
+            ),
           ),
         ),
       ),
-      _patternOverlay(),
     ];
+  }
+
+  Widget _softGlowBlob({
+    required double width,
+    required double height,
+    required Color color,
+    required double blurRadius,
+    required double spreadRadius,
+  }) {
+    return IgnorePointer(
+      child: Container(
+        width: width,
+        height: height,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(math.max(width, height)),
+          boxShadow: [
+            BoxShadow(
+              color: color,
+              blurRadius: blurRadius,
+              spreadRadius: spreadRadius,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _metaTile(String label, String value) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.74),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: Color.lerp(
+            GcTokens.brandLimeDark.withValues(alpha: 0.16),
+            GcTokens.primary.withValues(alpha: 0.10),
+            0.35,
+          )!,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label.toUpperCase(),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 7.5,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 1.1,
+              color: GcTokens.textTertiary.withValues(alpha: 0.74),
+            ),
+          ),
+          const SizedBox(height: 5),
+          Text(
+            value,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w900,
+              color: GcTokens.textPrimary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _currency(double value) => '₹${value.toStringAsFixed(0)}';
+
+  String get _pointsUsedText {
+    final points = order.totalPointsUsed;
+    if (points <= 0) return 'Not used';
+    return points % 1 == 0
+        ? '${points.toStringAsFixed(0)} pts'
+        : '${points.toStringAsFixed(1)} pts';
   }
 
   Widget _lightCircleButton({
@@ -451,7 +575,7 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
     required VoidCallback onTap,
   }) {
     return Material(
-      color: Colors.white.withValues(alpha: 0.82),
+      color: Colors.white.withValues(alpha: 0.66),
       shape: const CircleBorder(),
       elevation: 0,
       child: InkWell(
@@ -462,7 +586,7 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
           height: 38,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: Colors.white.withValues(alpha: 0.86),
+            color: Colors.white.withValues(alpha: 0.74),
             border: Border.all(
               color: Color.lerp(
                 GcTokens.brandLimeDark.withValues(alpha: 0.40),
@@ -472,7 +596,7 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
             ),
             boxShadow: [
               BoxShadow(
-                color: GcTokens.brandLime.withValues(alpha: 0.10),
+                color: GcTokens.primary.withValues(alpha: 0.06),
                 offset: const Offset(0, 8),
                 blurRadius: 16,
                 spreadRadius: -10,
@@ -523,7 +647,7 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
     return RepaintBoundary(
       key: _cardKey,
       child: AnimatedBuilder(
-        animation: Listenable.merge([_flipAnim, _glowCtrl, _ambientCtrl]),
+        animation: _flipAnim,
         builder: (context, child) {
           final flip = _flipAnim.value * math.pi;
           final isBack = flip > math.pi / 2;
@@ -560,171 +684,176 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
         child: Stack(
           children: [
             ..._cardDecorativeLayers(),
-
-            // Cardholder name — top right
             Positioned(
-              top: 22,
+              top: 18,
+              left: 22,
               right: 22,
-              left: 80,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'CARDHOLDER',
-                    style: TextStyle(
-                      fontSize: 8.5,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 1.4,
-                      color: GcTokens.primaryDark.withValues(alpha: 0.42),
+                  SizedBox(
+                    width: 46,
+                    height: 46,
+                    child: Image.asset(
+                      'assets/images/logo_transparant.png',
+                      fit: BoxFit.contain,
+                      errorBuilder: (_, __, ___) => Image.asset(
+                        'assets/images/logo.png',
+                        fit: BoxFit.contain,
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const Spacer(),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        'ORDER #${order.id}',
+                        style: TextStyle(
+                          fontSize: 8.5,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 1.2,
+                          color: GcTokens.primary.withValues(alpha: 0.52),
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        _fmt(order.created),
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                          color: GcTokens.textSecondary.withValues(alpha: 0.82),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            Positioned(
+              left: 22,
+              right: 22,
+              top: 84,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                   Text(
-                    (_userName ?? 'CARD HOLDER').toUpperCase(),
-                    maxLines: 1,
+                    order.productName,
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 13,
+                    style: TextStyle(
+                      fontSize: 24,
                       fontWeight: FontWeight.w900,
                       color: GcTokens.textPrimary,
-                      letterSpacing: 1.2,
+                      height: 1.05,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Issued to ${(_userName ?? 'card holder').trim()}',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: GcTokens.textSecondary.withValues(alpha: 0.82),
                     ),
                   ),
                 ],
               ),
             ),
-
-            // SavEdge logo top-left
             Positioned(
-              top: 18,
               left: 22,
-              child: SizedBox(
-                width: 46,
-                height: 46,
-                child: Image.asset(
-                  'assets/images/logo_transparant.png',
-                  fit: BoxFit.contain,
-                  errorBuilder: (_, __, ___) => Image.asset(
-                    'assets/images/logo.png',
-                    fit: BoxFit.contain,
-                  ),
-                ),
-              ),
-            ),
-
-            // Vertical brand name on left side
-            Positioned(
-              left: 18,
-              top: 78,
-              bottom: 100,
-              child: RotatedBox(
-                quarterTurns: 3,
-                child: Center(
-                  child: Text(
-                    order.productName.toUpperCase(),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w900,
-                      color: GcTokens.textTertiary.withValues(alpha: 0.45),
-                      letterSpacing: 3,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-
-            // Centered value block (label + amount)
-            Positioned(
-              left: 50,
               right: 22,
-              top: 96,
+              top: 176,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          GcTokens.brandLime.withValues(alpha: 0.44),
-                          GcTokens.secondary.withValues(alpha: 0.12),
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: Color.lerp(
-                          GcTokens.brandLimeDark.withValues(alpha: 0.58),
-                          GcTokens.primary.withValues(alpha: 0.22),
-                          0.35,
-                        )!,
-                      ),
-                    ),
-                    child: const Text(
-                      'GIFT CARD VALUE',
-                      style: TextStyle(
-                        fontSize: 9,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 1.6,
-                        color: GcTokens.brandInk,
-                      ),
+                  Text(
+                    'GIFT CARD VALUE',
+                    style: TextStyle(
+                      fontSize: 9,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 1.6,
+                      color: GcTokens.primary.withValues(alpha: 0.56),
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 8),
                   Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 14),
-                        child: Text(
-                          '\u20B9',
-                          style: TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.w900,
-                            color: GcTokens.textPrimary.withValues(alpha: 0.85),
-                          ),
+                      Text(
+                        '\u20B9',
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.w900,
+                          color: GcTokens.textPrimary.withValues(alpha: 0.78),
                         ),
                       ),
-                      const SizedBox(width: 4),
+                      const SizedBox(width: 6),
                       Text(
                         (order.woohooActivatedAmount ?? order.requestedAmount)
                             .toStringAsFixed(0),
                         style: const TextStyle(
-                          fontSize: 60,
+                          fontSize: 58,
                           fontWeight: FontWeight.w900,
                           color: GcTokens.textPrimary,
                           height: 1.0,
                           letterSpacing: -2,
                         ),
                       ),
+                      const Spacer(),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            order.status.name.toUpperCase(),
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 1.2,
+                              color: GcTokens.brandLimeDark.withValues(
+                                alpha: 0.86,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Ready to use',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                              color: GcTokens.textSecondary.withValues(
+                                alpha: 0.72,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
+                  ),
+                  const SizedBox(height: 14),
+                  Text(
+                    'Use this gift card online or in store where accepted.',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      height: 1.45,
+                      color: GcTokens.textSecondary.withValues(alpha: 0.76),
+                    ),
                   ),
                 ],
               ),
             ),
-
-            // Card number + validity stacked together
             Positioned(
-              left: 50,
+              left: 22,
               right: 22,
-              bottom: 70,
+              bottom: 22,
               child: Container(
-                padding: const EdgeInsets.fromLTRB(14, 10, 10, 12),
+                padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Colors.white.withValues(alpha: 0.78),
-                      GcTokens.surfaceMuted.withValues(alpha: 0.96),
-                      GcTokens.brandLime.withValues(alpha: 0.08),
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(12),
+                  color: Colors.white.withValues(alpha: 0.94),
+                  borderRadius: BorderRadius.circular(18),
                   border: Border.all(
                     color: Color.lerp(
                       GcTokens.primary.withValues(alpha: 0.12),
@@ -767,93 +896,61 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
                           _copyChip(
                             onTap: () =>
                                 _copy('Card number', order.woohooCardNumber!),
-                            iconColor: GcTokens.primary,
-                            bgColor: GcTokens.primary.withValues(alpha: 0.08),
-                            borderColor: GcTokens.primary.withValues(
-                              alpha: 0.20,
-                            ),
                           ),
                         ],
                       ],
                     ),
                     const SizedBox(height: 10),
                     Container(height: 1, color: GcTokens.border),
-                    const SizedBox(height: 10),
-                    Text(
-                      'VALID THRU',
-                      style: TextStyle(
-                        fontSize: 7.5,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 1.2,
-                        color: GcTokens.textTertiary.withValues(alpha: 0.70),
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      _validity,
-                      style: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w900,
-                        color: GcTokens.textPrimary,
-                        letterSpacing: 1.6,
-                      ),
+                    const SizedBox(height: 12),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 4),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'VALID THRU',
+                                  style: TextStyle(
+                                    fontSize: 7.5,
+                                    fontWeight: FontWeight.w900,
+                                    letterSpacing: 1.2,
+                                    color: GcTokens.textTertiary.withValues(
+                                      alpha: 0.70,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  _validity,
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w900,
+                                    color: GcTokens.textPrimary,
+                                    letterSpacing: 1.4,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        if (order.woohooActivationCode != null &&
+                            order.woohooActivationCode!.isNotEmpty) ...[
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: _metaTile(
+                              'Activation',
+                              order.woohooActivationCode!,
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
                   ],
                 ),
-              ),
-            ),
-
-            // Footer row — ACTIVE pill on the right
-            Positioned(
-              left: 22,
-              right: 22,
-              bottom: 22,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  const Spacer(),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          GcTokens.brandLime.withValues(alpha: 0.42),
-                          GcTokens.brandLimeDark.withValues(alpha: 0.18),
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: GcTokens.brandLimeDark.withValues(alpha: 0.65),
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          width: 6,
-                          height: 6,
-                          decoration: const BoxDecoration(
-                            color: GcTokens.brandLimeDark,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                        const SizedBox(width: 6),
-                        const Text(
-                          'ACTIVE',
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w900,
-                            color: GcTokens.brandInk,
-                            letterSpacing: 1.2,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
               ),
             ),
           ],
@@ -881,7 +978,7 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
               top: 40,
               child: Container(
                 height: 52,
-                color: GcTokens.textPrimary.withValues(alpha: 0.08),
+                color: const Color(0xFFCBD5E1).withValues(alpha: 0.82),
               ),
             ),
 
@@ -906,15 +1003,7 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
                   Container(
                     padding: const EdgeInsets.fromLTRB(18, 12, 12, 10),
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          Colors.white.withValues(alpha: 0.74),
-                          GcTokens.surfaceMuted.withValues(alpha: 0.96),
-                          GcTokens.secondary.withValues(alpha: 0.08),
-                        ],
-                      ),
+                      color: Colors.white.withValues(alpha: 0.90),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
                         color: Color.lerp(
@@ -957,23 +1046,17 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
                                       width: 32,
                                       height: 32,
                                       decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          colors: [
-                                            GcTokens.brandLime.withValues(
-                                              alpha: 0.42,
-                                            ),
-                                            GcTokens.secondary.withValues(
-                                              alpha: 0.12,
-                                            ),
-                                          ],
+                                        color: const Color(0xFFE9ECF1),
+                                        border: Border.all(
+                                          color: const Color(0xFFD6DCE5),
                                         ),
                                         shape: BoxShape.circle,
                                       ),
                                       alignment: Alignment.center,
-                                      child: const Icon(
+                                      child: Icon(
                                         Icons.copy_rounded,
                                         size: 15,
-                                        color: GcTokens.brandInk,
+                                        color: const Color(0xFF6B7280),
                                       ),
                                     ),
                                     const SizedBox(height: 3),
@@ -1063,38 +1146,6 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
     );
   }
 
-  Widget _animatedGlows() {
-    return Positioned.fill(
-      child: CustomPaint(
-        painter: _AuroraPainter(
-          time: _ambientCtrl.value,
-          pulse: _glowCtrl.value,
-        ),
-      ),
-    );
-  }
-
-  Widget _patternOverlay() {
-    return Positioned.fill(
-      child: Stack(
-        children: [
-          CustomPaint(
-            painter: _ConstellationPainter(
-              time: _ambientCtrl.value,
-              color: GcTokens.primary,
-            ),
-          ),
-          CustomPaint(
-            painter: _ConstellationPainter(
-              time: (_ambientCtrl.value + 0.16) % 1.0,
-              color: GcTokens.brandLimeDark,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   // ── Actions ────────────────────────────────────────────────────────────
 
   Widget _buildActions() {
@@ -1174,10 +1225,10 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
 
   Widget _buildOrderMeta() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.82),
-        borderRadius: BorderRadius.circular(14),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
         border: Border.all(
           color: Color.lerp(
             GcTokens.primary.withValues(alpha: 0.08),
@@ -1185,24 +1236,52 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
             0.30,
           )!,
         ),
-      ),
-      child: Row(
-        children: [
-          Icon(
-            Icons.receipt_long_rounded,
-            size: 16,
-            color: GcTokens.textTertiary.withValues(alpha: 0.65),
+        boxShadow: [
+          BoxShadow(
+            color: GcTokens.primary.withValues(alpha: 0.05),
+            offset: const Offset(0, 14),
+            blurRadius: 24,
+            spreadRadius: -18,
           ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              'Order #${order.id}  ·  ${_fmt(order.created)}',
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w800,
-                color: GcTokens.textSecondary,
+        ],
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: _metaTile('You Save', _currency(order.discountAmount)),
               ),
-            ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _metaTile('Payable', _currency(order.payableAmount)),
+              ),
+              const SizedBox(width: 10),
+              Expanded(child: _metaTile('Points', _pointsUsedText)),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Container(height: 1, color: GcTokens.border),
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              Icon(
+                Icons.receipt_long_rounded,
+                size: 16,
+                color: GcTokens.textTertiary.withValues(alpha: 0.65),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Order #${order.id}  ·  ${_fmt(order.created)}',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                    color: GcTokens.textSecondary,
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
