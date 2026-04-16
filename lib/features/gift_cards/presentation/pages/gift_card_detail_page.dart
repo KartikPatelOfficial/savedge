@@ -166,6 +166,7 @@ class _GiftCardDetailPageState extends State<GiftCardDetailPage> {
               if (_p.themes.length > 1) _themesSection(),
               _infoButtons(),
               _relatedSection(),
+              _issuedByFooter(),
             ],
           ),
         ),
@@ -182,16 +183,7 @@ class _GiftCardDetailPageState extends State<GiftCardDetailPage> {
       scrolledUnderElevation: 0,
       systemOverlayStyle: SystemUiOverlayStyle.dark,
       titleSpacing: 0,
-      title: Text(
-        _p.brandName ?? _p.name,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        style: const TextStyle(
-          fontSize: 17,
-          fontWeight: FontWeight.w900,
-          color: GcTokens.textPrimary,
-        ),
-      ),
+      title: const SizedBox.shrink(),
       leading: IconButton(
         onPressed: () => Navigator.pop(context),
         icon: const Icon(
@@ -278,46 +270,28 @@ class _GiftCardDetailPageState extends State<GiftCardDetailPage> {
   }
 
   Widget _brandCard() {
-    return Container(
-      margin: const EdgeInsets.fromLTRB(16, 18, 16, 0),
-      padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(GcTokens.rCard),
-        border: Border.all(color: const Color(0xFFEFEAFB)),
-      ),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Title + discount badge
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      _p.brandName ?? _p.name,
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w900,
-                        color: GcTokens.textPrimary,
-                      ),
-                    ),
-                    if (_p.categoryName != null) ...[
-                      const SizedBox(height: 4),
-                      Text(
-                        _p.categoryName!,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: GcTokens.textTertiary,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ],
+                child: Text(
+                  _p.brandName ?? _p.name,
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w900,
+                    color: GcTokens.textPrimary,
+                    height: 1.2,
+                  ),
                 ),
               ),
-              if (_p.hasDiscount)
+              if (_p.hasDiscount) ...[
+                const SizedBox(width: 12),
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 12,
@@ -350,8 +324,32 @@ class _GiftCardDetailPageState extends State<GiftCardDetailPage> {
                     ],
                   ),
                 ),
+              ],
             ],
           ),
+          // Expiry
+          if (_p.formatExpiry != null && _p.formatExpiry!.isNotEmpty) ...[
+            const SizedBox(height: 6),
+            Row(
+              children: [
+                const Icon(
+                  Icons.schedule_rounded,
+                  size: 13,
+                  color: GcTokens.textTertiary,
+                ),
+                const SizedBox(width: 5),
+                Text(
+                  _p.formatExpiry!,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: GcTokens.textTertiary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ],
+          // Offer description chip
           if (_p.offerDescription != null &&
               _p.offerDescription!.isNotEmpty) ...[
             const SizedBox(height: 12),
@@ -382,25 +380,18 @@ class _GiftCardDetailPageState extends State<GiftCardDetailPage> {
               ),
             ),
           ],
-          if (_p.formatExpiry != null && _p.formatExpiry!.isNotEmpty) ...[
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                const Icon(
-                  Icons.schedule_rounded,
-                  size: 14,
-                  color: GcTokens.textTertiary,
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  _p.formatExpiry!,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: GcTokens.textTertiary,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
+          // Description (inline, no separate card)
+          if (_p.description != null && _p.description!.trim().isNotEmpty) ...[
+            const SizedBox(height: 14),
+            Text(
+              _p.description!,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontSize: 13,
+                height: 1.5,
+                color: GcTokens.textSecondary,
+              ),
             ),
           ],
         ],
@@ -682,6 +673,31 @@ class _GiftCardDetailPageState extends State<GiftCardDetailPage> {
           ),
         );
       },
+    );
+  }
+
+  Widget _issuedByFooter() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.verified_rounded,
+            size: 14,
+            color: GcTokens.textTertiary.withValues(alpha: 0.6),
+          ),
+          const SizedBox(width: 6),
+          Text(
+            'Issued by Qwikcilver Solutions Pvt. Ltd.',
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: GcTokens.textTertiary.withValues(alpha: 0.6),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
