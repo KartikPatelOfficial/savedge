@@ -17,7 +17,9 @@ import 'package:savedge/features/subscription/presentation/bloc/subscription_pla
 import 'package:savedge/features/subscription/presentation/pages/subscription_purchase_page.dart';
 
 class SubscriptionCarousel extends StatefulWidget {
-  const SubscriptionCarousel({super.key});
+  const SubscriptionCarousel({super.key, this.isGuest = false});
+
+  final bool isGuest;
 
   @override
   State<SubscriptionCarousel> createState() => _SubscriptionCarouselState();
@@ -55,6 +57,17 @@ class _SubscriptionCarouselState extends State<SubscriptionCarousel> {
   }
 
   Future<void> _checkVisibility() async {
+    // Guest users always see the plans carousel
+    if (widget.isGuest) {
+      if (mounted) {
+        setState(() {
+          _isVisible = true;
+          _isLoading = false;
+        });
+      }
+      return;
+    }
+
     try {
       // Check if user has active promotion enrollment - hide carousel if so
       final promotionBloc = getIt<PromotionBloc>();
@@ -147,7 +160,7 @@ class _SubscriptionCarouselState extends State<SubscriptionCarousel> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return const SizedBox.shrink();
+      return const _SubscriptionShimmer();
     }
 
     if (!_isVisible) {
@@ -1267,6 +1280,80 @@ class _SubscriptionPlanCard extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+// ─── Shimmer placeholder for subscription carousel loading ──────────────
+
+class _SubscriptionShimmer extends StatefulWidget {
+  const _SubscriptionShimmer();
+
+  @override
+  State<_SubscriptionShimmer> createState() => _SubscriptionShimmerState();
+}
+
+class _SubscriptionShimmerState extends State<_SubscriptionShimmer>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _ctrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _ctrl,
+      builder: (context, _) {
+        final gradient = LinearGradient(
+          begin: Alignment(-1.0 + 2.0 * _ctrl.value, 0),
+          end: Alignment(-1.0 + 2.0 * _ctrl.value + 1, 0),
+          colors: const [
+            Color(0xFFF0ECF8),
+            Color(0xFFE8E0F5),
+            Color(0xFFF0ECF8),
+          ],
+        );
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Title shimmer
+              Container(
+                width: 120,
+                height: 22,
+                decoration: BoxDecoration(
+                  gradient: gradient,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+              ),
+              const SizedBox(height: 14),
+              // Card shimmer
+              Container(
+                height: 200,
+                decoration: BoxDecoration(
+                  gradient: gradient,
+                  borderRadius: BorderRadius.circular(24),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

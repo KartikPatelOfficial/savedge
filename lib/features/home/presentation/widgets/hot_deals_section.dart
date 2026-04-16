@@ -61,9 +61,7 @@ class HotDealsView extends StatelessWidget {
           child: BlocBuilder<CouponsBloc, CouponsState>(
             builder: (context, state) {
               if (state is CouponsLoading) {
-                return const Center(
-                  child: CircularProgressIndicator(color: Color(0xFF6F3FCC)),
-                );
+                return const _HotDealsShimmer();
               } else if (state is CouponsError) {
                 return _buildErrorWidget(state.message);
               } else if (state is CouponsLoaded) {
@@ -664,6 +662,81 @@ class _StackedDealsCardsState extends State<StackedDealsCards>
           ),
         ),
       ),
+    );
+  }
+}
+
+// ─── Shimmer placeholder for hot deals loading ──────────────────────────
+
+class _HotDealsShimmer extends StatefulWidget {
+  const _HotDealsShimmer();
+
+  @override
+  State<_HotDealsShimmer> createState() => _HotDealsShimmerState();
+}
+
+class _HotDealsShimmerState extends State<_HotDealsShimmer>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _ctrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _ctrl,
+      builder: (context, _) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Column(
+            children: [
+              // Main card shimmer
+              Container(
+                height: 200,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  gradient: LinearGradient(
+                    begin: Alignment(-1.0 + 2.0 * _ctrl.value, 0),
+                    end: Alignment(-1.0 + 2.0 * _ctrl.value + 1, 0),
+                    colors: const [
+                      Color(0xFFF0ECF8),
+                      Color(0xFFE8E0F5),
+                      Color(0xFFF0ECF8),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 14),
+              // Dots shimmer
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(3, (i) => Container(
+                  width: i == 0 ? 24 : 8,
+                  height: 8,
+                  margin: const EdgeInsets.symmetric(horizontal: 3),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFE8E0F5),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                )),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

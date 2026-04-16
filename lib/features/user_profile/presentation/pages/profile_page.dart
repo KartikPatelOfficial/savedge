@@ -491,16 +491,17 @@ class _ProfilePageState extends State<ProfilePage> {
                         subtitle: 'Your favorite restaurants and items',
                         onTap: _onFavoritesTap,
                       ),
-                      ProfileMenuItem(
-                        icon: Icons.card_giftcard,
-                        title: _userProfile!.isEmployee
-                            ? 'Coupons & Benefits'
-                            : 'Gift Cards & Coupons',
-                        subtitle: _userProfile!.isEmployee
-                            ? 'View your employee benefits and coupons'
-                            : 'Manage your rewards',
-                        onTap: _onGiftCardsTap,
-                      ),
+                      // Gift Cards & Coupons - hidden until feature is ready
+                      // ProfileMenuItem(
+                      //   icon: Icons.card_giftcard,
+                      //   title: _userProfile!.isEmployee
+                      //       ? 'Coupons & Benefits'
+                      //       : 'Gift Cards & Coupons',
+                      //   subtitle: _userProfile!.isEmployee
+                      //       ? 'View your employee benefits and coupons'
+                      //       : 'Manage your rewards',
+                      //   onTap: _onGiftCardsTap,
+                      // ),
                       // Gift to colleagues (show for employees only)
                       if (_userProfile!.isEmployee) ...[
                         ProfileMenuItem(
@@ -657,8 +658,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _onOrderHistoryTap() {
-    debugPrint('Order History tapped');
-    // TODO: Navigate to order history
+    Navigator.of(context).pushNamed('/voucher-orders');
   }
 
   void _onInvoicesTap() {

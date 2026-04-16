@@ -639,20 +639,18 @@ class _VendorOfferCardState extends State<VendorOfferCard>
             color: Colors.white,
             child: Stack(
               children: [
-                IntrinsicHeight(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      _buildDiscountStub(accentColor),
-                      Expanded(
-                        child: _buildDetailsPanel(
-                          accentColor,
-                          hasCash: hasCash,
-                          hasMembership: hasMembership,
-                        ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    _buildDiscountStub(accentColor),
+                    Expanded(
+                      child: _buildDetailsPanel(
+                        accentColor,
+                        hasCash: hasCash,
+                        hasMembership: hasMembership,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
                 _buildDashedDivider(accentColor),
               ],
@@ -685,14 +683,20 @@ class _VendorOfferCardState extends State<VendorOfferCard>
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              _discountValueText(),
-              style: TextStyle(
-                fontSize: 30,
-                fontWeight: FontWeight.w800,
-                color: accentColor,
-                height: 1.0,
-                letterSpacing: -0.5,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4.0),
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  _discountValueText(),
+                  style: TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.w800,
+                    color: accentColor,
+                    height: 1.0,
+                    letterSpacing: -0.5,
+                  ),
+                ),
               ),
             ),
             const SizedBox(height: 6),

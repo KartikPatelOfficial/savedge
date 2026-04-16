@@ -130,6 +130,12 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
                 ),
               ),
               
+              // Scrollable content area
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
               // Vector Illustration section
               const SizedBox(height: 20),
               _buildVectorIllustration(primaryColor, isUse),
@@ -149,8 +155,7 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
                 ),
               ),
               const SizedBox(height: 24),
-              Expanded(
-                child: Container(
+              Container(
                   width: double.infinity,
                   padding: const EdgeInsets.fromLTRB(28, 36, 28, 24),
                   decoration: const BoxDecoration(
@@ -224,29 +229,35 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'DISCOUNT',
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w800,
-                                    color: primaryColor,
-                                    letterSpacing: 1.5,
+                            Flexible(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'DISCOUNT',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w800,
+                                      color: primaryColor,
+                                      letterSpacing: 1.5,
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  discountDisplay.toUpperCase(),
-                                  style: TextStyle(
-                                    fontSize: 32,
-                                    fontWeight: FontWeight.w900,
-                                    color: primaryColor,
-                                    letterSpacing: -1.0,
+                                  const SizedBox(height: 4),
+                                  FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      discountDisplay.toUpperCase(),
+                                      style: TextStyle(
+                                        fontSize: 32,
+                                        fontWeight: FontWeight.w900,
+                                        color: primaryColor,
+                                        letterSpacing: -1.0,
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                             if (minCartValue > 0)
                               Container(
@@ -286,13 +297,9 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
                       const SizedBox(height: 32),
                       
                       // Info rows
-                      Expanded(
-                        child: SingleChildScrollView(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: _getInfoItemsFlat(primaryColor),
-                          ),
-                        ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: _getInfoItemsFlat(primaryColor),
                       ),
                       
                       // Main Action Button
@@ -338,6 +345,9 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
                           ),
                         ),
                       ),
+                    ],
+                  ),
+                ),
                     ],
                   ),
                 ),
