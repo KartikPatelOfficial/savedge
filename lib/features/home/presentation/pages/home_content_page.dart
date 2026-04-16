@@ -73,8 +73,8 @@ class _HomeContentPageState extends State<HomeContentPage> {
 
     // Load Hot Deals (special offers) with city filter
     _couponsBloc.add(LoadSpecialOfferCoupons(cityId: cityId));
+    _subscriptionBloc.add(const LoadSubscriptionPlans());
     if (!widget.isGuest) {
-      _subscriptionBloc.add(const LoadSubscriptionPlans());
       _promotionBloc.add(const PromotionEvent.checkStatus());
     }
   }
@@ -200,7 +200,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
                         if (isPromotionActive) return const SizedBox.shrink();
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: const SubscriptionCarousel(),
+                          child: SubscriptionCarousel(isGuest: widget.isGuest),
                         );
                       },
                     ),
@@ -322,7 +322,6 @@ class _HomeContentPageState extends State<HomeContentPage> {
               ],
             ),
             child: Row(
-              mainAxisSize: MainAxisSize.min,
               children: [
                 const Icon(
                   Icons.location_on_outlined,
@@ -330,8 +329,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
                   color: Color(0xFF1A202C),
                 ),
                 const SizedBox(width: 4),
-                ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 80),
+                Flexible(
                   child: Text(
                     cityName,
                     style: const TextStyle(
@@ -339,6 +337,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
                       fontWeight: FontWeight.w500,
                       color: Color(0xFF1A202C),
                     ),
+                    maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),

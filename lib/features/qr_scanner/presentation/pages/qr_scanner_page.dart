@@ -567,12 +567,13 @@ class _QRScannerPageState extends State<QRScannerPage>
           if (mounted) {
             Navigator.of(context).pop();
           }
-          throw Exception('Failed to ${widget.claimAndUse ? "claim and redeem" : "redeem"} coupon: $e');
+          rethrow;
         }
       }
     } catch (e) {
       debugPrint('QR Code handling error: $e');
-      _showErrorDialog(e.toString());
+      final msg = e.toString().replaceAll(RegExp(r'^Exception:\s*'), '');
+      _showErrorDialog(msg);
     } finally {
       if (mounted && !_isDisposed) {
         setState(() {
