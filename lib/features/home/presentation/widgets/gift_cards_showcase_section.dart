@@ -307,13 +307,6 @@ class _ShowcaseCard extends StatelessWidget {
                     border: Border.all(
                       color: Colors.white.withValues(alpha: 0.20),
                     ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: primary.withValues(alpha: 0.18),
-                        offset: const Offset(0, 14),
-                        blurRadius: 26,
-                      ),
-                    ],
                   ),
                   clipBehavior: Clip.antiAlias,
                   child: Stack(
@@ -540,15 +533,6 @@ class _ShowcaseCard extends StatelessWidget {
                                               alpha: 0.62,
                                             ),
                                           ),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: primary.withValues(
-                                                alpha: 0.14,
-                                              ),
-                                              offset: const Offset(0, 16),
-                                              blurRadius: 30,
-                                            ),
-                                          ],
                                         ),
                                         padding: const EdgeInsets.all(10),
                                         child: _buildImage(

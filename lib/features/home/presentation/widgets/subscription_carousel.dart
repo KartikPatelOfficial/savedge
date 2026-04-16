@@ -15,6 +15,7 @@ import 'package:savedge/features/promotion/presentation/bloc/promotion_bloc.dart
 import 'package:savedge/features/subscription/domain/entities/subscription_plan.dart';
 import 'package:savedge/features/subscription/presentation/bloc/subscription_plan_bloc.dart';
 import 'package:savedge/features/subscription/presentation/pages/subscription_purchase_page.dart';
+import 'package:savedge/core/widgets/login_prompt.dart';
 
 class SubscriptionCarousel extends StatefulWidget {
   const SubscriptionCarousel({super.key, this.isGuest = false});
@@ -175,6 +176,7 @@ class _SubscriptionCarouselState extends State<SubscriptionCarousel> {
       child: _UnifiedCarousel(
         pageController: _pageController,
         currentPage: _currentPage,
+        isGuest: widget.isGuest,
         onPauseAutoScroll: _pauseAutoScroll,
         onResumeAutoScroll: _resumeAutoScroll,
         onCardsCountChanged: _updateTotalCards,
@@ -187,6 +189,7 @@ class _UnifiedCarousel extends StatelessWidget {
   const _UnifiedCarousel({
     required this.pageController,
     required this.currentPage,
+    required this.isGuest,
     required this.onPauseAutoScroll,
     required this.onResumeAutoScroll,
     required this.onCardsCountChanged,
@@ -194,6 +197,7 @@ class _UnifiedCarousel extends StatelessWidget {
 
   final PageController pageController;
   final int currentPage;
+  final bool isGuest;
   final VoidCallback onPauseAutoScroll;
   final VoidCallback onResumeAutoScroll;
   final ValueChanged<int> onCardsCountChanged;
@@ -350,6 +354,10 @@ class _UnifiedCarousel extends StatelessWidget {
   }
 
   void _navigateToDetails(BuildContext context, SubscriptionPlan plan) {
+    if (isGuest) {
+      LoginPrompt.show(context, message: 'Sign in to subscribe to a plan.');
+      return;
+    }
     Navigator.of(context).push(SubscriptionPurchasePage.route(plan));
   }
 }

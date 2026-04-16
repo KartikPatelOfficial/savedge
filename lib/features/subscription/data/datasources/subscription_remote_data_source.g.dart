@@ -2,11 +2,13 @@
 
 part of 'subscription_remote_data_source.dart';
 
+// dart format off
+
 // **************************************************************************
 // RetrofitGenerator
 // **************************************************************************
 
-// ignore_for_file: unnecessary_brace_in_string_interps,no_leading_underscores_for_local_identifiers,unused_element,unnecessary_string_interpolations,unused_element_parameter
+// ignore_for_file: unnecessary_brace_in_string_interps,no_leading_underscores_for_local_identifiers,unused_element,unnecessary_string_interpolations,unused_element_parameter,avoid_unused_constructor_parameters,unreachable_from_main
 
 class _SubscriptionRemoteDataSource implements SubscriptionRemoteDataSource {
   _SubscriptionRemoteDataSource(this._dio, {this.baseUrl, this.errorLogger});
@@ -55,7 +57,7 @@ class _SubscriptionRemoteDataSource implements SubscriptionRemoteDataSource {
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
-    final _options = _setStreamType<UserSubscriptionModel>(
+    final _options = _setStreamType<UserSubscriptionModel?>(
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
@@ -291,3 +293,5 @@ class _SubscriptionRemoteDataSource implements SubscriptionRemoteDataSource {
     return Uri.parse(dioBaseUrl).resolveUri(url).toString();
   }
 }
+
+// dart format on

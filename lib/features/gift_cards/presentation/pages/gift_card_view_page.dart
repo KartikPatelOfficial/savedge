@@ -136,8 +136,8 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
 
   Future<void> _loadUser() async {
     try {
-      final UserProfileResponse3 profile =
-          await getIt<AuthRepository>().getCurrentUserProfile();
+      final UserProfileResponse3 profile = await getIt<AuthRepository>()
+          .getCurrentUserProfile();
       if (!mounted) return;
       setState(() => _userName = profile.displayName);
     } catch (_) {
@@ -150,13 +150,13 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
     HapticFeedback.selectionClick();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        backgroundColor: GcTokens.brandBlack,
+        backgroundColor: GcTokens.primary,
         duration: const Duration(milliseconds: 1500),
         content: Row(
           children: [
             const Icon(
               Icons.check_circle_rounded,
-              color: GcTokens.brandLime,
+              color: Colors.white,
               size: 16,
             ),
             const SizedBox(width: 10),
@@ -217,14 +217,14 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
       final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
       if (byteData == null) return;
       final dir = await getTemporaryDirectory();
-      final file = File(
-        '${dir.path}/savedge_gift_card_${order.id}.png',
-      );
+      final file = File('${dir.path}/savedge_gift_card_${order.id}.png');
       await file.writeAsBytes(byteData.buffer.asUint8List());
 
       final caption = StringBuffer()
         ..writeln('${order.productName} gift card')
-        ..writeln('Value: ₹${(order.woohooActivatedAmount ?? order.requestedAmount).toStringAsFixed(0)}');
+        ..writeln(
+          'Value: ₹${(order.woohooActivatedAmount ?? order.requestedAmount).toStringAsFixed(0)}',
+        );
       if (order.woohooCardNumber != null) {
         caption.writeln('Card: ${order.woohooCardNumber}');
       }
@@ -235,15 +235,12 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
         caption.writeln('Activate: ${order.woohooActivationUrl}');
       }
 
-      await Share.shareXFiles(
-        [XFile(file.path)],
-        text: caption.toString(),
-      );
+      await Share.shareXFiles([XFile(file.path)], text: caption.toString());
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not share card: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Could not share card: $e')));
     }
   }
 
@@ -252,17 +249,17 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: GcTokens.brandBlack,
+      backgroundColor: const Color(0xFFF6F8F1),
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         scrolledUnderElevation: 0,
-        systemOverlayStyle: SystemUiOverlayStyle.light,
+        systemOverlayStyle: SystemUiOverlayStyle.dark,
         leading: Padding(
           padding: const EdgeInsets.only(left: 12),
-          child: _glassCircleButton(
+          child: _lightCircleButton(
             icon: Icons.arrow_back_ios_new_rounded,
             onTap: () => Navigator.pop(context),
           ),
@@ -272,46 +269,191 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
           style: TextStyle(
             fontSize: 17,
             fontWeight: FontWeight.w900,
-            color: Colors.white,
+            color: GcTokens.textPrimary,
           ),
         ),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 12),
-            child: _glassCircleButton(
+            child: _lightCircleButton(
               icon: Icons.ios_share_rounded,
               onTap: _share,
             ),
           ),
         ],
       ),
-      body: ListView(
-        padding: EdgeInsets.fromLTRB(
-          20,
-          MediaQuery.of(context).padding.top + kToolbarHeight + 12,
-          20,
-          32,
-        ),
+      body: Stack(
         children: [
-          _buildFlippableCard(),
-          const SizedBox(height: 14),
-          _buildFlipHint(),
-          const SizedBox(height: 24),
-          _buildActions(),
-          const SizedBox(height: 18),
-          _buildOrderMeta(),
+          Positioned.fill(child: _buildPageBackground()),
+          ListView(
+            padding: EdgeInsets.fromLTRB(
+              20,
+              MediaQuery.of(context).padding.top + kToolbarHeight + 12,
+              20,
+              32,
+            ),
+            children: [
+              _buildFlippableCard(),
+              const SizedBox(height: 14),
+              _buildFlipHint(),
+              const SizedBox(height: 24),
+              _buildActions(),
+              const SizedBox(height: 18),
+              _buildOrderMeta(),
+            ],
+          ),
         ],
       ),
     );
   }
 
-  Widget _glassCircleButton({
+  Widget _buildPageBackground() {
+    return IgnorePointer(
+      child: Stack(
+        children: [
+          Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color(0xFFFFFEFC),
+                  Color(0xFFF8FCEC),
+                  Color(0xFFF9F5FF),
+                ],
+                stops: [0.0, 0.54, 1.0],
+              ),
+            ),
+          ),
+          Positioned(
+            top: -90,
+            left: -86,
+            child: _backgroundOrb(
+              size: 260,
+              colors: [
+                GcTokens.brandLime.withValues(alpha: 0.18),
+                GcTokens.brandLime.withValues(alpha: 0.0),
+              ],
+            ),
+          ),
+          Positioned(
+            top: 120,
+            right: -72,
+            child: _backgroundOrb(
+              size: 240,
+              colors: [
+                GcTokens.primary.withValues(alpha: 0.10),
+                GcTokens.secondary.withValues(alpha: 0.0),
+              ],
+            ),
+          ),
+          Positioned(
+            bottom: 120,
+            left: -64,
+            child: _backgroundOrb(
+              size: 220,
+              colors: [
+                GcTokens.secondary.withValues(alpha: 0.09),
+                GcTokens.secondary.withValues(alpha: 0.0),
+              ],
+            ),
+          ),
+          Positioned(
+            bottom: -88,
+            right: -44,
+            child: _backgroundOrb(
+              size: 280,
+              colors: [
+                GcTokens.brandLimeDark.withValues(alpha: 0.14),
+                GcTokens.brandLimeDark.withValues(alpha: 0.0),
+              ],
+            ),
+          ),
+          Positioned.fill(
+            child: CustomPaint(
+              painter: _PageBackdropPainter(
+                lime: GcTokens.brandLimeDark,
+                purple: GcTokens.primary,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _backgroundOrb({required double size, required List<Color> colors}) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: RadialGradient(colors: colors),
+      ),
+    );
+  }
+
+  BoxDecoration _cardDecoration() {
+    return BoxDecoration(
+      color: const Color(0xFFFFFEFD),
+      borderRadius: BorderRadius.circular(28),
+      border: Border.all(
+        color: Color.lerp(
+          GcTokens.primary.withValues(alpha: 0.08),
+          GcTokens.brandLimeDark.withValues(alpha: 0.12),
+          0.30,
+        )!,
+        width: 1.2,
+      ),
+      boxShadow: [
+        BoxShadow(
+          color: GcTokens.primary.withValues(alpha: 0.035),
+          offset: const Offset(0, 18),
+          blurRadius: 28,
+          spreadRadius: -18,
+        ),
+      ],
+    );
+  }
+
+  List<Widget> _cardDecorativeLayers() {
+    return [
+      Positioned.fill(
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.white.withValues(alpha: 0.65),
+                Colors.white.withValues(alpha: 0.0),
+                GcTokens.brandLime.withValues(alpha: 0.02),
+              ],
+              stops: const [0.0, 0.42, 1.0],
+            ),
+          ),
+        ),
+      ),
+      Positioned.fill(
+        child: CustomPaint(
+          painter: _AbstractCardWatermarkPainter(
+            lime: GcTokens.brandLimeDark,
+            purple: GcTokens.primary,
+          ),
+        ),
+      ),
+      _patternOverlay(),
+    ];
+  }
+
+  Widget _lightCircleButton({
     required IconData icon,
     required VoidCallback onTap,
   }) {
     return Material(
-      color: Colors.white.withValues(alpha: 0.08),
+      color: Colors.white.withValues(alpha: 0.82),
       shape: const CircleBorder(),
+      elevation: 0,
       child: InkWell(
         customBorder: const CircleBorder(),
         onTap: onTap,
@@ -320,11 +462,24 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
           height: 38,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
+            color: Colors.white.withValues(alpha: 0.86),
             border: Border.all(
-              color: Colors.white.withValues(alpha: 0.16),
+              color: Color.lerp(
+                GcTokens.brandLimeDark.withValues(alpha: 0.40),
+                GcTokens.primary.withValues(alpha: 0.18),
+                0.35,
+              )!,
             ),
+            boxShadow: [
+              BoxShadow(
+                color: GcTokens.brandLime.withValues(alpha: 0.10),
+                offset: const Offset(0, 8),
+                blurRadius: 16,
+                spreadRadius: -10,
+              ),
+            ],
           ),
-          child: Icon(icon, color: Colors.white, size: 17),
+          child: Icon(icon, color: GcTokens.textPrimary, size: 17),
         ),
       ),
     );
@@ -340,18 +495,20 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
             Icon(
               Icons.touch_app_rounded,
               size: 13,
-              color: GcTokens.brandLime.withValues(alpha: 0.85),
+              color: GcTokens.primary.withValues(alpha: 0.70),
             ),
             const SizedBox(width: 6),
             Text(
-              _showingBack
-                  ? 'TAP TO SHOW NUMBER'
-                  : 'TAP CARD TO REVEAL PIN',
+              _showingBack ? 'TAP TO SHOW NUMBER' : 'TAP CARD TO REVEAL PIN',
               style: TextStyle(
                 fontSize: 10,
                 fontWeight: FontWeight.w900,
                 letterSpacing: 1.6,
-                color: GcTokens.brandLime.withValues(alpha: 0.85),
+                color: Color.lerp(
+                  GcTokens.primary.withValues(alpha: 0.78),
+                  GcTokens.brandLimeDark.withValues(alpha: 0.88),
+                  0.18,
+                )!,
               ),
             ),
           ],
@@ -396,44 +553,13 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
 
   Widget _buildCardFront() {
     return AspectRatio(
-      aspectRatio: 0.62, // closer to a real vertical credit card
+      aspectRatio: 0.62,
       child: Container(
-        decoration: BoxDecoration(
-          color: GcTokens.brandBlack,
-          borderRadius: BorderRadius.circular(28),
-          border: Border.all(
-            color: GcTokens.primary.withValues(
-              alpha: 0.30 + _glowCtrl.value * 0.20,
-            ),
-            width: 1.2,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.55),
-              offset: const Offset(0, 24),
-              blurRadius: 40,
-            ),
-            BoxShadow(
-              color: GcTokens.primary
-                  .withValues(alpha: 0.20 + _glowCtrl.value * 0.18),
-              offset: const Offset(-6, 8),
-              blurRadius: 32,
-              spreadRadius: 1,
-            ),
-            BoxShadow(
-              color: GcTokens.brandLime
-                  .withValues(alpha: 0.16 + _glowCtrl.value * 0.16),
-              offset: const Offset(8, -4),
-              blurRadius: 32,
-              spreadRadius: 1,
-            ),
-          ],
-        ),
+        decoration: _cardDecoration(),
         clipBehavior: Clip.antiAlias,
         child: Stack(
           children: [
-            _animatedGlows(),
-            _patternOverlay(),
+            ..._cardDecorativeLayers(),
 
             // Cardholder name — top right
             Positioned(
@@ -449,7 +575,7 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
                       fontSize: 8.5,
                       fontWeight: FontWeight.w900,
                       letterSpacing: 1.4,
-                      color: Colors.white.withValues(alpha: 0.45),
+                      color: GcTokens.primaryDark.withValues(alpha: 0.42),
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -460,7 +586,7 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
                     style: const TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w900,
-                      color: Colors.white,
+                      color: GcTokens.textPrimary,
                       letterSpacing: 1.2,
                     ),
                   ),
@@ -468,21 +594,13 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
               ),
             ),
 
-            // SavEdge logo top-left (replaces the chip)
+            // SavEdge logo top-left
             Positioned(
               top: 18,
               left: 22,
-              child: Container(
+              child: SizedBox(
                 width: 46,
                 height: 46,
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.06),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: GcTokens.brandLime.withValues(alpha: 0.30),
-                  ),
-                ),
-                padding: const EdgeInsets.all(6),
                 child: Image.asset(
                   'assets/images/logo_transparant.png',
                   fit: BoxFit.contain,
@@ -509,7 +627,7 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w900,
-                      color: Colors.white.withValues(alpha: 0.55),
+                      color: GcTokens.textTertiary.withValues(alpha: 0.45),
                       letterSpacing: 3,
                     ),
                   ),
@@ -531,10 +649,19 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: GcTokens.brandLime.withValues(alpha: 0.16),
+                      gradient: LinearGradient(
+                        colors: [
+                          GcTokens.brandLime.withValues(alpha: 0.44),
+                          GcTokens.secondary.withValues(alpha: 0.12),
+                        ],
+                      ),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color: GcTokens.brandLime.withValues(alpha: 0.40),
+                        color: Color.lerp(
+                          GcTokens.brandLimeDark.withValues(alpha: 0.58),
+                          GcTokens.primary.withValues(alpha: 0.22),
+                          0.35,
+                        )!,
                       ),
                     ),
                     child: const Text(
@@ -543,7 +670,7 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
                         fontSize: 9,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 1.6,
-                        color: GcTokens.brandLime,
+                        color: GcTokens.brandInk,
                       ),
                     ),
                   ),
@@ -558,7 +685,7 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
                           style: TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.w900,
-                            color: Colors.white.withValues(alpha: 0.95),
+                            color: GcTokens.textPrimary.withValues(alpha: 0.85),
                           ),
                         ),
                       ),
@@ -569,7 +696,7 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
                         style: const TextStyle(
                           fontSize: 60,
                           fontWeight: FontWeight.w900,
-                          color: Colors.white,
+                          color: GcTokens.textPrimary,
                           height: 1.0,
                           letterSpacing: -2,
                         ),
@@ -580,8 +707,7 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
               ),
             ),
 
-            // Card number row
-            // Card number + validity stacked together (real-card layout)
+            // Card number + validity stacked together
             Positioned(
               left: 50,
               right: 22,
@@ -589,10 +715,22 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
               child: Container(
                 padding: const EdgeInsets.fromLTRB(14, 10, 10, 12),
                 decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.45),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Colors.white.withValues(alpha: 0.78),
+                      GcTokens.surfaceMuted.withValues(alpha: 0.96),
+                      GcTokens.brandLime.withValues(alpha: 0.08),
+                    ],
+                  ),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.10),
+                    color: Color.lerp(
+                      GcTokens.primary.withValues(alpha: 0.12),
+                      GcTokens.brandLimeDark.withValues(alpha: 0.24),
+                      0.30,
+                    )!,
                   ),
                 ),
                 child: Column(
@@ -605,7 +743,7 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
                         fontSize: 8.5,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 1.4,
-                        color: Colors.white.withValues(alpha: 0.55),
+                        color: GcTokens.textTertiary.withValues(alpha: 0.70),
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -618,7 +756,7 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w900,
-                              color: Colors.white,
+                              color: GcTokens.textPrimary,
                               letterSpacing: 2.2,
                             ),
                           ),
@@ -627,20 +765,19 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
                             order.woohooCardNumber!.isNotEmpty) ...[
                           const SizedBox(width: 8),
                           _copyChip(
-                            onTap: () => _copy(
-                              'Card number',
-                              order.woohooCardNumber!,
+                            onTap: () =>
+                                _copy('Card number', order.woohooCardNumber!),
+                            iconColor: GcTokens.primary,
+                            bgColor: GcTokens.primary.withValues(alpha: 0.08),
+                            borderColor: GcTokens.primary.withValues(
+                              alpha: 0.20,
                             ),
                           ),
                         ],
                       ],
                     ),
                     const SizedBox(height: 10),
-                    // Faint divider
-                    Container(
-                      height: 1,
-                      color: Colors.white.withValues(alpha: 0.08),
-                    ),
+                    Container(height: 1, color: GcTokens.border),
                     const SizedBox(height: 10),
                     Text(
                       'VALID THRU',
@@ -648,7 +785,7 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
                         fontSize: 7.5,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 1.2,
-                        color: Colors.white.withValues(alpha: 0.55),
+                        color: GcTokens.textTertiary.withValues(alpha: 0.70),
                       ),
                     ),
                     const SizedBox(height: 2),
@@ -657,7 +794,7 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
                       style: const TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w900,
-                        color: Colors.white,
+                        color: GcTokens.textPrimary,
                         letterSpacing: 1.6,
                       ),
                     ),
@@ -675,26 +812,22 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   const Spacer(),
-                  // ACTIVE pill on the right
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 12,
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: GcTokens.brandLime.withValues(alpha: 0.18),
+                      gradient: LinearGradient(
+                        colors: [
+                          GcTokens.brandLime.withValues(alpha: 0.42),
+                          GcTokens.brandLimeDark.withValues(alpha: 0.18),
+                        ],
+                      ),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color: GcTokens.brandLime.withValues(alpha: 0.55),
+                        color: GcTokens.brandLimeDark.withValues(alpha: 0.65),
                       ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: GcTokens.brandLime.withValues(
-                            alpha: 0.20 + _glowCtrl.value * 0.20,
-                          ),
-                          blurRadius: 12,
-                        ),
-                      ],
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -703,7 +836,7 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
                           width: 6,
                           height: 6,
                           decoration: const BoxDecoration(
-                            color: GcTokens.brandLime,
+                            color: GcTokens.brandLimeDark,
                             shape: BoxShape.circle,
                           ),
                         ),
@@ -713,7 +846,7 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
                           style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.w900,
-                            color: GcTokens.brandLime,
+                            color: GcTokens.brandInk,
                             letterSpacing: 1.2,
                           ),
                         ),
@@ -735,42 +868,11 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
     return AspectRatio(
       aspectRatio: 0.62,
       child: Container(
-        decoration: BoxDecoration(
-          color: GcTokens.brandBlack,
-          borderRadius: BorderRadius.circular(28),
-          border: Border.all(
-            color: GcTokens.primary.withValues(
-              alpha: 0.30 + _glowCtrl.value * 0.20,
-            ),
-            width: 1.2,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.55),
-              offset: const Offset(0, 24),
-              blurRadius: 40,
-            ),
-            BoxShadow(
-              color: GcTokens.primary
-                  .withValues(alpha: 0.20 + _glowCtrl.value * 0.18),
-              offset: const Offset(-6, 8),
-              blurRadius: 32,
-              spreadRadius: 1,
-            ),
-            BoxShadow(
-              color: GcTokens.brandLime
-                  .withValues(alpha: 0.16 + _glowCtrl.value * 0.16),
-              offset: const Offset(8, -4),
-              blurRadius: 32,
-              spreadRadius: 1,
-            ),
-          ],
-        ),
+        decoration: _cardDecoration(),
         clipBehavior: Clip.antiAlias,
         child: Stack(
           children: [
-            _animatedGlows(),
-            _patternOverlay(),
+            ..._cardDecorativeLayers(),
 
             // Magnetic stripe
             Positioned(
@@ -779,7 +881,7 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
               top: 40,
               child: Container(
                 height: 52,
-                color: Colors.black,
+                color: GcTokens.textPrimary.withValues(alpha: 0.08),
               ),
             ),
 
@@ -797,15 +899,30 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
                       fontSize: 9,
                       fontWeight: FontWeight.w900,
                       letterSpacing: 1.6,
-                      color: GcTokens.brandLime,
+                      color: GcTokens.primary,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Container(
                     padding: const EdgeInsets.fromLTRB(18, 12, 12, 10),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Colors.white.withValues(alpha: 0.74),
+                          GcTokens.surfaceMuted.withValues(alpha: 0.96),
+                          GcTokens.secondary.withValues(alpha: 0.08),
+                        ],
+                      ),
                       borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: Color.lerp(
+                          GcTokens.primary.withValues(alpha: 0.14),
+                          GcTokens.brandLimeDark.withValues(alpha: 0.22),
+                          0.28,
+                        )!,
+                      ),
                     ),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -816,7 +933,7 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
                             style: const TextStyle(
                               fontSize: 26,
                               fontWeight: FontWeight.w900,
-                              color: GcTokens.brandBlack,
+                              color: GcTokens.textPrimary,
                               letterSpacing: 6,
                             ),
                           ),
@@ -827,8 +944,7 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
                             color: Colors.transparent,
                             child: InkWell(
                               borderRadius: BorderRadius.circular(10),
-                              onTap: () =>
-                                  _copy('PIN', order.woohooCardPin!),
+                              onTap: () => _copy('PIN', order.woohooCardPin!),
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 6,
@@ -841,15 +957,23 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
                                       width: 32,
                                       height: 32,
                                       decoration: BoxDecoration(
-                                        color: GcTokens.brandBlack
-                                            .withValues(alpha: 0.06),
+                                        gradient: LinearGradient(
+                                          colors: [
+                                            GcTokens.brandLime.withValues(
+                                              alpha: 0.42,
+                                            ),
+                                            GcTokens.secondary.withValues(
+                                              alpha: 0.12,
+                                            ),
+                                          ],
+                                        ),
                                         shape: BoxShape.circle,
                                       ),
                                       alignment: Alignment.center,
                                       child: const Icon(
                                         Icons.copy_rounded,
                                         size: 15,
-                                        color: GcTokens.brandBlack,
+                                        color: GcTokens.brandInk,
                                       ),
                                     ),
                                     const SizedBox(height: 3),
@@ -859,8 +983,9 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
                                         fontSize: 8,
                                         fontWeight: FontWeight.w900,
                                         letterSpacing: 0.8,
-                                        color: GcTokens.brandBlack
-                                            .withValues(alpha: 0.65),
+                                        color: GcTokens.textTertiary.withValues(
+                                          alpha: 0.65,
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -879,7 +1004,7 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
                         fontSize: 9,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 1.4,
-                        color: Colors.white.withValues(alpha: 0.55),
+                        color: GcTokens.textTertiary.withValues(alpha: 0.65),
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -888,7 +1013,7 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w900,
-                        color: Colors.white,
+                        color: GcTokens.textPrimary,
                         letterSpacing: 1.4,
                       ),
                     ),
@@ -911,7 +1036,7 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
                       style: TextStyle(
                         fontSize: 9,
                         fontWeight: FontWeight.w700,
-                        color: Colors.white.withValues(alpha: 0.50),
+                        color: GcTokens.textTertiary.withValues(alpha: 0.60),
                         height: 1.4,
                       ),
                     ),
@@ -951,11 +1076,21 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
 
   Widget _patternOverlay() {
     return Positioned.fill(
-      child: CustomPaint(
-        painter: _ConstellationPainter(
-          time: _ambientCtrl.value,
-          color: Colors.white,
-        ),
+      child: Stack(
+        children: [
+          CustomPaint(
+            painter: _ConstellationPainter(
+              time: _ambientCtrl.value,
+              color: GcTokens.primary,
+            ),
+          ),
+          CustomPaint(
+            painter: _ConstellationPainter(
+              time: (_ambientCtrl.value + 0.16) % 1.0,
+              color: GcTokens.brandLimeDark,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -975,19 +1110,24 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
             icon: const Icon(
               Icons.menu_book_rounded,
               size: 16,
-              color: GcTokens.brandLime,
+              color: GcTokens.primary,
             ),
             label: const Text(
               'How to redeem',
               style: TextStyle(
-                color: GcTokens.brandLime,
+                color: GcTokens.primary,
                 fontWeight: FontWeight.w900,
               ),
             ),
             style: OutlinedButton.styleFrom(
               side: BorderSide(
-                color: GcTokens.brandLime.withValues(alpha: 0.45),
+                color: Color.lerp(
+                  GcTokens.brandLimeDark.withValues(alpha: 0.42),
+                  GcTokens.primary.withValues(alpha: 0.22),
+                  0.36,
+                )!,
               ),
+              backgroundColor: Colors.white.withValues(alpha: 0.84),
               padding: const EdgeInsets.symmetric(vertical: 14),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(GcTokens.rPill),
@@ -1007,18 +1147,18 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
               icon: const Icon(
                 Icons.open_in_new_rounded,
                 size: 16,
-                color: GcTokens.brandBlack,
+                color: Colors.white,
               ),
               label: const Text(
                 'Use now',
                 style: TextStyle(
-                  color: GcTokens.brandBlack,
+                  color: Colors.white,
                   fontWeight: FontWeight.w900,
                 ),
               ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: GcTokens.brandLime,
-                foregroundColor: GcTokens.brandBlack,
+                backgroundColor: GcTokens.primary,
+                foregroundColor: Colors.white,
                 elevation: 0,
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
@@ -1036,10 +1176,14 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.04),
+        color: Colors.white.withValues(alpha: 0.82),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.06),
+          color: Color.lerp(
+            GcTokens.primary.withValues(alpha: 0.08),
+            GcTokens.brandLimeDark.withValues(alpha: 0.18),
+            0.30,
+          )!,
         ),
       ),
       child: Row(
@@ -1047,16 +1191,16 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
           Icon(
             Icons.receipt_long_rounded,
             size: 16,
-            color: Colors.white.withValues(alpha: 0.55),
+            color: GcTokens.textTertiary.withValues(alpha: 0.65),
           ),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               'Order #${order.id}  ·  ${_fmt(order.created)}',
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w800,
-                color: Colors.white.withValues(alpha: 0.55),
+                color: GcTokens.textSecondary,
               ),
             ),
           ),
@@ -1073,10 +1217,7 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
 /// inside their corners. Glows never reach the centre of the card so the
 /// big text and number row stay perfectly readable.
 class _AuroraPainter extends CustomPainter {
-  _AuroraPainter({
-    required this.time,
-    required this.pulse,
-  });
+  _AuroraPainter({required this.time, required this.pulse});
 
   final double time; // 0..1, slow loop (~24s)
   final double pulse; // 0..1, fast pulse (~3s)
@@ -1089,22 +1230,22 @@ class _AuroraPainter extends CustomPainter {
     // centre stays clean.
     final corners = [
       _CornerGlow(
-        color: GcTokens.primary,
-        baseAlpha: 0.50,
-        radius: size.width * 0.55,
-        anchor: Offset(-size.width * 0.10, size.height * 1.10), // bottom-left
-        driftX: 14,
-        driftY: 14,
+        color: GcTokens.secondary,
+        baseAlpha: 0.10,
+        radius: size.width * 0.50,
+        anchor: Offset(-size.width * 0.06, size.height * 1.04),
+        driftX: 12,
+        driftY: 12,
         speed: 0.6,
         phase: 0.0,
       ),
       _CornerGlow(
-        color: GcTokens.brandLime,
-        baseAlpha: 0.32,
-        radius: size.width * 0.50,
-        anchor: Offset(size.width * 1.05, -size.height * 0.05), // top-right
-        driftX: 16,
-        driftY: 12,
+        color: GcTokens.brandLimeDark,
+        baseAlpha: 0.08,
+        radius: size.width * 0.46,
+        anchor: Offset(size.width * 1.02, -size.height * 0.02),
+        driftX: 12,
+        driftY: 10,
         speed: -0.5,
         phase: math.pi / 2,
       ),
@@ -1116,14 +1257,10 @@ class _AuroraPainter extends CustomPainter {
       final dy = c.anchor.dy + math.sin(angle) * c.driftY;
       final alpha = (c.baseAlpha + pulse * 0.10).clamp(0.0, 1.0);
       final paint = Paint()
-        ..shader = ui.Gradient.radial(
-          Offset(dx, dy),
-          c.radius,
-          [
-            c.color.withValues(alpha: alpha),
-            c.color.withValues(alpha: 0.0),
-          ],
-        );
+        ..shader = ui.Gradient.radial(Offset(dx, dy), c.radius, [
+          c.color.withValues(alpha: alpha),
+          c.color.withValues(alpha: 0.0),
+        ]);
       canvas.drawCircle(Offset(dx, dy), c.radius, paint);
     }
   }
@@ -1165,12 +1302,12 @@ class _ConstellationPainter extends CustomPainter {
 
   static const _layers = <List<double>>[
     // [verticalCenter, amplitude, frequency, speed, phase, alpha]
-    [0.20, 0.040, 3.5, 0.6, 0.0, 0.055],
-    [0.32, 0.055, 2.8, -0.5, 1.1, 0.045],
-    [0.46, 0.035, 4.2, 0.7, 2.2, 0.060],
-    [0.58, 0.060, 2.4, -0.4, 0.6, 0.040],
-    [0.70, 0.040, 3.8, 0.55, 1.7, 0.050],
-    [0.84, 0.050, 3.0, -0.65, 2.5, 0.045],
+    [0.20, 0.040, 3.5, 0.6, 0.0, 0.035],
+    [0.32, 0.055, 2.8, -0.5, 1.1, 0.030],
+    [0.46, 0.035, 4.2, 0.7, 2.2, 0.035],
+    [0.58, 0.060, 2.4, -0.4, 0.6, 0.025],
+    [0.70, 0.040, 3.8, 0.55, 1.7, 0.030],
+    [0.84, 0.050, 3.0, -0.65, 2.5, 0.025],
   ];
 
   @override
@@ -1197,11 +1334,12 @@ class _ConstellationPainter extends CustomPainter {
         final t = i / steps;
         final x = t * size.width;
         // Two interfering sine waves give the engraved guilloché look
-        final y = centerY +
+        final y =
+            centerY +
             math.sin(t * twoPi * freq + time * twoPi * speed + phase) * amp +
-            math.sin(t * twoPi * (freq * 0.5) -
-                    time * twoPi * speed * 1.3 +
-                    phase) *
+            math.sin(
+                  t * twoPi * (freq * 0.5) - time * twoPi * speed * 1.3 + phase,
+                ) *
                 amp *
                 0.5;
         if (i == 0) {
@@ -1217,4 +1355,191 @@ class _ConstellationPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _ConstellationPainter old) =>
       old.time != time || old.color != color;
+}
+
+class _AbstractCardWatermarkPainter extends CustomPainter {
+  const _AbstractCardWatermarkPainter({
+    required this.lime,
+    required this.purple,
+  });
+
+  final Color lime;
+  final Color purple;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final limeStroke = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.2
+      ..color = lime.withValues(alpha: 0.09);
+    final purpleStroke = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.0
+      ..color = purple.withValues(alpha: 0.07);
+
+    final limeFill = Paint()
+      ..shader = ui.Gradient.linear(
+        Offset(size.width * 0.68, size.height * 0.16),
+        Offset(size.width * 0.94, size.height * 0.34),
+        [lime.withValues(alpha: 0.10), lime.withValues(alpha: 0.0)],
+      );
+    final purpleFill = Paint()
+      ..shader = ui.Gradient.linear(
+        Offset(size.width * 0.04, size.height * 0.78),
+        Offset(size.width * 0.28, size.height * 1.0),
+        [purple.withValues(alpha: 0.08), purple.withValues(alpha: 0.0)],
+      );
+
+    final topArc = Path()
+      ..moveTo(size.width * 0.58, size.height * 0.22)
+      ..quadraticBezierTo(
+        size.width * 0.74,
+        size.height * 0.08,
+        size.width * 0.90,
+        size.height * 0.22,
+      )
+      ..quadraticBezierTo(
+        size.width * 0.78,
+        size.height * 0.32,
+        size.width * 0.66,
+        size.height * 0.24,
+      );
+
+    final bottomWave = Path()
+      ..moveTo(size.width * 0.06, size.height * 0.90)
+      ..quadraticBezierTo(
+        size.width * 0.18,
+        size.height * 0.78,
+        size.width * 0.34,
+        size.height * 0.88,
+      )
+      ..quadraticBezierTo(
+        size.width * 0.48,
+        size.height * 0.97,
+        size.width * 0.62,
+        size.height * 0.86,
+      );
+
+    final ringRect = Rect.fromCircle(
+      center: Offset(size.width * 0.84, size.height * 0.68),
+      radius: size.width * 0.14,
+    );
+    final secondaryRingRect = Rect.fromCircle(
+      center: Offset(size.width * 0.20, size.height * 0.82),
+      radius: size.width * 0.10,
+    );
+
+    canvas.drawPath(topArc, limeStroke);
+    canvas.drawPath(bottomWave, purpleStroke);
+    canvas.drawArc(ringRect, -0.4, math.pi * 1.45, false, limeStroke);
+    canvas.drawArc(
+      secondaryRingRect,
+      math.pi * 0.1,
+      math.pi * 1.2,
+      false,
+      purpleStroke,
+    );
+
+    canvas.drawCircle(
+      Offset(size.width * 0.84, size.height * 0.68),
+      size.width * 0.10,
+      limeFill,
+    );
+    canvas.drawCircle(
+      Offset(size.width * 0.18, size.height * 0.82),
+      size.width * 0.09,
+      purpleFill,
+    );
+
+    final dotPaint = Paint()..style = PaintingStyle.fill;
+    for (final dot in [
+      Offset(size.width * 0.74, size.height * 0.24),
+      Offset(size.width * 0.80, size.height * 0.28),
+      Offset(size.width * 0.86, size.height * 0.24),
+      Offset(size.width * 0.28, size.height * 0.84),
+      Offset(size.width * 0.34, size.height * 0.88),
+    ]) {
+      dotPaint.color = (dot.dx > size.width * 0.5 ? lime : purple).withValues(
+        alpha: 0.10,
+      );
+      canvas.drawCircle(dot, 2.2, dotPaint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _AbstractCardWatermarkPainter oldDelegate) =>
+      oldDelegate.lime != lime || oldDelegate.purple != purple;
+}
+
+class _PageBackdropPainter extends CustomPainter {
+  _PageBackdropPainter({required this.lime, required this.purple});
+
+  final Color lime;
+  final Color purple;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final limePaint = Paint()
+      ..strokeWidth = 1.0
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..color = lime.withValues(alpha: 0.032);
+    final purplePaint = Paint()
+      ..strokeWidth = 0.9
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..color = purple.withValues(alpha: 0.026);
+
+    final topWave = Path()
+      ..moveTo(0, size.height * 0.16)
+      ..quadraticBezierTo(
+        size.width * 0.22,
+        size.height * 0.06,
+        size.width * 0.48,
+        size.height * 0.15,
+      )
+      ..quadraticBezierTo(
+        size.width * 0.78,
+        size.height * 0.26,
+        size.width,
+        size.height * 0.12,
+      );
+
+    final lowerWave = Path()
+      ..moveTo(0, size.height * 0.78)
+      ..quadraticBezierTo(
+        size.width * 0.18,
+        size.height * 0.68,
+        size.width * 0.44,
+        size.height * 0.76,
+      )
+      ..quadraticBezierTo(
+        size.width * 0.74,
+        size.height * 0.88,
+        size.width,
+        size.height * 0.74,
+      );
+
+    final sideCurve = Path()
+      ..moveTo(size.width * 0.88, 0)
+      ..quadraticBezierTo(
+        size.width * 0.95,
+        size.height * 0.18,
+        size.width * 0.82,
+        size.height * 0.38,
+      )
+      ..quadraticBezierTo(
+        size.width * 0.70,
+        size.height * 0.54,
+        size.width * 0.84,
+        size.height * 0.76,
+      );
+
+    canvas.drawPath(topWave, limePaint);
+    canvas.drawPath(lowerWave, purplePaint);
+    canvas.drawPath(sideCurve, limePaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _PageBackdropPainter old) => false;
 }

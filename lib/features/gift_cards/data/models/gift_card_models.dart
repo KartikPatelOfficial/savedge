@@ -49,6 +49,7 @@ abstract class GiftCardProduct with _$GiftCardProduct {
     double? discountPercentage,
     String? themesJson,
     @Default([]) List<GiftCardTheme> parsedThemes,
+    @Default(3) int redemptionMode,
   }) = _GiftCardProduct;
 
   factory GiftCardProduct.fromJson(Map<String, dynamic> json) =>

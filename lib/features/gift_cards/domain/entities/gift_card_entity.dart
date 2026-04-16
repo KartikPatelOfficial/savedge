@@ -79,6 +79,7 @@ class GiftCardProductEntity extends Equatable {
   final String? termsAndConditionsUrl;
   final double? discountPercentage;
   final List<GiftCardThemeEntity> themes;
+  final int redemptionMode;
 
   const GiftCardProductEntity({
     required this.id,
@@ -105,6 +106,7 @@ class GiftCardProductEntity extends Equatable {
     this.termsAndConditionsUrl,
     this.discountPercentage,
     this.themes = const [],
+    this.redemptionMode = 3,
   });
 
   bool get hasDiscount =>
@@ -180,6 +182,7 @@ class GiftCardProductEntity extends Equatable {
         termsAndConditionsUrl,
         discountPercentage,
         themes,
+        redemptionMode,
       ];
 }
 

@@ -18,6 +18,7 @@ import 'package:savedge/features/home/presentation/pages/home_content_page.dart'
 import 'package:savedge/features/home/presentation/widgets/widgets.dart';
 import 'package:savedge/features/notifications/presentation/bloc/notification_bloc.dart';
 import 'package:savedge/features/user_profile/presentation/pages/profile_page.dart';
+import 'package:savedge/shared/widgets/home_skeleton.dart';
 
 /// Main navigation wrapper that handles bottom navigation
 class MainNavigationPage extends StatefulWidget {
@@ -169,11 +170,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> with SingleTick
   @override
   Widget build(BuildContext context) {
     if (_isLoadingProfile) {
-      return const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(color: Color(0xFF6F3FCC)),
-        ),
-      );
+      return const HomeSkeleton();
     }
 
     return BlocConsumer<CityBloc, CityState>(
@@ -187,11 +184,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> with SingleTick
           if (cityState is CityInitial) {
             context.read<CityBloc>().add(const LoadCities());
           }
-          return const Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(color: Color(0xFF6F3FCC)),
-            ),
-          );
+          return const HomeSkeleton();
         }
 
         // If "Other" city is selected, show region unavailable page

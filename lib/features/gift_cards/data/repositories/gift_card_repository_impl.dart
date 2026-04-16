@@ -255,6 +255,7 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
       termsAndConditions: model.termsAndConditions,
       termsAndConditionsUrl: model.termsAndConditionsUrl,
       discountPercentage: model.discountPercentage,
+      redemptionMode: model.redemptionMode,
       themes: model.parsedThemes
           .map((t) => GiftCardThemeEntity(
                 sku: t.sku,

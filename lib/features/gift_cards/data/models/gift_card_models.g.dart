@@ -71,6 +71,7 @@ _GiftCardProduct _$GiftCardProductFromJson(Map<String, dynamic> json) =>
               ?.map((e) => GiftCardTheme.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],
+      redemptionMode: (json['redemptionMode'] as num?)?.toInt() ?? 3,
     );
 
 Map<String, dynamic> _$GiftCardProductToJson(_GiftCardProduct instance) =>
@@ -100,6 +101,7 @@ Map<String, dynamic> _$GiftCardProductToJson(_GiftCardProduct instance) =>
       'discountPercentage': instance.discountPercentage,
       'themesJson': instance.themesJson,
       'parsedThemes': instance.parsedThemes,
+      'redemptionMode': instance.redemptionMode,
     };
 
 _GiftCardTheme _$GiftCardThemeFromJson(Map<String, dynamic> json) =>

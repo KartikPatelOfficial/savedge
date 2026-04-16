@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/injection/injection.dart';
+import '../../../../core/storage/secure_storage_service.dart';
+import '../../../../core/widgets/login_prompt.dart';
 import '../../data/services/gift_card_favorites_service.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
@@ -544,8 +546,16 @@ class _GiftCardsViewState extends State<_GiftCardsView> {
           shadowColor: Colors.black.withValues(alpha: 0.4),
           child: InkWell(
             borderRadius: BorderRadius.circular(GcTokens.rPill),
-            onTap: () =>
-                Navigator.pushNamed(context, '/gift-card-orders'),
+            onTap: () async {
+              final isAuth = await getIt<SecureStorageService>().isAuthenticated();
+              if (!isAuth) {
+                if (!mounted) return;
+                LoginPrompt.show(context, message: 'Sign in to view your gift cards.');
+                return;
+              }
+              if (!mounted) return;
+              Navigator.pushNamed(context, '/gift-card-orders');
+            },
             child: Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: 24,
