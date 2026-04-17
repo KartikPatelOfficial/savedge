@@ -49,7 +49,6 @@ class AppConstants {
 
   // App Info
   static const String appName = 'Savedge';
-  static const String appVersion = '1.0.0';
 
   // Validation
   static const int minPasswordLength = 8;
