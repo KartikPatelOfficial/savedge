@@ -33,11 +33,17 @@ abstract class VendorResponse with _$VendorResponse {
 }
 
 /// Vendor image DTO
+///
+/// For logo images the backend populates [thumbnailUrl] and [mediumUrl] with
+/// progressively sized WebP variants so the UI can show a low-res placeholder
+/// while the full [imageUrl] loads. For non-logo images both are null.
 @freezed
 abstract class VendorImageDto with _$VendorImageDto {
   const factory VendorImageDto({
     @Default(0) int id,
     required String imageUrl,
+    String? thumbnailUrl,
+    String? mediumUrl,
     String? altText,
     @Default(0) int displayOrder,
     required bool isPrimary,
