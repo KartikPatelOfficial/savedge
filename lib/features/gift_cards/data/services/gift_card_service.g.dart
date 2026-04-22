@@ -183,12 +183,14 @@ class _GiftCardService implements GiftCardService {
     required int productId,
     required double amount,
     int pointsToUse = 0,
+    int quantity = 1,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{
       r'productId': productId,
       r'amount': amount,
       r'pointsToUse': pointsToUse,
+      r'quantity': quantity,
     };
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;

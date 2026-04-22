@@ -185,6 +185,7 @@ _GiftCardOrder _$GiftCardOrderFromJson(Map<String, dynamic> json) =>
       giftCardProductId: (json['giftCardProductId'] as num).toInt(),
       productName: json['productName'] as String,
       productImageUrl: json['productImageUrl'] as String?,
+      quantity: (json['quantity'] as num?)?.toInt() ?? 1,
       requestedAmount: (json['requestedAmount'] as num).toDouble(),
       discountPercentage: (json['discountPercentage'] as num).toDouble(),
       discountAmount: (json['discountAmount'] as num).toDouble(),
@@ -228,6 +229,7 @@ Map<String, dynamic> _$GiftCardOrderToJson(_GiftCardOrder instance) =>
       'giftCardProductId': instance.giftCardProductId,
       'productName': instance.productName,
       'productImageUrl': instance.productImageUrl,
+      'quantity': instance.quantity,
       'requestedAmount': instance.requestedAmount,
       'discountPercentage': instance.discountPercentage,
       'discountAmount': instance.discountAmount,
@@ -305,6 +307,7 @@ _CreateGiftCardOrderRequest _$CreateGiftCardOrderRequestFromJson(
 ) => _CreateGiftCardOrderRequest(
   giftCardProductId: (json['giftCardProductId'] as num).toInt(),
   amount: (json['amount'] as num).toDouble(),
+  quantity: (json['quantity'] as num?)?.toInt() ?? 1,
   paymentMethod: $enumDecode(
     _$GiftCardPaymentMethodEnumMap,
     json['paymentMethod'],
@@ -318,6 +321,7 @@ Map<String, dynamic> _$CreateGiftCardOrderRequestToJson(
 ) => <String, dynamic>{
   'giftCardProductId': instance.giftCardProductId,
   'amount': instance.amount,
+  'quantity': instance.quantity,
   'paymentMethod': _$GiftCardPaymentMethodEnumMap[instance.paymentMethod]!,
   'pointsToUse': instance.pointsToUse,
   'themeSku': instance.themeSku,
@@ -328,6 +332,7 @@ _GiftCardPriceBreakdown _$GiftCardPriceBreakdownFromJson(
 ) => _GiftCardPriceBreakdown(
   productId: (json['giftCardProductId'] as num?)?.toInt() ?? 0,
   productName: json['productName'] as String? ?? '',
+  quantity: (json['quantity'] as num?)?.toInt() ?? 1,
   requestedAmount: (json['requestedAmount'] as num?)?.toDouble() ?? 0,
   discountPercentage: (json['discountPercentage'] as num?)?.toDouble() ?? 0,
   discountAmount: (json['discountAmount'] as num?)?.toDouble() ?? 0,
@@ -342,6 +347,7 @@ Map<String, dynamic> _$GiftCardPriceBreakdownToJson(
 ) => <String, dynamic>{
   'giftCardProductId': instance.productId,
   'productName': instance.productName,
+  'quantity': instance.quantity,
   'requestedAmount': instance.requestedAmount,
   'discountPercentage': instance.discountPercentage,
   'discountAmount': instance.discountAmount,
@@ -356,6 +362,7 @@ _CreateGiftCardPaymentOrderRequest _$CreateGiftCardPaymentOrderRequestFromJson(
 ) => _CreateGiftCardPaymentOrderRequest(
   giftCardProductId: (json['giftCardProductId'] as num).toInt(),
   amount: (json['amount'] as num).toDouble(),
+  quantity: (json['quantity'] as num?)?.toInt() ?? 1,
   pointsToUse: (json['pointsToUse'] as num?)?.toInt() ?? 0,
   themeSku: json['themeSku'] as String?,
 );
@@ -365,6 +372,7 @@ Map<String, dynamic> _$CreateGiftCardPaymentOrderRequestToJson(
 ) => <String, dynamic>{
   'giftCardProductId': instance.giftCardProductId,
   'amount': instance.amount,
+  'quantity': instance.quantity,
   'pointsToUse': instance.pointsToUse,
   'themeSku': instance.themeSku,
 };

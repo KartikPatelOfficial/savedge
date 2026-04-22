@@ -1510,7 +1510,7 @@ as bool,
 /// @nodoc
 mixin _$GiftCardOrder {
 
- int get id; String get userId; int get giftCardProductId; String get productName; String? get productImageUrl; double get requestedAmount; double get discountPercentage; double get discountAmount; double get payableAmount; GiftCardPaymentMethod get paymentMethod; GiftCardPaymentStatus get paymentStatus; double get totalPointsUsed; String? get razorpayOrderId; String? get razorpayPaymentId; GiftCardOrderStatus get status; String? get woohooCardNumber; String? get woohooCardPin; String? get woohooActivationCode; String? get woohooActivationUrl; double? get woohooActivatedAmount; DateTime? get woohooCardExpiry; String? get failureReason; String? get razorpayRefundId; double? get refundAmount; String? get refundStatus; DateTime? get refundedAt; int? get pointsRefunded; DateTime get created;
+ int get id; String get userId; int get giftCardProductId; String get productName; String? get productImageUrl; int get quantity; double get requestedAmount; double get discountPercentage; double get discountAmount; double get payableAmount; GiftCardPaymentMethod get paymentMethod; GiftCardPaymentStatus get paymentStatus; double get totalPointsUsed; String? get razorpayOrderId; String? get razorpayPaymentId; GiftCardOrderStatus get status; String? get woohooCardNumber; String? get woohooCardPin; String? get woohooActivationCode; String? get woohooActivationUrl; double? get woohooActivatedAmount; DateTime? get woohooCardExpiry; String? get failureReason; String? get razorpayRefundId; double? get refundAmount; String? get refundStatus; DateTime? get refundedAt; int? get pointsRefunded; DateTime get created;
 /// Create a copy of GiftCardOrder
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1523,16 +1523,16 @@ $GiftCardOrderCopyWith<GiftCardOrder> get copyWith => _$GiftCardOrderCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is GiftCardOrder&&(identical(other.id, id) || other.id == id)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.giftCardProductId, giftCardProductId) || other.giftCardProductId == giftCardProductId)&&(identical(other.productName, productName) || other.productName == productName)&&(identical(other.productImageUrl, productImageUrl) || other.productImageUrl == productImageUrl)&&(identical(other.requestedAmount, requestedAmount) || other.requestedAmount == requestedAmount)&&(identical(other.discountPercentage, discountPercentage) || other.discountPercentage == discountPercentage)&&(identical(other.discountAmount, discountAmount) || other.discountAmount == discountAmount)&&(identical(other.payableAmount, payableAmount) || other.payableAmount == payableAmount)&&(identical(other.paymentMethod, paymentMethod) || other.paymentMethod == paymentMethod)&&(identical(other.paymentStatus, paymentStatus) || other.paymentStatus == paymentStatus)&&(identical(other.totalPointsUsed, totalPointsUsed) || other.totalPointsUsed == totalPointsUsed)&&(identical(other.razorpayOrderId, razorpayOrderId) || other.razorpayOrderId == razorpayOrderId)&&(identical(other.razorpayPaymentId, razorpayPaymentId) || other.razorpayPaymentId == razorpayPaymentId)&&(identical(other.status, status) || other.status == status)&&(identical(other.woohooCardNumber, woohooCardNumber) || other.woohooCardNumber == woohooCardNumber)&&(identical(other.woohooCardPin, woohooCardPin) || other.woohooCardPin == woohooCardPin)&&(identical(other.woohooActivationCode, woohooActivationCode) || other.woohooActivationCode == woohooActivationCode)&&(identical(other.woohooActivationUrl, woohooActivationUrl) || other.woohooActivationUrl == woohooActivationUrl)&&(identical(other.woohooActivatedAmount, woohooActivatedAmount) || other.woohooActivatedAmount == woohooActivatedAmount)&&(identical(other.woohooCardExpiry, woohooCardExpiry) || other.woohooCardExpiry == woohooCardExpiry)&&(identical(other.failureReason, failureReason) || other.failureReason == failureReason)&&(identical(other.razorpayRefundId, razorpayRefundId) || other.razorpayRefundId == razorpayRefundId)&&(identical(other.refundAmount, refundAmount) || other.refundAmount == refundAmount)&&(identical(other.refundStatus, refundStatus) || other.refundStatus == refundStatus)&&(identical(other.refundedAt, refundedAt) || other.refundedAt == refundedAt)&&(identical(other.pointsRefunded, pointsRefunded) || other.pointsRefunded == pointsRefunded)&&(identical(other.created, created) || other.created == created));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is GiftCardOrder&&(identical(other.id, id) || other.id == id)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.giftCardProductId, giftCardProductId) || other.giftCardProductId == giftCardProductId)&&(identical(other.productName, productName) || other.productName == productName)&&(identical(other.productImageUrl, productImageUrl) || other.productImageUrl == productImageUrl)&&(identical(other.quantity, quantity) || other.quantity == quantity)&&(identical(other.requestedAmount, requestedAmount) || other.requestedAmount == requestedAmount)&&(identical(other.discountPercentage, discountPercentage) || other.discountPercentage == discountPercentage)&&(identical(other.discountAmount, discountAmount) || other.discountAmount == discountAmount)&&(identical(other.payableAmount, payableAmount) || other.payableAmount == payableAmount)&&(identical(other.paymentMethod, paymentMethod) || other.paymentMethod == paymentMethod)&&(identical(other.paymentStatus, paymentStatus) || other.paymentStatus == paymentStatus)&&(identical(other.totalPointsUsed, totalPointsUsed) || other.totalPointsUsed == totalPointsUsed)&&(identical(other.razorpayOrderId, razorpayOrderId) || other.razorpayOrderId == razorpayOrderId)&&(identical(other.razorpayPaymentId, razorpayPaymentId) || other.razorpayPaymentId == razorpayPaymentId)&&(identical(other.status, status) || other.status == status)&&(identical(other.woohooCardNumber, woohooCardNumber) || other.woohooCardNumber == woohooCardNumber)&&(identical(other.woohooCardPin, woohooCardPin) || other.woohooCardPin == woohooCardPin)&&(identical(other.woohooActivationCode, woohooActivationCode) || other.woohooActivationCode == woohooActivationCode)&&(identical(other.woohooActivationUrl, woohooActivationUrl) || other.woohooActivationUrl == woohooActivationUrl)&&(identical(other.woohooActivatedAmount, woohooActivatedAmount) || other.woohooActivatedAmount == woohooActivatedAmount)&&(identical(other.woohooCardExpiry, woohooCardExpiry) || other.woohooCardExpiry == woohooCardExpiry)&&(identical(other.failureReason, failureReason) || other.failureReason == failureReason)&&(identical(other.razorpayRefundId, razorpayRefundId) || other.razorpayRefundId == razorpayRefundId)&&(identical(other.refundAmount, refundAmount) || other.refundAmount == refundAmount)&&(identical(other.refundStatus, refundStatus) || other.refundStatus == refundStatus)&&(identical(other.refundedAt, refundedAt) || other.refundedAt == refundedAt)&&(identical(other.pointsRefunded, pointsRefunded) || other.pointsRefunded == pointsRefunded)&&(identical(other.created, created) || other.created == created));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hashAll([runtimeType,id,userId,giftCardProductId,productName,productImageUrl,requestedAmount,discountPercentage,discountAmount,payableAmount,paymentMethod,paymentStatus,totalPointsUsed,razorpayOrderId,razorpayPaymentId,status,woohooCardNumber,woohooCardPin,woohooActivationCode,woohooActivationUrl,woohooActivatedAmount,woohooCardExpiry,failureReason,razorpayRefundId,refundAmount,refundStatus,refundedAt,pointsRefunded,created]);
+int get hashCode => Object.hashAll([runtimeType,id,userId,giftCardProductId,productName,productImageUrl,quantity,requestedAmount,discountPercentage,discountAmount,payableAmount,paymentMethod,paymentStatus,totalPointsUsed,razorpayOrderId,razorpayPaymentId,status,woohooCardNumber,woohooCardPin,woohooActivationCode,woohooActivationUrl,woohooActivatedAmount,woohooCardExpiry,failureReason,razorpayRefundId,refundAmount,refundStatus,refundedAt,pointsRefunded,created]);
 
 @override
 String toString() {
-  return 'GiftCardOrder(id: $id, userId: $userId, giftCardProductId: $giftCardProductId, productName: $productName, productImageUrl: $productImageUrl, requestedAmount: $requestedAmount, discountPercentage: $discountPercentage, discountAmount: $discountAmount, payableAmount: $payableAmount, paymentMethod: $paymentMethod, paymentStatus: $paymentStatus, totalPointsUsed: $totalPointsUsed, razorpayOrderId: $razorpayOrderId, razorpayPaymentId: $razorpayPaymentId, status: $status, woohooCardNumber: $woohooCardNumber, woohooCardPin: $woohooCardPin, woohooActivationCode: $woohooActivationCode, woohooActivationUrl: $woohooActivationUrl, woohooActivatedAmount: $woohooActivatedAmount, woohooCardExpiry: $woohooCardExpiry, failureReason: $failureReason, razorpayRefundId: $razorpayRefundId, refundAmount: $refundAmount, refundStatus: $refundStatus, refundedAt: $refundedAt, pointsRefunded: $pointsRefunded, created: $created)';
+  return 'GiftCardOrder(id: $id, userId: $userId, giftCardProductId: $giftCardProductId, productName: $productName, productImageUrl: $productImageUrl, quantity: $quantity, requestedAmount: $requestedAmount, discountPercentage: $discountPercentage, discountAmount: $discountAmount, payableAmount: $payableAmount, paymentMethod: $paymentMethod, paymentStatus: $paymentStatus, totalPointsUsed: $totalPointsUsed, razorpayOrderId: $razorpayOrderId, razorpayPaymentId: $razorpayPaymentId, status: $status, woohooCardNumber: $woohooCardNumber, woohooCardPin: $woohooCardPin, woohooActivationCode: $woohooActivationCode, woohooActivationUrl: $woohooActivationUrl, woohooActivatedAmount: $woohooActivatedAmount, woohooCardExpiry: $woohooCardExpiry, failureReason: $failureReason, razorpayRefundId: $razorpayRefundId, refundAmount: $refundAmount, refundStatus: $refundStatus, refundedAt: $refundedAt, pointsRefunded: $pointsRefunded, created: $created)';
 }
 
 
@@ -1543,7 +1543,7 @@ abstract mixin class $GiftCardOrderCopyWith<$Res>  {
   factory $GiftCardOrderCopyWith(GiftCardOrder value, $Res Function(GiftCardOrder) _then) = _$GiftCardOrderCopyWithImpl;
 @useResult
 $Res call({
- int id, String userId, int giftCardProductId, String productName, String? productImageUrl, double requestedAmount, double discountPercentage, double discountAmount, double payableAmount, GiftCardPaymentMethod paymentMethod, GiftCardPaymentStatus paymentStatus, double totalPointsUsed, String? razorpayOrderId, String? razorpayPaymentId, GiftCardOrderStatus status, String? woohooCardNumber, String? woohooCardPin, String? woohooActivationCode, String? woohooActivationUrl, double? woohooActivatedAmount, DateTime? woohooCardExpiry, String? failureReason, String? razorpayRefundId, double? refundAmount, String? refundStatus, DateTime? refundedAt, int? pointsRefunded, DateTime created
+ int id, String userId, int giftCardProductId, String productName, String? productImageUrl, int quantity, double requestedAmount, double discountPercentage, double discountAmount, double payableAmount, GiftCardPaymentMethod paymentMethod, GiftCardPaymentStatus paymentStatus, double totalPointsUsed, String? razorpayOrderId, String? razorpayPaymentId, GiftCardOrderStatus status, String? woohooCardNumber, String? woohooCardPin, String? woohooActivationCode, String? woohooActivationUrl, double? woohooActivatedAmount, DateTime? woohooCardExpiry, String? failureReason, String? razorpayRefundId, double? refundAmount, String? refundStatus, DateTime? refundedAt, int? pointsRefunded, DateTime created
 });
 
 
@@ -1560,14 +1560,15 @@ class _$GiftCardOrderCopyWithImpl<$Res>
 
 /// Create a copy of GiftCardOrder
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? userId = null,Object? giftCardProductId = null,Object? productName = null,Object? productImageUrl = freezed,Object? requestedAmount = null,Object? discountPercentage = null,Object? discountAmount = null,Object? payableAmount = null,Object? paymentMethod = null,Object? paymentStatus = null,Object? totalPointsUsed = null,Object? razorpayOrderId = freezed,Object? razorpayPaymentId = freezed,Object? status = null,Object? woohooCardNumber = freezed,Object? woohooCardPin = freezed,Object? woohooActivationCode = freezed,Object? woohooActivationUrl = freezed,Object? woohooActivatedAmount = freezed,Object? woohooCardExpiry = freezed,Object? failureReason = freezed,Object? razorpayRefundId = freezed,Object? refundAmount = freezed,Object? refundStatus = freezed,Object? refundedAt = freezed,Object? pointsRefunded = freezed,Object? created = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? userId = null,Object? giftCardProductId = null,Object? productName = null,Object? productImageUrl = freezed,Object? quantity = null,Object? requestedAmount = null,Object? discountPercentage = null,Object? discountAmount = null,Object? payableAmount = null,Object? paymentMethod = null,Object? paymentStatus = null,Object? totalPointsUsed = null,Object? razorpayOrderId = freezed,Object? razorpayPaymentId = freezed,Object? status = null,Object? woohooCardNumber = freezed,Object? woohooCardPin = freezed,Object? woohooActivationCode = freezed,Object? woohooActivationUrl = freezed,Object? woohooActivatedAmount = freezed,Object? woohooCardExpiry = freezed,Object? failureReason = freezed,Object? razorpayRefundId = freezed,Object? refundAmount = freezed,Object? refundStatus = freezed,Object? refundedAt = freezed,Object? pointsRefunded = freezed,Object? created = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
 as String,giftCardProductId: null == giftCardProductId ? _self.giftCardProductId : giftCardProductId // ignore: cast_nullable_to_non_nullable
 as int,productName: null == productName ? _self.productName : productName // ignore: cast_nullable_to_non_nullable
 as String,productImageUrl: freezed == productImageUrl ? _self.productImageUrl : productImageUrl // ignore: cast_nullable_to_non_nullable
-as String?,requestedAmount: null == requestedAmount ? _self.requestedAmount : requestedAmount // ignore: cast_nullable_to_non_nullable
+as String?,quantity: null == quantity ? _self.quantity : quantity // ignore: cast_nullable_to_non_nullable
+as int,requestedAmount: null == requestedAmount ? _self.requestedAmount : requestedAmount // ignore: cast_nullable_to_non_nullable
 as double,discountPercentage: null == discountPercentage ? _self.discountPercentage : discountPercentage // ignore: cast_nullable_to_non_nullable
 as double,discountAmount: null == discountAmount ? _self.discountAmount : discountAmount // ignore: cast_nullable_to_non_nullable
 as double,payableAmount: null == payableAmount ? _self.payableAmount : payableAmount // ignore: cast_nullable_to_non_nullable
@@ -1675,10 +1676,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String userId,  int giftCardProductId,  String productName,  String? productImageUrl,  double requestedAmount,  double discountPercentage,  double discountAmount,  double payableAmount,  GiftCardPaymentMethod paymentMethod,  GiftCardPaymentStatus paymentStatus,  double totalPointsUsed,  String? razorpayOrderId,  String? razorpayPaymentId,  GiftCardOrderStatus status,  String? woohooCardNumber,  String? woohooCardPin,  String? woohooActivationCode,  String? woohooActivationUrl,  double? woohooActivatedAmount,  DateTime? woohooCardExpiry,  String? failureReason,  String? razorpayRefundId,  double? refundAmount,  String? refundStatus,  DateTime? refundedAt,  int? pointsRefunded,  DateTime created)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String userId,  int giftCardProductId,  String productName,  String? productImageUrl,  int quantity,  double requestedAmount,  double discountPercentage,  double discountAmount,  double payableAmount,  GiftCardPaymentMethod paymentMethod,  GiftCardPaymentStatus paymentStatus,  double totalPointsUsed,  String? razorpayOrderId,  String? razorpayPaymentId,  GiftCardOrderStatus status,  String? woohooCardNumber,  String? woohooCardPin,  String? woohooActivationCode,  String? woohooActivationUrl,  double? woohooActivatedAmount,  DateTime? woohooCardExpiry,  String? failureReason,  String? razorpayRefundId,  double? refundAmount,  String? refundStatus,  DateTime? refundedAt,  int? pointsRefunded,  DateTime created)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _GiftCardOrder() when $default != null:
-return $default(_that.id,_that.userId,_that.giftCardProductId,_that.productName,_that.productImageUrl,_that.requestedAmount,_that.discountPercentage,_that.discountAmount,_that.payableAmount,_that.paymentMethod,_that.paymentStatus,_that.totalPointsUsed,_that.razorpayOrderId,_that.razorpayPaymentId,_that.status,_that.woohooCardNumber,_that.woohooCardPin,_that.woohooActivationCode,_that.woohooActivationUrl,_that.woohooActivatedAmount,_that.woohooCardExpiry,_that.failureReason,_that.razorpayRefundId,_that.refundAmount,_that.refundStatus,_that.refundedAt,_that.pointsRefunded,_that.created);case _:
+return $default(_that.id,_that.userId,_that.giftCardProductId,_that.productName,_that.productImageUrl,_that.quantity,_that.requestedAmount,_that.discountPercentage,_that.discountAmount,_that.payableAmount,_that.paymentMethod,_that.paymentStatus,_that.totalPointsUsed,_that.razorpayOrderId,_that.razorpayPaymentId,_that.status,_that.woohooCardNumber,_that.woohooCardPin,_that.woohooActivationCode,_that.woohooActivationUrl,_that.woohooActivatedAmount,_that.woohooCardExpiry,_that.failureReason,_that.razorpayRefundId,_that.refundAmount,_that.refundStatus,_that.refundedAt,_that.pointsRefunded,_that.created);case _:
   return orElse();
 
 }
@@ -1696,10 +1697,10 @@ return $default(_that.id,_that.userId,_that.giftCardProductId,_that.productName,
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String userId,  int giftCardProductId,  String productName,  String? productImageUrl,  double requestedAmount,  double discountPercentage,  double discountAmount,  double payableAmount,  GiftCardPaymentMethod paymentMethod,  GiftCardPaymentStatus paymentStatus,  double totalPointsUsed,  String? razorpayOrderId,  String? razorpayPaymentId,  GiftCardOrderStatus status,  String? woohooCardNumber,  String? woohooCardPin,  String? woohooActivationCode,  String? woohooActivationUrl,  double? woohooActivatedAmount,  DateTime? woohooCardExpiry,  String? failureReason,  String? razorpayRefundId,  double? refundAmount,  String? refundStatus,  DateTime? refundedAt,  int? pointsRefunded,  DateTime created)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String userId,  int giftCardProductId,  String productName,  String? productImageUrl,  int quantity,  double requestedAmount,  double discountPercentage,  double discountAmount,  double payableAmount,  GiftCardPaymentMethod paymentMethod,  GiftCardPaymentStatus paymentStatus,  double totalPointsUsed,  String? razorpayOrderId,  String? razorpayPaymentId,  GiftCardOrderStatus status,  String? woohooCardNumber,  String? woohooCardPin,  String? woohooActivationCode,  String? woohooActivationUrl,  double? woohooActivatedAmount,  DateTime? woohooCardExpiry,  String? failureReason,  String? razorpayRefundId,  double? refundAmount,  String? refundStatus,  DateTime? refundedAt,  int? pointsRefunded,  DateTime created)  $default,) {final _that = this;
 switch (_that) {
 case _GiftCardOrder():
-return $default(_that.id,_that.userId,_that.giftCardProductId,_that.productName,_that.productImageUrl,_that.requestedAmount,_that.discountPercentage,_that.discountAmount,_that.payableAmount,_that.paymentMethod,_that.paymentStatus,_that.totalPointsUsed,_that.razorpayOrderId,_that.razorpayPaymentId,_that.status,_that.woohooCardNumber,_that.woohooCardPin,_that.woohooActivationCode,_that.woohooActivationUrl,_that.woohooActivatedAmount,_that.woohooCardExpiry,_that.failureReason,_that.razorpayRefundId,_that.refundAmount,_that.refundStatus,_that.refundedAt,_that.pointsRefunded,_that.created);case _:
+return $default(_that.id,_that.userId,_that.giftCardProductId,_that.productName,_that.productImageUrl,_that.quantity,_that.requestedAmount,_that.discountPercentage,_that.discountAmount,_that.payableAmount,_that.paymentMethod,_that.paymentStatus,_that.totalPointsUsed,_that.razorpayOrderId,_that.razorpayPaymentId,_that.status,_that.woohooCardNumber,_that.woohooCardPin,_that.woohooActivationCode,_that.woohooActivationUrl,_that.woohooActivatedAmount,_that.woohooCardExpiry,_that.failureReason,_that.razorpayRefundId,_that.refundAmount,_that.refundStatus,_that.refundedAt,_that.pointsRefunded,_that.created);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -1716,10 +1717,10 @@ return $default(_that.id,_that.userId,_that.giftCardProductId,_that.productName,
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String userId,  int giftCardProductId,  String productName,  String? productImageUrl,  double requestedAmount,  double discountPercentage,  double discountAmount,  double payableAmount,  GiftCardPaymentMethod paymentMethod,  GiftCardPaymentStatus paymentStatus,  double totalPointsUsed,  String? razorpayOrderId,  String? razorpayPaymentId,  GiftCardOrderStatus status,  String? woohooCardNumber,  String? woohooCardPin,  String? woohooActivationCode,  String? woohooActivationUrl,  double? woohooActivatedAmount,  DateTime? woohooCardExpiry,  String? failureReason,  String? razorpayRefundId,  double? refundAmount,  String? refundStatus,  DateTime? refundedAt,  int? pointsRefunded,  DateTime created)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String userId,  int giftCardProductId,  String productName,  String? productImageUrl,  int quantity,  double requestedAmount,  double discountPercentage,  double discountAmount,  double payableAmount,  GiftCardPaymentMethod paymentMethod,  GiftCardPaymentStatus paymentStatus,  double totalPointsUsed,  String? razorpayOrderId,  String? razorpayPaymentId,  GiftCardOrderStatus status,  String? woohooCardNumber,  String? woohooCardPin,  String? woohooActivationCode,  String? woohooActivationUrl,  double? woohooActivatedAmount,  DateTime? woohooCardExpiry,  String? failureReason,  String? razorpayRefundId,  double? refundAmount,  String? refundStatus,  DateTime? refundedAt,  int? pointsRefunded,  DateTime created)?  $default,) {final _that = this;
 switch (_that) {
 case _GiftCardOrder() when $default != null:
-return $default(_that.id,_that.userId,_that.giftCardProductId,_that.productName,_that.productImageUrl,_that.requestedAmount,_that.discountPercentage,_that.discountAmount,_that.payableAmount,_that.paymentMethod,_that.paymentStatus,_that.totalPointsUsed,_that.razorpayOrderId,_that.razorpayPaymentId,_that.status,_that.woohooCardNumber,_that.woohooCardPin,_that.woohooActivationCode,_that.woohooActivationUrl,_that.woohooActivatedAmount,_that.woohooCardExpiry,_that.failureReason,_that.razorpayRefundId,_that.refundAmount,_that.refundStatus,_that.refundedAt,_that.pointsRefunded,_that.created);case _:
+return $default(_that.id,_that.userId,_that.giftCardProductId,_that.productName,_that.productImageUrl,_that.quantity,_that.requestedAmount,_that.discountPercentage,_that.discountAmount,_that.payableAmount,_that.paymentMethod,_that.paymentStatus,_that.totalPointsUsed,_that.razorpayOrderId,_that.razorpayPaymentId,_that.status,_that.woohooCardNumber,_that.woohooCardPin,_that.woohooActivationCode,_that.woohooActivationUrl,_that.woohooActivatedAmount,_that.woohooCardExpiry,_that.failureReason,_that.razorpayRefundId,_that.refundAmount,_that.refundStatus,_that.refundedAt,_that.pointsRefunded,_that.created);case _:
   return null;
 
 }
@@ -1731,7 +1732,7 @@ return $default(_that.id,_that.userId,_that.giftCardProductId,_that.productName,
 @JsonSerializable()
 
 class _GiftCardOrder implements GiftCardOrder {
-  const _GiftCardOrder({required this.id, required this.userId, required this.giftCardProductId, required this.productName, this.productImageUrl, required this.requestedAmount, required this.discountPercentage, required this.discountAmount, required this.payableAmount, required this.paymentMethod, required this.paymentStatus, required this.totalPointsUsed, this.razorpayOrderId, this.razorpayPaymentId, required this.status, this.woohooCardNumber, this.woohooCardPin, this.woohooActivationCode, this.woohooActivationUrl, this.woohooActivatedAmount, this.woohooCardExpiry, this.failureReason, this.razorpayRefundId, this.refundAmount, this.refundStatus, this.refundedAt, this.pointsRefunded, required this.created});
+  const _GiftCardOrder({required this.id, required this.userId, required this.giftCardProductId, required this.productName, this.productImageUrl, this.quantity = 1, required this.requestedAmount, required this.discountPercentage, required this.discountAmount, required this.payableAmount, required this.paymentMethod, required this.paymentStatus, required this.totalPointsUsed, this.razorpayOrderId, this.razorpayPaymentId, required this.status, this.woohooCardNumber, this.woohooCardPin, this.woohooActivationCode, this.woohooActivationUrl, this.woohooActivatedAmount, this.woohooCardExpiry, this.failureReason, this.razorpayRefundId, this.refundAmount, this.refundStatus, this.refundedAt, this.pointsRefunded, required this.created});
   factory _GiftCardOrder.fromJson(Map<String, dynamic> json) => _$GiftCardOrderFromJson(json);
 
 @override final  int id;
@@ -1739,6 +1740,7 @@ class _GiftCardOrder implements GiftCardOrder {
 @override final  int giftCardProductId;
 @override final  String productName;
 @override final  String? productImageUrl;
+@override@JsonKey() final  int quantity;
 @override final  double requestedAmount;
 @override final  double discountPercentage;
 @override final  double discountAmount;
@@ -1776,16 +1778,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _GiftCardOrder&&(identical(other.id, id) || other.id == id)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.giftCardProductId, giftCardProductId) || other.giftCardProductId == giftCardProductId)&&(identical(other.productName, productName) || other.productName == productName)&&(identical(other.productImageUrl, productImageUrl) || other.productImageUrl == productImageUrl)&&(identical(other.requestedAmount, requestedAmount) || other.requestedAmount == requestedAmount)&&(identical(other.discountPercentage, discountPercentage) || other.discountPercentage == discountPercentage)&&(identical(other.discountAmount, discountAmount) || other.discountAmount == discountAmount)&&(identical(other.payableAmount, payableAmount) || other.payableAmount == payableAmount)&&(identical(other.paymentMethod, paymentMethod) || other.paymentMethod == paymentMethod)&&(identical(other.paymentStatus, paymentStatus) || other.paymentStatus == paymentStatus)&&(identical(other.totalPointsUsed, totalPointsUsed) || other.totalPointsUsed == totalPointsUsed)&&(identical(other.razorpayOrderId, razorpayOrderId) || other.razorpayOrderId == razorpayOrderId)&&(identical(other.razorpayPaymentId, razorpayPaymentId) || other.razorpayPaymentId == razorpayPaymentId)&&(identical(other.status, status) || other.status == status)&&(identical(other.woohooCardNumber, woohooCardNumber) || other.woohooCardNumber == woohooCardNumber)&&(identical(other.woohooCardPin, woohooCardPin) || other.woohooCardPin == woohooCardPin)&&(identical(other.woohooActivationCode, woohooActivationCode) || other.woohooActivationCode == woohooActivationCode)&&(identical(other.woohooActivationUrl, woohooActivationUrl) || other.woohooActivationUrl == woohooActivationUrl)&&(identical(other.woohooActivatedAmount, woohooActivatedAmount) || other.woohooActivatedAmount == woohooActivatedAmount)&&(identical(other.woohooCardExpiry, woohooCardExpiry) || other.woohooCardExpiry == woohooCardExpiry)&&(identical(other.failureReason, failureReason) || other.failureReason == failureReason)&&(identical(other.razorpayRefundId, razorpayRefundId) || other.razorpayRefundId == razorpayRefundId)&&(identical(other.refundAmount, refundAmount) || other.refundAmount == refundAmount)&&(identical(other.refundStatus, refundStatus) || other.refundStatus == refundStatus)&&(identical(other.refundedAt, refundedAt) || other.refundedAt == refundedAt)&&(identical(other.pointsRefunded, pointsRefunded) || other.pointsRefunded == pointsRefunded)&&(identical(other.created, created) || other.created == created));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _GiftCardOrder&&(identical(other.id, id) || other.id == id)&&(identical(other.userId, userId) || other.userId == userId)&&(identical(other.giftCardProductId, giftCardProductId) || other.giftCardProductId == giftCardProductId)&&(identical(other.productName, productName) || other.productName == productName)&&(identical(other.productImageUrl, productImageUrl) || other.productImageUrl == productImageUrl)&&(identical(other.quantity, quantity) || other.quantity == quantity)&&(identical(other.requestedAmount, requestedAmount) || other.requestedAmount == requestedAmount)&&(identical(other.discountPercentage, discountPercentage) || other.discountPercentage == discountPercentage)&&(identical(other.discountAmount, discountAmount) || other.discountAmount == discountAmount)&&(identical(other.payableAmount, payableAmount) || other.payableAmount == payableAmount)&&(identical(other.paymentMethod, paymentMethod) || other.paymentMethod == paymentMethod)&&(identical(other.paymentStatus, paymentStatus) || other.paymentStatus == paymentStatus)&&(identical(other.totalPointsUsed, totalPointsUsed) || other.totalPointsUsed == totalPointsUsed)&&(identical(other.razorpayOrderId, razorpayOrderId) || other.razorpayOrderId == razorpayOrderId)&&(identical(other.razorpayPaymentId, razorpayPaymentId) || other.razorpayPaymentId == razorpayPaymentId)&&(identical(other.status, status) || other.status == status)&&(identical(other.woohooCardNumber, woohooCardNumber) || other.woohooCardNumber == woohooCardNumber)&&(identical(other.woohooCardPin, woohooCardPin) || other.woohooCardPin == woohooCardPin)&&(identical(other.woohooActivationCode, woohooActivationCode) || other.woohooActivationCode == woohooActivationCode)&&(identical(other.woohooActivationUrl, woohooActivationUrl) || other.woohooActivationUrl == woohooActivationUrl)&&(identical(other.woohooActivatedAmount, woohooActivatedAmount) || other.woohooActivatedAmount == woohooActivatedAmount)&&(identical(other.woohooCardExpiry, woohooCardExpiry) || other.woohooCardExpiry == woohooCardExpiry)&&(identical(other.failureReason, failureReason) || other.failureReason == failureReason)&&(identical(other.razorpayRefundId, razorpayRefundId) || other.razorpayRefundId == razorpayRefundId)&&(identical(other.refundAmount, refundAmount) || other.refundAmount == refundAmount)&&(identical(other.refundStatus, refundStatus) || other.refundStatus == refundStatus)&&(identical(other.refundedAt, refundedAt) || other.refundedAt == refundedAt)&&(identical(other.pointsRefunded, pointsRefunded) || other.pointsRefunded == pointsRefunded)&&(identical(other.created, created) || other.created == created));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hashAll([runtimeType,id,userId,giftCardProductId,productName,productImageUrl,requestedAmount,discountPercentage,discountAmount,payableAmount,paymentMethod,paymentStatus,totalPointsUsed,razorpayOrderId,razorpayPaymentId,status,woohooCardNumber,woohooCardPin,woohooActivationCode,woohooActivationUrl,woohooActivatedAmount,woohooCardExpiry,failureReason,razorpayRefundId,refundAmount,refundStatus,refundedAt,pointsRefunded,created]);
+int get hashCode => Object.hashAll([runtimeType,id,userId,giftCardProductId,productName,productImageUrl,quantity,requestedAmount,discountPercentage,discountAmount,payableAmount,paymentMethod,paymentStatus,totalPointsUsed,razorpayOrderId,razorpayPaymentId,status,woohooCardNumber,woohooCardPin,woohooActivationCode,woohooActivationUrl,woohooActivatedAmount,woohooCardExpiry,failureReason,razorpayRefundId,refundAmount,refundStatus,refundedAt,pointsRefunded,created]);
 
 @override
 String toString() {
-  return 'GiftCardOrder(id: $id, userId: $userId, giftCardProductId: $giftCardProductId, productName: $productName, productImageUrl: $productImageUrl, requestedAmount: $requestedAmount, discountPercentage: $discountPercentage, discountAmount: $discountAmount, payableAmount: $payableAmount, paymentMethod: $paymentMethod, paymentStatus: $paymentStatus, totalPointsUsed: $totalPointsUsed, razorpayOrderId: $razorpayOrderId, razorpayPaymentId: $razorpayPaymentId, status: $status, woohooCardNumber: $woohooCardNumber, woohooCardPin: $woohooCardPin, woohooActivationCode: $woohooActivationCode, woohooActivationUrl: $woohooActivationUrl, woohooActivatedAmount: $woohooActivatedAmount, woohooCardExpiry: $woohooCardExpiry, failureReason: $failureReason, razorpayRefundId: $razorpayRefundId, refundAmount: $refundAmount, refundStatus: $refundStatus, refundedAt: $refundedAt, pointsRefunded: $pointsRefunded, created: $created)';
+  return 'GiftCardOrder(id: $id, userId: $userId, giftCardProductId: $giftCardProductId, productName: $productName, productImageUrl: $productImageUrl, quantity: $quantity, requestedAmount: $requestedAmount, discountPercentage: $discountPercentage, discountAmount: $discountAmount, payableAmount: $payableAmount, paymentMethod: $paymentMethod, paymentStatus: $paymentStatus, totalPointsUsed: $totalPointsUsed, razorpayOrderId: $razorpayOrderId, razorpayPaymentId: $razorpayPaymentId, status: $status, woohooCardNumber: $woohooCardNumber, woohooCardPin: $woohooCardPin, woohooActivationCode: $woohooActivationCode, woohooActivationUrl: $woohooActivationUrl, woohooActivatedAmount: $woohooActivatedAmount, woohooCardExpiry: $woohooCardExpiry, failureReason: $failureReason, razorpayRefundId: $razorpayRefundId, refundAmount: $refundAmount, refundStatus: $refundStatus, refundedAt: $refundedAt, pointsRefunded: $pointsRefunded, created: $created)';
 }
 
 
@@ -1796,7 +1798,7 @@ abstract mixin class _$GiftCardOrderCopyWith<$Res> implements $GiftCardOrderCopy
   factory _$GiftCardOrderCopyWith(_GiftCardOrder value, $Res Function(_GiftCardOrder) _then) = __$GiftCardOrderCopyWithImpl;
 @override @useResult
 $Res call({
- int id, String userId, int giftCardProductId, String productName, String? productImageUrl, double requestedAmount, double discountPercentage, double discountAmount, double payableAmount, GiftCardPaymentMethod paymentMethod, GiftCardPaymentStatus paymentStatus, double totalPointsUsed, String? razorpayOrderId, String? razorpayPaymentId, GiftCardOrderStatus status, String? woohooCardNumber, String? woohooCardPin, String? woohooActivationCode, String? woohooActivationUrl, double? woohooActivatedAmount, DateTime? woohooCardExpiry, String? failureReason, String? razorpayRefundId, double? refundAmount, String? refundStatus, DateTime? refundedAt, int? pointsRefunded, DateTime created
+ int id, String userId, int giftCardProductId, String productName, String? productImageUrl, int quantity, double requestedAmount, double discountPercentage, double discountAmount, double payableAmount, GiftCardPaymentMethod paymentMethod, GiftCardPaymentStatus paymentStatus, double totalPointsUsed, String? razorpayOrderId, String? razorpayPaymentId, GiftCardOrderStatus status, String? woohooCardNumber, String? woohooCardPin, String? woohooActivationCode, String? woohooActivationUrl, double? woohooActivatedAmount, DateTime? woohooCardExpiry, String? failureReason, String? razorpayRefundId, double? refundAmount, String? refundStatus, DateTime? refundedAt, int? pointsRefunded, DateTime created
 });
 
 
@@ -1813,14 +1815,15 @@ class __$GiftCardOrderCopyWithImpl<$Res>
 
 /// Create a copy of GiftCardOrder
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? userId = null,Object? giftCardProductId = null,Object? productName = null,Object? productImageUrl = freezed,Object? requestedAmount = null,Object? discountPercentage = null,Object? discountAmount = null,Object? payableAmount = null,Object? paymentMethod = null,Object? paymentStatus = null,Object? totalPointsUsed = null,Object? razorpayOrderId = freezed,Object? razorpayPaymentId = freezed,Object? status = null,Object? woohooCardNumber = freezed,Object? woohooCardPin = freezed,Object? woohooActivationCode = freezed,Object? woohooActivationUrl = freezed,Object? woohooActivatedAmount = freezed,Object? woohooCardExpiry = freezed,Object? failureReason = freezed,Object? razorpayRefundId = freezed,Object? refundAmount = freezed,Object? refundStatus = freezed,Object? refundedAt = freezed,Object? pointsRefunded = freezed,Object? created = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? userId = null,Object? giftCardProductId = null,Object? productName = null,Object? productImageUrl = freezed,Object? quantity = null,Object? requestedAmount = null,Object? discountPercentage = null,Object? discountAmount = null,Object? payableAmount = null,Object? paymentMethod = null,Object? paymentStatus = null,Object? totalPointsUsed = null,Object? razorpayOrderId = freezed,Object? razorpayPaymentId = freezed,Object? status = null,Object? woohooCardNumber = freezed,Object? woohooCardPin = freezed,Object? woohooActivationCode = freezed,Object? woohooActivationUrl = freezed,Object? woohooActivatedAmount = freezed,Object? woohooCardExpiry = freezed,Object? failureReason = freezed,Object? razorpayRefundId = freezed,Object? refundAmount = freezed,Object? refundStatus = freezed,Object? refundedAt = freezed,Object? pointsRefunded = freezed,Object? created = null,}) {
   return _then(_GiftCardOrder(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,userId: null == userId ? _self.userId : userId // ignore: cast_nullable_to_non_nullable
 as String,giftCardProductId: null == giftCardProductId ? _self.giftCardProductId : giftCardProductId // ignore: cast_nullable_to_non_nullable
 as int,productName: null == productName ? _self.productName : productName // ignore: cast_nullable_to_non_nullable
 as String,productImageUrl: freezed == productImageUrl ? _self.productImageUrl : productImageUrl // ignore: cast_nullable_to_non_nullable
-as String?,requestedAmount: null == requestedAmount ? _self.requestedAmount : requestedAmount // ignore: cast_nullable_to_non_nullable
+as String?,quantity: null == quantity ? _self.quantity : quantity // ignore: cast_nullable_to_non_nullable
+as int,requestedAmount: null == requestedAmount ? _self.requestedAmount : requestedAmount // ignore: cast_nullable_to_non_nullable
 as double,discountPercentage: null == discountPercentage ? _self.discountPercentage : discountPercentage // ignore: cast_nullable_to_non_nullable
 as double,discountAmount: null == discountAmount ? _self.discountAmount : discountAmount // ignore: cast_nullable_to_non_nullable
 as double,payableAmount: null == payableAmount ? _self.payableAmount : payableAmount // ignore: cast_nullable_to_non_nullable
@@ -2138,7 +2141,7 @@ as bool,
 /// @nodoc
 mixin _$CreateGiftCardOrderRequest {
 
- int get giftCardProductId; double get amount; GiftCardPaymentMethod get paymentMethod; int get pointsToUse; String? get themeSku;
+ int get giftCardProductId; double get amount; int get quantity; GiftCardPaymentMethod get paymentMethod; int get pointsToUse; String? get themeSku;
 /// Create a copy of CreateGiftCardOrderRequest
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -2151,16 +2154,16 @@ $CreateGiftCardOrderRequestCopyWith<CreateGiftCardOrderRequest> get copyWith => 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CreateGiftCardOrderRequest&&(identical(other.giftCardProductId, giftCardProductId) || other.giftCardProductId == giftCardProductId)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.paymentMethod, paymentMethod) || other.paymentMethod == paymentMethod)&&(identical(other.pointsToUse, pointsToUse) || other.pointsToUse == pointsToUse)&&(identical(other.themeSku, themeSku) || other.themeSku == themeSku));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CreateGiftCardOrderRequest&&(identical(other.giftCardProductId, giftCardProductId) || other.giftCardProductId == giftCardProductId)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.quantity, quantity) || other.quantity == quantity)&&(identical(other.paymentMethod, paymentMethod) || other.paymentMethod == paymentMethod)&&(identical(other.pointsToUse, pointsToUse) || other.pointsToUse == pointsToUse)&&(identical(other.themeSku, themeSku) || other.themeSku == themeSku));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,giftCardProductId,amount,paymentMethod,pointsToUse,themeSku);
+int get hashCode => Object.hash(runtimeType,giftCardProductId,amount,quantity,paymentMethod,pointsToUse,themeSku);
 
 @override
 String toString() {
-  return 'CreateGiftCardOrderRequest(giftCardProductId: $giftCardProductId, amount: $amount, paymentMethod: $paymentMethod, pointsToUse: $pointsToUse, themeSku: $themeSku)';
+  return 'CreateGiftCardOrderRequest(giftCardProductId: $giftCardProductId, amount: $amount, quantity: $quantity, paymentMethod: $paymentMethod, pointsToUse: $pointsToUse, themeSku: $themeSku)';
 }
 
 
@@ -2171,7 +2174,7 @@ abstract mixin class $CreateGiftCardOrderRequestCopyWith<$Res>  {
   factory $CreateGiftCardOrderRequestCopyWith(CreateGiftCardOrderRequest value, $Res Function(CreateGiftCardOrderRequest) _then) = _$CreateGiftCardOrderRequestCopyWithImpl;
 @useResult
 $Res call({
- int giftCardProductId, double amount, GiftCardPaymentMethod paymentMethod, int pointsToUse, String? themeSku
+ int giftCardProductId, double amount, int quantity, GiftCardPaymentMethod paymentMethod, int pointsToUse, String? themeSku
 });
 
 
@@ -2188,11 +2191,12 @@ class _$CreateGiftCardOrderRequestCopyWithImpl<$Res>
 
 /// Create a copy of CreateGiftCardOrderRequest
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? giftCardProductId = null,Object? amount = null,Object? paymentMethod = null,Object? pointsToUse = null,Object? themeSku = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? giftCardProductId = null,Object? amount = null,Object? quantity = null,Object? paymentMethod = null,Object? pointsToUse = null,Object? themeSku = freezed,}) {
   return _then(_self.copyWith(
 giftCardProductId: null == giftCardProductId ? _self.giftCardProductId : giftCardProductId // ignore: cast_nullable_to_non_nullable
 as int,amount: null == amount ? _self.amount : amount // ignore: cast_nullable_to_non_nullable
-as double,paymentMethod: null == paymentMethod ? _self.paymentMethod : paymentMethod // ignore: cast_nullable_to_non_nullable
+as double,quantity: null == quantity ? _self.quantity : quantity // ignore: cast_nullable_to_non_nullable
+as int,paymentMethod: null == paymentMethod ? _self.paymentMethod : paymentMethod // ignore: cast_nullable_to_non_nullable
 as GiftCardPaymentMethod,pointsToUse: null == pointsToUse ? _self.pointsToUse : pointsToUse // ignore: cast_nullable_to_non_nullable
 as int,themeSku: freezed == themeSku ? _self.themeSku : themeSku // ignore: cast_nullable_to_non_nullable
 as String?,
@@ -2280,10 +2284,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int giftCardProductId,  double amount,  GiftCardPaymentMethod paymentMethod,  int pointsToUse,  String? themeSku)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int giftCardProductId,  double amount,  int quantity,  GiftCardPaymentMethod paymentMethod,  int pointsToUse,  String? themeSku)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _CreateGiftCardOrderRequest() when $default != null:
-return $default(_that.giftCardProductId,_that.amount,_that.paymentMethod,_that.pointsToUse,_that.themeSku);case _:
+return $default(_that.giftCardProductId,_that.amount,_that.quantity,_that.paymentMethod,_that.pointsToUse,_that.themeSku);case _:
   return orElse();
 
 }
@@ -2301,10 +2305,10 @@ return $default(_that.giftCardProductId,_that.amount,_that.paymentMethod,_that.p
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int giftCardProductId,  double amount,  GiftCardPaymentMethod paymentMethod,  int pointsToUse,  String? themeSku)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int giftCardProductId,  double amount,  int quantity,  GiftCardPaymentMethod paymentMethod,  int pointsToUse,  String? themeSku)  $default,) {final _that = this;
 switch (_that) {
 case _CreateGiftCardOrderRequest():
-return $default(_that.giftCardProductId,_that.amount,_that.paymentMethod,_that.pointsToUse,_that.themeSku);case _:
+return $default(_that.giftCardProductId,_that.amount,_that.quantity,_that.paymentMethod,_that.pointsToUse,_that.themeSku);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -2321,10 +2325,10 @@ return $default(_that.giftCardProductId,_that.amount,_that.paymentMethod,_that.p
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int giftCardProductId,  double amount,  GiftCardPaymentMethod paymentMethod,  int pointsToUse,  String? themeSku)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int giftCardProductId,  double amount,  int quantity,  GiftCardPaymentMethod paymentMethod,  int pointsToUse,  String? themeSku)?  $default,) {final _that = this;
 switch (_that) {
 case _CreateGiftCardOrderRequest() when $default != null:
-return $default(_that.giftCardProductId,_that.amount,_that.paymentMethod,_that.pointsToUse,_that.themeSku);case _:
+return $default(_that.giftCardProductId,_that.amount,_that.quantity,_that.paymentMethod,_that.pointsToUse,_that.themeSku);case _:
   return null;
 
 }
@@ -2336,11 +2340,12 @@ return $default(_that.giftCardProductId,_that.amount,_that.paymentMethod,_that.p
 @JsonSerializable()
 
 class _CreateGiftCardOrderRequest implements CreateGiftCardOrderRequest {
-  const _CreateGiftCardOrderRequest({required this.giftCardProductId, required this.amount, required this.paymentMethod, this.pointsToUse = 0, this.themeSku});
+  const _CreateGiftCardOrderRequest({required this.giftCardProductId, required this.amount, this.quantity = 1, required this.paymentMethod, this.pointsToUse = 0, this.themeSku});
   factory _CreateGiftCardOrderRequest.fromJson(Map<String, dynamic> json) => _$CreateGiftCardOrderRequestFromJson(json);
 
 @override final  int giftCardProductId;
 @override final  double amount;
+@override@JsonKey() final  int quantity;
 @override final  GiftCardPaymentMethod paymentMethod;
 @override@JsonKey() final  int pointsToUse;
 @override final  String? themeSku;
@@ -2358,16 +2363,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CreateGiftCardOrderRequest&&(identical(other.giftCardProductId, giftCardProductId) || other.giftCardProductId == giftCardProductId)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.paymentMethod, paymentMethod) || other.paymentMethod == paymentMethod)&&(identical(other.pointsToUse, pointsToUse) || other.pointsToUse == pointsToUse)&&(identical(other.themeSku, themeSku) || other.themeSku == themeSku));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CreateGiftCardOrderRequest&&(identical(other.giftCardProductId, giftCardProductId) || other.giftCardProductId == giftCardProductId)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.quantity, quantity) || other.quantity == quantity)&&(identical(other.paymentMethod, paymentMethod) || other.paymentMethod == paymentMethod)&&(identical(other.pointsToUse, pointsToUse) || other.pointsToUse == pointsToUse)&&(identical(other.themeSku, themeSku) || other.themeSku == themeSku));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,giftCardProductId,amount,paymentMethod,pointsToUse,themeSku);
+int get hashCode => Object.hash(runtimeType,giftCardProductId,amount,quantity,paymentMethod,pointsToUse,themeSku);
 
 @override
 String toString() {
-  return 'CreateGiftCardOrderRequest(giftCardProductId: $giftCardProductId, amount: $amount, paymentMethod: $paymentMethod, pointsToUse: $pointsToUse, themeSku: $themeSku)';
+  return 'CreateGiftCardOrderRequest(giftCardProductId: $giftCardProductId, amount: $amount, quantity: $quantity, paymentMethod: $paymentMethod, pointsToUse: $pointsToUse, themeSku: $themeSku)';
 }
 
 
@@ -2378,7 +2383,7 @@ abstract mixin class _$CreateGiftCardOrderRequestCopyWith<$Res> implements $Crea
   factory _$CreateGiftCardOrderRequestCopyWith(_CreateGiftCardOrderRequest value, $Res Function(_CreateGiftCardOrderRequest) _then) = __$CreateGiftCardOrderRequestCopyWithImpl;
 @override @useResult
 $Res call({
- int giftCardProductId, double amount, GiftCardPaymentMethod paymentMethod, int pointsToUse, String? themeSku
+ int giftCardProductId, double amount, int quantity, GiftCardPaymentMethod paymentMethod, int pointsToUse, String? themeSku
 });
 
 
@@ -2395,11 +2400,12 @@ class __$CreateGiftCardOrderRequestCopyWithImpl<$Res>
 
 /// Create a copy of CreateGiftCardOrderRequest
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? giftCardProductId = null,Object? amount = null,Object? paymentMethod = null,Object? pointsToUse = null,Object? themeSku = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? giftCardProductId = null,Object? amount = null,Object? quantity = null,Object? paymentMethod = null,Object? pointsToUse = null,Object? themeSku = freezed,}) {
   return _then(_CreateGiftCardOrderRequest(
 giftCardProductId: null == giftCardProductId ? _self.giftCardProductId : giftCardProductId // ignore: cast_nullable_to_non_nullable
 as int,amount: null == amount ? _self.amount : amount // ignore: cast_nullable_to_non_nullable
-as double,paymentMethod: null == paymentMethod ? _self.paymentMethod : paymentMethod // ignore: cast_nullable_to_non_nullable
+as double,quantity: null == quantity ? _self.quantity : quantity // ignore: cast_nullable_to_non_nullable
+as int,paymentMethod: null == paymentMethod ? _self.paymentMethod : paymentMethod // ignore: cast_nullable_to_non_nullable
 as GiftCardPaymentMethod,pointsToUse: null == pointsToUse ? _self.pointsToUse : pointsToUse // ignore: cast_nullable_to_non_nullable
 as int,themeSku: freezed == themeSku ? _self.themeSku : themeSku // ignore: cast_nullable_to_non_nullable
 as String?,
@@ -2413,7 +2419,7 @@ as String?,
 /// @nodoc
 mixin _$GiftCardPriceBreakdown {
 
-@JsonKey(name: 'giftCardProductId') int get productId; String get productName; double get requestedAmount; double get discountPercentage; double get discountAmount; double get payableAmount; int get availablePoints; double get pointsDiscount; double get finalPayableAmount;
+@JsonKey(name: 'giftCardProductId') int get productId; String get productName; int get quantity; double get requestedAmount; double get discountPercentage; double get discountAmount; double get payableAmount; int get availablePoints; double get pointsDiscount; double get finalPayableAmount;
 /// Create a copy of GiftCardPriceBreakdown
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -2426,16 +2432,16 @@ $GiftCardPriceBreakdownCopyWith<GiftCardPriceBreakdown> get copyWith => _$GiftCa
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is GiftCardPriceBreakdown&&(identical(other.productId, productId) || other.productId == productId)&&(identical(other.productName, productName) || other.productName == productName)&&(identical(other.requestedAmount, requestedAmount) || other.requestedAmount == requestedAmount)&&(identical(other.discountPercentage, discountPercentage) || other.discountPercentage == discountPercentage)&&(identical(other.discountAmount, discountAmount) || other.discountAmount == discountAmount)&&(identical(other.payableAmount, payableAmount) || other.payableAmount == payableAmount)&&(identical(other.availablePoints, availablePoints) || other.availablePoints == availablePoints)&&(identical(other.pointsDiscount, pointsDiscount) || other.pointsDiscount == pointsDiscount)&&(identical(other.finalPayableAmount, finalPayableAmount) || other.finalPayableAmount == finalPayableAmount));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is GiftCardPriceBreakdown&&(identical(other.productId, productId) || other.productId == productId)&&(identical(other.productName, productName) || other.productName == productName)&&(identical(other.quantity, quantity) || other.quantity == quantity)&&(identical(other.requestedAmount, requestedAmount) || other.requestedAmount == requestedAmount)&&(identical(other.discountPercentage, discountPercentage) || other.discountPercentage == discountPercentage)&&(identical(other.discountAmount, discountAmount) || other.discountAmount == discountAmount)&&(identical(other.payableAmount, payableAmount) || other.payableAmount == payableAmount)&&(identical(other.availablePoints, availablePoints) || other.availablePoints == availablePoints)&&(identical(other.pointsDiscount, pointsDiscount) || other.pointsDiscount == pointsDiscount)&&(identical(other.finalPayableAmount, finalPayableAmount) || other.finalPayableAmount == finalPayableAmount));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,productId,productName,requestedAmount,discountPercentage,discountAmount,payableAmount,availablePoints,pointsDiscount,finalPayableAmount);
+int get hashCode => Object.hash(runtimeType,productId,productName,quantity,requestedAmount,discountPercentage,discountAmount,payableAmount,availablePoints,pointsDiscount,finalPayableAmount);
 
 @override
 String toString() {
-  return 'GiftCardPriceBreakdown(productId: $productId, productName: $productName, requestedAmount: $requestedAmount, discountPercentage: $discountPercentage, discountAmount: $discountAmount, payableAmount: $payableAmount, availablePoints: $availablePoints, pointsDiscount: $pointsDiscount, finalPayableAmount: $finalPayableAmount)';
+  return 'GiftCardPriceBreakdown(productId: $productId, productName: $productName, quantity: $quantity, requestedAmount: $requestedAmount, discountPercentage: $discountPercentage, discountAmount: $discountAmount, payableAmount: $payableAmount, availablePoints: $availablePoints, pointsDiscount: $pointsDiscount, finalPayableAmount: $finalPayableAmount)';
 }
 
 
@@ -2446,7 +2452,7 @@ abstract mixin class $GiftCardPriceBreakdownCopyWith<$Res>  {
   factory $GiftCardPriceBreakdownCopyWith(GiftCardPriceBreakdown value, $Res Function(GiftCardPriceBreakdown) _then) = _$GiftCardPriceBreakdownCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(name: 'giftCardProductId') int productId, String productName, double requestedAmount, double discountPercentage, double discountAmount, double payableAmount, int availablePoints, double pointsDiscount, double finalPayableAmount
+@JsonKey(name: 'giftCardProductId') int productId, String productName, int quantity, double requestedAmount, double discountPercentage, double discountAmount, double payableAmount, int availablePoints, double pointsDiscount, double finalPayableAmount
 });
 
 
@@ -2463,11 +2469,12 @@ class _$GiftCardPriceBreakdownCopyWithImpl<$Res>
 
 /// Create a copy of GiftCardPriceBreakdown
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? productId = null,Object? productName = null,Object? requestedAmount = null,Object? discountPercentage = null,Object? discountAmount = null,Object? payableAmount = null,Object? availablePoints = null,Object? pointsDiscount = null,Object? finalPayableAmount = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? productId = null,Object? productName = null,Object? quantity = null,Object? requestedAmount = null,Object? discountPercentage = null,Object? discountAmount = null,Object? payableAmount = null,Object? availablePoints = null,Object? pointsDiscount = null,Object? finalPayableAmount = null,}) {
   return _then(_self.copyWith(
 productId: null == productId ? _self.productId : productId // ignore: cast_nullable_to_non_nullable
 as int,productName: null == productName ? _self.productName : productName // ignore: cast_nullable_to_non_nullable
-as String,requestedAmount: null == requestedAmount ? _self.requestedAmount : requestedAmount // ignore: cast_nullable_to_non_nullable
+as String,quantity: null == quantity ? _self.quantity : quantity // ignore: cast_nullable_to_non_nullable
+as int,requestedAmount: null == requestedAmount ? _self.requestedAmount : requestedAmount // ignore: cast_nullable_to_non_nullable
 as double,discountPercentage: null == discountPercentage ? _self.discountPercentage : discountPercentage // ignore: cast_nullable_to_non_nullable
 as double,discountAmount: null == discountAmount ? _self.discountAmount : discountAmount // ignore: cast_nullable_to_non_nullable
 as double,payableAmount: null == payableAmount ? _self.payableAmount : payableAmount // ignore: cast_nullable_to_non_nullable
@@ -2559,10 +2566,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'giftCardProductId')  int productId,  String productName,  double requestedAmount,  double discountPercentage,  double discountAmount,  double payableAmount,  int availablePoints,  double pointsDiscount,  double finalPayableAmount)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'giftCardProductId')  int productId,  String productName,  int quantity,  double requestedAmount,  double discountPercentage,  double discountAmount,  double payableAmount,  int availablePoints,  double pointsDiscount,  double finalPayableAmount)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _GiftCardPriceBreakdown() when $default != null:
-return $default(_that.productId,_that.productName,_that.requestedAmount,_that.discountPercentage,_that.discountAmount,_that.payableAmount,_that.availablePoints,_that.pointsDiscount,_that.finalPayableAmount);case _:
+return $default(_that.productId,_that.productName,_that.quantity,_that.requestedAmount,_that.discountPercentage,_that.discountAmount,_that.payableAmount,_that.availablePoints,_that.pointsDiscount,_that.finalPayableAmount);case _:
   return orElse();
 
 }
@@ -2580,10 +2587,10 @@ return $default(_that.productId,_that.productName,_that.requestedAmount,_that.di
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'giftCardProductId')  int productId,  String productName,  double requestedAmount,  double discountPercentage,  double discountAmount,  double payableAmount,  int availablePoints,  double pointsDiscount,  double finalPayableAmount)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'giftCardProductId')  int productId,  String productName,  int quantity,  double requestedAmount,  double discountPercentage,  double discountAmount,  double payableAmount,  int availablePoints,  double pointsDiscount,  double finalPayableAmount)  $default,) {final _that = this;
 switch (_that) {
 case _GiftCardPriceBreakdown():
-return $default(_that.productId,_that.productName,_that.requestedAmount,_that.discountPercentage,_that.discountAmount,_that.payableAmount,_that.availablePoints,_that.pointsDiscount,_that.finalPayableAmount);case _:
+return $default(_that.productId,_that.productName,_that.quantity,_that.requestedAmount,_that.discountPercentage,_that.discountAmount,_that.payableAmount,_that.availablePoints,_that.pointsDiscount,_that.finalPayableAmount);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -2600,10 +2607,10 @@ return $default(_that.productId,_that.productName,_that.requestedAmount,_that.di
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'giftCardProductId')  int productId,  String productName,  double requestedAmount,  double discountPercentage,  double discountAmount,  double payableAmount,  int availablePoints,  double pointsDiscount,  double finalPayableAmount)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'giftCardProductId')  int productId,  String productName,  int quantity,  double requestedAmount,  double discountPercentage,  double discountAmount,  double payableAmount,  int availablePoints,  double pointsDiscount,  double finalPayableAmount)?  $default,) {final _that = this;
 switch (_that) {
 case _GiftCardPriceBreakdown() when $default != null:
-return $default(_that.productId,_that.productName,_that.requestedAmount,_that.discountPercentage,_that.discountAmount,_that.payableAmount,_that.availablePoints,_that.pointsDiscount,_that.finalPayableAmount);case _:
+return $default(_that.productId,_that.productName,_that.quantity,_that.requestedAmount,_that.discountPercentage,_that.discountAmount,_that.payableAmount,_that.availablePoints,_that.pointsDiscount,_that.finalPayableAmount);case _:
   return null;
 
 }
@@ -2615,11 +2622,12 @@ return $default(_that.productId,_that.productName,_that.requestedAmount,_that.di
 @JsonSerializable()
 
 class _GiftCardPriceBreakdown implements GiftCardPriceBreakdown {
-  const _GiftCardPriceBreakdown({@JsonKey(name: 'giftCardProductId') this.productId = 0, this.productName = '', this.requestedAmount = 0, this.discountPercentage = 0, this.discountAmount = 0, this.payableAmount = 0, this.availablePoints = 0, this.pointsDiscount = 0, this.finalPayableAmount = 0});
+  const _GiftCardPriceBreakdown({@JsonKey(name: 'giftCardProductId') this.productId = 0, this.productName = '', this.quantity = 1, this.requestedAmount = 0, this.discountPercentage = 0, this.discountAmount = 0, this.payableAmount = 0, this.availablePoints = 0, this.pointsDiscount = 0, this.finalPayableAmount = 0});
   factory _GiftCardPriceBreakdown.fromJson(Map<String, dynamic> json) => _$GiftCardPriceBreakdownFromJson(json);
 
 @override@JsonKey(name: 'giftCardProductId') final  int productId;
 @override@JsonKey() final  String productName;
+@override@JsonKey() final  int quantity;
 @override@JsonKey() final  double requestedAmount;
 @override@JsonKey() final  double discountPercentage;
 @override@JsonKey() final  double discountAmount;
@@ -2641,16 +2649,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _GiftCardPriceBreakdown&&(identical(other.productId, productId) || other.productId == productId)&&(identical(other.productName, productName) || other.productName == productName)&&(identical(other.requestedAmount, requestedAmount) || other.requestedAmount == requestedAmount)&&(identical(other.discountPercentage, discountPercentage) || other.discountPercentage == discountPercentage)&&(identical(other.discountAmount, discountAmount) || other.discountAmount == discountAmount)&&(identical(other.payableAmount, payableAmount) || other.payableAmount == payableAmount)&&(identical(other.availablePoints, availablePoints) || other.availablePoints == availablePoints)&&(identical(other.pointsDiscount, pointsDiscount) || other.pointsDiscount == pointsDiscount)&&(identical(other.finalPayableAmount, finalPayableAmount) || other.finalPayableAmount == finalPayableAmount));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _GiftCardPriceBreakdown&&(identical(other.productId, productId) || other.productId == productId)&&(identical(other.productName, productName) || other.productName == productName)&&(identical(other.quantity, quantity) || other.quantity == quantity)&&(identical(other.requestedAmount, requestedAmount) || other.requestedAmount == requestedAmount)&&(identical(other.discountPercentage, discountPercentage) || other.discountPercentage == discountPercentage)&&(identical(other.discountAmount, discountAmount) || other.discountAmount == discountAmount)&&(identical(other.payableAmount, payableAmount) || other.payableAmount == payableAmount)&&(identical(other.availablePoints, availablePoints) || other.availablePoints == availablePoints)&&(identical(other.pointsDiscount, pointsDiscount) || other.pointsDiscount == pointsDiscount)&&(identical(other.finalPayableAmount, finalPayableAmount) || other.finalPayableAmount == finalPayableAmount));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,productId,productName,requestedAmount,discountPercentage,discountAmount,payableAmount,availablePoints,pointsDiscount,finalPayableAmount);
+int get hashCode => Object.hash(runtimeType,productId,productName,quantity,requestedAmount,discountPercentage,discountAmount,payableAmount,availablePoints,pointsDiscount,finalPayableAmount);
 
 @override
 String toString() {
-  return 'GiftCardPriceBreakdown(productId: $productId, productName: $productName, requestedAmount: $requestedAmount, discountPercentage: $discountPercentage, discountAmount: $discountAmount, payableAmount: $payableAmount, availablePoints: $availablePoints, pointsDiscount: $pointsDiscount, finalPayableAmount: $finalPayableAmount)';
+  return 'GiftCardPriceBreakdown(productId: $productId, productName: $productName, quantity: $quantity, requestedAmount: $requestedAmount, discountPercentage: $discountPercentage, discountAmount: $discountAmount, payableAmount: $payableAmount, availablePoints: $availablePoints, pointsDiscount: $pointsDiscount, finalPayableAmount: $finalPayableAmount)';
 }
 
 
@@ -2661,7 +2669,7 @@ abstract mixin class _$GiftCardPriceBreakdownCopyWith<$Res> implements $GiftCard
   factory _$GiftCardPriceBreakdownCopyWith(_GiftCardPriceBreakdown value, $Res Function(_GiftCardPriceBreakdown) _then) = __$GiftCardPriceBreakdownCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(name: 'giftCardProductId') int productId, String productName, double requestedAmount, double discountPercentage, double discountAmount, double payableAmount, int availablePoints, double pointsDiscount, double finalPayableAmount
+@JsonKey(name: 'giftCardProductId') int productId, String productName, int quantity, double requestedAmount, double discountPercentage, double discountAmount, double payableAmount, int availablePoints, double pointsDiscount, double finalPayableAmount
 });
 
 
@@ -2678,11 +2686,12 @@ class __$GiftCardPriceBreakdownCopyWithImpl<$Res>
 
 /// Create a copy of GiftCardPriceBreakdown
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? productId = null,Object? productName = null,Object? requestedAmount = null,Object? discountPercentage = null,Object? discountAmount = null,Object? payableAmount = null,Object? availablePoints = null,Object? pointsDiscount = null,Object? finalPayableAmount = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? productId = null,Object? productName = null,Object? quantity = null,Object? requestedAmount = null,Object? discountPercentage = null,Object? discountAmount = null,Object? payableAmount = null,Object? availablePoints = null,Object? pointsDiscount = null,Object? finalPayableAmount = null,}) {
   return _then(_GiftCardPriceBreakdown(
 productId: null == productId ? _self.productId : productId // ignore: cast_nullable_to_non_nullable
 as int,productName: null == productName ? _self.productName : productName // ignore: cast_nullable_to_non_nullable
-as String,requestedAmount: null == requestedAmount ? _self.requestedAmount : requestedAmount // ignore: cast_nullable_to_non_nullable
+as String,quantity: null == quantity ? _self.quantity : quantity // ignore: cast_nullable_to_non_nullable
+as int,requestedAmount: null == requestedAmount ? _self.requestedAmount : requestedAmount // ignore: cast_nullable_to_non_nullable
 as double,discountPercentage: null == discountPercentage ? _self.discountPercentage : discountPercentage // ignore: cast_nullable_to_non_nullable
 as double,discountAmount: null == discountAmount ? _self.discountAmount : discountAmount // ignore: cast_nullable_to_non_nullable
 as double,payableAmount: null == payableAmount ? _self.payableAmount : payableAmount // ignore: cast_nullable_to_non_nullable
@@ -2700,7 +2709,7 @@ as double,
 /// @nodoc
 mixin _$CreateGiftCardPaymentOrderRequest {
 
- int get giftCardProductId; double get amount; int get pointsToUse; String? get themeSku;
+ int get giftCardProductId; double get amount; int get quantity; int get pointsToUse; String? get themeSku;
 /// Create a copy of CreateGiftCardPaymentOrderRequest
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -2713,16 +2722,16 @@ $CreateGiftCardPaymentOrderRequestCopyWith<CreateGiftCardPaymentOrderRequest> ge
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CreateGiftCardPaymentOrderRequest&&(identical(other.giftCardProductId, giftCardProductId) || other.giftCardProductId == giftCardProductId)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.pointsToUse, pointsToUse) || other.pointsToUse == pointsToUse)&&(identical(other.themeSku, themeSku) || other.themeSku == themeSku));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CreateGiftCardPaymentOrderRequest&&(identical(other.giftCardProductId, giftCardProductId) || other.giftCardProductId == giftCardProductId)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.quantity, quantity) || other.quantity == quantity)&&(identical(other.pointsToUse, pointsToUse) || other.pointsToUse == pointsToUse)&&(identical(other.themeSku, themeSku) || other.themeSku == themeSku));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,giftCardProductId,amount,pointsToUse,themeSku);
+int get hashCode => Object.hash(runtimeType,giftCardProductId,amount,quantity,pointsToUse,themeSku);
 
 @override
 String toString() {
-  return 'CreateGiftCardPaymentOrderRequest(giftCardProductId: $giftCardProductId, amount: $amount, pointsToUse: $pointsToUse, themeSku: $themeSku)';
+  return 'CreateGiftCardPaymentOrderRequest(giftCardProductId: $giftCardProductId, amount: $amount, quantity: $quantity, pointsToUse: $pointsToUse, themeSku: $themeSku)';
 }
 
 
@@ -2733,7 +2742,7 @@ abstract mixin class $CreateGiftCardPaymentOrderRequestCopyWith<$Res>  {
   factory $CreateGiftCardPaymentOrderRequestCopyWith(CreateGiftCardPaymentOrderRequest value, $Res Function(CreateGiftCardPaymentOrderRequest) _then) = _$CreateGiftCardPaymentOrderRequestCopyWithImpl;
 @useResult
 $Res call({
- int giftCardProductId, double amount, int pointsToUse, String? themeSku
+ int giftCardProductId, double amount, int quantity, int pointsToUse, String? themeSku
 });
 
 
@@ -2750,11 +2759,12 @@ class _$CreateGiftCardPaymentOrderRequestCopyWithImpl<$Res>
 
 /// Create a copy of CreateGiftCardPaymentOrderRequest
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? giftCardProductId = null,Object? amount = null,Object? pointsToUse = null,Object? themeSku = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? giftCardProductId = null,Object? amount = null,Object? quantity = null,Object? pointsToUse = null,Object? themeSku = freezed,}) {
   return _then(_self.copyWith(
 giftCardProductId: null == giftCardProductId ? _self.giftCardProductId : giftCardProductId // ignore: cast_nullable_to_non_nullable
 as int,amount: null == amount ? _self.amount : amount // ignore: cast_nullable_to_non_nullable
-as double,pointsToUse: null == pointsToUse ? _self.pointsToUse : pointsToUse // ignore: cast_nullable_to_non_nullable
+as double,quantity: null == quantity ? _self.quantity : quantity // ignore: cast_nullable_to_non_nullable
+as int,pointsToUse: null == pointsToUse ? _self.pointsToUse : pointsToUse // ignore: cast_nullable_to_non_nullable
 as int,themeSku: freezed == themeSku ? _self.themeSku : themeSku // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
@@ -2841,10 +2851,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int giftCardProductId,  double amount,  int pointsToUse,  String? themeSku)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int giftCardProductId,  double amount,  int quantity,  int pointsToUse,  String? themeSku)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _CreateGiftCardPaymentOrderRequest() when $default != null:
-return $default(_that.giftCardProductId,_that.amount,_that.pointsToUse,_that.themeSku);case _:
+return $default(_that.giftCardProductId,_that.amount,_that.quantity,_that.pointsToUse,_that.themeSku);case _:
   return orElse();
 
 }
@@ -2862,10 +2872,10 @@ return $default(_that.giftCardProductId,_that.amount,_that.pointsToUse,_that.the
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int giftCardProductId,  double amount,  int pointsToUse,  String? themeSku)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int giftCardProductId,  double amount,  int quantity,  int pointsToUse,  String? themeSku)  $default,) {final _that = this;
 switch (_that) {
 case _CreateGiftCardPaymentOrderRequest():
-return $default(_that.giftCardProductId,_that.amount,_that.pointsToUse,_that.themeSku);case _:
+return $default(_that.giftCardProductId,_that.amount,_that.quantity,_that.pointsToUse,_that.themeSku);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -2882,10 +2892,10 @@ return $default(_that.giftCardProductId,_that.amount,_that.pointsToUse,_that.the
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int giftCardProductId,  double amount,  int pointsToUse,  String? themeSku)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int giftCardProductId,  double amount,  int quantity,  int pointsToUse,  String? themeSku)?  $default,) {final _that = this;
 switch (_that) {
 case _CreateGiftCardPaymentOrderRequest() when $default != null:
-return $default(_that.giftCardProductId,_that.amount,_that.pointsToUse,_that.themeSku);case _:
+return $default(_that.giftCardProductId,_that.amount,_that.quantity,_that.pointsToUse,_that.themeSku);case _:
   return null;
 
 }
@@ -2897,11 +2907,12 @@ return $default(_that.giftCardProductId,_that.amount,_that.pointsToUse,_that.the
 @JsonSerializable()
 
 class _CreateGiftCardPaymentOrderRequest implements CreateGiftCardPaymentOrderRequest {
-  const _CreateGiftCardPaymentOrderRequest({required this.giftCardProductId, required this.amount, this.pointsToUse = 0, this.themeSku});
+  const _CreateGiftCardPaymentOrderRequest({required this.giftCardProductId, required this.amount, this.quantity = 1, this.pointsToUse = 0, this.themeSku});
   factory _CreateGiftCardPaymentOrderRequest.fromJson(Map<String, dynamic> json) => _$CreateGiftCardPaymentOrderRequestFromJson(json);
 
 @override final  int giftCardProductId;
 @override final  double amount;
+@override@JsonKey() final  int quantity;
 @override@JsonKey() final  int pointsToUse;
 @override final  String? themeSku;
 
@@ -2918,16 +2929,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CreateGiftCardPaymentOrderRequest&&(identical(other.giftCardProductId, giftCardProductId) || other.giftCardProductId == giftCardProductId)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.pointsToUse, pointsToUse) || other.pointsToUse == pointsToUse)&&(identical(other.themeSku, themeSku) || other.themeSku == themeSku));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CreateGiftCardPaymentOrderRequest&&(identical(other.giftCardProductId, giftCardProductId) || other.giftCardProductId == giftCardProductId)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.quantity, quantity) || other.quantity == quantity)&&(identical(other.pointsToUse, pointsToUse) || other.pointsToUse == pointsToUse)&&(identical(other.themeSku, themeSku) || other.themeSku == themeSku));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,giftCardProductId,amount,pointsToUse,themeSku);
+int get hashCode => Object.hash(runtimeType,giftCardProductId,amount,quantity,pointsToUse,themeSku);
 
 @override
 String toString() {
-  return 'CreateGiftCardPaymentOrderRequest(giftCardProductId: $giftCardProductId, amount: $amount, pointsToUse: $pointsToUse, themeSku: $themeSku)';
+  return 'CreateGiftCardPaymentOrderRequest(giftCardProductId: $giftCardProductId, amount: $amount, quantity: $quantity, pointsToUse: $pointsToUse, themeSku: $themeSku)';
 }
 
 
@@ -2938,7 +2949,7 @@ abstract mixin class _$CreateGiftCardPaymentOrderRequestCopyWith<$Res> implement
   factory _$CreateGiftCardPaymentOrderRequestCopyWith(_CreateGiftCardPaymentOrderRequest value, $Res Function(_CreateGiftCardPaymentOrderRequest) _then) = __$CreateGiftCardPaymentOrderRequestCopyWithImpl;
 @override @useResult
 $Res call({
- int giftCardProductId, double amount, int pointsToUse, String? themeSku
+ int giftCardProductId, double amount, int quantity, int pointsToUse, String? themeSku
 });
 
 
@@ -2955,11 +2966,12 @@ class __$CreateGiftCardPaymentOrderRequestCopyWithImpl<$Res>
 
 /// Create a copy of CreateGiftCardPaymentOrderRequest
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? giftCardProductId = null,Object? amount = null,Object? pointsToUse = null,Object? themeSku = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? giftCardProductId = null,Object? amount = null,Object? quantity = null,Object? pointsToUse = null,Object? themeSku = freezed,}) {
   return _then(_CreateGiftCardPaymentOrderRequest(
 giftCardProductId: null == giftCardProductId ? _self.giftCardProductId : giftCardProductId // ignore: cast_nullable_to_non_nullable
 as int,amount: null == amount ? _self.amount : amount // ignore: cast_nullable_to_non_nullable
-as double,pointsToUse: null == pointsToUse ? _self.pointsToUse : pointsToUse // ignore: cast_nullable_to_non_nullable
+as double,quantity: null == quantity ? _self.quantity : quantity // ignore: cast_nullable_to_non_nullable
+as int,pointsToUse: null == pointsToUse ? _self.pointsToUse : pointsToUse // ignore: cast_nullable_to_non_nullable
 as int,themeSku: freezed == themeSku ? _self.themeSku : themeSku // ignore: cast_nullable_to_non_nullable
 as String?,
   ));

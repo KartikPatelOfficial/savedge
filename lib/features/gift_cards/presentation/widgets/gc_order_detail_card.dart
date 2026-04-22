@@ -46,9 +46,10 @@ class _GcOrderDetailCardState extends State<GcOrderDetailCard> {
 
   Future<void> _share() async {
     final o = widget.order;
+    final qtyLabel = o.quantity > 1 ? ' x ${o.quantity}' : '';
     final buf = StringBuffer()
       ..writeln('${o.productName} gift card from SavEdge')
-      ..writeln('Amount: ₹${o.requestedAmount.toStringAsFixed(0)}');
+      ..writeln('Amount: ₹${o.requestedAmount.toStringAsFixed(0)}$qtyLabel');
     if (o.woohooCardNumber != null) {
       buf.writeln('Card: ${o.woohooCardNumber}');
     }
@@ -156,7 +157,9 @@ class _GcOrderDetailCardState extends State<GcOrderDetailCard> {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  '₹${o.requestedAmount.toStringAsFixed(0)} · #${o.id}',
+                  o.quantity > 1
+                      ? '₹${o.requestedAmount.toStringAsFixed(0)} x ${o.quantity} · #${o.id}'
+                      : '₹${o.requestedAmount.toStringAsFixed(0)} · #${o.id}',
                   style: const TextStyle(
                     fontSize: 12,
                     color: GcTokens.textTertiary,

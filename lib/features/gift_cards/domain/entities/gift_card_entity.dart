@@ -192,6 +192,7 @@ class GiftCardOrderEntity extends Equatable {
   final int giftCardProductId;
   final String productName;
   final String? productImageUrl;
+  final int quantity;
   final double requestedAmount;
   final double discountPercentage;
   final double discountAmount;
@@ -222,6 +223,7 @@ class GiftCardOrderEntity extends Equatable {
     required this.giftCardProductId,
     required this.productName,
     this.productImageUrl,
+    this.quantity = 1,
     required this.requestedAmount,
     required this.discountPercentage,
     required this.discountAmount,
@@ -251,7 +253,8 @@ class GiftCardOrderEntity extends Equatable {
   bool get isPending => status == GiftCardOrderStatusEntity.pending;
   bool get isFailed => status == GiftCardOrderStatusEntity.failed;
   bool get hasCardDetails =>
-      woohooCardNumber != null && woohooCardNumber!.isNotEmpty;
+      (woohooCardNumber != null && woohooCardNumber!.isNotEmpty) ||
+      (woohooActivationUrl != null && woohooActivationUrl!.isNotEmpty);
   bool get isRefunded => status == GiftCardOrderStatusEntity.refunded;
   bool get hasRefundDetails => razorpayRefundId != null || (pointsRefunded != null && pointsRefunded! > 0);
 
@@ -262,6 +265,7 @@ class GiftCardOrderEntity extends Equatable {
         giftCardProductId,
         productName,
         productImageUrl,
+        quantity,
         requestedAmount,
         discountPercentage,
         discountAmount,

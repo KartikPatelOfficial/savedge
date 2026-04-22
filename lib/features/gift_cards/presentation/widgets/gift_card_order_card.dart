@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../domain/entities/gift_card_entity.dart';
 
@@ -145,15 +146,43 @@ class GiftCardOrderCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      order.productName,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF111827),
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            order.productName,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF111827),
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        if (order.quantity > 1) ...[
+                          const SizedBox(width: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: _accent.withAlpha(30),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              'x${order.quantity}',
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w800,
+                                color: _accent,
+                                letterSpacing: 0.2,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
                     const SizedBox(height: 3),
                     Text(
@@ -267,7 +296,12 @@ class GiftCardOrderCard extends StatelessWidget {
 
   // ── Completed: show card details ──────────────────────────────────────────
   Widget _buildCompletedContent(BuildContext context) {
-    if (!order.hasCardDetails) {
+    final hasCardNumber =
+        order.woohooCardNumber != null && order.woohooCardNumber!.isNotEmpty;
+    final hasActivationUrl = order.woohooActivationUrl != null &&
+        order.woohooActivationUrl!.isNotEmpty;
+
+    if (!hasCardNumber && !hasActivationUrl) {
       return Row(
         children: [
           Icon(Icons.check_circle_rounded,
@@ -335,6 +369,10 @@ class GiftCardOrderCard extends StatelessWidget {
             copyable: false,
             context: context,
           ),
+        if (hasActivationUrl) ...[
+          const SizedBox(height: 4),
+          _ActivationUrlButton(url: order.woohooActivationUrl!),
+        ],
       ],
     );
   }
@@ -701,6 +739,39 @@ class _RefundRow extends StatelessWidget {
           ),
           Expanded(child: child),
         ],
+      ),
+    );
+  }
+}
+
+class _ActivationUrlButton extends StatelessWidget {
+  final String url;
+
+  const _ActivationUrlButton({required this.url});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton.icon(
+        onPressed: () => launchUrl(
+          Uri.parse(url),
+          mode: LaunchMode.externalApplication,
+        ),
+        icon: const Icon(Icons.open_in_new_rounded, size: 16),
+        label: const Text(
+          'Redeem on brand site',
+          style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w800),
+        ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFF059669),
+          foregroundColor: Colors.white,
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          elevation: 0,
+        ),
       ),
     );
   }

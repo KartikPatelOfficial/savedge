@@ -115,6 +115,7 @@ abstract class GiftCardOrder with _$GiftCardOrder {
     required int giftCardProductId,
     required String productName,
     String? productImageUrl,
+    @Default(1) int quantity,
     required double requestedAmount,
     required double discountPercentage,
     required double discountAmount,
@@ -166,6 +167,7 @@ abstract class CreateGiftCardOrderRequest with _$CreateGiftCardOrderRequest {
   const factory CreateGiftCardOrderRequest({
     required int giftCardProductId,
     required double amount,
+    @Default(1) int quantity,
     required GiftCardPaymentMethod paymentMethod,
     @Default(0) int pointsToUse,
     String? themeSku,
@@ -180,6 +182,7 @@ abstract class GiftCardPriceBreakdown with _$GiftCardPriceBreakdown {
   const factory GiftCardPriceBreakdown({
     @JsonKey(name: 'giftCardProductId') @Default(0) int productId,
     @Default('') String productName,
+    @Default(1) int quantity,
     @Default(0) double requestedAmount,
     @Default(0) double discountPercentage,
     @Default(0) double discountAmount,
@@ -199,6 +202,7 @@ abstract class CreateGiftCardPaymentOrderRequest
   const factory CreateGiftCardPaymentOrderRequest({
     required int giftCardProductId,
     required double amount,
+    @Default(1) int quantity,
     @Default(0) int pointsToUse,
     String? themeSku,
   }) = _CreateGiftCardPaymentOrderRequest;

@@ -26,12 +26,14 @@ abstract class GiftCardRepository {
     required int productId,
     required double amount,
     int pointsToUse = 0,
+    int quantity = 1,
   });
 
   Future<Either<Failure, GiftCardOrderEntity>> createOrder({
     required int giftCardProductId,
     required double amount,
     required GiftCardPaymentMethodEntity paymentMethod,
+    int quantity = 1,
     String? themeSku,
   });
 
@@ -40,6 +42,7 @@ abstract class GiftCardRepository {
     required int giftCardProductId,
     required double amount,
     int pointsToUse = 0,
+    int quantity = 1,
     String? themeSku,
   });
 
