@@ -297,6 +297,20 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
       woohooActivationUrl: model.woohooActivationUrl,
       woohooActivatedAmount: model.woohooActivatedAmount,
       woohooCardExpiry: model.woohooCardExpiry,
+      issuedCards: model.issuedCards
+          .map((c) => GiftCardIssuedCardEntity(
+                id: c.id,
+                sequenceIndex: c.sequenceIndex,
+                cardNumber: c.cardNumber,
+                cardPin: c.cardPin,
+                activationCode: c.activationCode,
+                activationUrl: c.activationUrl,
+                barcode: c.barcode,
+                activatedAmount: c.activatedAmount,
+                cardExpiry: c.cardExpiry,
+                issuanceDate: c.issuanceDate,
+              ))
+          .toList(),
       failureReason: model.failureReason,
       razorpayRefundId: model.razorpayRefundId,
       refundAmount: model.refundAmount,

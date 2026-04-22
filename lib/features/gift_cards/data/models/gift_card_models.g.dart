@@ -178,49 +178,54 @@ Map<String, dynamic> _$PaginatedGiftCardProductResponseToJson(
   'hasNextPage': instance.hasNextPage,
 };
 
-_GiftCardOrder _$GiftCardOrderFromJson(Map<String, dynamic> json) =>
-    _GiftCardOrder(
-      id: (json['id'] as num).toInt(),
-      userId: json['userId'] as String,
-      giftCardProductId: (json['giftCardProductId'] as num).toInt(),
-      productName: json['productName'] as String,
-      productImageUrl: json['productImageUrl'] as String?,
-      quantity: (json['quantity'] as num?)?.toInt() ?? 1,
-      requestedAmount: (json['requestedAmount'] as num).toDouble(),
-      discountPercentage: (json['discountPercentage'] as num).toDouble(),
-      discountAmount: (json['discountAmount'] as num).toDouble(),
-      payableAmount: (json['payableAmount'] as num).toDouble(),
-      paymentMethod: $enumDecode(
-        _$GiftCardPaymentMethodEnumMap,
-        json['paymentMethod'],
-      ),
-      paymentStatus: $enumDecode(
-        _$GiftCardPaymentStatusEnumMap,
-        json['paymentStatus'],
-      ),
-      totalPointsUsed: (json['totalPointsUsed'] as num).toDouble(),
-      razorpayOrderId: json['razorpayOrderId'] as String?,
-      razorpayPaymentId: json['razorpayPaymentId'] as String?,
-      status: $enumDecode(_$GiftCardOrderStatusEnumMap, json['status']),
-      woohooCardNumber: json['woohooCardNumber'] as String?,
-      woohooCardPin: json['woohooCardPin'] as String?,
-      woohooActivationCode: json['woohooActivationCode'] as String?,
-      woohooActivationUrl: json['woohooActivationUrl'] as String?,
-      woohooActivatedAmount: (json['woohooActivatedAmount'] as num?)
-          ?.toDouble(),
-      woohooCardExpiry: json['woohooCardExpiry'] == null
-          ? null
-          : DateTime.parse(json['woohooCardExpiry'] as String),
-      failureReason: json['failureReason'] as String?,
-      razorpayRefundId: json['razorpayRefundId'] as String?,
-      refundAmount: (json['refundAmount'] as num?)?.toDouble(),
-      refundStatus: json['refundStatus'] as String?,
-      refundedAt: json['refundedAt'] == null
-          ? null
-          : DateTime.parse(json['refundedAt'] as String),
-      pointsRefunded: (json['pointsRefunded'] as num?)?.toInt(),
-      created: DateTime.parse(json['created'] as String),
-    );
+_GiftCardOrder _$GiftCardOrderFromJson(
+  Map<String, dynamic> json,
+) => _GiftCardOrder(
+  id: (json['id'] as num).toInt(),
+  userId: json['userId'] as String,
+  giftCardProductId: (json['giftCardProductId'] as num).toInt(),
+  productName: json['productName'] as String,
+  productImageUrl: json['productImageUrl'] as String?,
+  quantity: (json['quantity'] as num?)?.toInt() ?? 1,
+  requestedAmount: (json['requestedAmount'] as num).toDouble(),
+  discountPercentage: (json['discountPercentage'] as num).toDouble(),
+  discountAmount: (json['discountAmount'] as num).toDouble(),
+  payableAmount: (json['payableAmount'] as num).toDouble(),
+  paymentMethod: $enumDecode(
+    _$GiftCardPaymentMethodEnumMap,
+    json['paymentMethod'],
+  ),
+  paymentStatus: $enumDecode(
+    _$GiftCardPaymentStatusEnumMap,
+    json['paymentStatus'],
+  ),
+  totalPointsUsed: (json['totalPointsUsed'] as num).toDouble(),
+  razorpayOrderId: json['razorpayOrderId'] as String?,
+  razorpayPaymentId: json['razorpayPaymentId'] as String?,
+  status: $enumDecode(_$GiftCardOrderStatusEnumMap, json['status']),
+  woohooCardNumber: json['woohooCardNumber'] as String?,
+  woohooCardPin: json['woohooCardPin'] as String?,
+  woohooActivationCode: json['woohooActivationCode'] as String?,
+  woohooActivationUrl: json['woohooActivationUrl'] as String?,
+  woohooActivatedAmount: (json['woohooActivatedAmount'] as num?)?.toDouble(),
+  woohooCardExpiry: json['woohooCardExpiry'] == null
+      ? null
+      : DateTime.parse(json['woohooCardExpiry'] as String),
+  issuedCards:
+      (json['issuedCards'] as List<dynamic>?)
+          ?.map((e) => GiftCardIssuedCard.fromJson(e as Map<String, dynamic>))
+          .toList() ??
+      const [],
+  failureReason: json['failureReason'] as String?,
+  razorpayRefundId: json['razorpayRefundId'] as String?,
+  refundAmount: (json['refundAmount'] as num?)?.toDouble(),
+  refundStatus: json['refundStatus'] as String?,
+  refundedAt: json['refundedAt'] == null
+      ? null
+      : DateTime.parse(json['refundedAt'] as String),
+  pointsRefunded: (json['pointsRefunded'] as num?)?.toInt(),
+  created: DateTime.parse(json['created'] as String),
+);
 
 Map<String, dynamic> _$GiftCardOrderToJson(_GiftCardOrder instance) =>
     <String, dynamic>{
@@ -246,6 +251,7 @@ Map<String, dynamic> _$GiftCardOrderToJson(_GiftCardOrder instance) =>
       'woohooActivationUrl': instance.woohooActivationUrl,
       'woohooActivatedAmount': instance.woohooActivatedAmount,
       'woohooCardExpiry': instance.woohooCardExpiry?.toIso8601String(),
+      'issuedCards': instance.issuedCards,
       'failureReason': instance.failureReason,
       'razorpayRefundId': instance.razorpayRefundId,
       'refundAmount': instance.refundAmount,
@@ -277,6 +283,38 @@ const _$GiftCardOrderStatusEnumMap = {
   GiftCardOrderStatus.cancelled: 6,
   GiftCardOrderStatus.refunded: 7,
 };
+
+_GiftCardIssuedCard _$GiftCardIssuedCardFromJson(Map<String, dynamic> json) =>
+    _GiftCardIssuedCard(
+      id: (json['id'] as num).toInt(),
+      sequenceIndex: (json['sequenceIndex'] as num).toInt(),
+      cardNumber: json['cardNumber'] as String?,
+      cardPin: json['cardPin'] as String?,
+      activationCode: json['activationCode'] as String?,
+      activationUrl: json['activationUrl'] as String?,
+      barcode: json['barcode'] as String?,
+      activatedAmount: (json['activatedAmount'] as num?)?.toDouble(),
+      cardExpiry: json['cardExpiry'] == null
+          ? null
+          : DateTime.parse(json['cardExpiry'] as String),
+      issuanceDate: json['issuanceDate'] == null
+          ? null
+          : DateTime.parse(json['issuanceDate'] as String),
+    );
+
+Map<String, dynamic> _$GiftCardIssuedCardToJson(_GiftCardIssuedCard instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'sequenceIndex': instance.sequenceIndex,
+      'cardNumber': instance.cardNumber,
+      'cardPin': instance.cardPin,
+      'activationCode': instance.activationCode,
+      'activationUrl': instance.activationUrl,
+      'barcode': instance.barcode,
+      'activatedAmount': instance.activatedAmount,
+      'cardExpiry': instance.cardExpiry?.toIso8601String(),
+      'issuanceDate': instance.issuanceDate?.toIso8601String(),
+    };
 
 _PaginatedGiftCardOrderResponse _$PaginatedGiftCardOrderResponseFromJson(
   Map<String, dynamic> json,

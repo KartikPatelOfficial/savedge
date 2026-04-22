@@ -209,6 +209,7 @@ class GiftCardOrderEntity extends Equatable {
   final String? woohooActivationUrl;
   final double? woohooActivatedAmount;
   final DateTime? woohooCardExpiry;
+  final List<GiftCardIssuedCardEntity> issuedCards;
   final String? failureReason;
   final String? razorpayRefundId;
   final double? refundAmount;
@@ -240,6 +241,7 @@ class GiftCardOrderEntity extends Equatable {
     this.woohooActivationUrl,
     this.woohooActivatedAmount,
     this.woohooCardExpiry,
+    this.issuedCards = const [],
     this.failureReason,
     this.razorpayRefundId,
     this.refundAmount,
@@ -282,6 +284,7 @@ class GiftCardOrderEntity extends Equatable {
         woohooActivationUrl,
         woohooActivatedAmount,
         woohooCardExpiry,
+        issuedCards,
         failureReason,
         razorpayRefundId,
         refundAmount,
@@ -289,6 +292,51 @@ class GiftCardOrderEntity extends Equatable {
         refundedAt,
         pointsRefunded,
         created,
+      ];
+}
+
+class GiftCardIssuedCardEntity extends Equatable {
+  final int id;
+  final int sequenceIndex;
+  final String? cardNumber;
+  final String? cardPin;
+  final String? activationCode;
+  final String? activationUrl;
+  final String? barcode;
+  final double? activatedAmount;
+  final DateTime? cardExpiry;
+  final DateTime? issuanceDate;
+
+  const GiftCardIssuedCardEntity({
+    required this.id,
+    required this.sequenceIndex,
+    this.cardNumber,
+    this.cardPin,
+    this.activationCode,
+    this.activationUrl,
+    this.barcode,
+    this.activatedAmount,
+    this.cardExpiry,
+    this.issuanceDate,
+  });
+
+  bool get hasAnyCredential =>
+      (cardNumber != null && cardNumber!.isNotEmpty) ||
+      (cardPin != null && cardPin!.isNotEmpty) ||
+      (activationUrl != null && activationUrl!.isNotEmpty);
+
+  @override
+  List<Object?> get props => [
+        id,
+        sequenceIndex,
+        cardNumber,
+        cardPin,
+        activationCode,
+        activationUrl,
+        barcode,
+        activatedAmount,
+        cardExpiry,
+        issuanceDate,
       ];
 }
 

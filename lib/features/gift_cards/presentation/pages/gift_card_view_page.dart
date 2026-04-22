@@ -55,6 +55,30 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
 
   GiftCardOrderEntity get order => widget.order;
 
+  // Multi-card pagination. For legacy orders with no IssuedCards list we fall
+  // back to the flat Woohoo* fields on the order row (synthesised as a single
+  // entry below).
+  int _currentCardIndex = 0;
+  int get _totalCards =>
+      order.issuedCards.isNotEmpty ? order.issuedCards.length : 1;
+  bool get _isMultiCard => _totalCards > 1;
+  GiftCardIssuedCardEntity? get _currentCard =>
+      (order.issuedCards.isNotEmpty &&
+              _currentCardIndex < order.issuedCards.length)
+          ? order.issuedCards[_currentCardIndex]
+          : null;
+  String? get _cardNumber =>
+      _currentCard?.cardNumber ?? widget.order.woohooCardNumber;
+  String? get _cardPin => _currentCard?.cardPin ?? widget.order.woohooCardPin;
+  String? get _activationCode =>
+      _currentCard?.activationCode ?? widget.order.woohooActivationCode;
+  String? get _activationUrl =>
+      _currentCard?.activationUrl ?? widget.order.woohooActivationUrl;
+  DateTime? get _cardExpiry =>
+      _currentCard?.cardExpiry ?? widget.order.woohooCardExpiry;
+  double? get _activatedAmount =>
+      _currentCard?.activatedAmount ?? widget.order.woohooActivatedAmount;
+
   // Cardholder name
   String? _userName;
 
@@ -93,7 +117,7 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
   // ── Helpers ────────────────────────────────────────────────────────────
 
   String get _maskedNumber {
-    final n = order.woohooCardNumber ?? '';
+    final n = _cardNumber ?? '';
     final clean = n.replaceAll(RegExp(r'\s+'), '');
     if (clean.isEmpty) return '•••• •••• •••• ••••';
     final groups = <String>[];
@@ -104,7 +128,7 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
   }
 
   String get _validity {
-    final d = order.woohooCardExpiry;
+    final d = _cardExpiry;
     if (d == null) return '••/••';
     return '${d.month.toString().padLeft(2, '0')}/${d.year % 100}';
   }
@@ -213,16 +237,16 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
       final caption = StringBuffer()
         ..writeln('${order.productName} gift card')
         ..writeln(
-          'Value: ₹${(order.woohooActivatedAmount ?? order.requestedAmount).toStringAsFixed(0)}',
+          'Value: ₹${(_activatedAmount ?? order.requestedAmount).toStringAsFixed(0)}',
         );
-      if (order.woohooCardNumber != null) {
-        caption.writeln('Card: ${order.woohooCardNumber}');
+      if (_cardNumber != null) {
+        caption.writeln('Card: ${_cardNumber}');
       }
-      if (order.woohooCardPin != null) {
-        caption.writeln('PIN: ${order.woohooCardPin}');
+      if (_cardPin != null) {
+        caption.writeln('PIN: ${_cardPin}');
       }
-      if (order.woohooActivationUrl != null) {
-        caption.writeln('Activate: ${order.woohooActivationUrl}');
+      if (_activationUrl != null) {
+        caption.writeln('Activate: ${_activationUrl}');
       }
 
       await Share.shareXFiles([XFile(file.path)], text: caption.toString());
@@ -311,7 +335,15 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
                 32,
               ),
               children: [
-                _buildFlippableCard(),
+                if (_isMultiCard) ...[
+                  _buildCardCountHeader(),
+                  const SizedBox(height: 10),
+                ],
+                _buildSwipeableCard(),
+                if (_isMultiCard) ...[
+                  const SizedBox(height: 14),
+                  _buildCardIndicator(),
+                ],
                 const SizedBox(height: 14),
                 _buildFlipHint(),
                 const SizedBox(height: 24),
@@ -328,6 +360,171 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
 
   Widget _buildPageBackground() {
     return IgnorePointer(child: Container(color: Colors.white));
+  }
+
+  /// Plain-language header shown above the card when the order has multiple
+  /// gift cards. Explicit text so non-technical users know what they're
+  /// looking at without guessing a gesture.
+  Widget _buildCardCountHeader() {
+    return Center(
+      child: Text(
+        'Gift card ${_currentCardIndex + 1} of $_totalCards',
+        style: const TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.w900,
+          color: GcTokens.textPrimary,
+          letterSpacing: 0.2,
+        ),
+      ),
+    );
+  }
+
+  /// Hero card with horizontal-swipe navigation between cards (Quantity > 1).
+  /// Swipe is a bonus gesture — primary navigation is the Prev/Next buttons
+  /// below the card, which are easier for non-technical users to discover.
+  Widget _buildSwipeableCard() {
+    final card = _buildFlippableCard();
+    if (!_isMultiCard) return card;
+
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onHorizontalDragEnd: (details) {
+        final v = details.primaryVelocity ?? 0;
+        if (v < -250) {
+          _goToCard(_currentCardIndex + 1);
+        } else if (v > 250) {
+          _goToCard(_currentCardIndex - 1);
+        }
+      },
+      child: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 260),
+        switchInCurve: Curves.easeOutCubic,
+        switchOutCurve: Curves.easeInCubic,
+        transitionBuilder: (child, anim) {
+          final slide = Tween<Offset>(
+            begin: const Offset(0.08, 0),
+            end: Offset.zero,
+          ).animate(anim);
+          return FadeTransition(
+            opacity: anim,
+            child: SlideTransition(position: slide, child: child),
+          );
+        },
+        child: KeyedSubtree(
+          key: ValueKey<int>(_currentCardIndex),
+          child: card,
+        ),
+      ),
+    );
+  }
+
+  /// Navigation row: [◀]  • • • •  [▶]
+  /// Tap the chevrons to move between cards; tap any dot to jump directly.
+  /// Falls back to a compact pill when there are more than 6 cards so the row
+  /// never overflows on small screens.
+  Widget _buildCardIndicator() {
+    final canPrev = _currentCardIndex > 0;
+    final canNext = _currentCardIndex < _totalCards - 1;
+
+    final middle = _totalCards > 6
+        ? Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: GcTokens.primary.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(999),
+              ),
+              child: Text(
+                '${_currentCardIndex + 1} / $_totalCards',
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800,
+                  color: GcTokens.primary,
+                ),
+              ),
+            ),
+          )
+        : Row(
+            mainAxisSize: MainAxisSize.min,
+            children: List.generate(_totalCards, (i) {
+              final selected = i == _currentCardIndex;
+              return GestureDetector(
+                onTap: () => _goToCard(i),
+                behavior: HitTestBehavior.opaque,
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 220),
+                  curve: Curves.easeOutCubic,
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  width: selected ? 22 : 7,
+                  height: 7,
+                  decoration: BoxDecoration(
+                    color: selected
+                        ? GcTokens.primary
+                        : GcTokens.primary.withValues(alpha: 0.22),
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                ),
+              );
+            }),
+          );
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        _navArrow(
+          icon: Icons.chevron_left_rounded,
+          enabled: canPrev,
+          onTap: () => _goToCard(_currentCardIndex - 1),
+        ),
+        const SizedBox(width: 10),
+        middle,
+        const SizedBox(width: 10),
+        _navArrow(
+          icon: Icons.chevron_right_rounded,
+          enabled: canNext,
+          onTap: () => _goToCard(_currentCardIndex + 1),
+        ),
+      ],
+    );
+  }
+
+  Widget _navArrow({
+    required IconData icon,
+    required bool enabled,
+    required VoidCallback onTap,
+  }) {
+    final bg = enabled
+        ? GcTokens.primary.withValues(alpha: 0.10)
+        : const Color(0xFFF2F0F8);
+    final fg = enabled ? GcTokens.primary : const Color(0xFFB9B4C9);
+    return Material(
+      color: bg,
+      shape: const CircleBorder(),
+      child: InkWell(
+        customBorder: const CircleBorder(),
+        onTap: enabled ? onTap : null,
+        child: SizedBox(
+          width: 34,
+          height: 34,
+          child: Icon(icon, size: 20, color: fg),
+        ),
+      ),
+    );
+  }
+
+  void _goToCard(int i) {
+    if (i < 0 || i >= _totalCards || i == _currentCardIndex) return;
+    setState(() {
+      _currentCardIndex = i;
+      // Reset flip when switching cards so PIN-side doesn't stay stuck showing
+      // the previous card's PIN.
+      if (_showingBack) {
+        _showingBack = false;
+        _flipCtrl.reverse();
+      }
+    });
   }
 
   BoxDecoration _cardDecoration() {
@@ -792,7 +989,7 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
                       ),
                       const SizedBox(width: 6),
                       Text(
-                        (order.woohooActivatedAmount ?? order.requestedAmount)
+                        (_activatedAmount ?? order.requestedAmount)
                             .toStringAsFixed(0),
                         style: const TextStyle(
                           fontSize: 58,
@@ -890,12 +1087,12 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
                             ),
                           ),
                         ),
-                        if (order.woohooCardNumber != null &&
-                            order.woohooCardNumber!.isNotEmpty) ...[
+                        if (_cardNumber != null &&
+                            _cardNumber!.isNotEmpty) ...[
                           const SizedBox(width: 8),
                           _copyChip(
                             onTap: () =>
-                                _copy('Card number', order.woohooCardNumber!),
+                                _copy('Card number', _cardNumber!),
                           ),
                         ],
                       ],
@@ -937,13 +1134,13 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
                             ),
                           ),
                         ),
-                        if (order.woohooActivationCode != null &&
-                            order.woohooActivationCode!.isNotEmpty) ...[
+                        if (_activationCode != null &&
+                            _activationCode!.isNotEmpty) ...[
                           const SizedBox(width: 10),
                           Expanded(
                             child: _metaTile(
                               'Activation',
-                              order.woohooActivationCode!,
+                              _activationCode!,
                             ),
                           ),
                         ],
@@ -1018,7 +1215,7 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
                       children: [
                         Expanded(
                           child: Text(
-                            order.woohooCardPin ?? '••••••',
+                            _cardPin ?? '••••••',
                             style: const TextStyle(
                               fontSize: 26,
                               fontWeight: FontWeight.w900,
@@ -1027,13 +1224,13 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
                             ),
                           ),
                         ),
-                        if (order.woohooCardPin != null &&
-                            order.woohooCardPin!.isNotEmpty)
+                        if (_cardPin != null &&
+                            _cardPin!.isNotEmpty)
                           Material(
                             color: Colors.transparent,
                             child: InkWell(
                               borderRadius: BorderRadius.circular(10),
-                              onTap: () => _copy('PIN', order.woohooCardPin!),
+                              onTap: () => _copy('PIN', _cardPin!),
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 6,
@@ -1080,7 +1277,7 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
                     ),
                   ),
                   const SizedBox(height: 22),
-                  if (order.woohooActivationCode != null) ...[
+                  if (_activationCode != null) ...[
                     Text(
                       'ACTIVATION CODE',
                       style: TextStyle(
@@ -1092,7 +1289,7 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      order.woohooActivationCode!,
+                      _activationCode!,
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w900,
@@ -1156,7 +1353,7 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
             onPressed: () => GcHowToRedeemSheet.show(
               context,
               brandName: order.productName,
-              brandUrl: order.woohooActivationUrl,
+              brandUrl: _activationUrl,
             ),
             icon: const Icon(
               Icons.menu_book_rounded,
@@ -1186,13 +1383,13 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
             ),
           ),
         ),
-        if (order.woohooActivationUrl != null &&
-            order.woohooActivationUrl!.isNotEmpty) ...[
+        if (_activationUrl != null &&
+            _activationUrl!.isNotEmpty) ...[
           const SizedBox(width: 10),
           Expanded(
             child: ElevatedButton.icon(
               onPressed: () => launchUrl(
-                Uri.parse(order.woohooActivationUrl!),
+                Uri.parse(_activationUrl!),
                 mode: LaunchMode.externalApplication,
               ),
               icon: const Icon(

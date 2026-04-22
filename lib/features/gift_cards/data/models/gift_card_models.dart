@@ -132,6 +132,7 @@ abstract class GiftCardOrder with _$GiftCardOrder {
     String? woohooActivationUrl,
     double? woohooActivatedAmount,
     DateTime? woohooCardExpiry,
+    @Default([]) List<GiftCardIssuedCard> issuedCards,
     String? failureReason,
     String? razorpayRefundId,
     double? refundAmount,
@@ -143,6 +144,25 @@ abstract class GiftCardOrder with _$GiftCardOrder {
 
   factory GiftCardOrder.fromJson(Map<String, dynamic> json) =>
       _$GiftCardOrderFromJson(json);
+}
+
+@freezed
+abstract class GiftCardIssuedCard with _$GiftCardIssuedCard {
+  const factory GiftCardIssuedCard({
+    required int id,
+    required int sequenceIndex,
+    String? cardNumber,
+    String? cardPin,
+    String? activationCode,
+    String? activationUrl,
+    String? barcode,
+    double? activatedAmount,
+    DateTime? cardExpiry,
+    DateTime? issuanceDate,
+  }) = _GiftCardIssuedCard;
+
+  factory GiftCardIssuedCard.fromJson(Map<String, dynamic> json) =>
+      _$GiftCardIssuedCardFromJson(json);
 }
 
 @freezed
