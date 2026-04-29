@@ -11,6 +11,7 @@ import 'package:savedge/features/city/presentation/bloc/city_state.dart';
 import 'package:savedge/features/city/presentation/widgets/city_selection_sheet.dart';
 import 'package:savedge/features/favorites/presentation/pages/favorites_page.dart';
 import 'package:savedge/features/free_trial/presentation/bloc/free_trial_bloc.dart';
+import 'package:savedge/features/gift_cards/presentation/bloc/gift_cards_bloc.dart';
 import 'package:savedge/features/promotion/presentation/bloc/promotion_bloc.dart';
 import 'package:savedge/features/promotion/presentation/widgets/promotion_banner.dart';
 import 'package:savedge/features/promotion/presentation/widgets/promotion_enrollment_dialog.dart';
@@ -44,6 +45,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
   late final SubscriptionPlanBloc _subscriptionBloc;
   late final FreeTrialBloc _freeTrialBloc;
   late final PromotionBloc _promotionBloc;
+  late final GiftCardsBloc _giftCardsBloc;
 
   bool _isEmployee = false;
   bool _hasLoadedFreeTrialStatus = false;
@@ -60,6 +62,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
     _subscriptionBloc = getIt<SubscriptionPlanBloc>();
     _freeTrialBloc = getIt<FreeTrialBloc>();
     _promotionBloc = getIt<PromotionBloc>();
+    _giftCardsBloc = getIt<GiftCardsBloc>();
     _loadInitialData();
     if (!widget.isGuest) {
       _loadUserProfile();
@@ -74,6 +77,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
     // Load Hot Deals (special offers) with city filter
     _couponsBloc.add(LoadSpecialOfferCoupons(cityId: cityId));
     _subscriptionBloc.add(const LoadSubscriptionPlans());
+    _giftCardsBloc.add(const LoadHotDeals());
     if (!widget.isGuest) {
       _promotionBloc.add(const PromotionEvent.checkStatus());
     }
@@ -133,6 +137,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
         BlocProvider.value(value: _subscriptionBloc),
         BlocProvider.value(value: _freeTrialBloc),
         BlocProvider.value(value: _promotionBloc),
+        BlocProvider.value(value: _giftCardsBloc),
       ],
       child: MultiBlocListener(
         listeners: [
@@ -204,6 +209,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
                         );
                       },
                     ),
+                    const GiftCardsShowcaseSection(),
                     _buildTopOffersSection(),
                     // Bottom padding to prevent content from being hidden
                     // behind the floating bottom navigation bar
@@ -566,6 +572,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
     // Reload all data from BLoCs
     // Refresh Hot Deals (special offers) with city filter
     _couponsBloc.add(RefreshSpecialOfferCoupons(cityId: cityId));
+    _giftCardsBloc.add(const LoadHotDeals());
     // Refresh Top Offers by recreating the section's bloc
     setState(() => _topOffersRefreshKey++);
     if (!widget.isGuest) {

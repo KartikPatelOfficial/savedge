@@ -79,6 +79,7 @@ class GiftCardProductEntity extends Equatable {
   final String? termsAndConditionsUrl;
   final double? discountPercentage;
   final List<GiftCardThemeEntity> themes;
+  final int redemptionMode;
 
   const GiftCardProductEntity({
     required this.id,
@@ -105,6 +106,7 @@ class GiftCardProductEntity extends Equatable {
     this.termsAndConditionsUrl,
     this.discountPercentage,
     this.themes = const [],
+    this.redemptionMode = 3,
   });
 
   bool get hasDiscount =>
@@ -180,6 +182,7 @@ class GiftCardProductEntity extends Equatable {
         termsAndConditionsUrl,
         discountPercentage,
         themes,
+        redemptionMode,
       ];
 }
 
@@ -189,6 +192,7 @@ class GiftCardOrderEntity extends Equatable {
   final int giftCardProductId;
   final String productName;
   final String? productImageUrl;
+  final int quantity;
   final double requestedAmount;
   final double discountPercentage;
   final double discountAmount;
@@ -205,6 +209,7 @@ class GiftCardOrderEntity extends Equatable {
   final String? woohooActivationUrl;
   final double? woohooActivatedAmount;
   final DateTime? woohooCardExpiry;
+  final List<GiftCardIssuedCardEntity> issuedCards;
   final String? failureReason;
   final String? razorpayRefundId;
   final double? refundAmount;
@@ -219,6 +224,7 @@ class GiftCardOrderEntity extends Equatable {
     required this.giftCardProductId,
     required this.productName,
     this.productImageUrl,
+    this.quantity = 1,
     required this.requestedAmount,
     required this.discountPercentage,
     required this.discountAmount,
@@ -235,6 +241,7 @@ class GiftCardOrderEntity extends Equatable {
     this.woohooActivationUrl,
     this.woohooActivatedAmount,
     this.woohooCardExpiry,
+    this.issuedCards = const [],
     this.failureReason,
     this.razorpayRefundId,
     this.refundAmount,
@@ -248,7 +255,8 @@ class GiftCardOrderEntity extends Equatable {
   bool get isPending => status == GiftCardOrderStatusEntity.pending;
   bool get isFailed => status == GiftCardOrderStatusEntity.failed;
   bool get hasCardDetails =>
-      woohooCardNumber != null && woohooCardNumber!.isNotEmpty;
+      (woohooCardNumber != null && woohooCardNumber!.isNotEmpty) ||
+      (woohooActivationUrl != null && woohooActivationUrl!.isNotEmpty);
   bool get isRefunded => status == GiftCardOrderStatusEntity.refunded;
   bool get hasRefundDetails => razorpayRefundId != null || (pointsRefunded != null && pointsRefunded! > 0);
 
@@ -259,6 +267,7 @@ class GiftCardOrderEntity extends Equatable {
         giftCardProductId,
         productName,
         productImageUrl,
+        quantity,
         requestedAmount,
         discountPercentage,
         discountAmount,
@@ -275,6 +284,7 @@ class GiftCardOrderEntity extends Equatable {
         woohooActivationUrl,
         woohooActivatedAmount,
         woohooCardExpiry,
+        issuedCards,
         failureReason,
         razorpayRefundId,
         refundAmount,
@@ -282,6 +292,51 @@ class GiftCardOrderEntity extends Equatable {
         refundedAt,
         pointsRefunded,
         created,
+      ];
+}
+
+class GiftCardIssuedCardEntity extends Equatable {
+  final int id;
+  final int sequenceIndex;
+  final String? cardNumber;
+  final String? cardPin;
+  final String? activationCode;
+  final String? activationUrl;
+  final String? barcode;
+  final double? activatedAmount;
+  final DateTime? cardExpiry;
+  final DateTime? issuanceDate;
+
+  const GiftCardIssuedCardEntity({
+    required this.id,
+    required this.sequenceIndex,
+    this.cardNumber,
+    this.cardPin,
+    this.activationCode,
+    this.activationUrl,
+    this.barcode,
+    this.activatedAmount,
+    this.cardExpiry,
+    this.issuanceDate,
+  });
+
+  bool get hasAnyCredential =>
+      (cardNumber != null && cardNumber!.isNotEmpty) ||
+      (cardPin != null && cardPin!.isNotEmpty) ||
+      (activationUrl != null && activationUrl!.isNotEmpty);
+
+  @override
+  List<Object?> get props => [
+        id,
+        sequenceIndex,
+        cardNumber,
+        cardPin,
+        activationCode,
+        activationUrl,
+        barcode,
+        activatedAmount,
+        cardExpiry,
+        issuanceDate,
       ];
 }
 

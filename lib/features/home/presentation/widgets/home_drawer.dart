@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:savedge/features/coupons/presentation/pages/redemption_history_page.dart';
 import 'package:savedge/features/static_pages/presentation/pages/about_us_page.dart';
 import 'package:savedge/features/static_pages/presentation/pages/contact_us_page.dart';
@@ -68,14 +69,20 @@ class HomeDrawer extends StatelessWidget {
                 ),
               ),
               // Footer element
-              Text(
-                'Savedge App v1.0.0',
-                style: TextStyle(
-                  color: const Color(0xFF6F3FCC).withOpacity(0.4),
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  letterSpacing: 1.0,
-                ),
+              FutureBuilder<PackageInfo>(
+                future: PackageInfo.fromPlatform(),
+                builder: (context, snapshot) {
+                  final version = snapshot.data?.version ?? '';
+                  return Text(
+                    'Savedge App${version.isNotEmpty ? ' v$version' : ''}',
+                    style: TextStyle(
+                      color: const Color(0xFF6F3FCC).withOpacity(0.4),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      letterSpacing: 1.0,
+                    ),
+                  );
+                },
               ),
             ],
           ),

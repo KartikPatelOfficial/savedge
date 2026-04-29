@@ -108,12 +108,14 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
     required int productId,
     required double amount,
     int pointsToUse = 0,
+    int quantity = 1,
   }) async {
     try {
       final response = await _service.getPriceBreakdown(
         productId: productId,
         amount: amount,
         pointsToUse: pointsToUse,
+        quantity: quantity,
       );
       return Right(response);
     } catch (e) {
@@ -126,12 +128,14 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
     required int giftCardProductId,
     required double amount,
     required GiftCardPaymentMethodEntity paymentMethod,
+    int quantity = 1,
     String? themeSku,
   }) async {
     try {
       final request = CreateGiftCardOrderRequest(
         giftCardProductId: giftCardProductId,
         amount: amount,
+        quantity: quantity,
         paymentMethod: _mapPaymentMethodToModel(paymentMethod),
         themeSku: themeSku,
       );
@@ -148,12 +152,14 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
     required int giftCardProductId,
     required double amount,
     int pointsToUse = 0,
+    int quantity = 1,
     String? themeSku,
   }) async {
     try {
       final request = CreateGiftCardPaymentOrderRequest(
         giftCardProductId: giftCardProductId,
         amount: amount,
+        quantity: quantity,
         pointsToUse: pointsToUse,
         themeSku: themeSku,
       );
@@ -255,6 +261,7 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
       termsAndConditions: model.termsAndConditions,
       termsAndConditionsUrl: model.termsAndConditionsUrl,
       discountPercentage: model.discountPercentage,
+      redemptionMode: model.redemptionMode,
       themes: model.parsedThemes
           .map((t) => GiftCardThemeEntity(
                 sku: t.sku,
@@ -273,6 +280,7 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
       giftCardProductId: model.giftCardProductId,
       productName: model.productName,
       productImageUrl: model.productImageUrl,
+      quantity: model.quantity,
       requestedAmount: model.requestedAmount,
       discountPercentage: model.discountPercentage,
       discountAmount: model.discountAmount,
@@ -289,6 +297,20 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
       woohooActivationUrl: model.woohooActivationUrl,
       woohooActivatedAmount: model.woohooActivatedAmount,
       woohooCardExpiry: model.woohooCardExpiry,
+      issuedCards: model.issuedCards
+          .map((c) => GiftCardIssuedCardEntity(
+                id: c.id,
+                sequenceIndex: c.sequenceIndex,
+                cardNumber: c.cardNumber,
+                cardPin: c.cardPin,
+                activationCode: c.activationCode,
+                activationUrl: c.activationUrl,
+                barcode: c.barcode,
+                activatedAmount: c.activatedAmount,
+                cardExpiry: c.cardExpiry,
+                issuanceDate: c.issuanceDate,
+              ))
+          .toList(),
       failureReason: model.failureReason,
       razorpayRefundId: model.razorpayRefundId,
       refundAmount: model.refundAmount,

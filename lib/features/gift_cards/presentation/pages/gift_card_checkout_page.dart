@@ -20,6 +20,7 @@ import '../theme/gc_tokens.dart';
 import '../widgets/gc_palette_extractor.dart';
 import '../widgets/gc_payment_method_tile.dart';
 import '../widgets/gc_price_breakdown_card.dart';
+import '../widgets/gc_quantity_stepper.dart';
 
 class GiftCardCheckoutPage extends StatelessWidget {
   const GiftCardCheckoutPage({
@@ -70,6 +71,7 @@ class _CheckoutViewState extends State<_CheckoutView> {
   bool _isEmployee = false;
   GiftCardPriceBreakdown? _breakdown;
   _PayMethod _method = _PayMethod.online;
+  int _quantity = 1;
   int? _currentOrderId;
   Color _accent = GcTokens.primary;
 
@@ -130,6 +132,7 @@ class _CheckoutViewState extends State<_CheckoutView> {
             productId: widget.product.id,
             amount: widget.amount,
             pointsToUse: pts,
+            quantity: _quantity,
           ),
         );
   }
@@ -137,6 +140,12 @@ class _CheckoutViewState extends State<_CheckoutView> {
   void _selectMethod(_PayMethod m) {
     if (_method == m) return;
     setState(() => _method = m);
+    _fetchBreakdown();
+  }
+
+  void _setQuantity(int q) {
+    if (q < 1 || q > 5 || q == _quantity) return;
+    setState(() => _quantity = q);
     _fetchBreakdown();
   }
 
@@ -178,7 +187,7 @@ class _CheckoutViewState extends State<_CheckoutView> {
       'order_id': state.razorpayOrderId,
       'name': 'SavEdge',
       'description':
-          '${state.productName} - \u20B9${state.requestedAmount.toStringAsFixed(0)}',
+          '${state.productName} - \u20B9${state.requestedAmount.toStringAsFixed(0)}${_quantity > 1 ? " x $_quantity" : ""}',
       'prefill': {
         'contact': _profile?.phoneNumber ?? '',
         'email': _profile?.email ?? '',
@@ -207,6 +216,7 @@ class _CheckoutViewState extends State<_CheckoutView> {
               giftCardProductId: widget.product.id,
               amount: widget.amount,
               paymentMethod: GiftCardPaymentMethodEntity.points,
+              quantity: _quantity,
               themeSku: widget.themeSku,
             ),
           );
@@ -216,6 +226,7 @@ class _CheckoutViewState extends State<_CheckoutView> {
               giftCardProductId: widget.product.id,
               amount: widget.amount,
               pointsToUse: pts,
+              quantity: _quantity,
               themeSku: widget.themeSku,
             ),
           );
@@ -329,6 +340,12 @@ class _CheckoutViewState extends State<_CheckoutView> {
                       accent: _accent,
                     ),
                     const SizedBox(height: 18),
+                    GcQuantityStepper(
+                      value: _quantity,
+                      onChanged: _setQuantity,
+                      accent: _accent,
+                    ),
+                    const SizedBox(height: 18),
                     GcPriceBreakdownCard(
                       amount: widget.amount,
                       discountPercentage: widget.product.discountPercentage ?? 0,
@@ -336,6 +353,7 @@ class _CheckoutViewState extends State<_CheckoutView> {
                       pointsDiscount: pointsDiscount,
                       totalPayable: payable,
                       currencySymbol: currency,
+                      quantity: _quantity,
                       accent: _accent,
                     ),
                   ],

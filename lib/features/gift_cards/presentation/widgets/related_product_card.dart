@@ -11,6 +11,7 @@ class RelatedProductCard extends StatelessWidget {
   final String? offerShortDesc;
   final String currencySymbol;
   final int index;
+  final VoidCallback? onTap;
 
   static const _palettes = [
     Color(0xFFF3EFFE),
@@ -39,6 +40,7 @@ class RelatedProductCard extends StatelessWidget {
     this.offerShortDesc,
     required this.currencySymbol,
     required this.index,
+    this.onTap,
   });
 
   @override
@@ -55,84 +57,100 @@ class RelatedProductCard extends StatelessWidget {
     return SizedBox(
       width: 140,
       height: 170,
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFFF0F0F0), width: 1.5),
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Image section
-            Container(
-              height: 90,
-              width: double.infinity,
-              color: palette,
-              child: imageUrl != null
-                  ? CachedNetworkImage(
-                      imageUrl: imageUrl!,
-                      fit: BoxFit.cover,
-                      placeholder: (_, __) => Center(
-                        child: Icon(Icons.card_giftcard_rounded,
-                            size: 32, color: accent.withAlpha(80)),
-                      ),
-                      errorWidget: (_, __, ___) => Center(
-                        child: Icon(Icons.card_giftcard_rounded,
-                            size: 32, color: accent.withAlpha(80)),
-                      ),
-                    )
-                  : Center(
-                      child: Icon(Icons.card_giftcard_rounded,
-                          size: 32, color: accent.withAlpha(80)),
-                    ),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0xFFF0F0F0), width: 1.5),
             ),
-
-            // Info section
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      name,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF111827),
-                        height: 1.2,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      priceText,
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: accent,
-                      ),
-                    ),
-                    if (offerShortDesc != null) ...[
-                      Text(
-                        offerShortDesc!,
-                        style: const TextStyle(
-                          fontSize: 9,
-                          fontWeight: FontWeight.w400,
-                          color: Color(0xFF9CA3AF),
+            clipBehavior: Clip.antiAlias,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Image section
+                Container(
+                  height: 90,
+                  width: double.infinity,
+                  color: palette,
+                  child: imageUrl != null
+                      ? CachedNetworkImage(
+                          imageUrl: imageUrl!,
+                          fit: BoxFit.cover,
+                          placeholder: (_, __) => Center(
+                            child: Icon(
+                              Icons.card_giftcard_rounded,
+                              size: 32,
+                              color: accent.withAlpha(80),
+                            ),
+                          ),
+                          errorWidget: (_, __, ___) => Center(
+                            child: Icon(
+                              Icons.card_giftcard_rounded,
+                              size: 32,
+                              color: accent.withAlpha(80),
+                            ),
+                          ),
+                        )
+                      : Center(
+                          child: Icon(
+                            Icons.card_giftcard_rounded,
+                            size: 32,
+                            color: accent.withAlpha(80),
+                          ),
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ],
                 ),
-              ),
+
+                // Info section
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          name,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF111827),
+                            height: 1.2,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          priceText,
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: accent,
+                          ),
+                        ),
+                        if (offerShortDesc != null) ...[
+                          Text(
+                            offerShortDesc!,
+                            style: const TextStyle(
+                              fontSize: 9,
+                              fontWeight: FontWeight.w400,
+                              color: Color(0xFF9CA3AF),
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

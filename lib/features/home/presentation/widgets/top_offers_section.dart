@@ -33,15 +33,15 @@ class _TopOffersSectionState extends State<TopOffersSection> {
   void initState() {
     super.initState();
     // Use a dedicated bloc so regular vendor loads don't overwrite top offers
-    // Don't filter by city - show all featured vendors regardless of location
-    _topOffersBloc = getIt<VendorsBloc>()..add(const LoadTopOfferVendors());
+    _topOffersBloc = getIt<VendorsBloc>()
+      ..add(LoadTopOfferVendors(cityId: widget.cityId));
   }
 
   @override
   void didUpdateWidget(TopOffersSection oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.key != widget.key) {
-      _topOffersBloc.add(const LoadTopOfferVendors());
+    if (oldWidget.key != widget.key || oldWidget.cityId != widget.cityId) {
+      _topOffersBloc.add(LoadTopOfferVendors(cityId: widget.cityId));
     }
   }
 
@@ -82,18 +82,13 @@ class TopOffersView extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Row(
               children: [
-                ShaderMask(
-                  shaderCallback: (bounds) => const LinearGradient(
-                    colors: [Color(0xFF6F3FCC), Color(0xFF9F6BFF)],
-                  ).createShader(bounds),
-                  child: Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w800,
-                      color: Colors.white,
-                      letterSpacing: -0.5,
-                    ),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                    color: Color(0xFF1A202C),
+                    letterSpacing: -0.5,
                   ),
                 ),
                 const SizedBox(width: 8),
