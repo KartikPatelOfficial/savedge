@@ -37,7 +37,12 @@ class GcAmountChipPicker extends StatelessWidget {
       _hasDiscount ? selected * discountPercentage! / 100 : 0;
   double get _payable => selected - _discountAmount;
 
-  bool get _isSlab => priceType.toUpperCase() == 'SLAB';
+  // Woohoo V3 returns a `denominations` array on both SLAB and RANGE products and
+  // the Order API enforces it (5318 "Denomination is not available" otherwise). Treat
+  // the list as authoritative regardless of priceType — render the fixed-chip picker
+  // whenever it's populated, fall back to free-form RANGE input only when truly empty.
+  bool get _isSlab =>
+      priceType.toUpperCase() == 'SLAB' || denominations.isNotEmpty;
 
   /// Conventional round amounts a real user would actually pick.
   static const _conventional = <double>[

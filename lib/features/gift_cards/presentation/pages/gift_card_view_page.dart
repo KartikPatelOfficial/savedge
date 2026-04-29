@@ -79,6 +79,12 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
   double? get _activatedAmount =>
       _currentCard?.activatedAmount ?? widget.order.woohooActivatedAmount;
 
+  // Voucher-only products (e.g. VOUCHERCODE) return cardNumber=null with the
+  // redeemable value living in cardPin. Render the value as the primary credential.
+  bool get _isVoucherOnly =>
+      (_cardNumber == null || _cardNumber!.isEmpty) &&
+      (_cardPin != null && _cardPin!.isNotEmpty);
+
   // Cardholder name
   String? _userName;
 
@@ -239,11 +245,15 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
         ..writeln(
           'Value: ₹${(_activatedAmount ?? order.requestedAmount).toStringAsFixed(0)}',
         );
-      if (_cardNumber != null) {
-        caption.writeln('Card: ${_cardNumber}');
-      }
-      if (_cardPin != null) {
-        caption.writeln('PIN: ${_cardPin}');
+      if (_isVoucherOnly) {
+        caption.writeln('Voucher: ${_cardPin}');
+      } else {
+        if (_cardNumber != null) {
+          caption.writeln('Card: ${_cardNumber}');
+        }
+        if (_cardPin != null) {
+          caption.writeln('PIN: ${_cardPin}');
+        }
       }
       if (_activationUrl != null) {
         caption.writeln('Activate: ${_activationUrl}');
@@ -1064,7 +1074,7 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      'CARD NUMBER',
+                      _isVoucherOnly ? 'VOUCHER CODE' : 'CARD NUMBER',
                       style: TextStyle(
                         fontSize: 8.5,
                         fontWeight: FontWeight.w900,
@@ -1078,7 +1088,7 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
                       children: [
                         Flexible(
                           child: Text(
-                            _maskedNumber,
+                            _isVoucherOnly ? _cardPin! : _maskedNumber,
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w900,
@@ -1087,7 +1097,13 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
                             ),
                           ),
                         ),
-                        if (_cardNumber != null &&
+                        if (_isVoucherOnly) ...[
+                          const SizedBox(width: 8),
+                          _copyChip(
+                            onTap: () =>
+                                _copy('Voucher code', _cardPin!),
+                          ),
+                        ] else if (_cardNumber != null &&
                             _cardNumber!.isNotEmpty) ...[
                           const SizedBox(width: 8),
                           _copyChip(
@@ -1179,7 +1195,7 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
               ),
             ),
 
-            // PIN block
+            // PIN block (relabelled to VOUCHER CODE for voucher-only products)
             Positioned(
               left: 22,
               right: 22,
@@ -1187,9 +1203,9 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'PIN',
-                    style: TextStyle(
+                  Text(
+                    _isVoucherOnly ? 'VOUCHER CODE' : 'PIN',
+                    style: const TextStyle(
                       fontSize: 9,
                       fontWeight: FontWeight.w900,
                       letterSpacing: 1.6,
@@ -1230,7 +1246,10 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
                             color: Colors.transparent,
                             child: InkWell(
                               borderRadius: BorderRadius.circular(10),
-                              onTap: () => _copy('PIN', _cardPin!),
+                              onTap: () => _copy(
+                                _isVoucherOnly ? 'Voucher code' : 'PIN',
+                                _cardPin!,
+                              ),
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 6,
