@@ -1396,6 +1396,18 @@ class _GcOrderTileState extends State<_GcOrderTile> {
               ),
             ),
           ),
+          if (o.status == GiftCardOrderStatusEntity.refunded) ...[
+            const SizedBox(height: 8),
+            Text(
+              'Your payment will be refunded to the original payment method within 3-5 business days.',
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: GcTokens.textSecondary.withValues(alpha: 0.85),
+                height: 1.4,
+              ),
+            ),
+          ],
         ] else
           Text(
             'We weren\'t able to issue this gift card. If money was deducted, it will be auto-refunded within 3-5 business days.',
