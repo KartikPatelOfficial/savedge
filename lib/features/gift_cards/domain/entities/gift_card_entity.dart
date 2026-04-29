@@ -256,6 +256,7 @@ class GiftCardOrderEntity extends Equatable {
   bool get isFailed => status == GiftCardOrderStatusEntity.failed;
   bool get hasCardDetails =>
       (woohooCardNumber != null && woohooCardNumber!.isNotEmpty) ||
+      (woohooCardPin != null && woohooCardPin!.isNotEmpty) ||
       (woohooActivationUrl != null && woohooActivationUrl!.isNotEmpty);
   bool get isRefunded => status == GiftCardOrderStatusEntity.refunded;
   bool get hasRefundDetails => razorpayRefundId != null || (pointsRefunded != null && pointsRefunded! > 0);
