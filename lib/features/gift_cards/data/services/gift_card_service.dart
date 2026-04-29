@@ -37,6 +37,7 @@ abstract class GiftCardService {
     @Query('productId') required int productId,
     @Query('amount') required double amount,
     @Query('pointsToUse') int pointsToUse = 0,
+    @Query('quantity') int quantity = 1,
   });
 
   @POST('/api/gift-card-orders')

@@ -2,27 +2,48 @@ import 'dart:async';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_blurhash/flutter_blurhash.dart';
 
-import '../../domain/entities/gift_card_entity.dart';
-import '../theme/gc_tokens.dart';
-import 'gc_palette_extractor.dart';
+import 'package:savedge/features/gift_cards/domain/entities/gift_card_entity.dart';
+import 'package:savedge/features/gift_cards/presentation/bloc/gift_cards_bloc.dart';
+import 'package:savedge/features/gift_cards/presentation/pages/gift_card_detail_page.dart';
+import 'package:savedge/features/gift_cards/presentation/pages/gift_cards_page.dart';
+import 'package:savedge/features/gift_cards/presentation/theme/gc_tokens.dart';
+import 'package:savedge/features/gift_cards/presentation/widgets/gc_palette_extractor.dart';
 
-class GcHeroCarousel extends StatefulWidget {
-  const GcHeroCarousel({
-    super.key,
-    required this.items,
-    required this.onTap,
-  });
-
-  final List<GiftCardProductEntity> items;
-  final ValueChanged<GiftCardProductEntity> onTap;
+/// Premium gift cards showcase section for the home page.
+/// Displays admin-enabled "hot deal" gift cards in a horizontal
+/// PageView carousel with dynamic brand colors extracted from images.
+class GiftCardsShowcaseSection extends StatelessWidget {
+  const GiftCardsShowcaseSection({super.key});
 
   @override
-  State<GcHeroCarousel> createState() => _GcHeroCarouselState();
+  Widget build(BuildContext context) {
+    return BlocBuilder<GiftCardsBloc, GiftCardsState>(
+      buildWhen: (prev, curr) =>
+          curr is HotDealsLoaded || curr is GiftCardsInitial,
+      builder: (context, state) {
+        if (state is HotDealsLoaded && state.hotDeals.isNotEmpty) {
+          return _ShowcaseView(hotDeals: state.hotDeals);
+        }
+        return const SizedBox.shrink();
+      },
+    );
+  }
 }
 
-class _GcHeroCarouselState extends State<GcHeroCarousel> {
+class _ShowcaseView extends StatefulWidget {
+  const _ShowcaseView({required this.hotDeals});
+
+  final List<GiftCardProductEntity> hotDeals;
+
+  @override
+  State<_ShowcaseView> createState() => _ShowcaseViewState();
+}
+
+class _ShowcaseViewState extends State<_ShowcaseView> {
   late final PageController _controller;
   Timer? _timer;
   int _index = 0;
@@ -36,10 +57,10 @@ class _GcHeroCarouselState extends State<GcHeroCarousel> {
 
   void _startAutoScroll() {
     _timer?.cancel();
-    if (widget.items.length <= 1) return;
+    if (widget.hotDeals.length <= 1) return;
     _timer = Timer.periodic(const Duration(seconds: 4), (_) {
       if (!_controller.hasClients) return;
-      final next = (_index + 1) % widget.items.length;
+      final next = (_index + 1) % widget.hotDeals.length;
       _controller.animateToPage(
         next,
         duration: const Duration(milliseconds: 400),
@@ -63,11 +84,104 @@ class _GcHeroCarouselState extends State<GcHeroCarousel> {
     super.dispose();
   }
 
+  void _openDetail(GiftCardProductEntity product) {
+    HapticFeedback.lightImpact();
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => GiftCardDetailPage(product: product)),
+    );
+  }
+
+  void _openAllGiftCards() {
+    HapticFeedback.lightImpact();
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const GiftCardsPage()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    if (widget.items.isEmpty) return const SizedBox.shrink();
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Section header — gradient title matching Top Offers style
+        Padding(
+          padding: const EdgeInsets.fromLTRB(24, 16, 16, 12),
+          child: Row(
+            children: [
+              Expanded(
+                child: Row(
+                  children: [
+                    const Text(
+                      'Gift Cards',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF1A202C),
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 3,
+                      ),
+                      decoration: BoxDecoration(
+                        color: GcTokens.brandLime,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: const Text(
+                        'DEALS',
+                        style: TextStyle(
+                          fontSize: 9,
+                          fontWeight: FontWeight.w900,
+                          color: GcTokens.brandBlack,
+                          letterSpacing: 0.8,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              GestureDetector(
+                onTap: _openAllGiftCards,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 7,
+                  ),
+                  decoration: BoxDecoration(
+                    color: GcTokens.primary.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'See All',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: GcTokens.primary,
+                        ),
+                      ),
+                      SizedBox(width: 4),
+                      Icon(
+                        Icons.arrow_forward_rounded,
+                        size: 14,
+                        color: GcTokens.primary,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // Card carousel
         SizedBox(
           height: 236,
           child: NotificationListener<ScrollNotification>(
@@ -81,26 +195,28 @@ class _GcHeroCarouselState extends State<GcHeroCarousel> {
             },
             child: PageView.builder(
               controller: _controller,
-              itemCount: widget.items.length,
               clipBehavior: Clip.none,
+              itemCount: widget.hotDeals.length,
               onPageChanged: (i) => setState(() => _index = i),
               itemBuilder: (_, i) => Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 6),
-                child: _HeroCard(
-                  product: widget.items[i],
-                  onTap: () => widget.onTap(widget.items[i]),
+                child: _ShowcaseCard(
+                  product: widget.hotDeals[i],
+                  onTap: () => _openDetail(widget.hotDeals[i]),
                 ),
               ),
             ),
           ),
         ),
-        if (widget.items.length > 1)
+
+        // Page indicators
+        if (widget.hotDeals.length > 1)
           Padding(
             padding: const EdgeInsets.only(top: 12),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(
-                widget.items.length,
+                widget.hotDeals.length,
                 (i) => AnimatedContainer(
                   duration: const Duration(milliseconds: 250),
                   margin: const EdgeInsets.symmetric(horizontal: 3),
@@ -116,15 +232,18 @@ class _GcHeroCarouselState extends State<GcHeroCarousel> {
               ),
             ),
           ),
+
+        const SizedBox(height: 8),
       ],
     );
   }
 }
 
-/// Premium showcase card with dynamic brand colors extracted from
-/// the product image — matches the home page gift cards showcase style.
-class _HeroCard extends StatelessWidget {
-  const _HeroCard({required this.product, required this.onTap});
+/// A premium gift card with dynamic brand colors extracted from the product
+/// image. Uses [GcPaletteExtractor] to tint the card background, glow, and
+/// accents based on the actual brand image palette.
+class _ShowcaseCard extends StatelessWidget {
+  const _ShowcaseCard({required this.product, required this.onTap});
 
   final GiftCardProductEntity product;
   final VoidCallback onTap;
@@ -197,7 +316,6 @@ class _HeroCard extends StatelessWidget {
                         primaryTint: Colors.white,
                         accentTint: accentLine,
                       ),
-                      // Top-right glow
                       Positioned(
                         right: -26,
                         top: -34,
@@ -215,7 +333,6 @@ class _HeroCard extends StatelessWidget {
                           ),
                         ),
                       ),
-                      // Bottom-left glow
                       Positioned(
                         left: -46,
                         bottom: -74,
@@ -233,7 +350,6 @@ class _HeroCard extends StatelessWidget {
                           ),
                         ),
                       ),
-                      // Logo watermark
                       Positioned(
                         left: isCompact ? -28 : -36,
                         bottom: isCompact ? -36 : -48,
@@ -250,7 +366,6 @@ class _HeroCard extends StatelessWidget {
                           ),
                         ),
                       ),
-                      // Content
                       Padding(
                         padding: const EdgeInsets.fromLTRB(18, 18, 18, 18),
                         child: Column(
@@ -390,7 +505,6 @@ class _HeroCard extends StatelessWidget {
                                     ),
                                   ),
                                   SizedBox(width: isCompact ? 8 : 10),
-                                  // Product image
                                   Transform.translate(
                                     offset: const Offset(0, 2),
                                     child: Transform.rotate(
@@ -399,8 +513,9 @@ class _HeroCard extends StatelessWidget {
                                         width: imageWidth,
                                         height: imageHeight,
                                         decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(24),
+                                          borderRadius: BorderRadius.circular(
+                                            24,
+                                          ),
                                           gradient: LinearGradient(
                                             begin: Alignment.topLeft,
                                             end: Alignment.bottomRight,
@@ -428,6 +543,9 @@ class _HeroCard extends StatelessWidget {
                                             Colors.white,
                                             0.80,
                                           )!,
+                                          fit: BoxFit.contain,
+                                          radius: 18,
+                                          memCacheWidth: 560,
                                         ),
                                       ),
                                     ),
@@ -451,10 +569,14 @@ class _HeroCard extends StatelessWidget {
 
   String get _subtitle {
     final offer = product.offerDescription?.trim();
-    if (offer != null && offer.isNotEmpty) return offer;
+    if (offer != null && offer.isNotEmpty) {
+      return offer;
+    }
 
     final description = product.description?.trim();
-    if (description != null && description.isNotEmpty) return description;
+    if (description != null && description.isNotEmpty) {
+      return description;
+    }
 
     final category = product.categoryName?.trim();
     if (category != null && category.isNotEmpty) {
@@ -462,6 +584,18 @@ class _HeroCard extends StatelessWidget {
     }
 
     return 'Flexible gifting with instant checkout and easy redemption.';
+  }
+
+  String _supportingPriceText(String currency) {
+    if (product.hasDiscount) {
+      return 'Worth $currency${product.minPrice.toStringAsFixed(0)}';
+    }
+
+    if (product.maxPrice > product.minPrice) {
+      return 'Up to $currency${product.maxPrice.toStringAsFixed(0)}';
+    }
+
+    return 'Ready to send instantly';
   }
 
   List<Widget> _buildBackgroundWatermarks({
@@ -524,7 +658,7 @@ class _HeroCard extends StatelessWidget {
           child: Transform.rotate(
             angle: -0.10,
             child: Text(
-              '\u2726',
+              '✦',
               style: TextStyle(
                 fontSize: isCompact ? 20 : 26,
                 fontWeight: FontWeight.w800,
@@ -537,14 +671,20 @@ class _HeroCard extends StatelessWidget {
     ];
   }
 
-  Widget _buildImage(String? url, Color fallbackColor) {
+  Widget _buildImage(
+    String? url,
+    Color fallbackColor, {
+    BoxFit fit = BoxFit.contain,
+    double radius = 14,
+    int memCacheWidth = 400,
+  }) {
     if (url != null && url.trim().isNotEmpty) {
       return ClipRRect(
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(radius),
         child: CachedNetworkImage(
           imageUrl: url,
-          fit: BoxFit.contain,
-          memCacheWidth: 560,
+          fit: fit,
+          memCacheWidth: memCacheWidth,
           placeholder: (_, _) => product.blurHash != null
               ? BlurHash(hash: product.blurHash!)
               : Container(color: fallbackColor),

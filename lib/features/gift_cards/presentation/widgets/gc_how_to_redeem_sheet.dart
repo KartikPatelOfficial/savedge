@@ -50,12 +50,12 @@ class GcHowToRedeemSheet extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: GcTokens.brandBlack,
+        color: Colors.white,
         borderRadius: const BorderRadius.vertical(
           top: Radius.circular(GcTokens.rSheet),
         ),
         border: Border.all(
-          color: GcTokens.primary.withValues(alpha: 0.18),
+          color: GcTokens.border,
         ),
       ),
       child: SafeArea(
@@ -71,7 +71,7 @@ class GcHowToRedeemSheet extends StatelessWidget {
                   width: 44,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.18),
+                    color: GcTokens.textTertiary.withValues(alpha: 0.25),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -82,15 +82,15 @@ class GcHowToRedeemSheet extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w900,
-                  color: Colors.white,
+                  color: GcTokens.textPrimary,
                 ),
               ),
               const SizedBox(height: 6),
               Text(
                 'Quick steps to use your $brandName gift card.',
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 13,
-                  color: Colors.white.withValues(alpha: 0.55),
+                  color: GcTokens.textTertiary,
                 ),
               ),
               const SizedBox(height: 22),
@@ -110,18 +110,18 @@ class GcHowToRedeemSheet extends StatelessWidget {
                     icon: const Icon(
                       Icons.open_in_new_rounded,
                       size: 18,
-                      color: GcTokens.brandBlack,
+                      color: Colors.white,
                     ),
                     label: Text(
                       'Open $brandName',
                       style: const TextStyle(
-                        color: GcTokens.brandBlack,
+                        color: Colors.white,
                         fontWeight: FontWeight.w900,
                       ),
                     ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: GcTokens.brandLime,
-                      foregroundColor: GcTokens.brandBlack,
+                      backgroundColor: GcTokens.primary,
+                      foregroundColor: Colors.white,
                       elevation: 0,
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
@@ -159,10 +159,10 @@ class _StepRow extends StatelessWidget {
           width: 34,
           height: 34,
           decoration: BoxDecoration(
-            color: GcTokens.brandLime.withValues(alpha: 0.14),
+            color: GcTokens.primary.withValues(alpha: 0.10),
             borderRadius: BorderRadius.circular(11),
             border: Border.all(
-              color: GcTokens.brandLime.withValues(alpha: 0.45),
+              color: GcTokens.primary.withValues(alpha: 0.22),
             ),
           ),
           alignment: Alignment.center,
@@ -171,7 +171,7 @@ class _StepRow extends StatelessWidget {
             style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w900,
-              color: GcTokens.brandLime,
+              color: GcTokens.primary,
             ),
           ),
         ),
@@ -185,16 +185,16 @@ class _StepRow extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 14.5,
                   fontWeight: FontWeight.w900,
-                  color: Colors.white,
+                  color: GcTokens.textPrimary,
                 ),
               ),
               const SizedBox(height: 3),
               Text(
                 step.body,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 13,
                   height: 1.45,
-                  color: Colors.white.withValues(alpha: 0.65),
+                  color: GcTokens.textTertiary,
                 ),
               ),
             ],

@@ -1,6 +1,7 @@
 // Export all home page widgets
 // Export home content page
 export 'categories_section.dart';
+export 'gift_cards_showcase_section.dart';
 export 'home_bottom_nav_bar.dart';
 export 'home_drawer.dart';
 export 'home_header.dart';

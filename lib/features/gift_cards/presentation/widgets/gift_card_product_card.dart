@@ -5,6 +5,7 @@ import 'package:flutter_blurhash/flutter_blurhash.dart';
 import '../../data/services/gift_card_favorites_service.dart';
 import '../../domain/entities/gift_card_entity.dart';
 import '../theme/gc_tokens.dart';
+import 'gc_palette_extractor.dart';
 
 /// Premium-looking product card used on the listing grid and the
 /// "Save X%" sections. Shows brand image, name, strikethrough+payable price,
@@ -24,156 +25,163 @@ class GiftCardProductCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final accent = GcTokens.accentFor(product.id);
-    final bg = GcTokens.bgFor(product.id);
     final currency = product.currencySymbol ?? '\u20B9';
     final base = product.minPrice;
     final payable = product.calculatePayable(base);
 
-    return Material(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(GcTokens.rCard),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(GcTokens.rCard),
-        child: Container(
-          decoration: BoxDecoration(
+    return GcPaletteExtractor(
+      imageUrl: product.squareImageUrl,
+      fallback: accent,
+      builder: (context, brand) {
+        // Soft pastel tint of the brand color filling the entire image area.
+        final tint = Color.lerp(brand, Colors.white, 0.82)!;
+        final borderTint = brand.withValues(alpha: 0.22);
+
+        return Material(
+          color: tint,
+          borderRadius: BorderRadius.circular(GcTokens.rCard),
+          child: InkWell(
+            onTap: onTap,
             borderRadius: BorderRadius.circular(GcTokens.rCard),
-            border: Border.all(color: const Color(0xFFEFEAFB)),
-            boxShadow: GcTokens.tinyShadow,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Expanded(
-                child: Stack(
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            bg,
-                            Color.lerp(bg, Colors.white, 0.35)!,
-                          ],
-                        ),
-                        borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(GcTokens.rCard),
-                        ),
-                      ),
-                      padding: const EdgeInsets.all(18),
-                      child: _ProductImage(
-                        product: product,
-                        accent: accent,
-                      ),
-                    ),
-                    if (product.hasDiscount)
-                      Positioned(
-                        top: 10,
-                        left: 10,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [Color(0xFF7C3AED), Color(0xFF9F7AEA)],
-                            ),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            'Save ${product.discountPercentage!.toStringAsFixed(0)}%',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 10,
-                              fontWeight: FontWeight.w900,
+            child: Container(
+              decoration: BoxDecoration(
+                color: tint,
+                borderRadius: BorderRadius.circular(GcTokens.rCard),
+                border: Border.all(color: borderTint),
+                boxShadow: GcTokens.tinyShadow,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
+                    child: Stack(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(18),
+                          child: Center(
+                            child: _ProductImage(
+                              product: product,
+                              accent: brand == accent ? accent : brand,
                             ),
                           ),
                         ),
-                      ),
-                    Positioned(
-                      top: 8,
-                      right: 8,
-                      child: AnimatedBuilder(
-                        animation: favorites,
-                        builder: (_, __) {
-                          final fav = favorites.isFavorite(product.id);
-                          return Material(
-                            color: Colors.white,
-                            shape: const CircleBorder(),
-                            elevation: 1,
-                            child: InkWell(
-                              customBorder: const CircleBorder(),
-                              onTap: () => favorites.toggle(product.id),
-                              child: SizedBox(
-                                width: 30,
-                                height: 30,
-                                child: Icon(
-                                  fav
-                                      ? Icons.favorite_rounded
-                                      : Icons.favorite_border_rounded,
-                                  size: 16,
-                                  color: fav
-                                      ? Colors.redAccent
-                                      : GcTokens.textTertiary,
+                        if (product.hasDiscount)
+                          Positioned(
+                            top: 10,
+                            left: 10,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [
+                                    Color(0xFF7C3AED),
+                                    Color(0xFF9F7AEA),
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                'Save ${product.discountPercentage!.toStringAsFixed(0)}%',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w900,
                                 ),
                               ),
                             ),
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      product.brandName ?? product.name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w800,
-                        color: GcTokens.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        if (product.hasDiscount) ...[
-                          Text(
-                            '$currency${base.toStringAsFixed(0)}',
-                            style: const TextStyle(
-                              fontSize: 11,
-                              color: GcTokens.textTertiary,
-                              decoration: TextDecoration.lineThrough,
-                              fontWeight: FontWeight.w600,
-                            ),
                           ),
-                          const SizedBox(width: 4),
-                        ],
-                        Text(
-                          '$currency${payable.toStringAsFixed(0)}',
-                          style: TextStyle(
-                            fontSize: 13.5,
-                            fontWeight: FontWeight.w900,
-                            color: accent,
+                        Positioned(
+                          top: 8,
+                          right: 8,
+                          child: AnimatedBuilder(
+                            animation: favorites,
+                            builder: (_, __) {
+                              final fav = favorites.isFavorite(product.id);
+                              return Material(
+                                color: Colors.white,
+                                shape: const CircleBorder(),
+                                elevation: 1,
+                                child: InkWell(
+                                  customBorder: const CircleBorder(),
+                                  onTap: () => favorites.toggle(product.id),
+                                  child: SizedBox(
+                                    width: 30,
+                                    height: 30,
+                                    child: Icon(
+                                      fav
+                                          ? Icons.favorite_rounded
+                                          : Icons.favorite_border_rounded,
+                                      size: 16,
+                                      color: fav
+                                          ? Colors.redAccent
+                                          : GcTokens.textTertiary,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
                           ),
                         ),
                       ],
                     ),
-                  ],
-                ),
+                  ),
+                  Container(
+                    height: 1,
+                    margin: const EdgeInsets.symmetric(horizontal: 12),
+                    color: brand.withValues(alpha: 0.18),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          product.brandName ?? product.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w800,
+                            color: GcTokens.textPrimary,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            if (product.hasDiscount) ...[
+                              Text(
+                                '$currency${base.toStringAsFixed(0)}',
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  color: GcTokens.textTertiary,
+                                  decoration: TextDecoration.lineThrough,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                            ],
+                            Text(
+                              '$currency${payable.toStringAsFixed(0)}',
+                              style: TextStyle(
+                                fontSize: 13.5,
+                                fontWeight: FontWeight.w900,
+                                color: brand == accent ? accent : brand,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
@@ -185,8 +193,7 @@ class _ProductImage extends StatelessWidget {
   final Color accent;
 
   String? get _bestUrl => product.squareImageUrl;
-  bool get _hasUrl =>
-      _bestUrl != null && _bestUrl!.trim().isNotEmpty;
+  bool get _hasUrl => _bestUrl != null && _bestUrl!.trim().isNotEmpty;
 
   @override
   Widget build(BuildContext context) {

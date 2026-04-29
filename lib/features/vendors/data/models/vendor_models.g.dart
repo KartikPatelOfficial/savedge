@@ -70,6 +70,8 @@ _VendorImageDto _$VendorImageDtoFromJson(Map<String, dynamic> json) =>
     _VendorImageDto(
       id: (json['id'] as num?)?.toInt() ?? 0,
       imageUrl: json['imageUrl'] as String,
+      thumbnailUrl: json['thumbnailUrl'] as String?,
+      mediumUrl: json['mediumUrl'] as String?,
       altText: json['altText'] as String?,
       displayOrder: (json['displayOrder'] as num?)?.toInt() ?? 0,
       isPrimary: json['isPrimary'] as bool,
@@ -84,6 +86,8 @@ Map<String, dynamic> _$VendorImageDtoToJson(_VendorImageDto instance) =>
     <String, dynamic>{
       'id': instance.id,
       'imageUrl': instance.imageUrl,
+      'thumbnailUrl': instance.thumbnailUrl,
+      'mediumUrl': instance.mediumUrl,
       'altText': instance.altText,
       'displayOrder': instance.displayOrder,
       'isPrimary': instance.isPrimary,

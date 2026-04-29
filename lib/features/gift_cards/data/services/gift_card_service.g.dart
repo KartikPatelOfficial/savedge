@@ -2,11 +2,13 @@
 
 part of 'gift_card_service.dart';
 
+// dart format off
+
 // **************************************************************************
 // RetrofitGenerator
 // **************************************************************************
 
-// ignore_for_file: unnecessary_brace_in_string_interps,no_leading_underscores_for_local_identifiers,unused_element,unnecessary_string_interpolations,unused_element_parameter
+// ignore_for_file: unnecessary_brace_in_string_interps,no_leading_underscores_for_local_identifiers,unused_element,unnecessary_string_interpolations,unused_element_parameter,avoid_unused_constructor_parameters,unreachable_from_main
 
 class _GiftCardService implements GiftCardService {
   _GiftCardService(this._dio, {this.baseUrl, this.errorLogger});
@@ -181,12 +183,14 @@ class _GiftCardService implements GiftCardService {
     required int productId,
     required double amount,
     int pointsToUse = 0,
+    int quantity = 1,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{
       r'productId': productId,
       r'amount': amount,
       r'pointsToUse': pointsToUse,
+      r'quantity': quantity,
     };
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
@@ -386,3 +390,5 @@ class _GiftCardService implements GiftCardService {
     return Uri.parse(dioBaseUrl).resolveUri(url).toString();
   }
 }
+
+// dart format on

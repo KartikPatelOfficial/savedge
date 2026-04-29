@@ -4,46 +4,15 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blurhash/flutter_blurhash.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:savedge/core/injection/injection.dart';
 import 'package:savedge/features/stores/presentation/pages/vendor_detail_page.dart';
 import 'package:savedge/features/vendors/domain/entities/coupon.dart';
 import 'package:savedge/features/vendors/presentation/bloc/coupons_bloc.dart';
 
-/// Hot deals section widget with real coupon data
-class HotDealsSection extends StatefulWidget {
+class HotDealsSection extends StatelessWidget {
   const HotDealsSection({super.key});
-
-  // final List<HotDeal> deals;
-
-  @override
-  State<HotDealsSection> createState() => _HotDealsSectionState();
-}
-
-class _HotDealsSectionState extends State<HotDealsSection> {
-  bool _dispatched = false;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    // If a CouponsBloc is already provided up the tree, trigger special offers load once
-    final existingBloc = context.read<CouponsBloc?>();
-    if (existingBloc != null && !_dispatched) {
-      existingBloc.add(const LoadSpecialOfferCoupons());
-      _dispatched = true;
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
-    // Use existing BLoC if available; otherwise create one and load specials
-    final couponsBloc = context.read<CouponsBloc?>();
-    if (couponsBloc == null) {
-      return BlocProvider(
-        create: (context) =>
-            getIt<CouponsBloc>()..add(const LoadSpecialOfferCoupons()),
-        child: const HotDealsView(),
-      );
-    }
     return const HotDealsView();
   }
 }

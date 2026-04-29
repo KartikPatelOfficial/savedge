@@ -833,6 +833,11 @@ class _GcOrderTileState extends State<_GcOrderTile> {
       o.status == GiftCardOrderStatusEntity.pending ||
       o.status == GiftCardOrderStatusEntity.paymentCompleted ||
       o.status == GiftCardOrderStatusEntity.issuing;
+  // Issuing means Woohoo is actively processing the order — the user must NOT remove it
+  // from their list because it may still complete successfully (or settle to refund).
+  bool get _isIssuing =>
+      o.status == GiftCardOrderStatusEntity.issuing ||
+      o.status == GiftCardOrderStatusEntity.paymentCompleted;
   bool get _hasExpandable => _isRefunded || _isFailed;
 
   Color get _statusColor {
@@ -1391,6 +1396,18 @@ class _GcOrderTileState extends State<_GcOrderTile> {
               ),
             ),
           ),
+          if (o.status == GiftCardOrderStatusEntity.refunded) ...[
+            const SizedBox(height: 8),
+            Text(
+              'Your payment will be refunded to the original payment method within 3-5 business days.',
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: GcTokens.textSecondary.withValues(alpha: 0.85),
+                height: 1.4,
+              ),
+            ),
+          ],
         ] else
           Text(
             'We weren\'t able to issue this gift card. If money was deducted, it will be auto-refunded within 3-5 business days.',
@@ -1482,34 +1499,39 @@ class _GcOrderTileState extends State<_GcOrderTile> {
       padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
       child: Row(
         children: [
-          Expanded(
-            child: OutlinedButton.icon(
-              onPressed: widget.onDelete,
-              icon: const Icon(
-                Icons.delete_outline_rounded,
-                size: 16,
-                color: GcTokens.danger,
-              ),
-              label: const Text(
-                'Delete',
-                style: TextStyle(
-                  fontSize: 12.5,
-                  fontWeight: FontWeight.w900,
+          // Delete (hide-from-list) is intentionally suppressed while the order is
+          // actively being issued — Woohoo may still complete or settle to refund,
+          // and removing the row would orphan the result.
+          if (!_isIssuing) ...[
+            Expanded(
+              child: OutlinedButton.icon(
+                onPressed: widget.onDelete,
+                icon: const Icon(
+                  Icons.delete_outline_rounded,
+                  size: 16,
                   color: GcTokens.danger,
                 ),
-              ),
-              style: OutlinedButton.styleFrom(
-                side: BorderSide(
-                  color: GcTokens.danger.withValues(alpha: 0.40),
+                label: const Text(
+                  'Delete',
+                  style: TextStyle(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w900,
+                    color: GcTokens.danger,
+                  ),
                 ),
-                padding: const EdgeInsets.symmetric(vertical: 11),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(GcTokens.rPill),
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide(
+                    color: GcTokens.danger.withValues(alpha: 0.40),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 11),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(GcTokens.rPill),
+                  ),
                 ),
               ),
             ),
-          ),
-          const SizedBox(width: 10),
+            const SizedBox(width: 10),
+          ],
           Expanded(
             child: ElevatedButton.icon(
               onPressed: widget.onSupport,

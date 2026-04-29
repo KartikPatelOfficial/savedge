@@ -11,6 +11,7 @@ class GcPriceBreakdownCard extends StatelessWidget {
     required this.pointsDiscount,
     required this.totalPayable,
     required this.currencySymbol,
+    this.quantity = 1,
     this.accent = GcTokens.primary,
   });
 
@@ -20,6 +21,7 @@ class GcPriceBreakdownCard extends StatelessWidget {
   final double pointsDiscount;
   final double totalPayable;
   final String currencySymbol;
+  final int quantity;
   final Color accent;
 
   @override
@@ -44,8 +46,10 @@ class GcPriceBreakdownCard extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           _row(
-            'Voucher value',
-            '$currencySymbol${amount.toStringAsFixed(0)}',
+            quantity > 1
+                ? 'Voucher value ($currencySymbol${amount.toStringAsFixed(0)} × $quantity)'
+                : 'Voucher value',
+            '$currencySymbol${(amount * quantity).toStringAsFixed(0)}',
           ),
           if (discountAmount > 0) ...[
             const SizedBox(height: 8),
