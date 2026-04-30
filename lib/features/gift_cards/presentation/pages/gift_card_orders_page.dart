@@ -645,14 +645,15 @@ class _OrdersViewState extends State<_OrdersView> {
     final ok = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: GcTokens.brandBlack,
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
         title: const Text(
           'Delete pending order?',
           style: TextStyle(
-            color: Colors.white,
+            color: GcTokens.textPrimary,
             fontWeight: FontWeight.w900,
             fontSize: 18,
           ),
@@ -661,9 +662,10 @@ class _OrdersViewState extends State<_OrdersView> {
           'This will remove order #${o.id} from your list. '
           'It is just a pending order, so no payment is involved. '
           'You can\'t undo this.',
-          style: TextStyle(
-            color: Colors.white.withValues(alpha: 0.75),
+          style: const TextStyle(
+            color: GcTokens.textSecondary,
             fontSize: 13,
+            fontWeight: FontWeight.w600,
             height: 1.45,
           ),
         ),
@@ -671,9 +673,12 @@ class _OrdersViewState extends State<_OrdersView> {
           TextButton(
             onPressed: () => Navigator.pop(context, false),
             style: TextButton.styleFrom(
-              foregroundColor: Colors.white.withValues(alpha: 0.65),
+              foregroundColor: GcTokens.textTertiary,
             ),
-            child: const Text('Cancel'),
+            child: const Text(
+              'Cancel',
+              style: TextStyle(fontWeight: FontWeight.w800),
+            ),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
