@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -26,7 +27,7 @@ class HotDealsView extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(
-          height: 260,
+          height: 280,
           child: BlocBuilder<CouponsBloc, CouponsState>(
             builder: (context, state) {
               if (state is CouponsLoading) {
@@ -306,7 +307,7 @@ class _StackedDealsCardsState extends State<StackedDealsCards>
       children: [
         // Main stacked cards
         SizedBox(
-          height: 220,
+          height: 240,
           child: NotificationListener<ScrollNotification>(
             onNotification: (notification) {
               if (notification is ScrollStartNotification) {
@@ -389,236 +390,6 @@ class _StackedDealsCardsState extends State<StackedDealsCards>
 
   Widget _buildCouponTicket(Coupon coupon, int index) {
     final palette = _dealPalettes[index % _dealPalettes.length];
-
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final stubWidth = constraints.maxWidth * 0.34;
-        final clipper = _TicketClipper(
-          notchPosition: stubWidth,
-          notchRadius: 12,
-          cornerRadius: 24,
-        );
-
-        return PhysicalShape(
-          clipper: clipper,
-          color: palette.gradient.first,
-          shadowColor: palette.gradient[1].withOpacity(0.55),
-          elevation: 12,
-          clipBehavior: Clip.antiAlias,
-          child: Stack(
-            children: [
-              // Layered gradient background
-              Positioned.fill(
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: palette.gradient,
-                      stops: const [0.0, 0.55, 1.0],
-                    ),
-                  ),
-                ),
-              ),
-              // Soft glows for depth
-              Positioned(
-                top: -60,
-                right: -50,
-                child: Container(
-                  width: 170,
-                  height: 170,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: RadialGradient(
-                      colors: [
-                        Colors.white.withOpacity(0.22),
-                        Colors.white.withOpacity(0.0),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                bottom: -80,
-                left: -40,
-                child: Container(
-                  width: 200,
-                  height: 200,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: RadialGradient(
-                      colors: [
-                        Colors.black.withOpacity(0.22),
-                        Colors.black.withOpacity(0.0),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              // Sparkle / dot pattern
-              Positioned.fill(
-                child: IgnorePointer(
-                  child: CustomPaint(painter: _SparklesPainter()),
-                ),
-              ),
-              // Content
-              Row(
-                children: [
-                  SizedBox(
-                    width: stubWidth,
-                    child: _buildDiscountStub(coupon, palette),
-                  ),
-                  // Perforation
-                  SizedBox(
-                    width: 2,
-                    child: CustomPaint(
-                      painter: _DashedLinePainter(
-                        color: Colors.white.withOpacity(0.55),
-                      ),
-                      child: const SizedBox.expand(),
-                    ),
-                  ),
-                  Expanded(child: _buildMainSection(coupon, palette)),
-                ],
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildDiscountStub(Coupon coupon, _DealPalette palette) {
-    final type = coupon.discountType.toLowerCase();
-
-    if (type == 'freeitem') {
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.card_giftcard_rounded,
-              color: palette.accent,
-              size: 36,
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'FREE',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 30,
-                fontWeight: FontWeight.w900,
-                letterSpacing: 1,
-                height: 0.95,
-              ),
-            ),
-            const SizedBox(height: 6),
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 8,
-                vertical: 3,
-              ),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.22),
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.white.withOpacity(0.35)),
-              ),
-              child: const Text(
-                'GIFT',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 10,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 2,
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    final isPercent = type == 'percentage';
-    final value = coupon.discountValue.toInt().toString();
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 16),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text(
-            'FLAT',
-            style: TextStyle(
-              color: palette.accent,
-              fontSize: 11,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 3,
-            ),
-          ),
-          const SizedBox(height: 6),
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (!isPercent)
-                  const Padding(
-                    padding: EdgeInsets.only(top: 10, right: 2),
-                    child: Text(
-                      '₹',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 26,
-                        fontWeight: FontWeight.w800,
-                        height: 1,
-                      ),
-                    ),
-                  ),
-                Text(
-                  value,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 56,
-                    fontWeight: FontWeight.w900,
-                    height: 0.9,
-                    letterSpacing: -2.5,
-                  ),
-                ),
-                if (isPercent)
-                  const Padding(
-                    padding: EdgeInsets.only(top: 8, left: 2),
-                    child: Text(
-                      '%',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 30,
-                        fontWeight: FontWeight.w900,
-                        height: 1,
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 4),
-          const Text(
-            'OFF',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 12,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 4,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMainSection(Coupon coupon, _DealPalette palette) {
     final daysLeft = coupon.validTo.difference(DateTime.now()).inDays;
     String? expText;
     if (daysLeft >= 0 && daysLeft <= 30) {
@@ -630,177 +401,436 @@ class _StackedDealsCardsState extends State<StackedDealsCards>
         expText = '$daysLeft days left';
       }
     }
-
     final minText = coupon.minimumAmountDisplay.isEmpty
         ? 'No minimum order'
         : coupon.minimumAmountDisplay;
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(18, 16, 16, 14),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Top: hot-deal badge + countdown
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 4,
-                ),
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: palette.gradient,
+          stops: const [0.0, 0.55, 1.0],
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: palette.gradient[1].withOpacity(0.45),
+            blurRadius: 22,
+            offset: const Offset(0, 10),
+            spreadRadius: -4,
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: Stack(
+          children: [
+            // Soft top-right glow
+            Positioned(
+              top: -60,
+              right: -50,
+              child: Container(
+                width: 170,
+                height: 170,
                 decoration: BoxDecoration(
-                  color: palette.accent,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: palette.accent.withOpacity(0.45),
-                      blurRadius: 10,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(palette.icon, color: palette.accentInk, size: 12),
-                    const SizedBox(width: 4),
-                    Text(
-                      palette.label,
-                      style: TextStyle(
-                        color: palette.accentInk,
-                        fontSize: 9.5,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 1.2,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const Spacer(),
-              if (expText != null)
-                Row(
-                  children: [
-                    Icon(
-                      Icons.access_time_rounded,
-                      color: Colors.white.withOpacity(0.85),
-                      size: 12,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      expText,
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.95),
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ],
-                ),
-            ],
-          ),
-          const Spacer(),
-          // Title
-          Text(
-            coupon.title,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.w800,
-              letterSpacing: -0.3,
-              height: 1.15,
-              shadows: [
-                Shadow(
-                  color: Colors.black26,
-                  blurRadius: 6,
-                  offset: Offset(0, 2),
-                ),
-              ],
-            ),
-          ),
-          if (coupon.description.isNotEmpty) ...[
-            const SizedBox(height: 4),
-            Text(
-              coupon.description,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: Colors.white.withOpacity(0.88),
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-                height: 1.2,
-              ),
-            ),
-          ],
-          const Spacer(),
-          // Bottom: minimum + CTA
-          Row(
-            children: [
-              Icon(
-                Icons.shopping_bag_outlined,
-                color: Colors.white.withOpacity(0.9),
-                size: 13,
-              ),
-              const SizedBox(width: 5),
-              Flexible(
-                child: Text(
-                  minText,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.95),
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(
+                    colors: [
+                      Colors.white.withOpacity(0.20),
+                      Colors.white.withOpacity(0.0),
+                    ],
                   ),
                 ),
               ),
-              const SizedBox(width: 8),
-              Container(
-                padding: const EdgeInsets.fromLTRB(12, 7, 8, 7),
-                decoration: BoxDecoration(
-                  color: palette.accent,
-                  borderRadius: BorderRadius.circular(30),
-                  boxShadow: [
-                    BoxShadow(
-                      color: palette.accent.withOpacity(0.55),
-                      blurRadius: 14,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'Grab',
-                      style: TextStyle(
-                        color: palette.accentInk,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 0.3,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    Container(
-                      width: 18,
-                      height: 18,
-                      decoration: BoxDecoration(
-                        color: palette.accentInk,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.arrow_forward_rounded,
-                        color: palette.accent,
-                        size: 12,
-                      ),
-                    ),
-                  ],
+            ),
+            // Big Savedge logo watermark — half cut at the bottom-left,
+            // masked to a soft white tint so it reads as a watermark.
+            Positioned(
+              left: -70,
+              bottom: -55,
+              child: IgnorePointer(
+                child: Transform.rotate(
+                  angle: -0.10,
+                  child: Image.asset(
+                    'assets/images/logo_transparant.png',
+                    width: 220,
+                    height: 220,
+                    fit: BoxFit.contain,
+                    color: Colors.white.withOpacity(0.10),
+                    colorBlendMode: BlendMode.srcIn,
+                  ),
                 ),
               ),
-            ],
+            ),
+            // Sparkle / dot pattern
+            Positioned.fill(
+              child: IgnorePointer(
+                child: CustomPaint(painter: _SparklesPainter()),
+              ),
+            ),
+            // Content
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Top row: category badge (left) + title & subtitle (right)
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildCategoryBadge(palette),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              coupon.title,
+                              textAlign: TextAlign.right,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: -0.2,
+                                height: 1.15,
+                                shadows: [
+                                  Shadow(
+                                    color: Colors.black26,
+                                    blurRadius: 6,
+                                    offset: Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            if (coupon.description.isNotEmpty) ...[
+                              const SizedBox(height: 3),
+                              Text(
+                                coupon.description,
+                                textAlign: TextAlign.right,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: Colors.white.withOpacity(0.85),
+                                  fontSize: 11.5,
+                                  fontWeight: FontWeight.w500,
+                                  height: 1.2,
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  // Center: hero discount seal
+                  Expanded(
+                    child: Center(
+                      child: _buildDiscountSeal(coupon, palette),
+                    ),
+                  ),
+                  // Bottom row: minimum (left) + countdown + CTA (right)
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.shopping_bag_outlined,
+                        color: Colors.white.withOpacity(0.9),
+                        size: 13,
+                      ),
+                      const SizedBox(width: 5),
+                      Flexible(
+                        child: Text(
+                          minText,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.95),
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      const Spacer(),
+                      if (expText != null) ...[
+                        _buildCountdownLabel(expText),
+                        const SizedBox(width: 8),
+                      ],
+                      _buildGrabCta(palette),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCategoryBadge(_DealPalette palette) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: palette.accent,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: palette.accent.withOpacity(0.45),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
           ),
         ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(palette.icon, color: palette.accentInk, size: 12),
+          const SizedBox(width: 4),
+          Text(
+            palette.label,
+            style: TextStyle(
+              color: palette.accentInk,
+              fontSize: 9.5,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 1.2,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCountdownLabel(String text) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(
+          Icons.access_time_rounded,
+          color: Colors.white.withOpacity(0.85),
+          size: 12,
+        ),
+        const SizedBox(width: 4),
+        Text(
+          text,
+          style: TextStyle(
+            color: Colors.white.withOpacity(0.95),
+            fontSize: 11,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildGrabCta(_DealPalette palette) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(12, 7, 8, 7),
+      decoration: BoxDecoration(
+        color: palette.accent,
+        borderRadius: BorderRadius.circular(30),
+        boxShadow: [
+          BoxShadow(
+            color: palette.accent.withOpacity(0.55),
+            blurRadius: 14,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            'Grab',
+            style: TextStyle(
+              color: palette.accentInk,
+              fontSize: 12,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 0.3,
+            ),
+          ),
+          const SizedBox(width: 4),
+          Container(
+            width: 18,
+            height: 18,
+            decoration: BoxDecoration(
+              color: palette.accentInk,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.arrow_forward_rounded,
+              color: palette.accent,
+              size: 12,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Hero centerpiece — a stamped circular seal with the discount value.
+  /// Outer dashed ring + inner accent-colored disc, slightly tilted for
+  /// hand-stamped character.
+  Widget _buildDiscountSeal(Coupon coupon, _DealPalette palette) {
+    final type = coupon.discountType.toLowerCase();
+    final ink = palette.accentInk;
+
+    Widget innerContent;
+    if (type == 'freeitem') {
+      innerContent = Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.card_giftcard_rounded, color: ink, size: 26),
+          const SizedBox(height: 1),
+          Text(
+            'FREE',
+            style: TextStyle(
+              color: ink,
+              fontSize: 20,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 1,
+              height: 1,
+            ),
+          ),
+          Text(
+            'GIFT',
+            style: TextStyle(
+              color: ink.withOpacity(0.7),
+              fontSize: 9,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 2.5,
+              height: 1.4,
+            ),
+          ),
+        ],
+      );
+    } else {
+      final isPercent = type == 'percentage';
+      final value = coupon.discountValue.toInt().toString();
+
+      innerContent = Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            'FLAT',
+            style: TextStyle(
+              color: ink.withOpacity(0.7),
+              fontSize: 9,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 3,
+              height: 1,
+            ),
+          ),
+          const SizedBox(height: 2),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (!isPercent)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 6, right: 1),
+                    child: Text(
+                      '₹',
+                      style: TextStyle(
+                        color: ink,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                        height: 1,
+                      ),
+                    ),
+                  ),
+                Text(
+                  value,
+                  style: TextStyle(
+                    color: ink,
+                    fontSize: 40,
+                    fontWeight: FontWeight.w900,
+                    height: 0.92,
+                    letterSpacing: -1.5,
+                  ),
+                ),
+                if (isPercent)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 6, left: 1),
+                    child: Text(
+                      '%',
+                      style: TextStyle(
+                        color: ink,
+                        fontSize: 22,
+                        fontWeight: FontWeight.w900,
+                        height: 1,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 1),
+          Text(
+            'OFF',
+            style: TextStyle(
+              color: ink.withOpacity(0.7),
+              fontSize: 9,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 4,
+              height: 1,
+            ),
+          ),
+        ],
+      );
+    }
+
+    return Transform.rotate(
+      angle: -0.10,
+      child: SizedBox(
+        width: 116,
+        height: 116,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            // Outer dashed ring — stamp-style perforation
+            CustomPaint(
+              size: const Size(116, 116),
+              painter: _DashedCirclePainter(
+                color: Colors.white.withOpacity(0.7),
+                strokeWidth: 1.6,
+                dashLengthDeg: 6,
+                gapLengthDeg: 4,
+              ),
+            ),
+            // Inner solid accent disc
+            Container(
+              width: 96,
+              height: 96,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: [
+                    Color.lerp(palette.accent, Colors.white, 0.08)!,
+                    palette.accent,
+                  ],
+                  stops: const [0, 1],
+                ),
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.45),
+                  width: 1.5,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: palette.accent.withOpacity(0.6),
+                    blurRadius: 26,
+                    spreadRadius: 1,
+                  ),
+                ],
+              ),
+              child: Center(child: innerContent),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -866,9 +896,9 @@ class _HotDealsShimmerState extends State<_HotDealsShimmer>
             children: [
               // Main card shimmer
               Container(
-                height: 200,
+                height: 220,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(24),
                   gradient: LinearGradient(
                     begin: Alignment(-1.0 + 2.0 * _ctrl.value, 0),
                     end: Alignment(-1.0 + 2.0 * _ctrl.value + 1, 0),
@@ -958,103 +988,53 @@ const List<_DealPalette> _dealPalettes = [
   ),
 ];
 
-/// Clipper that produces the classic coupon ticket silhouette: rounded
-/// rectangle with two semicircular notches in the top and bottom edges
-/// that align with the perforation between the discount stub and the
-/// content section.
-class _TicketClipper extends CustomClipper<Path> {
-  const _TicketClipper({
-    required this.notchPosition,
-    this.notchRadius = 12,
-    this.cornerRadius = 24,
+/// Subtle decorative dots and "+" sparkles to break up the gradient.
+/// Dashed circle around the centerpiece seal — gives it a postage-stamp
+/// "perforated" feel without notching the card itself.
+class _DashedCirclePainter extends CustomPainter {
+  _DashedCirclePainter({
+    required this.color,
+    this.strokeWidth = 1.5,
+    this.dashLengthDeg = 6,
+    this.gapLengthDeg = 4,
   });
 
-  final double notchPosition;
-  final double notchRadius;
-  final double cornerRadius;
-
-  @override
-  Path getClip(Size size) {
-    final r = cornerRadius;
-    final n = notchRadius;
-    final path = Path();
-
-    // Top edge — start after top-left corner
-    path.moveTo(r, 0);
-    path.lineTo(notchPosition - n, 0);
-    // Top notch dipping into the card
-    path.arcToPoint(
-      Offset(notchPosition + n, 0),
-      radius: Radius.circular(n),
-      clockwise: false,
-    );
-    path.lineTo(size.width - r, 0);
-    // Top-right corner
-    path.quadraticBezierTo(size.width, 0, size.width, r);
-    // Right edge
-    path.lineTo(size.width, size.height - r);
-    // Bottom-right corner
-    path.quadraticBezierTo(
-      size.width,
-      size.height,
-      size.width - r,
-      size.height,
-    );
-    // Bottom edge to bottom notch
-    path.lineTo(notchPosition + n, size.height);
-    path.arcToPoint(
-      Offset(notchPosition - n, size.height),
-      radius: Radius.circular(n),
-      clockwise: false,
-    );
-    path.lineTo(r, size.height);
-    // Bottom-left corner
-    path.quadraticBezierTo(0, size.height, 0, size.height - r);
-    // Left edge
-    path.lineTo(0, r);
-    // Top-left corner
-    path.quadraticBezierTo(0, 0, r, 0);
-    path.close();
-    return path;
-  }
-
-  @override
-  bool shouldReclip(covariant _TicketClipper oldClipper) =>
-      oldClipper.notchPosition != notchPosition ||
-      oldClipper.notchRadius != notchRadius ||
-      oldClipper.cornerRadius != cornerRadius;
-}
-
-/// Vertical perforation line drawn inside the gap between top and bottom
-/// notches.
-class _DashedLinePainter extends CustomPainter {
-  _DashedLinePainter({required this.color});
-
   final Color color;
+  final double strokeWidth;
+  final double dashLengthDeg;
+  final double gapLengthDeg;
 
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
       ..color = color
-      ..strokeWidth = 1.5
+      ..strokeWidth = strokeWidth
+      ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
 
-    const dashHeight = 4.0;
-    const dashSpace = 5.0;
-    final cx = size.width / 2;
-    var y = 6.0;
-    while (y < size.height - 6) {
-      canvas.drawLine(Offset(cx, y), Offset(cx, y + dashHeight), paint);
-      y += dashHeight + dashSpace;
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = math.min(size.width, size.height) / 2 - strokeWidth;
+    final rect = Rect.fromCircle(center: center, radius: radius);
+
+    final stepDeg = dashLengthDeg + gapLengthDeg;
+    final segments = (360 / stepDeg).floor();
+    final actualStepDeg = 360.0 / segments;
+    final dashRad = dashLengthDeg * math.pi / 180;
+    final stepRad = actualStepDeg * math.pi / 180;
+
+    for (var i = 0; i < segments; i++) {
+      canvas.drawArc(rect, i * stepRad, dashRad, false, paint);
     }
   }
 
   @override
-  bool shouldRepaint(covariant _DashedLinePainter oldDelegate) =>
-      oldDelegate.color != color;
+  bool shouldRepaint(covariant _DashedCirclePainter old) =>
+      old.color != color ||
+      old.strokeWidth != strokeWidth ||
+      old.dashLengthDeg != dashLengthDeg ||
+      old.gapLengthDeg != gapLengthDeg;
 }
 
-/// Subtle decorative dots and "+" sparkles to break up the gradient.
 class _SparklesPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {

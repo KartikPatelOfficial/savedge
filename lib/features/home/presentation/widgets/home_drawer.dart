@@ -55,9 +55,27 @@ class HomeDrawer extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Premium Header
-              _PremiumUserProfileSection(
-                  userName: userName, userAvatar: userAvatar),
-              const SizedBox(height: 40),
+              if (!isGuest) ...[
+                _PremiumUserProfileSection(
+                    userName: userName, userAvatar: userAvatar),
+                const SizedBox(height: 40),
+              ] else ...[
+                Padding(
+                  padding: const EdgeInsets.only(right: 24.0),
+                  child: ColorFiltered(
+                    colorFilter: const ColorFilter.mode(
+                      Color(0xFF6F3FCC),
+                      BlendMode.srcIn,
+                    ),
+                    child: Image.asset(
+                      'assets/images/logo_transparant.png',
+                      height: 120,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+              ],
               // Menu Items List - left aligned
               Expanded(
                 child: SizedBox(
