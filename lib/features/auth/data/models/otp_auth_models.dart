@@ -4,6 +4,22 @@ part 'otp_auth_models.freezed.dart';
 part 'otp_auth_models.g.dart';
 
 // Request Models
+
+/// Body for POST /api/v1/auth/user-auth/verify-msg91-token.
+/// The access token is the JWT returned by MSG91's Flutter SDK after the user
+/// completes OTP entry, OR a `BYPASS:phone` sentinel for whitelisted test phones.
+@freezed
+abstract class VerifyMsg91TokenRequest with _$VerifyMsg91TokenRequest {
+  const factory VerifyMsg91TokenRequest({required String accessToken}) =
+      _VerifyMsg91TokenRequest;
+
+  factory VerifyMsg91TokenRequest.fromJson(Map<String, dynamic> json) =>
+      _$VerifyMsg91TokenRequestFromJson(json);
+}
+
+/// Body for the legacy POST /api/auth/user-auth/send-otp endpoint, used by
+/// in-app OTP-gated actions (e.g. confirming the sender's phone before gifting).
+/// Login uses the MSG91 widget directly and does not go through this request.
 @freezed
 abstract class SendOtpRequest with _$SendOtpRequest {
   const factory SendOtpRequest({required String phoneNumber}) = _SendOtpRequest;
@@ -12,6 +28,8 @@ abstract class SendOtpRequest with _$SendOtpRequest {
       _$SendOtpRequestFromJson(json);
 }
 
+/// Body for the legacy POST /api/auth/user-auth/verify-otp endpoint, paired
+/// with [SendOtpRequest] for OTP-gated in-app actions.
 @freezed
 abstract class VerifyOtpRequest with _$VerifyOtpRequest {
   const factory VerifyOtpRequest({

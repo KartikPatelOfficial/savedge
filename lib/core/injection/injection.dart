@@ -19,9 +19,8 @@ import 'package:savedge/features/auth/domain/repositories/auth_repository.dart';
 import 'package:savedge/features/auth/domain/repositories/otp_auth_repository.dart';
 import 'package:savedge/features/auth/domain/usecases/get_profile_usecase.dart';
 import 'package:savedge/features/auth/domain/usecases/register_individual_usecase.dart';
-import 'package:savedge/features/auth/domain/usecases/send_otp_usecase.dart';
 import 'package:savedge/features/auth/domain/usecases/sync_user_usecase.dart';
-import 'package:savedge/features/auth/domain/usecases/verify_otp_usecase.dart';
+import 'package:savedge/features/auth/domain/usecases/verify_msg91_token_usecase.dart';
 import 'package:savedge/features/auth/presentation/bloc/otp_auth_cubit.dart';
 import 'package:savedge/features/brand_vouchers/data/repositories/brand_voucher_repository_impl.dart';
 // Brand voucher imports
@@ -162,11 +161,8 @@ Future<void> configureDependencies() async {
   getIt.registerSingleton<OtpAuthRepository>(
     OtpAuthRepositoryImpl(getIt<OtpAuthRemoteDataSource>()),
   );
-  getIt.registerSingleton<SendOtpUseCase>(
-    SendOtpUseCase(getIt<OtpAuthRepository>()),
-  );
-  getIt.registerSingleton<VerifyOtpUseCase>(
-    VerifyOtpUseCase(getIt<OtpAuthRepository>()),
+  getIt.registerSingleton<VerifyMsg91TokenUseCase>(
+    VerifyMsg91TokenUseCase(getIt<OtpAuthRepository>()),
   );
   getIt.registerSingleton<RegisterIndividualUseCase>(
     RegisterIndividualUseCase(getIt<OtpAuthRepository>()),
@@ -505,8 +501,7 @@ Future<void> configureDependencies() async {
   // Auth cubits
   getIt.registerFactory<OtpAuthCubit>(
     () => OtpAuthCubit(
-      getIt<SendOtpUseCase>(),
-      getIt<VerifyOtpUseCase>(),
+      getIt<VerifyMsg91TokenUseCase>(),
       getIt<RegisterIndividualUseCase>(),
     ),
   );

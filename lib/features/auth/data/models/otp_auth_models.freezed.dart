@@ -13,6 +13,269 @@ part of 'otp_auth_models.dart';
 T _$identity<T>(T value) => value;
 
 /// @nodoc
+mixin _$VerifyMsg91TokenRequest {
+
+ String get accessToken;
+/// Create a copy of VerifyMsg91TokenRequest
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$VerifyMsg91TokenRequestCopyWith<VerifyMsg91TokenRequest> get copyWith => _$VerifyMsg91TokenRequestCopyWithImpl<VerifyMsg91TokenRequest>(this as VerifyMsg91TokenRequest, _$identity);
+
+  /// Serializes this VerifyMsg91TokenRequest to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is VerifyMsg91TokenRequest&&(identical(other.accessToken, accessToken) || other.accessToken == accessToken));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,accessToken);
+
+@override
+String toString() {
+  return 'VerifyMsg91TokenRequest(accessToken: $accessToken)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $VerifyMsg91TokenRequestCopyWith<$Res>  {
+  factory $VerifyMsg91TokenRequestCopyWith(VerifyMsg91TokenRequest value, $Res Function(VerifyMsg91TokenRequest) _then) = _$VerifyMsg91TokenRequestCopyWithImpl;
+@useResult
+$Res call({
+ String accessToken
+});
+
+
+
+
+}
+/// @nodoc
+class _$VerifyMsg91TokenRequestCopyWithImpl<$Res>
+    implements $VerifyMsg91TokenRequestCopyWith<$Res> {
+  _$VerifyMsg91TokenRequestCopyWithImpl(this._self, this._then);
+
+  final VerifyMsg91TokenRequest _self;
+  final $Res Function(VerifyMsg91TokenRequest) _then;
+
+/// Create a copy of VerifyMsg91TokenRequest
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? accessToken = null,}) {
+  return _then(_self.copyWith(
+accessToken: null == accessToken ? _self.accessToken : accessToken // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [VerifyMsg91TokenRequest].
+extension VerifyMsg91TokenRequestPatterns on VerifyMsg91TokenRequest {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _VerifyMsg91TokenRequest value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _VerifyMsg91TokenRequest() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _VerifyMsg91TokenRequest value)  $default,){
+final _that = this;
+switch (_that) {
+case _VerifyMsg91TokenRequest():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _VerifyMsg91TokenRequest value)?  $default,){
+final _that = this;
+switch (_that) {
+case _VerifyMsg91TokenRequest() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String accessToken)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _VerifyMsg91TokenRequest() when $default != null:
+return $default(_that.accessToken);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String accessToken)  $default,) {final _that = this;
+switch (_that) {
+case _VerifyMsg91TokenRequest():
+return $default(_that.accessToken);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String accessToken)?  $default,) {final _that = this;
+switch (_that) {
+case _VerifyMsg91TokenRequest() when $default != null:
+return $default(_that.accessToken);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _VerifyMsg91TokenRequest implements VerifyMsg91TokenRequest {
+  const _VerifyMsg91TokenRequest({required this.accessToken});
+  factory _VerifyMsg91TokenRequest.fromJson(Map<String, dynamic> json) => _$VerifyMsg91TokenRequestFromJson(json);
+
+@override final  String accessToken;
+
+/// Create a copy of VerifyMsg91TokenRequest
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$VerifyMsg91TokenRequestCopyWith<_VerifyMsg91TokenRequest> get copyWith => __$VerifyMsg91TokenRequestCopyWithImpl<_VerifyMsg91TokenRequest>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$VerifyMsg91TokenRequestToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _VerifyMsg91TokenRequest&&(identical(other.accessToken, accessToken) || other.accessToken == accessToken));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,accessToken);
+
+@override
+String toString() {
+  return 'VerifyMsg91TokenRequest(accessToken: $accessToken)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$VerifyMsg91TokenRequestCopyWith<$Res> implements $VerifyMsg91TokenRequestCopyWith<$Res> {
+  factory _$VerifyMsg91TokenRequestCopyWith(_VerifyMsg91TokenRequest value, $Res Function(_VerifyMsg91TokenRequest) _then) = __$VerifyMsg91TokenRequestCopyWithImpl;
+@override @useResult
+$Res call({
+ String accessToken
+});
+
+
+
+
+}
+/// @nodoc
+class __$VerifyMsg91TokenRequestCopyWithImpl<$Res>
+    implements _$VerifyMsg91TokenRequestCopyWith<$Res> {
+  __$VerifyMsg91TokenRequestCopyWithImpl(this._self, this._then);
+
+  final _VerifyMsg91TokenRequest _self;
+  final $Res Function(_VerifyMsg91TokenRequest) _then;
+
+/// Create a copy of VerifyMsg91TokenRequest
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? accessToken = null,}) {
+  return _then(_VerifyMsg91TokenRequest(
+accessToken: null == accessToken ? _self.accessToken : accessToken // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
 mixin _$SendOtpRequest {
 
  String get phoneNumber;

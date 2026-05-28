@@ -6,6 +6,14 @@ part of 'otp_auth_models.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
+_VerifyMsg91TokenRequest _$VerifyMsg91TokenRequestFromJson(
+  Map<String, dynamic> json,
+) => _VerifyMsg91TokenRequest(accessToken: json['accessToken'] as String);
+
+Map<String, dynamic> _$VerifyMsg91TokenRequestToJson(
+  _VerifyMsg91TokenRequest instance,
+) => <String, dynamic>{'accessToken': instance.accessToken};
+
 _SendOtpRequest _$SendOtpRequestFromJson(Map<String, dynamic> json) =>
     _SendOtpRequest(phoneNumber: json['phoneNumber'] as String);
 

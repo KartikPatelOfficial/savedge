@@ -14,33 +14,12 @@ class OtpAuthRepositoryImpl implements OtpAuthRepository {
   OtpAuthRepositoryImpl(this.remoteDataSource);
 
   @override
-  Future<Either<Failure, void>> sendOtp(String phoneNumber) async {
-    try {
-      final request = SendOtpRequest(phoneNumber: phoneNumber);
-      final response = await remoteDataSource.sendOtp(request);
-
-      if (response.succeeded) {
-        return const Right(null);
-      } else {
-        return Left(ServerFailure(response.errors.join(', ')));
-      }
-    } on DioException catch (e) {
-      return Left(_handleDioException(e));
-    } on ServerException catch (e) {
-      return Left(ServerFailure(e.message));
-    } catch (e) {
-      return Left(ServerFailure('An unexpected error occurred'));
-    }
-  }
-
-  @override
-  Future<Either<Failure, UserVerificationResult>> verifyOtp(
-    String phoneNumber,
-    String otp,
+  Future<Either<Failure, UserVerificationResult>> verifyMsg91Token(
+    String accessToken,
   ) async {
     try {
-      final request = VerifyOtpRequest(phoneNumber: phoneNumber, otp: otp);
-      final response = await remoteDataSource.verifyOtp(request);
+      final request = VerifyMsg91TokenRequest(accessToken: accessToken);
+      final response = await remoteDataSource.verifyMsg91Token(request);
 
       if (response.succeeded && response.value != null) {
         return Right(response.value!);
@@ -112,6 +91,8 @@ class OtpAuthRepositoryImpl implements OtpAuthRepository {
           final errorMessage =
               e.response?.data?['errors']?.join(', ') ?? 'Bad request';
           return ServerFailure(errorMessage);
+        } else if (statusCode == 401) {
+          return const ServerFailure('Invalid or expired OTP token');
         } else if (statusCode == 429) {
           return const ServerFailure(
             'Too many requests. Please try again later.',
