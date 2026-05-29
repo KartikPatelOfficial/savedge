@@ -38,6 +38,14 @@ class _PointsPaymentDialogState extends State<PointsPaymentDialog> {
   bool _isFullPayment = true;
   bool _isValidInput = false;
 
+  // Point type: 0 = SavEdge, 1 = Meal. Balances are loaded per type.
+  int _pointType = 0;
+  int _savEdgeAvailable = 0;
+  int _mealAvailable = 0;
+
+  /// Available points for the currently selected point type.
+  int get _availablePoints => _pointType == 1 ? _mealAvailable : _savEdgeAvailable;
+
   // OTP Step
   final List<TextEditingController> _otpControllers = List.generate(
     6,
@@ -63,8 +71,44 @@ class _PointsPaymentDialogState extends State<PointsPaymentDialog> {
     super.initState();
     _billAmountController.addListener(_onBillAmountChanged);
     _pointsController.addListener(_onPointsChanged);
-    _pointsToUse = widget.availablePoints;
+    // Seed SavEdge balance from the caller; refine both buckets from the API.
+    _savEdgeAvailable = _availablePoints;
+    _pointsToUse = _availablePoints;
     _pointsController.text = _pointsToUse.toString();
+    _loadBalances();
+  }
+
+  Future<void> _loadBalances() async {
+    try {
+      final balance = await _paymentService.getBalance();
+      if (!mounted) return;
+      setState(() {
+        _savEdgeAvailable = balance.availablePoints;
+        _mealAvailable = balance.mealAvailablePoints;
+        if (_isFullPayment) {
+          _pointsToUse = _billAmount.toInt().clamp(0, _availablePoints);
+          _pointsController.text = _pointsToUse.toString();
+        }
+        _validateInput();
+      });
+    } catch (_) {
+      // Keep the seeded SavEdge balance on failure.
+    }
+  }
+
+  void _onPointTypeChanged(int type) {
+    if (type == _pointType) return;
+    setState(() {
+      _pointType = type;
+      // Re-clamp the points to the newly selected bucket.
+      if (_isFullPayment) {
+        _pointsToUse = _billAmount.toInt().clamp(0, _availablePoints);
+      } else {
+        _pointsToUse = _pointsToUse.clamp(0, _availablePoints);
+      }
+      _pointsController.text = _pointsToUse.toString();
+      _validateInput();
+    });
   }
 
   void _onBillAmountChanged() {
@@ -72,7 +116,7 @@ class _PointsPaymentDialogState extends State<PointsPaymentDialog> {
     setState(() {
       _billAmount = amount;
       if (_isFullPayment && amount > 0) {
-        _pointsToUse = amount.toInt().clamp(0, widget.availablePoints);
+        _pointsToUse = amount.toInt().clamp(0, _availablePoints);
         _pointsController.text = _pointsToUse.toString();
       }
       _validateInput();
@@ -91,14 +135,14 @@ class _PointsPaymentDialogState extends State<PointsPaymentDialog> {
 
   void _validateInput() {
     final pointsToUse = _isFullPayment
-        ? _billAmount.toInt().clamp(0, widget.availablePoints)
+        ? _billAmount.toInt().clamp(0, _availablePoints)
         : _pointsToUse;
 
     setState(() {
       _isValidInput =
           _billAmount > 0 &&
           pointsToUse > 0 &&
-          pointsToUse <= widget.availablePoints;
+          pointsToUse <= _availablePoints;
     });
   }
 
@@ -279,7 +323,27 @@ class _PointsPaymentDialogState extends State<PointsPaymentDialog> {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
+          _buildPointTypeSelector(cs),
+          const SizedBox(height: 16),
           _buildPointsBalance(cs),
+          if (_pointType == 1) ...[
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                const Icon(Icons.info_outline, size: 14, color: Color(0xFFEA580C)),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    'Meal points can only be used at participating vendors.',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: cs.onSurfaceVariant,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
           const SizedBox(height: 20),
           _buildBillAmountField(cs),
           const SizedBox(height: 16),
@@ -295,6 +359,83 @@ class _PointsPaymentDialogState extends State<PointsPaymentDialog> {
           const SizedBox(height: 20),
           _buildContinueButton(cs),
         ],
+      ),
+    );
+  }
+
+  Widget _buildPointTypeSelector(ColorScheme cs) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Points Type',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+            color: cs.onSurface,
+          ),
+        ),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            Expanded(child: _buildPointTypeOption('SavEdge', 0, cs)),
+            const SizedBox(width: 12),
+            Expanded(child: _buildPointTypeOption('Meal', 1, cs)),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPointTypeOption(String label, int type, ColorScheme cs) {
+    final selected = _pointType == type;
+    final available = type == 1 ? _mealAvailable : _savEdgeAvailable;
+    return GestureDetector(
+      onTap: () => _onPointTypeChanged(type),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 14),
+        decoration: BoxDecoration(
+          color: selected
+              ? const Color(0xFF6366F1).withOpacity(0.08)
+              : cs.surfaceContainerLow,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: selected
+                ? const Color(0xFF6366F1)
+                : cs.outline.withOpacity(0.3),
+            width: 2,
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: selected ? const Color(0xFF6366F1) : cs.onSurface,
+                  ),
+                ),
+                if (selected)
+                  const Icon(Icons.check_circle,
+                      size: 18, color: Color(0xFF6366F1)),
+              ],
+            ),
+            const SizedBox(height: 2),
+            Text(
+              '$available pts',
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: cs.onSurfaceVariant,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -345,7 +486,7 @@ class _PointsPaymentDialogState extends State<PointsPaymentDialog> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Available Points',
+                  _pointType == 1 ? 'Available Meal Points' : 'Available SavEdge Points',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -354,7 +495,7 @@ class _PointsPaymentDialogState extends State<PointsPaymentDialog> {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  '${widget.availablePoints} points',
+                  '$_availablePoints points',
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w800,
@@ -495,7 +636,7 @@ class _PointsPaymentDialogState extends State<PointsPaymentDialog> {
         setState(() {
           _isFullPayment = isFullMode;
           if (_isFullPayment && _billAmount > 0) {
-            _pointsToUse = _billAmount.toInt().clamp(0, widget.availablePoints);
+            _pointsToUse = _billAmount.toInt().clamp(0, _availablePoints);
             _pointsController.text = _pointsToUse.toString();
           } else if (!_isFullPayment) {
             _pointsToUse = 0;
@@ -543,8 +684,8 @@ class _PointsPaymentDialogState extends State<PointsPaymentDialog> {
 
   Widget _buildPointsField(ColorScheme cs) {
     final maxPoints = _billAmount > 0
-        ? _billAmount.toInt().clamp(0, widget.availablePoints)
-        : widget.availablePoints;
+        ? _billAmount.toInt().clamp(0, _availablePoints)
+        : _availablePoints;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -602,7 +743,7 @@ class _PointsPaymentDialogState extends State<PointsPaymentDialog> {
 
   Widget _buildPaymentSummary(ColorScheme cs) {
     final pointsUsed = _isFullPayment
-        ? _billAmount.toInt().clamp(0, widget.availablePoints)
+        ? _billAmount.toInt().clamp(0, _availablePoints)
         : _pointsToUse;
     final remaining = (_billAmount - pointsUsed).clamp(0, double.infinity);
 
@@ -808,7 +949,7 @@ class _PointsPaymentDialogState extends State<PointsPaymentDialog> {
 
     try {
       final pointsUsed = _isFullPayment
-          ? _billAmount.toInt().clamp(0, widget.availablePoints)
+          ? _billAmount.toInt().clamp(0, _availablePoints)
           : _pointsToUse;
 
       final response = await _paymentService.initiatePayment(
@@ -816,6 +957,7 @@ class _PointsPaymentDialogState extends State<PointsPaymentDialog> {
           vendorProfileId: widget.vendor.id,
           amount: _billAmount,
           pointsToUse: pointsUsed,
+          pointType: _pointType,
         ),
       );
 

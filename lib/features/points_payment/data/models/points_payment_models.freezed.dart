@@ -15,7 +15,9 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$InitiatePointsPaymentRequest {
 
- int get vendorProfileId; double get amount; int get pointsToUse;
+ int get vendorProfileId; double get amount; int get pointsToUse;// 0 = SavEdge points, 1 = Meal points. Meal points are only accepted at
+// allowlisted vendors (the backend validates and rejects otherwise).
+ int get pointType;
 /// Create a copy of InitiatePointsPaymentRequest
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +30,16 @@ $InitiatePointsPaymentRequestCopyWith<InitiatePointsPaymentRequest> get copyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is InitiatePointsPaymentRequest&&(identical(other.vendorProfileId, vendorProfileId) || other.vendorProfileId == vendorProfileId)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.pointsToUse, pointsToUse) || other.pointsToUse == pointsToUse));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is InitiatePointsPaymentRequest&&(identical(other.vendorProfileId, vendorProfileId) || other.vendorProfileId == vendorProfileId)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.pointsToUse, pointsToUse) || other.pointsToUse == pointsToUse)&&(identical(other.pointType, pointType) || other.pointType == pointType));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,vendorProfileId,amount,pointsToUse);
+int get hashCode => Object.hash(runtimeType,vendorProfileId,amount,pointsToUse,pointType);
 
 @override
 String toString() {
-  return 'InitiatePointsPaymentRequest(vendorProfileId: $vendorProfileId, amount: $amount, pointsToUse: $pointsToUse)';
+  return 'InitiatePointsPaymentRequest(vendorProfileId: $vendorProfileId, amount: $amount, pointsToUse: $pointsToUse, pointType: $pointType)';
 }
 
 
@@ -48,7 +50,7 @@ abstract mixin class $InitiatePointsPaymentRequestCopyWith<$Res>  {
   factory $InitiatePointsPaymentRequestCopyWith(InitiatePointsPaymentRequest value, $Res Function(InitiatePointsPaymentRequest) _then) = _$InitiatePointsPaymentRequestCopyWithImpl;
 @useResult
 $Res call({
- int vendorProfileId, double amount, int pointsToUse
+ int vendorProfileId, double amount, int pointsToUse, int pointType
 });
 
 
@@ -65,11 +67,12 @@ class _$InitiatePointsPaymentRequestCopyWithImpl<$Res>
 
 /// Create a copy of InitiatePointsPaymentRequest
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? vendorProfileId = null,Object? amount = null,Object? pointsToUse = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? vendorProfileId = null,Object? amount = null,Object? pointsToUse = null,Object? pointType = null,}) {
   return _then(_self.copyWith(
 vendorProfileId: null == vendorProfileId ? _self.vendorProfileId : vendorProfileId // ignore: cast_nullable_to_non_nullable
 as int,amount: null == amount ? _self.amount : amount // ignore: cast_nullable_to_non_nullable
 as double,pointsToUse: null == pointsToUse ? _self.pointsToUse : pointsToUse // ignore: cast_nullable_to_non_nullable
+as int,pointType: null == pointType ? _self.pointType : pointType // ignore: cast_nullable_to_non_nullable
 as int,
   ));
 }
@@ -155,10 +158,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int vendorProfileId,  double amount,  int pointsToUse)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int vendorProfileId,  double amount,  int pointsToUse,  int pointType)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _InitiatePointsPaymentRequest() when $default != null:
-return $default(_that.vendorProfileId,_that.amount,_that.pointsToUse);case _:
+return $default(_that.vendorProfileId,_that.amount,_that.pointsToUse,_that.pointType);case _:
   return orElse();
 
 }
@@ -176,10 +179,10 @@ return $default(_that.vendorProfileId,_that.amount,_that.pointsToUse);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int vendorProfileId,  double amount,  int pointsToUse)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int vendorProfileId,  double amount,  int pointsToUse,  int pointType)  $default,) {final _that = this;
 switch (_that) {
 case _InitiatePointsPaymentRequest():
-return $default(_that.vendorProfileId,_that.amount,_that.pointsToUse);case _:
+return $default(_that.vendorProfileId,_that.amount,_that.pointsToUse,_that.pointType);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -196,10 +199,10 @@ return $default(_that.vendorProfileId,_that.amount,_that.pointsToUse);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int vendorProfileId,  double amount,  int pointsToUse)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int vendorProfileId,  double amount,  int pointsToUse,  int pointType)?  $default,) {final _that = this;
 switch (_that) {
 case _InitiatePointsPaymentRequest() when $default != null:
-return $default(_that.vendorProfileId,_that.amount,_that.pointsToUse);case _:
+return $default(_that.vendorProfileId,_that.amount,_that.pointsToUse,_that.pointType);case _:
   return null;
 
 }
@@ -211,12 +214,15 @@ return $default(_that.vendorProfileId,_that.amount,_that.pointsToUse);case _:
 @JsonSerializable()
 
 class _InitiatePointsPaymentRequest implements InitiatePointsPaymentRequest {
-  const _InitiatePointsPaymentRequest({required this.vendorProfileId, required this.amount, required this.pointsToUse});
+  const _InitiatePointsPaymentRequest({required this.vendorProfileId, required this.amount, required this.pointsToUse, this.pointType = 0});
   factory _InitiatePointsPaymentRequest.fromJson(Map<String, dynamic> json) => _$InitiatePointsPaymentRequestFromJson(json);
 
 @override final  int vendorProfileId;
 @override final  double amount;
 @override final  int pointsToUse;
+// 0 = SavEdge points, 1 = Meal points. Meal points are only accepted at
+// allowlisted vendors (the backend validates and rejects otherwise).
+@override@JsonKey() final  int pointType;
 
 /// Create a copy of InitiatePointsPaymentRequest
 /// with the given fields replaced by the non-null parameter values.
@@ -231,16 +237,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _InitiatePointsPaymentRequest&&(identical(other.vendorProfileId, vendorProfileId) || other.vendorProfileId == vendorProfileId)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.pointsToUse, pointsToUse) || other.pointsToUse == pointsToUse));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _InitiatePointsPaymentRequest&&(identical(other.vendorProfileId, vendorProfileId) || other.vendorProfileId == vendorProfileId)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.pointsToUse, pointsToUse) || other.pointsToUse == pointsToUse)&&(identical(other.pointType, pointType) || other.pointType == pointType));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,vendorProfileId,amount,pointsToUse);
+int get hashCode => Object.hash(runtimeType,vendorProfileId,amount,pointsToUse,pointType);
 
 @override
 String toString() {
-  return 'InitiatePointsPaymentRequest(vendorProfileId: $vendorProfileId, amount: $amount, pointsToUse: $pointsToUse)';
+  return 'InitiatePointsPaymentRequest(vendorProfileId: $vendorProfileId, amount: $amount, pointsToUse: $pointsToUse, pointType: $pointType)';
 }
 
 
@@ -251,7 +257,7 @@ abstract mixin class _$InitiatePointsPaymentRequestCopyWith<$Res> implements $In
   factory _$InitiatePointsPaymentRequestCopyWith(_InitiatePointsPaymentRequest value, $Res Function(_InitiatePointsPaymentRequest) _then) = __$InitiatePointsPaymentRequestCopyWithImpl;
 @override @useResult
 $Res call({
- int vendorProfileId, double amount, int pointsToUse
+ int vendorProfileId, double amount, int pointsToUse, int pointType
 });
 
 
@@ -268,11 +274,12 @@ class __$InitiatePointsPaymentRequestCopyWithImpl<$Res>
 
 /// Create a copy of InitiatePointsPaymentRequest
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? vendorProfileId = null,Object? amount = null,Object? pointsToUse = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? vendorProfileId = null,Object? amount = null,Object? pointsToUse = null,Object? pointType = null,}) {
   return _then(_InitiatePointsPaymentRequest(
 vendorProfileId: null == vendorProfileId ? _self.vendorProfileId : vendorProfileId // ignore: cast_nullable_to_non_nullable
 as int,amount: null == amount ? _self.amount : amount // ignore: cast_nullable_to_non_nullable
 as double,pointsToUse: null == pointsToUse ? _self.pointsToUse : pointsToUse // ignore: cast_nullable_to_non_nullable
+as int,pointType: null == pointType ? _self.pointType : pointType // ignore: cast_nullable_to_non_nullable
 as int,
   ));
 }
@@ -1115,7 +1122,9 @@ as DateTime,
 /// @nodoc
 mixin _$UserPointsBalanceResponse {
 
- int get availablePoints; int get usedPoints; int get expiringPoints; List<PointTransactionDto> get recentTransactions;
+// SavEdge points (legacy field names preserved for back-compat).
+ int get availablePoints; int get usedPoints; int get expiringPoints; List<PointTransactionDto> get recentTransactions;// Meal points (separate bucket).
+ int get mealAvailablePoints; int get mealUsedPoints; int get mealExpiringPoints;
 /// Create a copy of UserPointsBalanceResponse
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1128,16 +1137,16 @@ $UserPointsBalanceResponseCopyWith<UserPointsBalanceResponse> get copyWith => _$
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is UserPointsBalanceResponse&&(identical(other.availablePoints, availablePoints) || other.availablePoints == availablePoints)&&(identical(other.usedPoints, usedPoints) || other.usedPoints == usedPoints)&&(identical(other.expiringPoints, expiringPoints) || other.expiringPoints == expiringPoints)&&const DeepCollectionEquality().equals(other.recentTransactions, recentTransactions));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is UserPointsBalanceResponse&&(identical(other.availablePoints, availablePoints) || other.availablePoints == availablePoints)&&(identical(other.usedPoints, usedPoints) || other.usedPoints == usedPoints)&&(identical(other.expiringPoints, expiringPoints) || other.expiringPoints == expiringPoints)&&const DeepCollectionEquality().equals(other.recentTransactions, recentTransactions)&&(identical(other.mealAvailablePoints, mealAvailablePoints) || other.mealAvailablePoints == mealAvailablePoints)&&(identical(other.mealUsedPoints, mealUsedPoints) || other.mealUsedPoints == mealUsedPoints)&&(identical(other.mealExpiringPoints, mealExpiringPoints) || other.mealExpiringPoints == mealExpiringPoints));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,availablePoints,usedPoints,expiringPoints,const DeepCollectionEquality().hash(recentTransactions));
+int get hashCode => Object.hash(runtimeType,availablePoints,usedPoints,expiringPoints,const DeepCollectionEquality().hash(recentTransactions),mealAvailablePoints,mealUsedPoints,mealExpiringPoints);
 
 @override
 String toString() {
-  return 'UserPointsBalanceResponse(availablePoints: $availablePoints, usedPoints: $usedPoints, expiringPoints: $expiringPoints, recentTransactions: $recentTransactions)';
+  return 'UserPointsBalanceResponse(availablePoints: $availablePoints, usedPoints: $usedPoints, expiringPoints: $expiringPoints, recentTransactions: $recentTransactions, mealAvailablePoints: $mealAvailablePoints, mealUsedPoints: $mealUsedPoints, mealExpiringPoints: $mealExpiringPoints)';
 }
 
 
@@ -1148,7 +1157,7 @@ abstract mixin class $UserPointsBalanceResponseCopyWith<$Res>  {
   factory $UserPointsBalanceResponseCopyWith(UserPointsBalanceResponse value, $Res Function(UserPointsBalanceResponse) _then) = _$UserPointsBalanceResponseCopyWithImpl;
 @useResult
 $Res call({
- int availablePoints, int usedPoints, int expiringPoints, List<PointTransactionDto> recentTransactions
+ int availablePoints, int usedPoints, int expiringPoints, List<PointTransactionDto> recentTransactions, int mealAvailablePoints, int mealUsedPoints, int mealExpiringPoints
 });
 
 
@@ -1165,13 +1174,16 @@ class _$UserPointsBalanceResponseCopyWithImpl<$Res>
 
 /// Create a copy of UserPointsBalanceResponse
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? availablePoints = null,Object? usedPoints = null,Object? expiringPoints = null,Object? recentTransactions = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? availablePoints = null,Object? usedPoints = null,Object? expiringPoints = null,Object? recentTransactions = null,Object? mealAvailablePoints = null,Object? mealUsedPoints = null,Object? mealExpiringPoints = null,}) {
   return _then(_self.copyWith(
 availablePoints: null == availablePoints ? _self.availablePoints : availablePoints // ignore: cast_nullable_to_non_nullable
 as int,usedPoints: null == usedPoints ? _self.usedPoints : usedPoints // ignore: cast_nullable_to_non_nullable
 as int,expiringPoints: null == expiringPoints ? _self.expiringPoints : expiringPoints // ignore: cast_nullable_to_non_nullable
 as int,recentTransactions: null == recentTransactions ? _self.recentTransactions : recentTransactions // ignore: cast_nullable_to_non_nullable
-as List<PointTransactionDto>,
+as List<PointTransactionDto>,mealAvailablePoints: null == mealAvailablePoints ? _self.mealAvailablePoints : mealAvailablePoints // ignore: cast_nullable_to_non_nullable
+as int,mealUsedPoints: null == mealUsedPoints ? _self.mealUsedPoints : mealUsedPoints // ignore: cast_nullable_to_non_nullable
+as int,mealExpiringPoints: null == mealExpiringPoints ? _self.mealExpiringPoints : mealExpiringPoints // ignore: cast_nullable_to_non_nullable
+as int,
   ));
 }
 
@@ -1256,10 +1268,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int availablePoints,  int usedPoints,  int expiringPoints,  List<PointTransactionDto> recentTransactions)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int availablePoints,  int usedPoints,  int expiringPoints,  List<PointTransactionDto> recentTransactions,  int mealAvailablePoints,  int mealUsedPoints,  int mealExpiringPoints)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _UserPointsBalanceResponse() when $default != null:
-return $default(_that.availablePoints,_that.usedPoints,_that.expiringPoints,_that.recentTransactions);case _:
+return $default(_that.availablePoints,_that.usedPoints,_that.expiringPoints,_that.recentTransactions,_that.mealAvailablePoints,_that.mealUsedPoints,_that.mealExpiringPoints);case _:
   return orElse();
 
 }
@@ -1277,10 +1289,10 @@ return $default(_that.availablePoints,_that.usedPoints,_that.expiringPoints,_tha
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int availablePoints,  int usedPoints,  int expiringPoints,  List<PointTransactionDto> recentTransactions)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int availablePoints,  int usedPoints,  int expiringPoints,  List<PointTransactionDto> recentTransactions,  int mealAvailablePoints,  int mealUsedPoints,  int mealExpiringPoints)  $default,) {final _that = this;
 switch (_that) {
 case _UserPointsBalanceResponse():
-return $default(_that.availablePoints,_that.usedPoints,_that.expiringPoints,_that.recentTransactions);case _:
+return $default(_that.availablePoints,_that.usedPoints,_that.expiringPoints,_that.recentTransactions,_that.mealAvailablePoints,_that.mealUsedPoints,_that.mealExpiringPoints);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -1297,10 +1309,10 @@ return $default(_that.availablePoints,_that.usedPoints,_that.expiringPoints,_tha
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int availablePoints,  int usedPoints,  int expiringPoints,  List<PointTransactionDto> recentTransactions)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int availablePoints,  int usedPoints,  int expiringPoints,  List<PointTransactionDto> recentTransactions,  int mealAvailablePoints,  int mealUsedPoints,  int mealExpiringPoints)?  $default,) {final _that = this;
 switch (_that) {
 case _UserPointsBalanceResponse() when $default != null:
-return $default(_that.availablePoints,_that.usedPoints,_that.expiringPoints,_that.recentTransactions);case _:
+return $default(_that.availablePoints,_that.usedPoints,_that.expiringPoints,_that.recentTransactions,_that.mealAvailablePoints,_that.mealUsedPoints,_that.mealExpiringPoints);case _:
   return null;
 
 }
@@ -1312,9 +1324,10 @@ return $default(_that.availablePoints,_that.usedPoints,_that.expiringPoints,_tha
 @JsonSerializable()
 
 class _UserPointsBalanceResponse implements UserPointsBalanceResponse {
-  const _UserPointsBalanceResponse({required this.availablePoints, required this.usedPoints, required this.expiringPoints, required final  List<PointTransactionDto> recentTransactions}): _recentTransactions = recentTransactions;
+  const _UserPointsBalanceResponse({required this.availablePoints, required this.usedPoints, required this.expiringPoints, required final  List<PointTransactionDto> recentTransactions, this.mealAvailablePoints = 0, this.mealUsedPoints = 0, this.mealExpiringPoints = 0}): _recentTransactions = recentTransactions;
   factory _UserPointsBalanceResponse.fromJson(Map<String, dynamic> json) => _$UserPointsBalanceResponseFromJson(json);
 
+// SavEdge points (legacy field names preserved for back-compat).
 @override final  int availablePoints;
 @override final  int usedPoints;
 @override final  int expiringPoints;
@@ -1325,6 +1338,10 @@ class _UserPointsBalanceResponse implements UserPointsBalanceResponse {
   return EqualUnmodifiableListView(_recentTransactions);
 }
 
+// Meal points (separate bucket).
+@override@JsonKey() final  int mealAvailablePoints;
+@override@JsonKey() final  int mealUsedPoints;
+@override@JsonKey() final  int mealExpiringPoints;
 
 /// Create a copy of UserPointsBalanceResponse
 /// with the given fields replaced by the non-null parameter values.
@@ -1339,16 +1356,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UserPointsBalanceResponse&&(identical(other.availablePoints, availablePoints) || other.availablePoints == availablePoints)&&(identical(other.usedPoints, usedPoints) || other.usedPoints == usedPoints)&&(identical(other.expiringPoints, expiringPoints) || other.expiringPoints == expiringPoints)&&const DeepCollectionEquality().equals(other._recentTransactions, _recentTransactions));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UserPointsBalanceResponse&&(identical(other.availablePoints, availablePoints) || other.availablePoints == availablePoints)&&(identical(other.usedPoints, usedPoints) || other.usedPoints == usedPoints)&&(identical(other.expiringPoints, expiringPoints) || other.expiringPoints == expiringPoints)&&const DeepCollectionEquality().equals(other._recentTransactions, _recentTransactions)&&(identical(other.mealAvailablePoints, mealAvailablePoints) || other.mealAvailablePoints == mealAvailablePoints)&&(identical(other.mealUsedPoints, mealUsedPoints) || other.mealUsedPoints == mealUsedPoints)&&(identical(other.mealExpiringPoints, mealExpiringPoints) || other.mealExpiringPoints == mealExpiringPoints));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,availablePoints,usedPoints,expiringPoints,const DeepCollectionEquality().hash(_recentTransactions));
+int get hashCode => Object.hash(runtimeType,availablePoints,usedPoints,expiringPoints,const DeepCollectionEquality().hash(_recentTransactions),mealAvailablePoints,mealUsedPoints,mealExpiringPoints);
 
 @override
 String toString() {
-  return 'UserPointsBalanceResponse(availablePoints: $availablePoints, usedPoints: $usedPoints, expiringPoints: $expiringPoints, recentTransactions: $recentTransactions)';
+  return 'UserPointsBalanceResponse(availablePoints: $availablePoints, usedPoints: $usedPoints, expiringPoints: $expiringPoints, recentTransactions: $recentTransactions, mealAvailablePoints: $mealAvailablePoints, mealUsedPoints: $mealUsedPoints, mealExpiringPoints: $mealExpiringPoints)';
 }
 
 
@@ -1359,7 +1376,7 @@ abstract mixin class _$UserPointsBalanceResponseCopyWith<$Res> implements $UserP
   factory _$UserPointsBalanceResponseCopyWith(_UserPointsBalanceResponse value, $Res Function(_UserPointsBalanceResponse) _then) = __$UserPointsBalanceResponseCopyWithImpl;
 @override @useResult
 $Res call({
- int availablePoints, int usedPoints, int expiringPoints, List<PointTransactionDto> recentTransactions
+ int availablePoints, int usedPoints, int expiringPoints, List<PointTransactionDto> recentTransactions, int mealAvailablePoints, int mealUsedPoints, int mealExpiringPoints
 });
 
 
@@ -1376,13 +1393,16 @@ class __$UserPointsBalanceResponseCopyWithImpl<$Res>
 
 /// Create a copy of UserPointsBalanceResponse
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? availablePoints = null,Object? usedPoints = null,Object? expiringPoints = null,Object? recentTransactions = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? availablePoints = null,Object? usedPoints = null,Object? expiringPoints = null,Object? recentTransactions = null,Object? mealAvailablePoints = null,Object? mealUsedPoints = null,Object? mealExpiringPoints = null,}) {
   return _then(_UserPointsBalanceResponse(
 availablePoints: null == availablePoints ? _self.availablePoints : availablePoints // ignore: cast_nullable_to_non_nullable
 as int,usedPoints: null == usedPoints ? _self.usedPoints : usedPoints // ignore: cast_nullable_to_non_nullable
 as int,expiringPoints: null == expiringPoints ? _self.expiringPoints : expiringPoints // ignore: cast_nullable_to_non_nullable
 as int,recentTransactions: null == recentTransactions ? _self._recentTransactions : recentTransactions // ignore: cast_nullable_to_non_nullable
-as List<PointTransactionDto>,
+as List<PointTransactionDto>,mealAvailablePoints: null == mealAvailablePoints ? _self.mealAvailablePoints : mealAvailablePoints // ignore: cast_nullable_to_non_nullable
+as int,mealUsedPoints: null == mealUsedPoints ? _self.mealUsedPoints : mealUsedPoints // ignore: cast_nullable_to_non_nullable
+as int,mealExpiringPoints: null == mealExpiringPoints ? _self.mealExpiringPoints : mealExpiringPoints // ignore: cast_nullable_to_non_nullable
+as int,
   ));
 }
 
@@ -1393,7 +1413,8 @@ as List<PointTransactionDto>,
 /// @nodoc
 mixin _$PointTransactionDto {
 
- int get transactionId; int get points; String get description; String get transactionType; DateTime get transactionDate; DateTime? get expiryDate;
+ int get transactionId; int get points; String get description; String get transactionType; DateTime get transactionDate; DateTime? get expiryDate;// 0 = SavEdge, 1 = Meal.
+ int get pointType;
 /// Create a copy of PointTransactionDto
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1406,16 +1427,16 @@ $PointTransactionDtoCopyWith<PointTransactionDto> get copyWith => _$PointTransac
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is PointTransactionDto&&(identical(other.transactionId, transactionId) || other.transactionId == transactionId)&&(identical(other.points, points) || other.points == points)&&(identical(other.description, description) || other.description == description)&&(identical(other.transactionType, transactionType) || other.transactionType == transactionType)&&(identical(other.transactionDate, transactionDate) || other.transactionDate == transactionDate)&&(identical(other.expiryDate, expiryDate) || other.expiryDate == expiryDate));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PointTransactionDto&&(identical(other.transactionId, transactionId) || other.transactionId == transactionId)&&(identical(other.points, points) || other.points == points)&&(identical(other.description, description) || other.description == description)&&(identical(other.transactionType, transactionType) || other.transactionType == transactionType)&&(identical(other.transactionDate, transactionDate) || other.transactionDate == transactionDate)&&(identical(other.expiryDate, expiryDate) || other.expiryDate == expiryDate)&&(identical(other.pointType, pointType) || other.pointType == pointType));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,transactionId,points,description,transactionType,transactionDate,expiryDate);
+int get hashCode => Object.hash(runtimeType,transactionId,points,description,transactionType,transactionDate,expiryDate,pointType);
 
 @override
 String toString() {
-  return 'PointTransactionDto(transactionId: $transactionId, points: $points, description: $description, transactionType: $transactionType, transactionDate: $transactionDate, expiryDate: $expiryDate)';
+  return 'PointTransactionDto(transactionId: $transactionId, points: $points, description: $description, transactionType: $transactionType, transactionDate: $transactionDate, expiryDate: $expiryDate, pointType: $pointType)';
 }
 
 
@@ -1426,7 +1447,7 @@ abstract mixin class $PointTransactionDtoCopyWith<$Res>  {
   factory $PointTransactionDtoCopyWith(PointTransactionDto value, $Res Function(PointTransactionDto) _then) = _$PointTransactionDtoCopyWithImpl;
 @useResult
 $Res call({
- int transactionId, int points, String description, String transactionType, DateTime transactionDate, DateTime? expiryDate
+ int transactionId, int points, String description, String transactionType, DateTime transactionDate, DateTime? expiryDate, int pointType
 });
 
 
@@ -1443,7 +1464,7 @@ class _$PointTransactionDtoCopyWithImpl<$Res>
 
 /// Create a copy of PointTransactionDto
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? transactionId = null,Object? points = null,Object? description = null,Object? transactionType = null,Object? transactionDate = null,Object? expiryDate = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? transactionId = null,Object? points = null,Object? description = null,Object? transactionType = null,Object? transactionDate = null,Object? expiryDate = freezed,Object? pointType = null,}) {
   return _then(_self.copyWith(
 transactionId: null == transactionId ? _self.transactionId : transactionId // ignore: cast_nullable_to_non_nullable
 as int,points: null == points ? _self.points : points // ignore: cast_nullable_to_non_nullable
@@ -1451,7 +1472,8 @@ as int,description: null == description ? _self.description : description // ign
 as String,transactionType: null == transactionType ? _self.transactionType : transactionType // ignore: cast_nullable_to_non_nullable
 as String,transactionDate: null == transactionDate ? _self.transactionDate : transactionDate // ignore: cast_nullable_to_non_nullable
 as DateTime,expiryDate: freezed == expiryDate ? _self.expiryDate : expiryDate // ignore: cast_nullable_to_non_nullable
-as DateTime?,
+as DateTime?,pointType: null == pointType ? _self.pointType : pointType // ignore: cast_nullable_to_non_nullable
+as int,
   ));
 }
 
@@ -1536,10 +1558,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int transactionId,  int points,  String description,  String transactionType,  DateTime transactionDate,  DateTime? expiryDate)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int transactionId,  int points,  String description,  String transactionType,  DateTime transactionDate,  DateTime? expiryDate,  int pointType)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _PointTransactionDto() when $default != null:
-return $default(_that.transactionId,_that.points,_that.description,_that.transactionType,_that.transactionDate,_that.expiryDate);case _:
+return $default(_that.transactionId,_that.points,_that.description,_that.transactionType,_that.transactionDate,_that.expiryDate,_that.pointType);case _:
   return orElse();
 
 }
@@ -1557,10 +1579,10 @@ return $default(_that.transactionId,_that.points,_that.description,_that.transac
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int transactionId,  int points,  String description,  String transactionType,  DateTime transactionDate,  DateTime? expiryDate)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int transactionId,  int points,  String description,  String transactionType,  DateTime transactionDate,  DateTime? expiryDate,  int pointType)  $default,) {final _that = this;
 switch (_that) {
 case _PointTransactionDto():
-return $default(_that.transactionId,_that.points,_that.description,_that.transactionType,_that.transactionDate,_that.expiryDate);case _:
+return $default(_that.transactionId,_that.points,_that.description,_that.transactionType,_that.transactionDate,_that.expiryDate,_that.pointType);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -1577,10 +1599,10 @@ return $default(_that.transactionId,_that.points,_that.description,_that.transac
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int transactionId,  int points,  String description,  String transactionType,  DateTime transactionDate,  DateTime? expiryDate)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int transactionId,  int points,  String description,  String transactionType,  DateTime transactionDate,  DateTime? expiryDate,  int pointType)?  $default,) {final _that = this;
 switch (_that) {
 case _PointTransactionDto() when $default != null:
-return $default(_that.transactionId,_that.points,_that.description,_that.transactionType,_that.transactionDate,_that.expiryDate);case _:
+return $default(_that.transactionId,_that.points,_that.description,_that.transactionType,_that.transactionDate,_that.expiryDate,_that.pointType);case _:
   return null;
 
 }
@@ -1592,7 +1614,7 @@ return $default(_that.transactionId,_that.points,_that.description,_that.transac
 @JsonSerializable()
 
 class _PointTransactionDto implements PointTransactionDto {
-  const _PointTransactionDto({required this.transactionId, required this.points, required this.description, required this.transactionType, required this.transactionDate, this.expiryDate});
+  const _PointTransactionDto({required this.transactionId, required this.points, required this.description, required this.transactionType, required this.transactionDate, this.expiryDate, this.pointType = 0});
   factory _PointTransactionDto.fromJson(Map<String, dynamic> json) => _$PointTransactionDtoFromJson(json);
 
 @override final  int transactionId;
@@ -1601,6 +1623,8 @@ class _PointTransactionDto implements PointTransactionDto {
 @override final  String transactionType;
 @override final  DateTime transactionDate;
 @override final  DateTime? expiryDate;
+// 0 = SavEdge, 1 = Meal.
+@override@JsonKey() final  int pointType;
 
 /// Create a copy of PointTransactionDto
 /// with the given fields replaced by the non-null parameter values.
@@ -1615,16 +1639,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PointTransactionDto&&(identical(other.transactionId, transactionId) || other.transactionId == transactionId)&&(identical(other.points, points) || other.points == points)&&(identical(other.description, description) || other.description == description)&&(identical(other.transactionType, transactionType) || other.transactionType == transactionType)&&(identical(other.transactionDate, transactionDate) || other.transactionDate == transactionDate)&&(identical(other.expiryDate, expiryDate) || other.expiryDate == expiryDate));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PointTransactionDto&&(identical(other.transactionId, transactionId) || other.transactionId == transactionId)&&(identical(other.points, points) || other.points == points)&&(identical(other.description, description) || other.description == description)&&(identical(other.transactionType, transactionType) || other.transactionType == transactionType)&&(identical(other.transactionDate, transactionDate) || other.transactionDate == transactionDate)&&(identical(other.expiryDate, expiryDate) || other.expiryDate == expiryDate)&&(identical(other.pointType, pointType) || other.pointType == pointType));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,transactionId,points,description,transactionType,transactionDate,expiryDate);
+int get hashCode => Object.hash(runtimeType,transactionId,points,description,transactionType,transactionDate,expiryDate,pointType);
 
 @override
 String toString() {
-  return 'PointTransactionDto(transactionId: $transactionId, points: $points, description: $description, transactionType: $transactionType, transactionDate: $transactionDate, expiryDate: $expiryDate)';
+  return 'PointTransactionDto(transactionId: $transactionId, points: $points, description: $description, transactionType: $transactionType, transactionDate: $transactionDate, expiryDate: $expiryDate, pointType: $pointType)';
 }
 
 
@@ -1635,7 +1659,7 @@ abstract mixin class _$PointTransactionDtoCopyWith<$Res> implements $PointTransa
   factory _$PointTransactionDtoCopyWith(_PointTransactionDto value, $Res Function(_PointTransactionDto) _then) = __$PointTransactionDtoCopyWithImpl;
 @override @useResult
 $Res call({
- int transactionId, int points, String description, String transactionType, DateTime transactionDate, DateTime? expiryDate
+ int transactionId, int points, String description, String transactionType, DateTime transactionDate, DateTime? expiryDate, int pointType
 });
 
 
@@ -1652,7 +1676,7 @@ class __$PointTransactionDtoCopyWithImpl<$Res>
 
 /// Create a copy of PointTransactionDto
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? transactionId = null,Object? points = null,Object? description = null,Object? transactionType = null,Object? transactionDate = null,Object? expiryDate = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? transactionId = null,Object? points = null,Object? description = null,Object? transactionType = null,Object? transactionDate = null,Object? expiryDate = freezed,Object? pointType = null,}) {
   return _then(_PointTransactionDto(
 transactionId: null == transactionId ? _self.transactionId : transactionId // ignore: cast_nullable_to_non_nullable
 as int,points: null == points ? _self.points : points // ignore: cast_nullable_to_non_nullable
@@ -1660,7 +1684,8 @@ as int,description: null == description ? _self.description : description // ign
 as String,transactionType: null == transactionType ? _self.transactionType : transactionType // ignore: cast_nullable_to_non_nullable
 as String,transactionDate: null == transactionDate ? _self.transactionDate : transactionDate // ignore: cast_nullable_to_non_nullable
 as DateTime,expiryDate: freezed == expiryDate ? _self.expiryDate : expiryDate // ignore: cast_nullable_to_non_nullable
-as DateTime?,
+as DateTime?,pointType: null == pointType ? _self.pointType : pointType // ignore: cast_nullable_to_non_nullable
+as int,
   ));
 }
 

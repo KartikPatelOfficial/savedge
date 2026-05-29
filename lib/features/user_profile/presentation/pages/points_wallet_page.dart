@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
+
+import 'package:savedge/features/points_payment/data/models/points_payment_models.dart';
+import 'package:savedge/features/points_payment/data/services/points_payment_service.dart';
 
 import '../../../../core/injection/injection.dart';
 import '../../../../shared/domain/entities/points.dart';
@@ -34,11 +38,79 @@ class _PointsWalletView extends StatefulWidget {
 class _PointsWalletViewState extends State<_PointsWalletView>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  late final Future<UserPointsBalanceResponse> _balanceFuture;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _balanceFuture = GetIt.I<PointsPaymentService>().getBalance();
+  }
+
+  /// Compact card surfacing the user's Meal Points balance, which lives in a
+  /// separate bucket from SavEdge points. Only shown when the user has any.
+  Widget _buildMealPointsCard() {
+    return FutureBuilder<UserPointsBalanceResponse>(
+      future: _balanceFuture,
+      builder: (context, snapshot) {
+        final meal = snapshot.data?.mealAvailablePoints ?? 0;
+        if (meal <= 0) return const SizedBox.shrink();
+        return Container(
+          margin: const EdgeInsets.fromLTRB(16, 0, 16, 4),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: const Color(0xFFFFF7ED),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: const Color(0xFFEA580C).withOpacity(0.25)),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFEA580C),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(Icons.restaurant_rounded,
+                    color: Colors.white, size: 22),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Meal Points',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black54,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '$meal points',
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFFEA580C),
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Text(
+                'At participating\nvendors',
+                textAlign: TextAlign.right,
+                style: TextStyle(fontSize: 11, color: Colors.black45),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -127,6 +199,9 @@ class _PointsWalletViewState extends State<_PointsWalletView>
                   padding: const EdgeInsets.all(16),
                   child: PointsBalanceCard(points: state.points),
                 ),
+
+                // Meal Points balance (separate bucket), shown only if any
+                _buildMealPointsCard(),
 
                 // Expiry Warning with modern design
                 if (state.points.isExpiringSoon)

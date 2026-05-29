@@ -12,6 +12,7 @@ _InitiatePointsPaymentRequest _$InitiatePointsPaymentRequestFromJson(
   vendorProfileId: (json['vendorProfileId'] as num).toInt(),
   amount: (json['amount'] as num).toDouble(),
   pointsToUse: (json['pointsToUse'] as num).toInt(),
+  pointType: (json['pointType'] as num?)?.toInt() ?? 0,
 );
 
 Map<String, dynamic> _$InitiatePointsPaymentRequestToJson(
@@ -20,6 +21,7 @@ Map<String, dynamic> _$InitiatePointsPaymentRequestToJson(
   'vendorProfileId': instance.vendorProfileId,
   'amount': instance.amount,
   'pointsToUse': instance.pointsToUse,
+  'pointType': instance.pointType,
 };
 
 _InitiatePointsPaymentResponse _$InitiatePointsPaymentResponseFromJson(
@@ -95,6 +97,9 @@ _UserPointsBalanceResponse _$UserPointsBalanceResponseFromJson(
   recentTransactions: (json['recentTransactions'] as List<dynamic>)
       .map((e) => PointTransactionDto.fromJson(e as Map<String, dynamic>))
       .toList(),
+  mealAvailablePoints: (json['mealAvailablePoints'] as num?)?.toInt() ?? 0,
+  mealUsedPoints: (json['mealUsedPoints'] as num?)?.toInt() ?? 0,
+  mealExpiringPoints: (json['mealExpiringPoints'] as num?)?.toInt() ?? 0,
 );
 
 Map<String, dynamic> _$UserPointsBalanceResponseToJson(
@@ -104,6 +109,9 @@ Map<String, dynamic> _$UserPointsBalanceResponseToJson(
   'usedPoints': instance.usedPoints,
   'expiringPoints': instance.expiringPoints,
   'recentTransactions': instance.recentTransactions,
+  'mealAvailablePoints': instance.mealAvailablePoints,
+  'mealUsedPoints': instance.mealUsedPoints,
+  'mealExpiringPoints': instance.mealExpiringPoints,
 };
 
 _PointTransactionDto _$PointTransactionDtoFromJson(Map<String, dynamic> json) =>
@@ -116,6 +124,7 @@ _PointTransactionDto _$PointTransactionDtoFromJson(Map<String, dynamic> json) =>
       expiryDate: json['expiryDate'] == null
           ? null
           : DateTime.parse(json['expiryDate'] as String),
+      pointType: (json['pointType'] as num?)?.toInt() ?? 0,
     );
 
 Map<String, dynamic> _$PointTransactionDtoToJson(
@@ -127,6 +136,7 @@ Map<String, dynamic> _$PointTransactionDtoToJson(
   'transactionType': instance.transactionType,
   'transactionDate': instance.transactionDate.toIso8601String(),
   'expiryDate': instance.expiryDate?.toIso8601String(),
+  'pointType': instance.pointType,
 };
 
 _PointsPaymentDetailsResponse _$PointsPaymentDetailsResponseFromJson(

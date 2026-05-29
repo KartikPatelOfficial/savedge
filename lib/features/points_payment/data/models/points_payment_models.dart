@@ -10,6 +10,9 @@ abstract class InitiatePointsPaymentRequest
     required int vendorProfileId,
     required double amount,
     required int pointsToUse,
+    // 0 = SavEdge points, 1 = Meal points. Meal points are only accepted at
+    // allowlisted vendors (the backend validates and rejects otherwise).
+    @Default(0) int pointType,
   }) = _InitiatePointsPaymentRequest;
 
   factory InitiatePointsPaymentRequest.fromJson(Map<String, dynamic> json) =>
@@ -66,10 +69,15 @@ abstract class VerifyPointsPaymentOtpResponse
 @freezed
 abstract class UserPointsBalanceResponse with _$UserPointsBalanceResponse {
   const factory UserPointsBalanceResponse({
+    // SavEdge points (legacy field names preserved for back-compat).
     required int availablePoints,
     required int usedPoints,
     required int expiringPoints,
     required List<PointTransactionDto> recentTransactions,
+    // Meal points (separate bucket).
+    @Default(0) int mealAvailablePoints,
+    @Default(0) int mealUsedPoints,
+    @Default(0) int mealExpiringPoints,
   }) = _UserPointsBalanceResponse;
 
   factory UserPointsBalanceResponse.fromJson(Map<String, dynamic> json) =>
@@ -85,6 +93,8 @@ abstract class PointTransactionDto with _$PointTransactionDto {
     required String transactionType,
     required DateTime transactionDate,
     DateTime? expiryDate,
+    // 0 = SavEdge, 1 = Meal.
+    @Default(0) int pointType,
   }) = _PointTransactionDto;
 
   factory PointTransactionDto.fromJson(Map<String, dynamic> json) =>
