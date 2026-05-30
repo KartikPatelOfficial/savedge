@@ -1,100 +1,50 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
-import 'package:savedge/core/constants/app_constants.dart';
 import 'package:savedge/core/utils/failure_message_mapper.dart';
 import 'package:savedge/features/auth/data/models/otp_auth_models.dart';
 import 'package:savedge/features/auth/domain/usecases/register_individual_usecase.dart';
-import 'package:savedge/features/auth/domain/usecases/verify_msg91_token_usecase.dart';
-import 'package:sendotp_flutter_sdk/sendotp_flutter_sdk.dart';
+import 'package:savedge/features/auth/domain/usecases/send_otp_usecase.dart';
+import 'package:savedge/features/auth/domain/usecases/verify_otp_usecase.dart';
 
 part 'otp_auth_state.dart';
 
 @injectable
 class OtpAuthCubit extends Cubit<OtpAuthState> {
   OtpAuthCubit(
-    this._verifyMsg91TokenUseCase,
+    this._sendOtpUseCase,
+    this._verifyOtpUseCase,
     this._registerIndividualUseCase,
   ) : super(const OtpAuthInitial());
 
-  final VerifyMsg91TokenUseCase _verifyMsg91TokenUseCase;
+  final SendOtpUseCase _sendOtpUseCase;
+  final VerifyOtpUseCase _verifyOtpUseCase;
   final RegisterIndividualUseCase _registerIndividualUseCase;
 
-  /// Trigger OTP send via the MSG91 widget SDK.
-  /// Whitelisted bypass phones short-circuit without calling MSG91.
+  /// Request the backend to send an OTP to the phone number (via SMS).
   Future<void> sendOtp(String phoneNumber) async {
     emit(const OtpAuthLoading());
 
     final normalized = _normalize(phoneNumber);
-    if (AppConstants.bypassPhoneNumbers.contains(normalized)) {
-      emit(const OtpAuthCodeSent());
-      return;
-    }
 
-    try {
-      final response = await OTPWidget.sendOTP(<String, String>{
-        'identifier': _stripPlus(normalized),
-      });
-      if (response == null) {
-        emit(const OtpAuthError('Failed to send OTP. Please try again.'));
-        return;
-      }
-      if (_isSuccess(response)) {
-        emit(const OtpAuthCodeSent());
-      } else {
-        emit(OtpAuthError(_messageOrDefault(response, 'Failed to send OTP')));
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        debugPrint('OTPWidget.sendOTP error: $e');
-      }
-      emit(const OtpAuthError('Failed to send OTP. Please try again.'));
-    }
+    final result = await _sendOtpUseCase(SendOtpParams(phoneNumber: normalized));
+
+    result.fold(
+      (failure) =>
+          emit(OtpAuthError(FailureMessageMapper.mapFailureToMessage(failure))),
+      (_) => emit(const OtpAuthCodeSent()),
+    );
   }
 
-  /// Verify the OTP via the MSG91 SDK and then exchange the resulting access
-  /// token with the backend to obtain SavEdge session tokens.
+  /// Verify the OTP with the backend, which returns the user's verification
+  /// status along with SavEdge session tokens for existing users.
   Future<void> verifyOtp(String phoneNumber, String otp) async {
     emit(const OtpAuthLoading());
 
     final normalized = _normalize(phoneNumber);
 
-    String accessToken;
-    if (AppConstants.bypassPhoneNumbers.contains(normalized) &&
-        otp == AppConstants.bypassOtp) {
-      accessToken = '${AppConstants.bypassTokenPrefix}$normalized';
-    } else {
-      try {
-        final response = await OTPWidget.verifyOTP(<String, String>{
-          'identifier': _stripPlus(normalized),
-          'otp': otp,
-        });
-        if (response == null) {
-          emit(const OtpAuthError('OTP verification failed. Please try again.'));
-          return;
-        }
-        if (!_isSuccess(response)) {
-          emit(OtpAuthError(_messageOrDefault(response, 'Invalid OTP')));
-          return;
-        }
-        final message = response['message'];
-        if (message is! String || message.isEmpty) {
-          emit(const OtpAuthError('OTP verification returned an empty token'));
-          return;
-        }
-        accessToken = message;
-      } catch (e) {
-        if (kDebugMode) {
-          debugPrint('OTPWidget.verifyOTP error: $e');
-        }
-        emit(const OtpAuthError('OTP verification failed. Please try again.'));
-        return;
-      }
-    }
-
-    final result = await _verifyMsg91TokenUseCase(
-      VerifyMsg91TokenParams(accessToken: accessToken),
+    final result = await _verifyOtpUseCase(
+      VerifyOtpParams(phoneNumber: normalized, otp: otp),
     );
 
     result.fold(
@@ -190,21 +140,5 @@ class OtpAuthCubit extends Cubit<OtpAuthState> {
     final trimmed = phoneNumber.trim();
     if (trimmed.isEmpty) return trimmed;
     return trimmed.startsWith('+') ? trimmed : '+91$trimmed';
-  }
-
-  static String _stripPlus(String phoneNumber) =>
-      phoneNumber.startsWith('+') ? phoneNumber.substring(1) : phoneNumber;
-
-  static bool _isSuccess(Map<String, dynamic> response) =>
-      response['type']?.toString().toLowerCase() == 'success';
-
-  static String _messageOrDefault(
-    Map<String, dynamic> response,
-    String fallback,
-  ) {
-    final raw = response['message'];
-    if (raw == null) return fallback;
-    final text = raw.toString();
-    return text.isEmpty ? fallback : text;
   }
 }

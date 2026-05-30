@@ -20,8 +20,35 @@ class _OtpAuthRemoteDataSource implements OtpAuthRemoteDataSource {
   final ParseErrorLogger? errorLogger;
 
   @override
-  Future<UserVerificationResponse> verifyMsg91Token(
-    VerifyMsg91TokenRequest request,
+  Future<OtpResponse> sendLoginOtp(SendOtpRequest request) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = request;
+    final _options = _setStreamType<OtpResponse>(
+      Options(method: 'POST', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/api/v1/auth/user-auth/send-otp',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late OtpResponse _value;
+    try {
+      _value = OtpResponse.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
+  Future<UserVerificationResponse> verifyLoginOtp(
+    VerifyOtpRequest request,
   ) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
@@ -31,7 +58,7 @@ class _OtpAuthRemoteDataSource implements OtpAuthRemoteDataSource {
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/api/v1/auth/user-auth/verify-msg91-token',
+            '/api/v1/auth/user-auth/verify-otp',
             queryParameters: queryParameters,
             data: _data,
           )

@@ -14,12 +14,35 @@ class OtpAuthRepositoryImpl implements OtpAuthRepository {
   OtpAuthRepositoryImpl(this.remoteDataSource);
 
   @override
-  Future<Either<Failure, UserVerificationResult>> verifyMsg91Token(
-    String accessToken,
+  Future<Either<Failure, Unit>> sendOtp(String phoneNumber) async {
+    try {
+      final response = await remoteDataSource.sendLoginOtp(
+        SendOtpRequest(phoneNumber: phoneNumber),
+      );
+
+      if (response.succeeded) {
+        return const Right(unit);
+      } else {
+        return Left(ServerFailure(response.errors.join(', ')));
+      }
+    } on DioException catch (e) {
+      return Left(_handleDioException(e));
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } catch (e) {
+      return Left(ServerFailure('An unexpected error occurred'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, UserVerificationResult>> verifyOtp(
+    String phoneNumber,
+    String otp,
   ) async {
     try {
-      final request = VerifyMsg91TokenRequest(accessToken: accessToken);
-      final response = await remoteDataSource.verifyMsg91Token(request);
+      final response = await remoteDataSource.verifyLoginOtp(
+        VerifyOtpRequest(phoneNumber: phoneNumber, otp: otp),
+      );
 
       if (response.succeeded && response.value != null) {
         return Right(response.value!);

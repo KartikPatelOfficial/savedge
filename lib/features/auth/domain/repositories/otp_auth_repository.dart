@@ -3,10 +3,14 @@ import 'package:savedge/core/error/failures.dart';
 import 'package:savedge/features/auth/data/models/otp_auth_models.dart';
 
 abstract class OtpAuthRepository {
-  /// Verifies an MSG91 widget access token with the backend.
+  /// Sends a login OTP to [phoneNumber] via the backend.
+  Future<Either<Failure, Unit>> sendOtp(String phoneNumber);
+
+  /// Verifies the login [otp] for [phoneNumber] with the backend.
   /// Returns the verification result (user status + session tokens for existing users).
-  Future<Either<Failure, UserVerificationResult>> verifyMsg91Token(
-    String accessToken,
+  Future<Either<Failure, UserVerificationResult>> verifyOtp(
+    String phoneNumber,
+    String otp,
   );
 
   Future<Either<Failure, IndividualRegistrationResult>> registerIndividual(

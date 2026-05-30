@@ -15,7 +15,7 @@ import 'package:savedge/features/auth/domain/repositories/auth_repository.dart';
 import 'package:savedge/features/favorites/presentation/bloc/favorites_bloc.dart';
 import 'package:savedge/features/favorites/presentation/bloc/favorites_event.dart';
 import 'package:savedge/features/favorites/presentation/bloc/favorites_state.dart';
-import 'package:savedge/features/points_payment/presentation/widgets/points_payment_dialog.dart';
+import 'package:savedge/features/points_payment/presentation/pages/points_payment_page.dart';
 import 'package:savedge/features/qr_scanner/presentation/pages/qr_scanner_page.dart';
 import 'package:savedge/features/stores/presentation/widgets/vendor_offers_section.dart';
 import 'package:savedge/features/user_profile/presentation/bloc/points_bloc.dart';
@@ -1028,7 +1028,7 @@ class _VendorDetailViewState extends State<_VendorDetailView> {
           ),
           const SizedBox(width: 12),
           ElevatedButton(
-            onPressed: () => _openPointsPaymentDialog(context),
+            onPressed: () => _openPointsPaymentPage(context),
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF3B82F6),
               foregroundColor: Colors.white,
@@ -1548,7 +1548,7 @@ class _VendorDetailViewState extends State<_VendorDetailView> {
   }
 
   /// Start pay-with-points flow: verify vendor via QR, then open payment dialog
-  Future<void> _openPointsPaymentDialog(BuildContext context) async {
+  Future<void> _openPointsPaymentPage(BuildContext context) async {
     HapticFeedback.lightImpact();
 
     // 1) Verify vendor via QR scanner
@@ -1567,18 +1567,21 @@ class _VendorDetailViewState extends State<_VendorDetailView> {
       return; // Cancelled or failed verification
     }
 
-    // 2) On success, open payment dialog
+    if (!context.mounted) return;
+
+    // 2) On success, open the points payment page
     final pointsState = context.read<PointsBloc>().state;
     final availablePoints = pointsState is PointsLoaded
         ? pointsState.points.balance
         : 0;
 
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (BuildContext context) => PointsPaymentDialog(
-        vendor: widget.vendor,
-        availablePoints: availablePoints,
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (BuildContext context) => PointsPaymentPage(
+          vendor: widget.vendor,
+          availablePoints: availablePoints,
+        ),
       ),
     );
   }
