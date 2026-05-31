@@ -11,17 +11,31 @@ import 'package:savedge/features/vendors/domain/entities/vendor.dart';
 
 // ── Design tokens ───────────────────────────────────────────────────────────
 // Restrained, iOS-inspired palette built around the SavEdge brand purple.
-const Color _kBg = Color(0xFFF2F2F7); // iOS grouped background
+const Color _kBg = Color(0xFFF6F4FC); // soft lilac-white
 const Color _kCard = Colors.white;
-const Color _kLabel = Color(0xFF1C1C1E); // primary label
-const Color _kSecondary = Color(0xFF8A8A8E); // secondary label
-const Color _kHairline = Color(0xFFE7E7EA); // separators / borders
-const Color _kTrack = Color(0xFFE9E9EB); // segmented control track
-const Color _kAccent = Color(0xFF6F3FCC); // brand purple
-const Color _kAccentSoft = Color(0xFFF1ECFB); // light purple tint
-const Color _kGreen = Color(0xFF34C759); // system green
-const Color _kGreenSoft = Color(0xFFE8F8EE);
-const Color _kRed = Color(0xFFFF3B30); // system red
+const Color _kLabel = Color(0xFF1A1430); // deep plum-black
+const Color _kSecondary = Color(0xFF8A8398); // warm gray-violet
+const Color _kHairline = Color(0xFFECE8F5); // faint violet separators
+const Color _kTrack = Color(0xFFEBE7F4); // segmented control track
+const Color _kAccent = Color(0xFF6D28D9); // deep violet
+const Color _kAccentAlt = Color(0xFF9333EA); // gradient partner
+const Color _kAccentSoft = Color(0xFFEFE9FB); // light violet tint
+const Color _kField = Color(0xFFF1ECFA); // filled input surface
+const Color _kGreen = Color(0xFF0E9F6E); // emerald (savings)
+const Color _kGreenDeep = Color(0xFF0A7E57); // emerald text
+const Color _kGreenSoft = Color(0xFFE7F6EF);
+const Color _kRed = Color(0xFFEF4444); // red
+
+const LinearGradient _kAccentGradient = LinearGradient(
+  colors: [_kAccent, _kAccentAlt],
+  begin: Alignment.topLeft,
+  end: Alignment.bottomRight,
+);
+const LinearGradient _kGreenGradient = LinearGradient(
+  colors: [Color(0xFF0E9F6E), Color(0xFF13B981)],
+  begin: Alignment.topLeft,
+  end: Alignment.bottomRight,
+);
 
 enum PaymentStep { billDetails, otpVerification, success }
 
@@ -341,7 +355,7 @@ class _PointsPaymentPageState extends State<PointsPaymentPage> {
               children: [
                 _buildAmountHero(),
                 const SizedBox(height: 28),
-                _sectionHeader('Pay using'),
+                _sectionHeader('Pay using', 'Choose which points to redeem'),
                 const SizedBox(height: 10),
                 _buildPointTypeSelector(),
                 if (_pointType == 1) ...[
@@ -349,7 +363,10 @@ class _PointsPaymentPageState extends State<PointsPaymentPage> {
                   _buildMealNote(),
                 ],
                 const SizedBox(height: 28),
-                _sectionHeader('Payment mode'),
+                _sectionHeader(
+                  'Payment mode',
+                  'Full uses points up to your bill. Partial lets you pick.',
+                ),
                 const SizedBox(height: 10),
                 _buildPaymentModeSelector(),
                 if (!_isFullPayment) ...[
@@ -365,7 +382,10 @@ class _PointsPaymentPageState extends State<PointsPaymentPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const SizedBox(height: 28),
-                            _sectionHeader('Summary'),
+                            _sectionHeader(
+                              'Summary',
+                              'Review before you continue',
+                            ),
                             const SizedBox(height: 10),
                             _buildPaymentSummary(),
                           ],
@@ -390,8 +410,10 @@ class _PointsPaymentPageState extends State<PointsPaymentPage> {
           button: _PrimaryButton(
             label: 'Continue',
             enabled: _isValidInput,
+            gradient: _kAccentGradient,
             onTap: _proceedToOtp,
           ),
+          note: 'Secured with a one-time code at checkout',
         ),
       ],
     );
@@ -450,8 +472,14 @@ class _PointsPaymentPageState extends State<PointsPaymentPage> {
                     ),
                     decoration: InputDecoration(
                       isDense: true,
+                      filled: false,
                       contentPadding: EdgeInsets.zero,
                       border: InputBorder.none,
+                      enabledBorder: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      disabledBorder: InputBorder.none,
+                      errorBorder: InputBorder.none,
+                      focusedErrorBorder: InputBorder.none,
                       hintText: '0',
                       hintStyle: TextStyle(
                         fontSize: 52,
@@ -483,9 +511,14 @@ class _PointsPaymentPageState extends State<PointsPaymentPage> {
               style: TextStyle(
                 fontSize: 12.5,
                 fontWeight: FontWeight.w600,
-                color: Color(0xFF1E9E54),
+                color: _kGreenDeep,
               ),
             ),
+          ),
+          const SizedBox(height: 12),
+          const Text(
+            'Enter the total shown on your bill',
+            style: TextStyle(fontSize: 12.5, color: _kSecondary),
           ),
         ],
       ),
@@ -530,11 +563,19 @@ class _PointsPaymentPageState extends State<PointsPaymentPage> {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: selected ? _kAccentSoft : _kCard,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(
-            color: selected ? _kAccent : _kHairline,
-            width: selected ? 1.6 : 1,
-          ),
+          borderRadius: BorderRadius.circular(20),
+          border: selected
+              ? Border.all(color: _kAccent, width: 1.6)
+              : null,
+          boxShadow: selected
+              ? null
+              : [
+                  BoxShadow(
+                    color: _kAccent.withValues(alpha: 0.05),
+                    blurRadius: 14,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -662,8 +703,14 @@ class _PointsPaymentPageState extends State<PointsPaymentPage> {
                   ),
                   decoration: InputDecoration(
                     isDense: true,
+                    filled: false,
                     contentPadding: EdgeInsets.zero,
                     border: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                    disabledBorder: InputBorder.none,
+                    errorBorder: InputBorder.none,
+                    focusedErrorBorder: InputBorder.none,
                     hintText: '0',
                     hintStyle: TextStyle(
                       fontSize: 26,
@@ -756,7 +803,7 @@ class _PointsPaymentPageState extends State<PointsPaymentPage> {
                       style: TextStyle(
                         fontSize: 13.5,
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFF1E9E54),
+                        color: _kGreenDeep,
                       ),
                     ),
                   ),
@@ -867,9 +914,8 @@ class _PointsPaymentPageState extends State<PointsPaymentPage> {
                       vertical: 8,
                     ),
                     decoration: BoxDecoration(
-                      color: _kCard,
+                      color: _kAccentSoft,
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: _kHairline),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -877,7 +923,7 @@ class _PointsPaymentPageState extends State<PointsPaymentPage> {
                         const Icon(
                           Icons.receipt_long_rounded,
                           size: 15,
-                          color: _kSecondary,
+                          color: _kAccent,
                         ),
                         const SizedBox(width: 7),
                         Text(
@@ -885,7 +931,7 @@ class _PointsPaymentPageState extends State<PointsPaymentPage> {
                           style: const TextStyle(
                             fontSize: 12.5,
                             fontWeight: FontWeight.w600,
-                            color: _kSecondary,
+                            color: _kAccent,
                             fontFamily: 'monospace',
                           ),
                         ),
@@ -895,7 +941,23 @@ class _PointsPaymentPageState extends State<PointsPaymentPage> {
                 ],
                 const SizedBox(height: 28),
                 _buildOtpFields(),
-                const SizedBox(height: 20),
+                const SizedBox(height: 18),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    Icon(
+                      Icons.verified_user_rounded,
+                      size: 14,
+                      color: _kGreen,
+                    ),
+                    SizedBox(width: 6),
+                    Text(
+                      'Bank-grade verification keeps your points safe',
+                      style: TextStyle(fontSize: 12.5, color: _kSecondary),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 18),
                 _buildResendSection(),
               ],
             ),
@@ -906,8 +968,10 @@ class _PointsPaymentPageState extends State<PointsPaymentPage> {
             label: 'Verify & pay',
             enabled: isComplete && !_isVerifying,
             loading: _isVerifying,
+            gradient: _kAccentGradient,
             onTap: _verifyOtp,
           ),
+          note: 'Points are deducted only after verification',
         ),
       ],
     );
@@ -980,6 +1044,7 @@ class _PointsPaymentPageState extends State<PointsPaymentPage> {
           button: _PrimaryButton(
             label: 'Try again',
             enabled: true,
+            gradient: _kAccentGradient,
             onTap: () {
               setState(() {
                 _currentStep = PaymentStep.billDetails;
@@ -1007,16 +1072,21 @@ class _PointsPaymentPageState extends State<PointsPaymentPage> {
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 150),
               decoration: BoxDecoration(
-                color: hasValue ? _kAccentSoft : _kCard,
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(
-                  color: hasFocus
-                      ? _kAccent
-                      : hasValue
-                          ? _kAccent.withValues(alpha: 0.4)
-                          : _kHairline,
-                  width: hasFocus ? 2 : 1.4,
-                ),
+                color: hasFocus
+                    ? _kCard
+                    : hasValue
+                        ? _kAccentSoft
+                        : _kField,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: hasFocus
+                    ? [
+                        BoxShadow(
+                          color: _kAccent.withValues(alpha: 0.28),
+                          blurRadius: 12,
+                          offset: const Offset(0, 5),
+                        ),
+                      ]
+                    : null,
               ),
               child: Center(
                 child: TextField(
@@ -1033,7 +1103,13 @@ class _PointsPaymentPageState extends State<PointsPaymentPage> {
                   ),
                   decoration: const InputDecoration(
                     counterText: '',
+                    filled: false,
                     border: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                    disabledBorder: InputBorder.none,
+                    errorBorder: InputBorder.none,
+                    focusedErrorBorder: InputBorder.none,
                     contentPadding: EdgeInsets.zero,
                   ),
                   inputFormatters: [
@@ -1194,6 +1270,25 @@ class _PointsPaymentPageState extends State<PointsPaymentPage> {
                     height: 1.4,
                   ),
                 ),
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: _kGreenSoft,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: const Text(
+                    'Receipt saved to your account',
+                    style: TextStyle(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w600,
+                      color: _kGreenDeep,
+                    ),
+                  ),
+                ),
                 if (res != null) ...[
                   const SizedBox(height: 28),
                   _Card(
@@ -1248,6 +1343,7 @@ class _PointsPaymentPageState extends State<PointsPaymentPage> {
             label: 'Done',
             enabled: true,
             color: _kGreen,
+            gradient: _kGreenGradient,
             onTap: () {
               HapticFeedback.lightImpact();
               Navigator.of(context).pop(true);
@@ -1260,11 +1356,21 @@ class _PointsPaymentPageState extends State<PointsPaymentPage> {
 
   // ── Shared building blocks ──────────────────────────────────────────────────
 
-  Widget _buildBottomBar({required Widget button, _RecapLine? recap}) {
+  Widget _buildBottomBar({
+    required Widget button,
+    _RecapLine? recap,
+    String? note,
+  }) {
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: _kBg,
-        border: Border(top: BorderSide(color: _kHairline, width: 1)),
+        boxShadow: [
+          BoxShadow(
+            color: _kAccent.withValues(alpha: 0.05),
+            blurRadius: 18,
+            offset: const Offset(0, -6),
+          ),
+        ],
       ),
       child: SafeArea(
         top: false,
@@ -1279,6 +1385,27 @@ class _PointsPaymentPageState extends State<PointsPaymentPage> {
                 const SizedBox(height: 12),
               ],
               button,
+              if (note != null) ...[
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.lock_rounded,
+                      size: 13,
+                      color: _kSecondary,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      note,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: _kSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ],
           ),
         ),
@@ -1286,15 +1413,31 @@ class _PointsPaymentPageState extends State<PointsPaymentPage> {
     );
   }
 
-  Widget _sectionHeader(String text) {
-    return Text(
-      text,
-      style: const TextStyle(
-        fontSize: 15,
-        fontWeight: FontWeight.w700,
-        color: _kLabel,
-        letterSpacing: -0.2,
-      ),
+  Widget _sectionHeader(String text, [String? subtitle]) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          text,
+          style: const TextStyle(
+            fontSize: 15.5,
+            fontWeight: FontWeight.w700,
+            color: _kLabel,
+            letterSpacing: -0.2,
+          ),
+        ),
+        if (subtitle != null) ...[
+          const SizedBox(height: 3),
+          Text(
+            subtitle,
+            style: const TextStyle(
+              fontSize: 12.5,
+              color: _kSecondary,
+              height: 1.3,
+            ),
+          ),
+        ],
+      ],
     );
   }
 
@@ -1392,13 +1535,17 @@ class _Card extends StatelessWidget {
       padding: padding ?? const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: _kCard,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: _kHairline),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 12,
-            offset: const Offset(0, 3),
+            color: _kAccent.withValues(alpha: 0.06),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -1421,10 +1568,10 @@ class _CircleIconButton extends StatelessWidget {
         width: 36,
         height: 36,
         decoration: const BoxDecoration(
-          color: Color(0xFFEDEDF0),
+          color: _kAccentSoft,
           shape: BoxShape.circle,
         ),
-        child: Icon(icon, size: 19, color: _kLabel),
+        child: Icon(icon, size: 19, color: _kAccent),
       ),
     );
   }
@@ -1572,12 +1719,14 @@ class _PrimaryButton extends StatefulWidget {
     required this.onTap,
     this.loading = false,
     this.color = _kAccent,
+    this.gradient,
   });
 
   final String label;
   final bool enabled;
   final bool loading;
   final Color color;
+  final Gradient? gradient;
   final VoidCallback onTap;
 
   @override
@@ -1608,14 +1757,17 @@ class _PrimaryButtonState extends State<_PrimaryButton> {
           height: 54,
           width: double.infinity,
           decoration: BoxDecoration(
-            color: active ? widget.color : const Color(0xFFD9D9DE),
+            gradient: active ? widget.gradient : null,
+            color: active
+                ? (widget.gradient == null ? widget.color : null)
+                : const Color(0xFFE4E0EC),
             borderRadius: BorderRadius.circular(16),
             boxShadow: active
                 ? [
                     BoxShadow(
-                      color: widget.color.withValues(alpha: 0.32),
-                      blurRadius: 16,
-                      offset: const Offset(0, 6),
+                      color: widget.color.withValues(alpha: 0.34),
+                      blurRadius: 20,
+                      offset: const Offset(0, 8),
                     ),
                   ]
                 : null,
@@ -1635,7 +1787,7 @@ class _PrimaryButtonState extends State<_PrimaryButton> {
                   style: TextStyle(
                     fontSize: 16.5,
                     fontWeight: FontWeight.w700,
-                    color: active ? Colors.white : const Color(0xFF8A8A8E),
+                    color: active ? Colors.white : _kSecondary,
                     letterSpacing: -0.2,
                   ),
                 ),
