@@ -20,6 +20,11 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
   final MarkNotificationReadUseCase markNotificationReadUseCase;
   final NotificationRepository repository;
 
+  // Remembered device metadata from the last registration so a refreshed FCM
+  // token can be re-registered with the same deviceId (required server-side to
+  // deactivate the stale token for this device).
+  RegisterDeviceToken _lastRegistration = const RegisterDeviceToken();
+
   NotificationBloc({
     required this.registerDeviceTokenUseCase,
     required this.getNotificationsUseCase,
@@ -45,6 +50,11 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
   ) async {
     final pushService = PushNotificationService.instance;
     final token = pushService.fcmToken;
+
+    // Remember device metadata and ensure refreshed tokens are re-registered
+    // with the same deviceId so the backend can deactivate the stale token.
+    _lastRegistration = event;
+    pushService.onTokenRefreshed = (_) => add(_lastRegistration);
 
     if (token == null) {
       emit(state.copyWith(

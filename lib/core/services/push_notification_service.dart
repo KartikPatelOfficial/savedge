@@ -28,6 +28,10 @@ class PushNotificationService {
   String? _fcmToken;
   bool _isInitialized = false;
 
+  /// Called whenever FCM issues a new token (refresh/reinstall) so the new token
+  /// can be synced to the backend. Wired up where the NotificationBloc is created.
+  void Function(String token)? onTokenRefreshed;
+
   /// Get the current FCM token
   String? get fcmToken => _fcmToken;
 
@@ -188,7 +192,10 @@ class PushNotificationService {
   void _onTokenRefresh(String token) {
     _fcmToken = token;
     debugPrint('FCM Token refreshed: $token');
-    // TODO: Send new token to backend
+    // Sync the refreshed token to the backend so stale tokens get deactivated
+    // and the device does not accumulate multiple active tokens (which would
+    // cause duplicate push deliveries).
+    onTokenRefreshed?.call(token);
   }
 
   /// Handle foreground messages
