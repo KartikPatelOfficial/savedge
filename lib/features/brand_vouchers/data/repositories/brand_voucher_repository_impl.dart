@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:savedge/core/error/error_message_mapper.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../../../core/error/failures.dart';
@@ -32,7 +33,7 @@ class BrandVoucherRepositoryImpl implements BrandVoucherRepository {
 
       return Right(entities);
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(ServerFailure(ErrorMessageMapper.map(e)));
     }
   }
 
@@ -42,7 +43,7 @@ class BrandVoucherRepositoryImpl implements BrandVoucherRepository {
       final response = await _service.getBrandVoucher(id);
       return Right(_mapToEntity(response));
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(ServerFailure(ErrorMessageMapper.map(e)));
     }
   }
 
@@ -62,7 +63,7 @@ class BrandVoucherRepositoryImpl implements BrandVoucherRepository {
       final orderId = await _service.createVoucherOrder(request);
       return Right(orderId);
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(ServerFailure(ErrorMessageMapper.map(e)));
     }
   }
 
@@ -85,7 +86,7 @@ class BrandVoucherRepositoryImpl implements BrandVoucherRepository {
           
       return Right(entities);
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(ServerFailure(ErrorMessageMapper.map(e)));
     }
   }
 
@@ -95,7 +96,7 @@ class BrandVoucherRepositoryImpl implements BrandVoucherRepository {
       final response = await _service.getVoucherOrder(id);
       return Right(_mapToOrderEntity(response));
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(ServerFailure(ErrorMessageMapper.map(e)));
     }
   }
 
@@ -113,7 +114,7 @@ class BrandVoucherRepositoryImpl implements BrandVoucherRepository {
       final response = await _service.createPaymentOrder(request);
       return Right(response);
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(ServerFailure(ErrorMessageMapper.map(e)));
     }
   }
 
@@ -125,7 +126,7 @@ class BrandVoucherRepositoryImpl implements BrandVoucherRepository {
       final response = await _service.checkPaymentStatus(voucherOrderId);
       return Right(response);
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(ServerFailure(ErrorMessageMapper.map(e)));
     }
   }
 

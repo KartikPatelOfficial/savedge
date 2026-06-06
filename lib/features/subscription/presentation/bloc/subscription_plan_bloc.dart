@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:savedge/core/error/error_message_mapper.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../domain/entities/subscription_plan.dart';
@@ -93,7 +94,7 @@ class SubscriptionPlanBloc
       print('❌ SubscriptionPlanBloc: Error loading subscription plans');
       print('   Error: $error');
       print('   Stack trace: $stackTrace');
-      emit(SubscriptionPlanError('Failed to load plans: ${error.toString()}'));
+      emit(SubscriptionPlanError(ErrorMessageMapper.map(error)));
     }
   }
 
@@ -106,7 +107,7 @@ class SubscriptionPlanBloc
       final plans = await _subscriptionPlanRepository.getSubscriptionPlans();
       emit(SubscriptionPlanLoaded(plans));
     } catch (error) {
-      emit(SubscriptionPlanError(error.toString()));
+      emit(SubscriptionPlanError(ErrorMessageMapper.map(error)));
     }
   }
 }

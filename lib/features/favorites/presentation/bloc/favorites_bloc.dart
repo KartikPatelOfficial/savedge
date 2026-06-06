@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:savedge/core/utils/failure_message_mapper.dart';
 import '../../../../core/usecases/usecase.dart';
 import '../../domain/usecases/add_favorite_usecase.dart';
 import '../../domain/usecases/check_favorite_usecase.dart';
@@ -35,7 +36,7 @@ class FavoritesBloc extends Bloc<FavoritesEvent, FavoritesState> {
     final result = await getFavoritesUseCase(NoParams());
     
     result.fold(
-      (failure) => emit(FavoritesError(failure.toString())),
+      (failure) => emit(FavoritesError(FailureMessageMapper.mapFailureToMessage(failure))),
       (favorites) {
         final favoriteIds = favorites.map((f) => f.vendorId).toSet();
         emit(FavoritesLoaded(
@@ -55,7 +56,7 @@ class FavoritesBloc extends Bloc<FavoritesEvent, FavoritesState> {
     );
     
     result.fold(
-      (failure) => emit(FavoritesError(failure.toString())),
+      (failure) => emit(FavoritesError(FailureMessageMapper.mapFailureToMessage(failure))),
       (_) => add(LoadFavorites()),
     );
   }
@@ -69,7 +70,7 @@ class FavoritesBloc extends Bloc<FavoritesEvent, FavoritesState> {
     );
     
     result.fold(
-      (failure) => emit(FavoritesError(failure.toString())),
+      (failure) => emit(FavoritesError(FailureMessageMapper.mapFailureToMessage(failure))),
       (_) => add(LoadFavorites()),
     );
   }
@@ -83,7 +84,7 @@ class FavoritesBloc extends Bloc<FavoritesEvent, FavoritesState> {
     );
     
     result.fold(
-      (failure) => emit(FavoritesError(failure.toString())),
+      (failure) => emit(FavoritesError(FailureMessageMapper.mapFailureToMessage(failure))),
       (isFavorite) => emit(FavoriteStatusChecked(
         vendorId: event.vendorId,
         isFavorite: isFavorite,
@@ -101,7 +102,7 @@ class FavoritesBloc extends Bloc<FavoritesEvent, FavoritesState> {
     );
     
     await checkResult.fold(
-      (failure) async => emit(FavoritesError(failure.toString())),
+      (failure) async => emit(FavoritesError(FailureMessageMapper.mapFailureToMessage(failure))),
       (isFavorite) async {
         if (isFavorite) {
           // Remove from favorites
@@ -109,7 +110,7 @@ class FavoritesBloc extends Bloc<FavoritesEvent, FavoritesState> {
             RemoveFavoriteParams(vendorId: event.vendor.id),
           );
           removeResult.fold(
-            (failure) => emit(FavoritesError(failure.toString())),
+            (failure) => emit(FavoritesError(FailureMessageMapper.mapFailureToMessage(failure))),
             (_) => add(LoadFavorites()),
           );
         } else {
@@ -118,7 +119,7 @@ class FavoritesBloc extends Bloc<FavoritesEvent, FavoritesState> {
             AddFavoriteParams(vendor: event.vendor),
           );
           addResult.fold(
-            (failure) => emit(FavoritesError(failure.toString())),
+            (failure) => emit(FavoritesError(FailureMessageMapper.mapFailureToMessage(failure))),
             (_) => add(LoadFavorites()),
           );
         }

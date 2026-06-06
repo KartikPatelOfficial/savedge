@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:savedge/core/error/error_message_mapper.dart';
 
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
@@ -664,7 +665,7 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
       }
     } catch (e) {
       if (!mounted) return;
-      _showErrorDialog(e.toString());
+      _showErrorDialog(ErrorMessageMapper.map(e));
     } finally {
       if (mounted) {
         setState(() => _isConfirming = false);
@@ -991,7 +992,7 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: ${e.toString()}'),
+            content: Text(ErrorMessageMapper.map(e)),
             backgroundColor: Colors.red,
           ),
         );

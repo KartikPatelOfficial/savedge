@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:savedge/core/error/error_message_mapper.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:savedge/core/error/failures.dart';
@@ -64,7 +65,7 @@ class VendorsRepositoryImpl implements VendorsRepository {
     } on DioException catch (e) {
       return Left(_handleDioError(e));
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(ServerFailure(ErrorMessageMapper.map(e)));
     }
   }
 
@@ -96,8 +97,8 @@ class VendorsRepositoryImpl implements VendorsRepository {
       return Right(vendor);
     } on DioException catch (e) {
       return Left(_handleDioError(e));
-    } catch (e, stackTrace) {
-      return Left(ServerFailure('Error: ${e.toString()}'));
+    } catch (e) {
+      return Left(ServerFailure(ErrorMessageMapper.map(e)));
     }
   }
 
@@ -114,7 +115,7 @@ class VendorsRepositoryImpl implements VendorsRepository {
     } on DioException catch (e) {
       return Left(_handleDioError(e));
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(ServerFailure(ErrorMessageMapper.map(e)));
     }
   }
 
@@ -140,7 +141,7 @@ class VendorsRepositoryImpl implements VendorsRepository {
     } on DioException catch (e) {
       return Left(_handleDioError(e));
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(ServerFailure(ErrorMessageMapper.map(e)));
     }
   }
 

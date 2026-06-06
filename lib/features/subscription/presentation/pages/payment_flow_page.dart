@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:savedge/core/error/error_message_mapper.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import '../../../../core/injection/injection.dart';
@@ -104,9 +105,9 @@ class _PaymentFlowViewState extends State<_PaymentFlowView> {
       if (mounted) {
         setState(() {
           _isProcessingPayment = false;
-          _paymentError = e.toString();
+          _paymentError = ErrorMessageMapper.map(e);
         });
-        _showErrorDialog('Payment Error', e.toString());
+        _showErrorDialog('Payment Error', ErrorMessageMapper.map(e));
       }
     }
   }

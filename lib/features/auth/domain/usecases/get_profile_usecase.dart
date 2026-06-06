@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:savedge/core/error/error_message_mapper.dart';
 import 'package:savedge/core/error/failures.dart';
 import 'package:savedge/core/usecases/usecase.dart';
 import 'package:savedge/features/auth/domain/entities/user_profile.dart';
@@ -19,7 +20,7 @@ class GetProfileUseCase extends UseCase<UserProfile, NoParams> {
       final profile = await _repository.getProfile();
       return Right(profile);
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(ServerFailure(ErrorMessageMapper.map(e)));
     }
   }
 }

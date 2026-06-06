@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:savedge/core/error/error_message_mapper.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
@@ -31,7 +32,7 @@ class PromotionBloc extends Bloc<PromotionEvent, PromotionState> {
         emit(const PromotionState.inactive());
       }
     } catch (e) {
-      emit(PromotionState.error(message: e.toString()));
+      emit(PromotionState.error(message: ErrorMessageMapper.map(e)));
     }
   }
 
@@ -44,7 +45,7 @@ class PromotionBloc extends Bloc<PromotionEvent, PromotionState> {
       final response = await _repository.enrollInPromotion();
       emit(PromotionState.enrolled(response: response));
     } catch (e) {
-      emit(PromotionState.error(message: e.toString()));
+      emit(PromotionState.error(message: ErrorMessageMapper.map(e)));
     }
   }
 }

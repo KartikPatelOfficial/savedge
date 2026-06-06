@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:savedge/core/error/error_message_mapper.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
@@ -42,7 +43,7 @@ class FreeTrialBloc extends Bloc<FreeTrialEvent, FreeTrialState> {
       }
     } catch (e) {
       print('❌ FreeTrialBloc: Error loading status: $e');
-      emit(FreeTrialState.error(message: e.toString()));
+      emit(FreeTrialState.error(message: ErrorMessageMapper.map(e)));
     }
   }
 
@@ -59,7 +60,7 @@ class FreeTrialBloc extends Bloc<FreeTrialEvent, FreeTrialState> {
       await Future.delayed(const Duration(seconds: 1));
       add(const FreeTrialEvent.loadStatus());
     } catch (e) {
-      emit(FreeTrialState.error(message: e.toString()));
+      emit(FreeTrialState.error(message: ErrorMessageMapper.map(e)));
     }
   }
 

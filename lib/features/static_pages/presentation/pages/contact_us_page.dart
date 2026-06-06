@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:savedge/core/error/error_message_mapper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:savedge/core/injection/injection.dart';
@@ -83,7 +84,7 @@ class _ContactUsPageState extends State<ContactUsPage> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Unexpected error: ${e.toString()}'),
+          content: Text(ErrorMessageMapper.map(e)),
           backgroundColor: const Color(0xFFE53E3E),
         ),
       );

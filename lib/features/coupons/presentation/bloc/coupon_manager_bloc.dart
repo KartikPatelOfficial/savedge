@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:savedge/core/error/error_message_mapper.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../data/models/coupon_gifting_models.dart';
@@ -32,7 +33,7 @@ class CouponManagerBloc extends Bloc<CouponManagerEvent, CouponManagerState> {
       final couponsData = await _enhancedCouponService.getMyCoupons();
       emit(CouponManagerLoaded(couponsData: couponsData));
     } catch (e) {
-      emit(CouponManagerError('Failed to load coupons: ${e.toString()}'));
+      emit(CouponManagerError('Failed to load coupons: ${ErrorMessageMapper.map(e)}'));
     }
   }
 
@@ -45,7 +46,7 @@ class CouponManagerBloc extends Bloc<CouponManagerEvent, CouponManagerState> {
       final couponsData = await _enhancedCouponService.getMyCoupons();
       emit(CouponManagerLoaded(couponsData: couponsData));
     } catch (e) {
-      emit(CouponManagerError('Failed to refresh coupons: ${e.toString()}'));
+      emit(CouponManagerError('Failed to refresh coupons: ${ErrorMessageMapper.map(e)}'));
     }
   }
 
@@ -61,7 +62,7 @@ class CouponManagerBloc extends Bloc<CouponManagerEvent, CouponManagerState> {
       );
       emit(CouponManagerLoaded(couponsData: couponsData));
     } catch (e) {
-      emit(CouponManagerError('Failed to load coupons: ${e.toString()}'));
+      emit(CouponManagerError('Failed to load coupons: ${ErrorMessageMapper.map(e)}'));
     }
   }
 

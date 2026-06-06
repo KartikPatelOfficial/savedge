@@ -51,61 +51,35 @@ class HotDealsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(
-          height: 260,
-          child: BlocBuilder<CouponsBloc, CouponsState>(
-            builder: (context, state) {
-              if (state is CouponsLoading) {
-                return const _HotDealsShimmer();
-              } else if (state is CouponsError) {
-                return _buildErrorWidget(state.message);
-              } else if (state is CouponsLoaded) {
-                return _buildCouponsList(context, state.coupons);
-              }
-              return const SizedBox.shrink();
-            },
-          ),
-        ),
-      ],
+    return BlocBuilder<CouponsBloc, CouponsState>(
+      builder: (context, state) {
+        if (state is CouponsLoading) {
+          return _wrap(const _HotDealsShimmer());
+        } else if (state is CouponsError) {
+          return _wrap(_buildErrorWidget(state.message));
+        } else if (state is CouponsLoaded) {
+          // Collapse the section entirely when there are no deals.
+          if (state.coupons.isEmpty) {
+            return const SizedBox.shrink();
+          }
+          return _wrap(_buildCouponsList(context, state.coupons));
+        }
+        return const SizedBox.shrink();
+      },
+    );
+  }
+
+  /// Wraps content with the section's vertical spacing and fixed height.
+  /// Kept here (rather than in the parent) so the whole section, spacing
+  /// included, collapses when there are no deals to show.
+  Widget _wrap(Widget child) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 20),
+      child: SizedBox(height: 260, child: child),
     );
   }
 
   Widget _buildCouponsList(BuildContext context, List<Coupon> coupons) {
-    if (coupons.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: const Color(0xFF6F3FCC).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(40),
-              ),
-              child: const Icon(
-                Icons.local_offer_outlined,
-                size: 40,
-                color: Color(0xFF6F3FCC),
-              ),
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'No deals available',
-              style: TextStyle(
-                fontSize: 16,
-                color: Color(0xFF4A5568),
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
     return StackedDealsCards(
       coupons: coupons,
       onCouponTap: (coupon) => _navigateToCouponDetail(context, coupon),

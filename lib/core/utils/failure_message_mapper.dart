@@ -1,3 +1,4 @@
+import 'package:savedge/core/error/error_message_mapper.dart';
 import 'package:savedge/core/error/failures.dart';
 
 /// Utility class for mapping failures to user-friendly error messages
@@ -10,12 +11,17 @@ class FailureMessageMapper {
   /// Maps a [Failure] to a user-friendly error message
   ///
   /// Returns appropriate error messages based on the type of failure.
-  /// If the failure has a custom message, it uses that; otherwise,
-  /// it provides default messages for each failure type.
+  /// If the failure has a custom message that is safe to display, it uses
+  /// that; otherwise, it provides default messages for each failure type.
   static String mapFailureToMessage(Failure failure) {
-    // Use custom message if available
-    if (failure.message != null && failure.message!.isNotEmpty) {
-      return failure.message!;
+    // Use the custom message only when it reads like a user-facing sentence,
+    // never a raw exception / stack-trace dump.
+    final custom = failure.message;
+    if (custom != null && custom.isNotEmpty) {
+      final safe = ErrorMessageMapper.map(failure);
+      if (safe != ErrorMessageMapper.generic) {
+        return safe;
+      }
     }
 
     // Default messages based on failure type

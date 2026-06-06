@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:savedge/core/error/error_message_mapper.dart';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -1204,7 +1205,7 @@ class _PointsPaymentPageState extends State<PointsPaymentPage> {
     } catch (e) {
       if (!mounted) return;
       setState(() => _isVerifying = false);
-      _showErrorSnackbar(e.toString().replaceAll('Exception: ', ''));
+      _showErrorSnackbar(ErrorMessageMapper.map(e));
     }
   }
 

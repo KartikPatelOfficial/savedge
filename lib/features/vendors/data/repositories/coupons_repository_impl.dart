@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:savedge/core/error/error_message_mapper.dart';
 import 'package:injectable/injectable.dart';
 
 import 'package:savedge/core/error/failures.dart';
@@ -38,7 +39,7 @@ class CouponsRepositoryImpl implements CouponsRepository {
       final coupons = response.items.map(_mapResponseToEntity).toList();
       return Right(coupons);
     } catch (e) {
-      return Left(UnexpectedFailure(e.toString()));
+      return Left(UnexpectedFailure(ErrorMessageMapper.map(e)));
     }
   }
 
@@ -62,7 +63,7 @@ class CouponsRepositoryImpl implements CouponsRepository {
       final coupons = response.items.map(_mapResponseToEntity).toList();
       return Right(coupons);
     } catch (e) {
-      return Left(UnexpectedFailure(e.toString()));
+      return Left(UnexpectedFailure(ErrorMessageMapper.map(e)));
     }
   }
 
@@ -84,7 +85,7 @@ class CouponsRepositoryImpl implements CouponsRepository {
       final coupons = response.items.map(_mapResponseToEntity).toList();
       return Right(coupons);
     } catch (e) {
-      return Left(UnexpectedFailure(e.toString()));
+      return Left(UnexpectedFailure(ErrorMessageMapper.map(e)));
     }
   }
 
@@ -111,7 +112,7 @@ class CouponsRepositoryImpl implements CouponsRepository {
         return const Left(UnexpectedFailure('Invalid response format'));
       }
     } catch (e) {
-      return Left(UnexpectedFailure(e.toString()));
+      return Left(UnexpectedFailure(ErrorMessageMapper.map(e)));
     }
   }
 

@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:savedge/core/error/error_message_mapper.dart';
 import 'package:injectable/injectable.dart';
 import 'package:savedge/core/error/failures.dart';
 import 'package:savedge/features/gift_cards/data/models/gift_card_models.dart';
@@ -19,7 +20,7 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
       final entities = response.map(_mapCategoryToEntity).toList();
       return Right(entities);
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(ServerFailure(ErrorMessageMapper.map(e)));
     }
   }
 
@@ -40,7 +41,7 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
       final entities = response.items.map(_mapProductToEntity).toList();
       return Right(entities);
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(ServerFailure(ErrorMessageMapper.map(e)));
     }
   }
 
@@ -50,7 +51,7 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
       final response = await _service.getProduct(id);
       return Right(_mapProductToEntity(response));
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(ServerFailure(ErrorMessageMapper.map(e)));
     }
   }
 
@@ -66,7 +67,7 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
       );
       return Right(response);
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(ServerFailure(ErrorMessageMapper.map(e)));
     }
   }
 
@@ -85,7 +86,7 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
       final response = await _service.createOrder(request);
       return Right(_mapOrderToEntity(response));
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(ServerFailure(ErrorMessageMapper.map(e)));
     }
   }
 
@@ -103,7 +104,7 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
       final response = await _service.createPaymentOrder(request);
       return Right(response);
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(ServerFailure(ErrorMessageMapper.map(e)));
     }
   }
 
@@ -124,7 +125,7 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
       final response = await _service.verifyPayment(request);
       return Right(_mapOrderToEntity(response));
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(ServerFailure(ErrorMessageMapper.map(e)));
     }
   }
 
@@ -143,7 +144,7 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
       final entities = response.items.map(_mapOrderToEntity).toList();
       return Right(entities);
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(ServerFailure(ErrorMessageMapper.map(e)));
     }
   }
 
@@ -153,7 +154,7 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
       final response = await _service.getOrder(id);
       return Right(_mapOrderToEntity(response));
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(ServerFailure(ErrorMessageMapper.map(e)));
     }
   }
 

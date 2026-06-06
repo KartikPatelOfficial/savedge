@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:savedge/core/error/error_message_mapper.dart';
 
 import '../../../../core/error/exceptions.dart';
 import '../../../../core/error/failures.dart';
@@ -25,7 +26,7 @@ class SubscriptionRepositoryImpl implements SubscriptionRepository {
       return Left(NetworkFailure(e.message));
     } catch (e) {
       return Left(
-        ServerFailure('Failed to get subscription plans: ${e.toString()}'),
+        ServerFailure('Failed to get subscription plans: ${ErrorMessageMapper.map(e)}'),
       );
     }
   }
@@ -42,7 +43,7 @@ class SubscriptionRepositoryImpl implements SubscriptionRepository {
       return Left(NetworkFailure(e.message));
     } catch (e) {
       return Left(
-        ServerFailure('Failed to get user subscription: ${e.toString()}'),
+        ServerFailure('Failed to get user subscription: ${ErrorMessageMapper.map(e)}'),
       );
     }
   }
@@ -66,7 +67,7 @@ class SubscriptionRepositoryImpl implements SubscriptionRepository {
       return Left(NetworkFailure(e.message));
     } catch (e) {
       return Left(
-        ServerFailure('Failed to purchase subscription: ${e.toString()}'),
+        ServerFailure('Failed to purchase subscription: ${ErrorMessageMapper.map(e)}'),
       );
     }
   }
@@ -104,7 +105,7 @@ class SubscriptionRepositoryImpl implements SubscriptionRepository {
     } catch (e) {
       return Left(
         ServerFailure(
-          'Failed to purchase subscription with points: ${e.toString()}',
+          'Failed to purchase subscription with points: ${ErrorMessageMapper.map(e)}',
         ),
       );
     }
@@ -136,7 +137,7 @@ class SubscriptionRepositoryImpl implements SubscriptionRepository {
       return Left(NetworkFailure(e.message));
     } catch (e) {
       return Left(
-        ServerFailure('Failed to create payment order: ${e.toString()}'),
+        ServerFailure('Failed to create payment order: ${ErrorMessageMapper.map(e)}'),
       );
     }
   }
@@ -170,7 +171,7 @@ class SubscriptionRepositoryImpl implements SubscriptionRepository {
     } on NetworkException catch (e) {
       return Left(NetworkFailure(e.message));
     } catch (e) {
-      return Left(ServerFailure('Failed to verify payment: ${e.toString()}'));
+      return Left(ServerFailure('Failed to verify payment: ${ErrorMessageMapper.map(e)}'));
     }
   }
 
@@ -187,7 +188,7 @@ class SubscriptionRepositoryImpl implements SubscriptionRepository {
       return Left(NetworkFailure(e.message));
     } catch (e) {
       return Left(
-        ServerFailure('Failed to get payment status: ${e.toString()}'),
+        ServerFailure('Failed to get payment status: ${ErrorMessageMapper.map(e)}'),
       );
     }
   }
@@ -204,7 +205,7 @@ class SubscriptionRepositoryImpl implements SubscriptionRepository {
       return Left(NetworkFailure(e.message));
     } catch (e) {
       return Left(
-        ServerFailure('Failed to get payment history: ${e.toString()}'),
+        ServerFailure('Failed to get payment history: ${ErrorMessageMapper.map(e)}'),
       );
     }
   }
@@ -220,7 +221,7 @@ class SubscriptionRepositoryImpl implements SubscriptionRepository {
       return Left(NetworkFailure(e.message));
     } catch (e) {
       return Left(
-        ServerFailure('Failed to cancel subscription: ${e.toString()}'),
+        ServerFailure('Failed to cancel subscription: ${ErrorMessageMapper.map(e)}'),
       );
     }
   }

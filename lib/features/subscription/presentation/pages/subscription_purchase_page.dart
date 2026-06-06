@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:savedge/core/error/error_message_mapper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
@@ -73,7 +74,7 @@ class _State extends State<SubscriptionPurchasePage> {
         _loading = false;
       });
     } catch (e) {
-      if (mounted) setState(() { _error = e.toString(); _loading = false; });
+      if (mounted) setState(() { _error = ErrorMessageMapper.map(e); _loading = false; });
     }
   }
 

@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:savedge/core/error/error_message_mapper.dart';
 import '../../../../core/error/failures.dart';
 import '../../../../core/error/exceptions.dart';
 import '../../../../shared/domain/entities/points.dart';
@@ -22,7 +23,7 @@ class PointsRepositoryImpl implements PointsRepository {
     } on NetworkException catch (e) {
       return Left(NetworkFailure(e.message));
     } catch (e) {
-      return Left(ServerFailure('Failed to get user points: ${e.toString()}'));
+      return Left(ServerFailure('Failed to get user points: ${ErrorMessageMapper.map(e)}'));
     }
   }
 
@@ -38,7 +39,7 @@ class PointsRepositoryImpl implements PointsRepository {
       return Left(NetworkFailure(e.message));
     } catch (e) {
       return Left(
-        ServerFailure('Failed to get points ledger: ${e.toString()}'),
+        ServerFailure('Failed to get points ledger: ${ErrorMessageMapper.map(e)}'),
       );
     }
   }
@@ -65,7 +66,7 @@ class PointsRepositoryImpl implements PointsRepository {
       return Left(NetworkFailure(e.message));
     } catch (e) {
       return Left(
-        ServerFailure('Failed to get employee points: ${e.toString()}'),
+        ServerFailure('Failed to get employee points: ${ErrorMessageMapper.map(e)}'),
       );
     }
   }
@@ -92,7 +93,7 @@ class PointsRepositoryImpl implements PointsRepository {
     } on NetworkException catch (e) {
       return Left(NetworkFailure(e.message));
     } catch (e) {
-      return Left(ServerFailure('Failed to allocate points: ${e.toString()}'));
+      return Left(ServerFailure('Failed to allocate points: ${ErrorMessageMapper.map(e)}'));
     }
   }
 
@@ -112,7 +113,7 @@ class PointsRepositoryImpl implements PointsRepository {
       return Left(NetworkFailure(e.message));
     } catch (e) {
       return Left(
-        ServerFailure('Failed to get expiring points: ${e.toString()}'),
+        ServerFailure('Failed to get expiring points: ${ErrorMessageMapper.map(e)}'),
       );
     }
   }
@@ -128,7 +129,7 @@ class PointsRepositoryImpl implements PointsRepository {
       return Left(NetworkFailure(e.message));
     } catch (e) {
       return Left(
-        ServerFailure('Failed to get expired points count: ${e.toString()}'),
+        ServerFailure('Failed to get expired points count: ${ErrorMessageMapper.map(e)}'),
       );
     }
   }
@@ -143,7 +144,7 @@ class PointsRepositoryImpl implements PointsRepository {
     } on NetworkException catch (e) {
       return Left(NetworkFailure(e.message));
     } catch (e) {
-      return Left(ServerFailure('Failed to expire points: ${e.toString()}'));
+      return Left(ServerFailure('Failed to expire points: ${ErrorMessageMapper.map(e)}'));
     }
   }
 }

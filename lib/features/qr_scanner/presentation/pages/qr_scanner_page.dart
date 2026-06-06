@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:savedge/core/error/error_message_mapper.dart';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -202,7 +203,7 @@ class _QRScannerPageState extends State<QRScannerPage>
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        error.toString(),
+                        ErrorMessageMapper.map(error),
                         style: const TextStyle(
                           color: Colors.white70,
                           fontSize: 14,
@@ -572,7 +573,7 @@ class _QRScannerPageState extends State<QRScannerPage>
       }
     } catch (e) {
       debugPrint('QR Code handling error: $e');
-      final msg = e.toString().replaceAll(RegExp(r'^Exception:\s*'), '');
+      final msg = ErrorMessageMapper.map(e);
       _showErrorDialog(msg);
     } finally {
       if (mounted && !_isDisposed) {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:savedge/core/error/error_message_mapper.dart';
 import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
 import 'package:savedge/features/invoices/data/models/invoice_models.dart';
@@ -67,7 +68,7 @@ class _InvoicesPageState extends State<InvoicesPage> {
       setState(() {
         _isLoading = false;
         _hasError = true;
-        _errorMessage = e.toString().replaceAll('Exception: ', '');
+        _errorMessage = ErrorMessageMapper.map(e);
       });
     }
   }
@@ -116,7 +117,7 @@ class _InvoicesPageState extends State<InvoicesPage> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Failed to download: ${e.toString().replaceAll('Exception: ', '')}'),
+          content: Text('Failed to download: ${ErrorMessageMapper.map(e)}'),
           backgroundColor: Colors.red,
         ),
       );

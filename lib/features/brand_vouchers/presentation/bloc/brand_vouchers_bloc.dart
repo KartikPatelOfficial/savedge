@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:savedge/core/utils/failure_message_mapper.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 
@@ -46,7 +47,7 @@ class BrandVouchersBloc extends Bloc<BrandVouchersEvent, BrandVouchersState> {
     );
 
     result.fold(
-      (failure) => emit(BrandVouchersError(failure.toString())),
+      (failure) => emit(BrandVouchersError(FailureMessageMapper.mapFailureToMessage(failure))),
       (vouchers) => emit(BrandVouchersLoaded(vouchers)),
     );
   }
@@ -61,7 +62,7 @@ class BrandVouchersBloc extends Bloc<BrandVouchersEvent, BrandVouchersState> {
     );
 
     result.fold(
-      (failure) => emit(BrandVouchersError(failure.toString())),
+      (failure) => emit(BrandVouchersError(FailureMessageMapper.mapFailureToMessage(failure))),
       (vouchers) => emit(BrandVouchersLoaded(vouchers)),
     );
   }
@@ -81,7 +82,7 @@ class BrandVouchersBloc extends Bloc<BrandVouchersEvent, BrandVouchersState> {
     );
 
     result.fold(
-      (failure) => emit(VoucherOrderError(failure.toString())),
+      (failure) => emit(VoucherOrderError(FailureMessageMapper.mapFailureToMessage(failure))),
       (orderId) => emit(VoucherOrderCreated(orderId)),
     );
   }
@@ -101,7 +102,7 @@ class BrandVouchersBloc extends Bloc<BrandVouchersEvent, BrandVouchersState> {
     );
 
     result.fold(
-      (failure) => emit(VoucherOrdersError(failure.toString())),
+      (failure) => emit(VoucherOrdersError(FailureMessageMapper.mapFailureToMessage(failure))),
       (orders) => emit(VoucherOrdersLoaded(orders)),
     );
   }
@@ -118,7 +119,7 @@ class BrandVouchersBloc extends Bloc<BrandVouchersEvent, BrandVouchersState> {
     );
 
     result.fold(
-      (failure) => emit(RazorpayOrderError(failure.toString())),
+      (failure) => emit(RazorpayOrderError(FailureMessageMapper.mapFailureToMessage(failure))),
       (response) => emit(
         RazorpayOrderCreated(
           orderId: response.orderId,
@@ -146,7 +147,7 @@ class BrandVouchersBloc extends Bloc<BrandVouchersEvent, BrandVouchersState> {
     );
 
     result.fold(
-      (failure) => emit(RazorpayPaymentError(failure.toString())),
+      (failure) => emit(RazorpayPaymentError(FailureMessageMapper.mapFailureToMessage(failure))),
       (response) {
         if (response.status == 'Success') {
           emit(

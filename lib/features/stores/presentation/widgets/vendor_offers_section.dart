@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:savedge/core/error/error_message_mapper.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
@@ -1165,7 +1166,7 @@ class _VendorOfferCardState extends State<VendorOfferCard>
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Error: ${e.toString()}'),
+          content: Text(ErrorMessageMapper.map(e)),
           backgroundColor: const Color(0xFFE53E3E),
           behavior: SnackBarBehavior.floating,
           margin: const EdgeInsets.all(16),

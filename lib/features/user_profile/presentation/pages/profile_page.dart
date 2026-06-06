@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:savedge/core/error/error_message_mapper.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -60,7 +61,7 @@ class _ProfilePageState extends State<ProfilePage> {
       final profile = await _authRepository.getCurrentUserProfile();
       setState(() => _userProfile = profile);
     } catch (e) {
-      setState(() => _error = e.toString());
+      setState(() => _error = ErrorMessageMapper.map(e));
     } finally {
       setState(() => _isLoading = false);
     }

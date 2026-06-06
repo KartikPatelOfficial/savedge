@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:savedge/core/error/error_message_mapper.dart';
 import 'package:get_it/get_it.dart';
 
 import 'package:savedge/features/coupons/data/services/coupon_service.dart';
@@ -80,7 +81,7 @@ class UserCouponsBloc extends Bloc<UserCouponsEvent, UserCouponsState> {
 
       _currentPage = event.pageNumber;
     } catch (e) {
-      emit(UserCouponsError(e.toString().replaceAll('Exception: ', '')));
+      emit(UserCouponsError(ErrorMessageMapper.map(e).replaceAll('Exception: ', '')));
     }
   }
 

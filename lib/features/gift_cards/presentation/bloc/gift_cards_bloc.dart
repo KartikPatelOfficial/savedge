@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:savedge/core/utils/failure_message_mapper.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 
@@ -44,7 +45,7 @@ class GiftCardsBloc extends Bloc<GiftCardsEvent, GiftCardsState> {
     final result = await giftCardRepository.getCategories();
 
     result.fold(
-      (failure) => emit(GiftCardCategoriesError(failure.toString())),
+      (failure) => emit(GiftCardCategoriesError(FailureMessageMapper.mapFailureToMessage(failure))),
       (categories) => emit(GiftCardCategoriesLoaded(categories)),
     );
   }
@@ -63,7 +64,7 @@ class GiftCardsBloc extends Bloc<GiftCardsEvent, GiftCardsState> {
     );
 
     result.fold(
-      (failure) => emit(GiftCardProductsError(failure.toString())),
+      (failure) => emit(GiftCardProductsError(FailureMessageMapper.mapFailureToMessage(failure))),
       (products) => emit(GiftCardProductsLoaded(products)),
     );
   }
@@ -77,7 +78,7 @@ class GiftCardsBloc extends Bloc<GiftCardsEvent, GiftCardsState> {
     final result = await giftCardRepository.getProduct(event.productId);
 
     result.fold(
-      (failure) => emit(GiftCardProductError(failure.toString())),
+      (failure) => emit(GiftCardProductError(FailureMessageMapper.mapFailureToMessage(failure))),
       (product) => emit(GiftCardProductLoaded(product)),
     );
   }
@@ -94,7 +95,7 @@ class GiftCardsBloc extends Bloc<GiftCardsEvent, GiftCardsState> {
     );
 
     result.fold(
-      (failure) => emit(PriceBreakdownError(failure.toString())),
+      (failure) => emit(PriceBreakdownError(FailureMessageMapper.mapFailureToMessage(failure))),
       (breakdown) => emit(PriceBreakdownLoaded(breakdown)),
     );
   }
@@ -114,7 +115,7 @@ class GiftCardsBloc extends Bloc<GiftCardsEvent, GiftCardsState> {
     );
 
     result.fold(
-      (failure) => emit(GiftCardOrderError(failure.toString())),
+      (failure) => emit(GiftCardOrderError(FailureMessageMapper.mapFailureToMessage(failure))),
       (order) => emit(GiftCardOrderCreated(order)),
     );
   }
@@ -131,7 +132,7 @@ class GiftCardsBloc extends Bloc<GiftCardsEvent, GiftCardsState> {
     );
 
     result.fold(
-      (failure) => emit(GiftCardRazorpayOrderError(failure.toString())),
+      (failure) => emit(GiftCardRazorpayOrderError(FailureMessageMapper.mapFailureToMessage(failure))),
       (response) => emit(
         GiftCardRazorpayOrderCreated(
           razorpayOrderId: response.razorpayOrderId,
@@ -163,7 +164,7 @@ class GiftCardsBloc extends Bloc<GiftCardsEvent, GiftCardsState> {
     );
 
     result.fold(
-      (failure) => emit(GiftCardPaymentError(failure.toString())),
+      (failure) => emit(GiftCardPaymentError(FailureMessageMapper.mapFailureToMessage(failure))),
       (order) => emit(GiftCardPaymentVerified(order)),
     );
   }
@@ -183,7 +184,7 @@ class GiftCardsBloc extends Bloc<GiftCardsEvent, GiftCardsState> {
     );
 
     result.fold(
-      (failure) => emit(GiftCardOrdersError(failure.toString())),
+      (failure) => emit(GiftCardOrdersError(FailureMessageMapper.mapFailureToMessage(failure))),
       (orders) => emit(GiftCardOrdersLoaded(orders)),
     );
   }

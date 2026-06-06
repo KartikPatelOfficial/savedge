@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:savedge/core/error/error_message_mapper.dart';
 import 'package:savedge/core/error/failures.dart';
 import 'package:savedge/features/favorites/data/datasources/favorites_local_datasource.dart';
 import 'package:savedge/features/favorites/data/models/favorite_vendor_model.dart';
@@ -19,7 +20,7 @@ class FavoritesRepositoryImpl implements FavoritesRepository {
           .toList();
       return Right(favorites);
     } catch (e) {
-      return Left(CacheFailure('Failed to get favorites: ${e.toString()}'));
+      return Left(CacheFailure('Failed to get favorites: ${ErrorMessageMapper.map(e)}'));
     }
   }
 
@@ -30,7 +31,7 @@ class FavoritesRepositoryImpl implements FavoritesRepository {
       await localDataSource.addFavorite(model);
       return const Right(null);
     } catch (e) {
-      return Left(CacheFailure('Failed to add favorite: ${e.toString()}'));
+      return Left(CacheFailure('Failed to add favorite: ${ErrorMessageMapper.map(e)}'));
     }
   }
 
@@ -40,7 +41,7 @@ class FavoritesRepositoryImpl implements FavoritesRepository {
       await localDataSource.removeFavorite(vendorId);
       return const Right(null);
     } catch (e) {
-      return Left(CacheFailure('Failed to remove favorite: ${e.toString()}'));
+      return Left(CacheFailure('Failed to remove favorite: ${ErrorMessageMapper.map(e)}'));
     }
   }
 
@@ -51,7 +52,7 @@ class FavoritesRepositoryImpl implements FavoritesRepository {
       return Right(isFav);
     } catch (e) {
       return Left(
-        CacheFailure('Failed to check favorite status: ${e.toString()}'),
+        CacheFailure('Failed to check favorite status: ${ErrorMessageMapper.map(e)}'),
       );
     }
   }
@@ -62,7 +63,7 @@ class FavoritesRepositoryImpl implements FavoritesRepository {
       await localDataSource.clearAllFavorites();
       return const Right(null);
     } catch (e) {
-      return Left(CacheFailure('Failed to clear favorites: ${e.toString()}'));
+      return Left(CacheFailure('Failed to clear favorites: ${ErrorMessageMapper.map(e)}'));
     }
   }
 }

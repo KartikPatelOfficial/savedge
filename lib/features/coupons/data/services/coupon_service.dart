@@ -1,4 +1,5 @@
 import 'package:get_it/get_it.dart';
+import 'package:savedge/core/error/error_message_mapper.dart';
 import 'package:savedge/core/network/network_client.dart';
 import 'package:savedge/features/coupons/data/models/coupon_claim_models.dart';
 import 'package:savedge/features/coupons/data/models/coupon_redemption_models.dart';
@@ -173,7 +174,7 @@ class CouponService {
         } else if (e.toString().contains('one per user')) {
           errorMessage = 'You can only claim this coupon once';
         } else {
-          errorMessage = 'Unable to claim coupon: ${e.toString()}';
+          errorMessage = ErrorMessageMapper.map(e);
         }
       }
 
@@ -202,7 +203,7 @@ class CouponService {
       } else if (e.toString().contains('No active promotion')) {
         errorMessage = 'The promotion has ended';
       } else {
-        errorMessage = 'Unable to claim coupon: ${e.toString()}';
+        errorMessage = ErrorMessageMapper.map(e);
       }
 
       throw Exception(errorMessage);

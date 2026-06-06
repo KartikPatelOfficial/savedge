@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:savedge/core/error/error_message_mapper.dart';
 import 'package:get_it/get_it.dart';
 import 'package:savedge/core/storage/secure_storage_service.dart';
 import 'package:savedge/features/auth/data/models/user_profile_models.dart';
@@ -113,7 +114,7 @@ class _CouponRedemptionOptionsPageState
       });
     } catch (e) {
       setState(() {
-        _profileError = e.toString();
+        _profileError = ErrorMessageMapper.map(e);
         isLoadingProfile = false;
       });
     }
@@ -1563,7 +1564,7 @@ class _CouponRedemptionOptionsPageState
         Navigator.of(context).pop(true);
       }
     } catch (e) {
-      _showErrorDialog(e.toString());
+      _showErrorDialog(ErrorMessageMapper.map(e));
     } finally {
       if (mounted) {
         setState(() => isProcessing = false);
@@ -1632,7 +1633,7 @@ class _CouponRedemptionOptionsPageState
         Navigator.of(context).pop(true);
       }
     } catch (e) {
-      _showErrorDialog(e.toString());
+      _showErrorDialog(ErrorMessageMapper.map(e));
     } finally {
       if (mounted) {
         setState(() => isProcessing = false);

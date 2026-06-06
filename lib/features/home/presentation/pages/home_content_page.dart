@@ -483,10 +483,9 @@ class _HomeContentPageState extends State<HomeContentPage> {
   }
 
   Widget _buildHotDealsSection() {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 20),
-      child: const HotDealsSection(),
-    );
+    // Spacing lives inside HotDealsSection so the whole section, margin
+    // included, collapses when there are no deals to show.
+    return const HotDealsSection();
   }
 
   Widget _buildTopOffersSection() {

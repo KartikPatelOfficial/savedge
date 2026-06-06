@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:savedge/core/error/error_message_mapper.dart';
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 
@@ -22,7 +23,7 @@ class CityRepositoryImpl implements CityRepository {
     } on DioException catch (e) {
       return Left(_handleDioError(e));
     } catch (e) {
-      return Left(ServerFailure(e.toString()));
+      return Left(ServerFailure(ErrorMessageMapper.map(e)));
     }
   }
 

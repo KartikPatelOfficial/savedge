@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:savedge/core/error/error_message_mapper.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
@@ -277,7 +278,7 @@ class RazorpayPaymentService {
     } catch (e) {
       return PaymentResult(
         success: false,
-        message: e.toString(),
+        message: ErrorMessageMapper.map(e),
       );
     }
   }

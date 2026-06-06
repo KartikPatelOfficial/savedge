@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:savedge/core/error/error_message_mapper.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 
@@ -30,7 +31,7 @@ class GiftingBloc extends Bloc<GiftingEvent, GiftingState> {
       final colleagues = await _giftingService.getColleagues();
       emit(ColleaguesLoaded(colleagues));
     } catch (e) {
-      emit(GiftingError('Failed to load colleagues: ${e.toString()}'));
+      emit(GiftingError('Failed to load colleagues: ${ErrorMessageMapper.map(e)}'));
     }
   }
 

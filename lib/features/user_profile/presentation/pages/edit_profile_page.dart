@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:savedge/core/error/error_message_mapper.dart';
 import 'package:get_it/get_it.dart';
 import 'package:savedge/features/auth/data/models/user_profile_models.dart';
 import 'package:savedge/features/auth/domain/repositories/auth_repository.dart';
@@ -1254,7 +1255,7 @@ class _EditProfilePageState extends State<EditProfilePage>
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: Text('Error: ${e.toString()}'),
+                  child: Text(ErrorMessageMapper.map(e)),
                 ),
               ],
             ),

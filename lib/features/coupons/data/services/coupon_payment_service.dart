@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:savedge/core/error/error_message_mapper.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -128,7 +129,7 @@ class CouponPaymentService {
       );
     } catch (e) {
       return CouponPaymentResult.failure(
-        errorMessage: e.toString(),
+        errorMessage: ErrorMessageMapper.map(e),
         errorCode: -3,
       );
     }
