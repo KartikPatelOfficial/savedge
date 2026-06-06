@@ -64,9 +64,14 @@ class SavedgeApp extends StatelessWidget {
   static Route<dynamic> _generateRoute(RouteSettings settings) {
     switch (settings.name) {
       case '/home':
-        final initialTab = settings.arguments is int ? settings.arguments as int : 0;
+        final homeArgs = settings.arguments;
+        final goToCoupons = homeArgs == 'coupons';
+        final initialTab = homeArgs is int ? homeArgs : 0;
         return MaterialPageRoute(
-          builder: (_) => MainNavigationPage(initialTab: initialTab),
+          builder: (_) => MainNavigationPage(
+            initialTab: initialTab,
+            goToCoupons: goToCoupons,
+          ),
         );
       case '/voucher-purchase':
         final voucher = settings.arguments as BrandVoucherEntity;

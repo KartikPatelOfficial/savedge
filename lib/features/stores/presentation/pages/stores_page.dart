@@ -159,8 +159,27 @@ class _StoresViewState extends State<StoresView> {
                 ),
                 if (state.vendors.isEmpty)
                   SliverFillRemaining(child: _buildEmptyWidget())
-                else
+                else ...[
                   _buildVendorGrid(state),
+                  // Loader centered in the remaining screen space while more
+                  // stores load.
+                  if (!state.hasReachedMax)
+                    const SliverToBoxAdapter(
+                      child: SizedBox(
+                        height: 220, // ~one card tall
+                        child: Center(
+                          child: SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              color: Color(0xFF6F3FCC),
+                              strokeWidth: 2,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
               ] else
                 const SliverToBoxAdapter(child: SizedBox.shrink()),
               const SliverToBoxAdapter(child: SizedBox(height: 48)),
@@ -590,30 +609,13 @@ class _StoresViewState extends State<StoresView> {
         ),
         delegate: SliverChildBuilderDelegate(
           (context, index) {
-            if (index >= state.vendors.length) {
-              if (!state.hasReachedMax) {
-                return const Center(
-                  child: SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      color: Color(0xFF6F3FCC),
-                      strokeWidth: 2,
-                    ),
-                  ),
-                );
-              }
-              return null;
-            }
             final vendor = state.vendors[index];
             return ModernVendorCard(
               vendor: vendor,
               onTap: () => _navigateToVendorDetail(vendor),
             );
           },
-          childCount: state.hasReachedMax
-              ? state.vendors.length
-              : state.vendors.length + 1,
+          childCount: state.vendors.length,
         ),
       ),
     );

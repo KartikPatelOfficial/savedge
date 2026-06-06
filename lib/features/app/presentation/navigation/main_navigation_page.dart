@@ -20,16 +20,29 @@ import 'package:savedge/features/user_profile/presentation/pages/profile_page.da
 
 /// Main navigation wrapper that handles bottom navigation
 class MainNavigationPage extends StatefulWidget {
-  const MainNavigationPage({super.key, this.initialTab = 0, this.isGuest = false});
+  const MainNavigationPage({
+    super.key,
+    this.initialTab = 0,
+    this.isGuest = false,
+    this.goToCoupons = false,
+  });
   final int initialTab;
   final bool isGuest;
+
+  /// When true, open the Coupons tab regardless of its dynamic index
+  /// (employees have an extra Gift tab that shifts the Coupons index).
+  final bool goToCoupons;
 
   @override
   State<MainNavigationPage> createState() => _MainNavigationPageState();
 }
 
 class _MainNavigationPageState extends State<MainNavigationPage> with SingleTickerProviderStateMixin {
-  late int _currentIndex = widget.initialTab;
+  late int _currentIndex = widget.goToCoupons ? 0 : widget.initialTab;
+
+  /// Pending request to land on the Coupons tab once pages reflect the
+  /// user's employee status (which is resolved asynchronously).
+  bool _goToCouponsPending = false;
   bool _isEmployee = false;
   bool _isLoadingProfile = true;
   bool _citySelectionShown = false;
@@ -66,6 +79,14 @@ class _MainNavigationPageState extends State<MainNavigationPage> with SingleTick
     );
 
     _buildPages();
+
+    // Resolve the Coupons tab now; it is re-resolved after the profile loads
+    // in case the user is an employee (extra Gift tab shifts the index).
+    _goToCouponsPending = widget.goToCoupons;
+    if (_goToCouponsPending) {
+      _currentIndex = _couponsTabIndex;
+    }
+
     if (!widget.isGuest) {
       _loadUserProfile();
       _initializeNotifications();
@@ -73,6 +94,11 @@ class _MainNavigationPageState extends State<MainNavigationPage> with SingleTick
       _isLoadingProfile = false;
     }
   }
+
+  /// Index of the Coupons tab. CouponsPage is always the second-to-last page
+  /// (followed only by ProfilePage), so this stays correct whether or not the
+  /// employee-only Gift tab is present.
+  int get _couponsTabIndex => _pages.length >= 2 ? _pages.length - 2 : 0;
 
   @override
   void dispose() {
@@ -123,6 +149,12 @@ class _MainNavigationPageState extends State<MainNavigationPage> with SingleTick
           if (_currentIndex >= _pages.length) {
             _currentIndex = 0;
           }
+        }
+
+        // Now that pages reflect employee status, land on Coupons if requested.
+        if (_goToCouponsPending) {
+          _currentIndex = _couponsTabIndex;
+          _goToCouponsPending = false;
         }
 
         _isLoadingProfile = false;

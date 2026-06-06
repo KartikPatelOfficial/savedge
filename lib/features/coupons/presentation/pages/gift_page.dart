@@ -114,70 +114,72 @@ class _GiftPageState extends State<GiftPage> with TickerProviderStateMixin {
         children: [
           const SizedBox(height: 8),
 
-          // Compact Transfer Points card
-          GestureDetector(
-            onTap: () => _showPointsTransferDialog(),
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: const Color(0xFFE2E8F0),
-                  width: 1,
-                ),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFD69E2E).withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Icon(
-                      Icons.stars_rounded,
-                      color: Color(0xFFD69E2E),
-                      size: 24,
-                    ),
-                  ),
-                  const SizedBox(width: 14),
-                  const Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Transfer Points',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFF1A202C),
-                          ),
-                        ),
-                        SizedBox(height: 2),
-                        Text(
-                          'Send points to a phone number',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Color(0xFF718096),
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const Icon(
-                    Icons.chevron_right_rounded,
-                    color: Color(0xFFA0AEC0),
-                    size: 24,
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 24),
+          // TODO: Transfer Points temporarily hidden — only coupon sharing is
+          // supported for now. Uncomment to restore points transfer in future.
+          // // Compact Transfer Points card
+          // GestureDetector(
+          //   onTap: () => _showPointsTransferDialog(),
+          //   child: Container(
+          //     padding: const EdgeInsets.all(16),
+          //     decoration: BoxDecoration(
+          //       color: Colors.white,
+          //       borderRadius: BorderRadius.circular(16),
+          //       border: Border.all(
+          //         color: const Color(0xFFE2E8F0),
+          //         width: 1,
+          //       ),
+          //     ),
+          //     child: Row(
+          //       children: [
+          //         Container(
+          //           width: 44,
+          //           height: 44,
+          //           decoration: BoxDecoration(
+          //             color: const Color(0xFFD69E2E).withOpacity(0.1),
+          //             borderRadius: BorderRadius.circular(12),
+          //           ),
+          //           child: const Icon(
+          //             Icons.stars_rounded,
+          //             color: Color(0xFFD69E2E),
+          //             size: 24,
+          //           ),
+          //         ),
+          //         const SizedBox(width: 14),
+          //         const Expanded(
+          //           child: Column(
+          //             crossAxisAlignment: CrossAxisAlignment.start,
+          //             children: [
+          //               Text(
+          //                 'Transfer Points',
+          //                 style: TextStyle(
+          //                   fontSize: 16,
+          //                   fontWeight: FontWeight.w700,
+          //                   color: Color(0xFF1A202C),
+          //                 ),
+          //               ),
+          //               SizedBox(height: 2),
+          //               Text(
+          //                 'Send points to a phone number',
+          //                 style: TextStyle(
+          //                   fontSize: 13,
+          //                   color: Color(0xFF718096),
+          //                   fontWeight: FontWeight.w500,
+          //                 ),
+          //               ),
+          //             ],
+          //           ),
+          //         ),
+          //         const Icon(
+          //           Icons.chevron_right_rounded,
+          //           color: Color(0xFFA0AEC0),
+          //           size: 24,
+          //         ),
+          //       ],
+          //     ),
+          //   ),
+          // ),
+          //
+          // const SizedBox(height: 24),
 
           // Available Coupons Section
           const Padding(
@@ -1026,6 +1028,8 @@ class _GiftPageState extends State<GiftPage> with TickerProviderStateMixin {
     );
   }
 
+  // Kept for the temporarily hidden Transfer Points card (see _buildSendGiftsTab).
+  // ignore: unused_element
   void _showPointsTransferDialog() {
     showDialog(
       context: context,

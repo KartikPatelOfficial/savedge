@@ -917,7 +917,7 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
                                 Navigator.of(context).pushNamedAndRemoveUntil(
                                   '/home',
                                   (route) => false,
-                                  arguments: 1, // Coupons tab index
+                                  arguments: 'coupons', // Coupons tab
                                 );
                               },
                               style: TextButton.styleFrom(
@@ -982,7 +982,7 @@ class _CouponConfirmationPageState extends State<CouponConfirmationPage>
           Navigator.of(context).pushNamedAndRemoveUntil(
             '/home',
             (route) => false,
-            arguments: 1, // Coupons tab
+            arguments: 'coupons', // Coupons tab
           );
         }
       }
