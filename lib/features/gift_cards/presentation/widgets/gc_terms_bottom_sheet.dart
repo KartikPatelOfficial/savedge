@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'package:savedge/features/gift_cards/presentation/util/gc_html.dart';
+
 import '../theme/gc_tokens.dart';
 
 class GcTermsBottomSheet extends StatelessWidget {
@@ -141,20 +143,8 @@ class GcTermsBottomSheet extends StatelessWidget {
 }
 
 List<Widget> _buildFormattedTerms(String rawTerms) {
-  final normalized = rawTerms
-      .replaceAll(RegExp(r'<br\s*/?>', caseSensitive: false), '\n')
-      .replaceAll('&nbsp;', ' ')
-      .replaceAll('&amp;', '&')
-      .replaceAll('&quot;', '"')
-      .replaceAll('&#39;', "'")
-      .replaceAll('\\n', '\n')
-      .replaceAll(RegExp(r'\r\n?|\n'), '\n');
-
-  final lines = normalized
-      .split('\n')
-      .map((line) => line.trim())
-      .where((line) => line.isNotEmpty)
-      .toList();
+  // Shared normalizer handles <li>/<p>/<ol> blocks and entities, not just <br>.
+  final lines = gcHtmlToLines(rawTerms);
 
   if (lines.isEmpty) {
     return const [

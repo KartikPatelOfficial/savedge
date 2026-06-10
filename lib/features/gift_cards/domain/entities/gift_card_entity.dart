@@ -70,6 +70,10 @@ class GiftCardProductEntity extends Equatable {
   final bool isActive;
   final String? categoryName;
   final String? brandName;
+  final String? brandLogoUrl;
+
+  /// Brand-specific redemption steps from Woohoo (often HTML).
+  final String? howToUse;
   final String? denominations;
   final List<double> parsedDenominations;
   final String? currencySymbol;
@@ -97,6 +101,8 @@ class GiftCardProductEntity extends Equatable {
     required this.isActive,
     this.categoryName,
     this.brandName,
+    this.brandLogoUrl,
+    this.howToUse,
     this.denominations,
     this.parsedDenominations = const [],
     this.currencySymbol,
@@ -173,6 +179,8 @@ class GiftCardProductEntity extends Equatable {
         isActive,
         categoryName,
         brandName,
+        brandLogoUrl,
+        howToUse,
         denominations,
         parsedDenominations,
         currencySymbol,

@@ -14,6 +14,7 @@ import '../../domain/entities/gift_card_entity.dart';
 import '../../domain/repositories/gift_card_repository.dart';
 import '../bloc/gift_cards_bloc.dart';
 import '../theme/gc_tokens.dart';
+import '../util/gc_html.dart';
 import '../widgets/gc_amount_chip_picker.dart';
 import '../widgets/gc_how_to_redeem_sheet.dart';
 import '../widgets/gc_how_to_save_steps.dart';
@@ -337,7 +338,7 @@ class _GiftCardDetailPageState extends State<GiftCardDetailPage> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: _ExpandableText(
-                      text: _p.offerDescription!,
+                      text: gcHtmlToPlainText(_p.offerDescription!),
                       collapsedMaxLines: 2,
                       textStyle: TextStyle(
                         fontSize: 12.5,
@@ -359,7 +360,7 @@ class _GiftCardDetailPageState extends State<GiftCardDetailPage> {
           if (_p.description != null && _p.description!.trim().isNotEmpty) ...[
             const SizedBox(height: 14),
             _ExpandableText(
-              text: _p.description!,
+              text: gcHtmlToPlainText(_p.description!),
               collapsedMaxLines: 3,
               textStyle: const TextStyle(
                 fontSize: 13,
@@ -528,6 +529,7 @@ class _GiftCardDetailPageState extends State<GiftCardDetailPage> {
                 onTap: () => GcHowToRedeemSheet.show(
                   context,
                   brandName: _p.brandName ?? _p.name,
+                  howToUse: _p.howToUse,
                 ),
               ),
             ),

@@ -39,6 +39,10 @@ abstract class GiftCardProduct with _$GiftCardProduct {
     required bool isActive,
     String? categoryName,
     String? brandName,
+    String? brandLogoUrl,
+
+    /// Brand-specific redemption steps from Woohoo (often HTML).
+    String? howToUse,
     String? denominations,
     @Default([]) List<double> parsedDenominations,
     String? currencySymbol,

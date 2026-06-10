@@ -216,6 +216,8 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
       isActive: model.isActive,
       categoryName: model.categoryName,
       brandName: model.brandName,
+      brandLogoUrl: model.brandLogoUrl,
+      howToUse: model.howToUse,
       denominations: model.denominations,
       parsedDenominations: model.parsedDenominations,
       currencySymbol: model.currencySymbol,

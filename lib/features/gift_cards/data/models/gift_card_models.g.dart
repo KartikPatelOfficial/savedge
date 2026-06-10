@@ -53,6 +53,8 @@ _GiftCardProduct _$GiftCardProductFromJson(Map<String, dynamic> json) =>
       isActive: json['isActive'] as bool,
       categoryName: json['categoryName'] as String?,
       brandName: json['brandName'] as String?,
+      brandLogoUrl: json['brandLogoUrl'] as String?,
+      howToUse: json['howToUse'] as String?,
       denominations: json['denominations'] as String?,
       parsedDenominations:
           (json['parsedDenominations'] as List<dynamic>?)
@@ -91,6 +93,8 @@ Map<String, dynamic> _$GiftCardProductToJson(_GiftCardProduct instance) =>
       'isActive': instance.isActive,
       'categoryName': instance.categoryName,
       'brandName': instance.brandName,
+      'brandLogoUrl': instance.brandLogoUrl,
+      'howToUse': instance.howToUse,
       'denominations': instance.denominations,
       'parsedDenominations': instance.parsedDenominations,
       'currencySymbol': instance.currencySymbol,
