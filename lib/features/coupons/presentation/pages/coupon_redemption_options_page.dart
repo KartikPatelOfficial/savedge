@@ -418,7 +418,8 @@ class _CouponRedemptionOptionsPageState
     }
 
     // Online payment tile
-    if (widget.couponData.cashPrice != null &&
+    if ((widget.couponData.canPurchaseWithCash ?? true) &&
+        widget.couponData.cashPrice != null &&
         widget.couponData.cashPrice! > 0) {
       tiles.add(_buildMethodTile(
         method: RedemptionMethod.online,
@@ -430,9 +431,12 @@ class _CouponRedemptionOptionsPageState
       ));
     }
 
-    // Membership / Free Trial tile
-    if (widget.couponData.userMaxRedemptions != null &&
-        widget.couponData.userMaxRedemptions! > 0) {
+    // Membership / Free Trial tile. Prefer the explicit flag; older payloads
+    // fall back to the per-user cap (where null means membership-disabled).
+    final canUseMembership = widget.couponData.canRedeemWithMembership ??
+        (widget.couponData.userMaxRedemptions != null &&
+            widget.couponData.userMaxRedemptions! > 0);
+    if (canUseMembership) {
       if (isLoadingProfile) {
         tiles.add(_buildLoadingTile());
       } else if (_hasActiveSubscription()) {
@@ -565,11 +569,13 @@ class _CouponRedemptionOptionsPageState
   }
 
   Widget _buildMembershipTile() {
-    final remainingClaims =
-        widget.couponData.remainingSubscriptionClaims ??
-        (widget.couponData.userMaxRedemptions! -
-            widget.couponData.userUsedRedemptions);
-    final isEnabled = remainingClaims > 0;
+    // A null cap means unlimited membership claims.
+    final remainingClaims = widget.couponData.remainingSubscriptionClaims ??
+        (widget.couponData.userMaxRedemptions != null
+            ? widget.couponData.userMaxRedemptions! -
+                widget.couponData.userUsedRedemptions
+            : null);
+    final isEnabled = remainingClaims == null || remainingClaims > 0;
     final isSelected = selectedMethod == RedemptionMethod.membership;
     const color = Color(0xFF6F3FCC);
 
@@ -640,7 +646,11 @@ class _CouponRedemptionOptionsPageState
             ),
             const SizedBox(height: 3),
             Text(
-              isEnabled ? 'FREE · $remainingClaims left' : 'No claims left',
+              isEnabled
+                  ? (remainingClaims == null
+                      ? 'FREE'
+                      : 'FREE · $remainingClaims left')
+                  : 'No claims left',
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w800,
@@ -658,11 +668,13 @@ class _CouponRedemptionOptionsPageState
   }
 
   Widget _buildFreeTrialTile() {
-    final remainingClaims =
-        widget.couponData.remainingSubscriptionClaims ??
-        (widget.couponData.userMaxRedemptions! -
-            widget.couponData.userUsedRedemptions);
-    final isEnabled = remainingClaims > 0;
+    // A null cap means unlimited membership claims.
+    final remainingClaims = widget.couponData.remainingSubscriptionClaims ??
+        (widget.couponData.userMaxRedemptions != null
+            ? widget.couponData.userMaxRedemptions! -
+                widget.couponData.userUsedRedemptions
+            : null);
+    final isEnabled = remainingClaims == null || remainingClaims > 0;
     final isSelected = selectedMethod == RedemptionMethod.freeTrial;
     const color = Color(0xFFFF6B35);
     final remainingDays = _freeTrialStatus?.remainingTime?.days ?? 0;

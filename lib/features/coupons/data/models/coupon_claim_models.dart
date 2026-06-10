@@ -49,6 +49,8 @@ class CouponCheckResponse {
     required this.minCartValue,
     required this.maxDiscountAmount,
     required this.cashPrice,
+    this.canPurchaseWithCash,
+    this.canRedeemWithMembership,
     required this.validFrom,
     required this.validUntil,
     required this.maxRedemptions,
@@ -82,6 +84,10 @@ class CouponCheckResponse {
   final double? minCartValue;
   final double? maxDiscountAmount;
   final double? cashPrice;
+
+  /// Explicit redemption flags from newer API payloads; null on older payloads.
+  final bool? canPurchaseWithCash;
+  final bool? canRedeemWithMembership;
   final String validFrom;
   final String validUntil;
   final int? maxRedemptions;
@@ -117,6 +123,8 @@ class CouponCheckResponse {
       minCartValue: (json['minCartValue'] as num?)?.toDouble(),
       maxDiscountAmount: (json['maxDiscountAmount'] as num?)?.toDouble(),
       cashPrice: (json['cashPrice'] as num?)?.toDouble(),
+      canPurchaseWithCash: json['canPurchaseWithCash'] as bool?,
+      canRedeemWithMembership: json['canRedeemWithMembership'] as bool?,
       validFrom: json['validFrom'] as String,
       validUntil: json['validUntil'] as String,
       maxRedemptions: json['maxRedemptions'] as int?,

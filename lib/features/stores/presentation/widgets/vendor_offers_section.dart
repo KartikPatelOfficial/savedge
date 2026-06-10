@@ -17,6 +17,10 @@ import 'package:savedge/features/vendors/presentation/bloc/coupons_bloc.dart';
 
 /// Decide if a coupon can be claimed via membership/subscription.
 bool _hasMembershipOption(Coupon coupon) {
+  // Newer payloads carry the explicit flag — always trust it when present.
+  final flag = coupon.canRedeemWithMembership;
+  if (flag != null) return flag;
+
   final max = coupon.maxRedemptions;
 
   // Any non-zero cap (including -1 for unlimited) counts as a membership path.
@@ -184,6 +188,152 @@ Widget _buildCouponsList(
   );
 }
 
+// Shared palette for the offers section header + filter. Kept in sync with
+// the vendor detail page's editorial style.
+const Color _kInk = Color(0xFF17181C);
+const Color _kInkLow = Color(0xFF9A9CA3);
+const Color _kBrand = Color(0xFF6F3FCC);
+
+/// Clean section heading: bold title with a small offer-count badge. No icon
+/// chrome — matches the typographic style of the rest of the detail page.
+class _OffersHeader extends StatelessWidget {
+  const _OffersHeader({required this.title, required this.count});
+
+  final String title;
+  final int count;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Row(
+        children: [
+          Flexible(
+            child: Text(
+              title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontSize: 19,
+                fontWeight: FontWeight.w800,
+                color: _kInk,
+                letterSpacing: -0.4,
+              ),
+            ),
+          ),
+          if (count > 0) ...[
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(
+                color: _kBrand.withValues(alpha: 0.10),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                '$count',
+                style: const TextStyle(
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w800,
+                  color: _kBrand,
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+/// iOS-style segmented toggle between all offers and membership-only offers.
+class _MembershipFilter extends StatelessWidget {
+  const _MembershipFilter({
+    required this.membershipOnly,
+    required this.onChanged,
+  });
+
+  final bool membershipOnly;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF1F1F4),
+        borderRadius: BorderRadius.circular(13),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _segment(label: 'All offers', selected: !membershipOnly, value: false),
+          _segment(
+            label: 'Membership',
+            icon: Icons.workspace_premium_rounded,
+            selected: membershipOnly,
+            value: true,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _segment({
+    required String label,
+    required bool selected,
+    required bool value,
+    IconData? icon,
+  }) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () {
+        if (selected) return;
+        HapticFeedback.selectionClick();
+        onChanged(value);
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOut,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+        decoration: BoxDecoration(
+          color: selected ? Colors.white : Colors.transparent,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: selected
+              ? [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.08),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : null,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (icon != null) ...[
+              Icon(
+                icon,
+                size: 15,
+                color: selected ? _kBrand : _kInkLow,
+              ),
+              const SizedBox(width: 5),
+            ],
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: selected ? _kInk : _kInkLow,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 /// Beautiful vendor offers section with animations
 class VendorOffersSection extends StatelessWidget {
   const VendorOffersSection({
@@ -252,104 +402,17 @@ class _VendorOffersBlocViewState extends State<VendorOffersBlocView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Section header
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF6F3FCC).withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(
-                    Icons.local_offer,
-                    color: Color(0xFF6F3FCC),
-                    size: 20,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Text(
-                  widget.title,
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFF1A202C),
-                  ),
-                ),
-              ],
-            ),
+          BlocBuilder<CouponsBloc, CouponsState>(
+            builder: (context, state) {
+              final claimable = state is CouponsLoaded
+                  ? state.coupons.where((c) => c.isValid).toList()
+                  : const <Coupon>[];
+              return _OffersHeader(
+                title: widget.title,
+                count: claimable.length,
+              );
+            },
           ),
-
-          // Filter chip section
-          Padding(
-            padding: const EdgeInsets.only(left: 24, right: 24, top: 12),
-            child: Row(
-              children: [
-                GestureDetector(
-                  onTap: () => setState(() => membershipOnly = !membershipOnly),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: membershipOnly
-                          ? const Color(0xFF6F3FCC)
-                          : const Color(0xFFF3F4F6),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          membershipOnly ? Icons.star : Icons.star_border,
-                          size: 16,
-                          color: membershipOnly
-                              ? Colors.white
-                              : const Color(0xFF6B7280),
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          'Membership Only',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: membershipOnly
-                                ? Colors.white
-                                : const Color(0xFF6B7280),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const Spacer(),
-                if (membershipOnly)
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF6F3FCC).withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      'Premium filters active',
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w500,
-                        color: const Color(0xFF6F3FCC),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-          ),
-
           const SizedBox(height: 20),
           BlocBuilder<CouponsBloc, CouponsState>(
             builder: (context, state) {
@@ -359,18 +422,29 @@ class _VendorOffersBlocViewState extends State<VendorOffersBlocView> {
                 return _buildErrorWidget(state.message);
               } else if (state is CouponsLoaded) {
                 // Only show claimable (valid & active) coupons
-                var visible = state.coupons.where((c) => c.isValid).toList();
-                if (membershipOnly) {
-                  // Include coupons that can be claimed via membership (subscription),
-                  // even if they also have a cash option.
-                  visible = visible
-                      .where((c) => _hasMembershipOption(c))
-                      .toList();
-                }
-                return _buildCouponsList(
-                  visible,
-                  widget.vendorUid,
-                  widget.vendorName,
+                final all = state.coupons.where((c) => c.isValid).toList();
+                final visible = membershipOnly
+                    ? all.where((c) => _hasMembershipOption(c)).toList()
+                    : all;
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(24, 0, 24, 20),
+                      child: _MembershipFilter(
+                        membershipOnly: membershipOnly,
+                        onChanged: (value) =>
+                            setState(() => membershipOnly = value),
+                      ),
+                    ),
+                    visible.isNotEmpty
+                        ? _buildCouponsList(
+                            visible,
+                            widget.vendorUid,
+                            widget.vendorName,
+                          )
+                        : _buildEmptyState(),
+                  ],
                 );
               }
               return _buildEmptyState();
@@ -406,96 +480,25 @@ class _VendorOffersViewState extends State<VendorOffersView> {
   @override
   Widget build(BuildContext context) {
     // Filter claimable coupons (valid & active)
-    var visible = widget.coupons.where((c) => c.isValid).toList();
-    if (membershipOnly) {
-      // Include coupons that can be claimed via membership (subscription),
-      // even if both membership and cash purchase are available.
-      visible = visible.where((c) => _hasMembershipOption(c)).toList();
-    }
+    final all = widget.coupons.where((c) => c.isValid).toList();
+    final visible = membershipOnly
+        ? all.where((c) => _hasMembershipOption(c)).toList()
+        : all;
 
     return Container(
       margin: const EdgeInsets.only(top: 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Section header
+          _OffersHeader(title: widget.title, count: all.length),
+          const SizedBox(height: 14),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF6F3FCC).withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(
-                    Icons.local_offer,
-                    color: Color(0xFF6F3FCC),
-                    size: 20,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Text(
-                  widget.title,
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFF1A202C),
-                  ),
-                ),
-              ],
+            child: _MembershipFilter(
+              membershipOnly: membershipOnly,
+              onChanged: (value) => setState(() => membershipOnly = value),
             ),
           ),
-
-          // Filter chip section
-          Padding(
-            padding: const EdgeInsets.only(left: 24, right: 24, top: 12),
-            child: Row(
-              children: [
-                GestureDetector(
-                  onTap: () => setState(() => membershipOnly = !membershipOnly),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: membershipOnly
-                          ? const Color(0xFF6F3FCC)
-                          : const Color(0xFFF3F4F6),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          membershipOnly ? Icons.star : Icons.star_border,
-                          size: 16,
-                          color: membershipOnly
-                              ? Colors.white
-                              : const Color(0xFF6B7280),
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          'Membership Only',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: membershipOnly
-                                ? Colors.white
-                                : const Color(0xFF6B7280),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
           const SizedBox(height: 20),
           visible.isNotEmpty
               ? _buildCouponsList(visible, widget.vendorUid, widget.vendorName)
@@ -554,8 +557,9 @@ class _VendorOfferCardState extends State<VendorOfferCard>
   @override
   Widget build(BuildContext context) {
     final accentColor = _getPrimaryColor();
-    final hasCash =
-        widget.coupon.cashPrice != null && widget.coupon.cashPrice! > 0;
+    final hasCash = (widget.coupon.canPurchaseWithCash ?? true) &&
+        widget.coupon.cashPrice != null &&
+        widget.coupon.cashPrice! > 0;
     final hasMembership = _hasMembershipOption(widget.coupon);
     final staticPreview = _buildStaticCard(
       accentColor,

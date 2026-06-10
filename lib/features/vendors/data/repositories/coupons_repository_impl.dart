@@ -133,6 +133,8 @@ class CouponsRepositoryImpl implements CouponsRepository {
       vendorUserId: response.vendorUserId,
       status: response.status,
       cashPrice: response.cashPrice,
+      canPurchaseWithCash: response.canPurchaseWithCash,
+      canRedeemWithMembership: response.canRedeemWithMembership,
       termsAndConditions: response.termsAndConditions,
       maxRedemptions: response.maxRedemptions,
       totalClaimed: response.totalClaimed,

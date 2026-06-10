@@ -1,13 +1,12 @@
-import 'dart:async';
-import 'package:savedge/core/error/error_message_mapper.dart';
 import 'dart:io';
+
+import 'package:savedge/core/error/error_message_mapper.dart';
 
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:savedge/features/coupons/data/services/coupon_service.dart';
-import 'package:savedge/features/coupons/presentation/pages/coupon_redemption_options_page.dart';
 
 /// QR Scanner page for scanning vendor QR codes to validate and claim coupons
 class QRScannerPage extends StatefulWidget {
@@ -44,7 +43,6 @@ class _QRScannerPageState extends State<QRScannerPage>
   bool isScanning = true;
   bool isProcessing = false;
   bool _isDisposed = false;
-  Timer? _debounceTimer;
 
   CouponService get _couponService => GetIt.I<CouponService>();
 
@@ -150,7 +148,6 @@ class _QRScannerPageState extends State<QRScannerPage>
   void dispose() {
     _isDisposed = true;
     WidgetsBinding.instance.removeObserver(this);
-    _debounceTimer?.cancel();
 
     // Properly dispose camera controller to prevent memory leaks
     cameraController.dispose();
@@ -164,17 +161,11 @@ class _QRScannerPageState extends State<QRScannerPage>
       body: Stack(
         children: [
           // QR Scanner View
+          // No scanWindow: native window mapping filters out valid detections
+          // after startup (QR only scanned if visible before the window is set).
           MobileScanner(
             controller: cameraController,
             onDetect: _onQRCodeDetected,
-            scanWindow: Rect.fromCenter(
-              center: Offset(
-                MediaQuery.of(context).size.width / 2,
-                MediaQuery.of(context).size.height / 2 - 60,
-              ),
-              width: 280,
-              height: 280,
-            ),
             errorBuilder: (context, error) {
               return Center(
                 child: Container(
@@ -456,16 +447,12 @@ class _QRScannerPageState extends State<QRScannerPage>
     final String? code = capture.barcodes.first.rawValue;
     if (code == null || code.isEmpty) return;
 
-    // Debounce multiple detections
-    _debounceTimer?.cancel();
-    _debounceTimer = Timer(const Duration(milliseconds: 500), () {
-      if (mounted && isScanning && !isProcessing) {
-        setState(() {
-          isScanning = false; // Stop scanning immediately
-        });
-        _handleQRCode(code);
-      }
+    // DetectionSpeed.noDuplicates already emits once per code; handle it
+    // immediately, guarded by isScanning/isProcessing against re-entry.
+    setState(() {
+      isScanning = false;
     });
+    _handleQRCode(code);
   }
 
   Future<void> _handleQRCode(String qrCode) async {

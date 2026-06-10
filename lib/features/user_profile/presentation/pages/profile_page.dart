@@ -14,6 +14,7 @@ import 'package:savedge/features/favorites/presentation/bloc/favorites_bloc.dart
 import 'package:savedge/features/favorites/presentation/bloc/favorites_event.dart';
 import 'package:savedge/features/favorites/presentation/pages/favorites_page.dart';
 import 'package:savedge/features/notifications/presentation/bloc/notification_bloc.dart';
+import 'package:savedge/features/points_payment/data/services/points_payment_service.dart';
 import 'package:savedge/features/static_pages/presentation/pages/about_us_page.dart';
 import 'package:savedge/features/static_pages/presentation/pages/contact_us_page.dart';
 import 'package:savedge/features/stores/presentation/pages/stores_page.dart';
@@ -35,6 +36,7 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   bool _isLoading = true;
   UserProfileResponse3? _userProfile;
+  int _mealPointsBalance = 0;
   String? _error;
 
   AuthRepository get _authRepository => GetIt.I<AuthRepository>();
@@ -49,7 +51,10 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> _loadUserProfile() async {
     try {
-      setState(() => _isLoading = true);
+      setState(() {
+        _isLoading = true;
+        _error = null;
+      });
 
       // Check if user is authenticated
       final isAuthenticated = await _secureStorage.isAuthenticated();
@@ -57,15 +62,42 @@ class _ProfilePageState extends State<ProfilePage> {
         throw Exception('No authenticated user found');
       }
 
-      // Get user profile directly from API using new unified endpoint
+      // Get user profile directly from API using new unified endpoint.
+      // Meal points live in a separate bucket not included in the profile's
+      // availablePoints, so they are fetched alongside it.
+      final mealPointsFuture = _loadMealPointsBalance();
       final profile = await _authRepository.getCurrentUserProfile();
-      setState(() => _userProfile = profile);
+      final mealPoints = await mealPointsFuture;
+      setState(() {
+        _userProfile = profile;
+        _mealPointsBalance = mealPoints;
+      });
     } catch (e) {
       setState(() => _error = ErrorMessageMapper.map(e));
     } finally {
       setState(() => _isLoading = false);
     }
   }
+
+  /// A failure here must not block the profile, so errors collapse to zero
+  /// and the points card falls back to the Savedge-only balance.
+  Future<int> _loadMealPointsBalance() async {
+    try {
+      final balance = await GetIt.I<PointsPaymentService>().getBalance();
+      return balance.mealAvailablePoints;
+    } catch (_) {
+      return 0;
+    }
+  }
+
+  int get _totalPointsBalance =>
+      (_userProfile?.pointsBalance ?? 0) + _mealPointsBalance;
+
+  /// Breakdown shown under the points total; meal points are a separate
+  /// bucket, so the description only appears when the user has any.
+  String? get _pointsBreakdown => _mealPointsBalance > 0
+      ? '${_userProfile?.pointsBalance ?? 0} Savedge + $_mealPointsBalance Meal'
+      : null;
 
   @override
   Widget build(BuildContext context) {
@@ -215,30 +247,37 @@ class _ProfilePageState extends State<ProfilePage> {
                   // Stats Cards (Only for employees)
                   if (_userProfile != null && _userProfile!.isEmployee) ...[
                     if (_userProfile!.hasActiveSubscription) ...[
-                      Row(
-                        children: [
-                          Expanded(
-                            child: ProfileStatsCard(
-                              title: 'Points Balance',
-                              value: '${_userProfile!.pointsBalance}',
-                              icon: Icons.stars_outlined,
-                              color: const Color(0xFFD69E2E),
-                              onTap: _onPointsBalanceTap,
+                      // IntrinsicHeight + stretch keeps both cards the same
+                      // height even when the points card grows a breakdown
+                      // line.
+                      IntrinsicHeight(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Expanded(
+                              child: ProfileStatsCard(
+                                title: 'Points Balance',
+                                value: '$_totalPointsBalance',
+                                subtitle: _pointsBreakdown,
+                                icon: Icons.stars_outlined,
+                                color: const Color(0xFFD69E2E),
+                                onTap: _onPointsBalanceTap,
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: ProfileStatsCard(
-                              title: _userProfile!.subscriptionInfo!.planName,
-                              value: 'Subscription',
-                              icon: Icons.star,
-                              color: !_userProfile!.subscriptionInfo!.isActive
-                                  ? Colors.red
-                                  : Colors.green,
-                              onTap: _onManageSubscriptionTap,
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: ProfileStatsCard(
+                                title: _userProfile!.subscriptionInfo!.planName,
+                                value: 'Subscription',
+                                icon: Icons.star,
+                                color: !_userProfile!.subscriptionInfo!.isActive
+                                    ? Colors.red
+                                    : Colors.green,
+                                onTap: _onManageSubscriptionTap,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ] else ...[
                       // For employees without subscriptions, show points balance only
@@ -247,7 +286,8 @@ class _ProfilePageState extends State<ProfilePage> {
                           Expanded(
                             child: ProfileStatsCard(
                               title: 'Points Balance',
-                              value: '${_userProfile!.pointsBalance}',
+                              value: '$_totalPointsBalance',
+                              subtitle: _pointsBreakdown,
                               icon: Icons.stars_outlined,
                               color: const Color(0xFFD69E2E),
                               onTap: _onPointsBalanceTap,

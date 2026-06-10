@@ -18,6 +18,8 @@ class Coupon extends Equatable {
     required this.vendorUserId,
     required this.status,
     this.cashPrice,
+    this.canPurchaseWithCash,
+    this.canRedeemWithMembership,
     this.termsAndConditions,
     this.maxRedemptions,
     this.totalClaimed = 0,
@@ -48,6 +50,10 @@ class Coupon extends Equatable {
   final String vendorUserId;
   final String status;
   final double? cashPrice;
+
+  /// Explicit redemption flags from newer API payloads; null on older payloads.
+  final bool? canPurchaseWithCash;
+  final bool? canRedeemWithMembership;
   final String? termsAndConditions;
   final int? maxRedemptions;
   final int totalClaimed;
@@ -118,6 +124,8 @@ class Coupon extends Equatable {
     vendorUserId,
     status,
     cashPrice,
+    canPurchaseWithCash,
+    canRedeemWithMembership,
     termsAndConditions,
     maxRedemptions,
     totalClaimed,

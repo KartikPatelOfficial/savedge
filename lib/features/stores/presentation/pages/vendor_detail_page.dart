@@ -763,37 +763,33 @@ class _VendorDetailViewState extends State<_VendorDetailView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header style mirrors VendorOffersSection so the two lists read
-          // as siblings.
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: _T.brand.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(
-                    Icons.cake_outlined,
-                    color: _T.brand,
-                    size: 20,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                const Text(
-                  'On your occasions',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700,
-                    color: _T.ink,
-                  ),
-                ),
-              ],
+          // Clean typographic header — mirrors the Special Offers section so
+          // the two lists read as siblings.
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 24),
+            child: Text(
+              'On your occasions',
+              style: TextStyle(
+                fontSize: 19,
+                fontWeight: FontWeight.w800,
+                color: _T.ink,
+                letterSpacing: -0.4,
+              ),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 6),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 24),
+            child: Text(
+              'Unlocked around your birthday & anniversary',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+                color: _T.inkLow,
+              ),
+            ),
+          ),
+          const SizedBox(height: 18),
           ...occasionCoupons.asMap().entries.map((entry) {
             final coupon = entry.value;
             final isAvailable = _isOccasionCouponAvailable(

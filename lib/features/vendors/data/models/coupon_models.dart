@@ -14,6 +14,8 @@ class CouponResponse {
       maximumDiscountAmount:
           (json['maxDiscountAmount'] as num?)?.toDouble() ?? 0.0,
       cashPrice: (json['cashPrice'] as num?)?.toDouble(),
+      canPurchaseWithCash: json['canPurchaseWithCash'] as bool?,
+      canRedeemWithMembership: json['canRedeemWithMembership'] as bool?,
       validFrom: DateTime.parse(json['validFrom'] as String),
       validTo: DateTime.parse(json['validUntil'] as String),
       vendorId: json['vendorProfileId'] as int,
@@ -67,6 +69,8 @@ class CouponResponse {
     required this.vendorUserId,
     required this.status,
     this.cashPrice,
+    this.canPurchaseWithCash,
+    this.canRedeemWithMembership,
     this.termsAndConditions,
     this.maxRedemptions,
     this.totalClaimed = 0,
@@ -101,6 +105,8 @@ class CouponResponse {
   final double minimumOrderAmount;
   final double maximumDiscountAmount;
   final double? cashPrice;
+  final bool? canPurchaseWithCash;
+  final bool? canRedeemWithMembership;
   final DateTime validFrom;
   final DateTime validTo;
   final int vendorId;
