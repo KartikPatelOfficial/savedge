@@ -344,7 +344,9 @@ as List<VendorSocialMediaDto>,
 /// @nodoc
 mixin _$VendorImageDto {
 
- int get id; String get imageUrl; String? get altText; int get displayOrder; bool get isPrimary; ImageType get imageType; String get imageTypeName;
+ int get id; String get imageUrl; String? get altText; int get displayOrder; bool get isPrimary;// Tolerate missing/unknown values (e.g. a stray 0 from list endpoints)
+// instead of throwing during decode.
+@JsonKey(unknownEnumValue: ImageType.gallery) ImageType get imageType; String get imageTypeName;
 /// Create a copy of VendorImageDto
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -377,7 +379,7 @@ abstract mixin class $VendorImageDtoCopyWith<$Res>  {
   factory $VendorImageDtoCopyWith(VendorImageDto value, $Res Function(VendorImageDto) _then) = _$VendorImageDtoCopyWithImpl;
 @useResult
 $Res call({
- int id, String imageUrl, String? altText, int displayOrder, bool isPrimary, ImageType imageType, String imageTypeName
+ int id, String imageUrl, String? altText, int displayOrder, bool isPrimary,@JsonKey(unknownEnumValue: ImageType.gallery) ImageType imageType, String imageTypeName
 });
 
 
@@ -488,7 +490,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String imageUrl,  String? altText,  int displayOrder,  bool isPrimary,  ImageType imageType,  String imageTypeName)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String imageUrl,  String? altText,  int displayOrder,  bool isPrimary, @JsonKey(unknownEnumValue: ImageType.gallery)  ImageType imageType,  String imageTypeName)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _VendorImageDto() when $default != null:
 return $default(_that.id,_that.imageUrl,_that.altText,_that.displayOrder,_that.isPrimary,_that.imageType,_that.imageTypeName);case _:
@@ -509,7 +511,7 @@ return $default(_that.id,_that.imageUrl,_that.altText,_that.displayOrder,_that.i
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String imageUrl,  String? altText,  int displayOrder,  bool isPrimary,  ImageType imageType,  String imageTypeName)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String imageUrl,  String? altText,  int displayOrder,  bool isPrimary, @JsonKey(unknownEnumValue: ImageType.gallery)  ImageType imageType,  String imageTypeName)  $default,) {final _that = this;
 switch (_that) {
 case _VendorImageDto():
 return $default(_that.id,_that.imageUrl,_that.altText,_that.displayOrder,_that.isPrimary,_that.imageType,_that.imageTypeName);case _:
@@ -529,7 +531,7 @@ return $default(_that.id,_that.imageUrl,_that.altText,_that.displayOrder,_that.i
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String imageUrl,  String? altText,  int displayOrder,  bool isPrimary,  ImageType imageType,  String imageTypeName)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String imageUrl,  String? altText,  int displayOrder,  bool isPrimary, @JsonKey(unknownEnumValue: ImageType.gallery)  ImageType imageType,  String imageTypeName)?  $default,) {final _that = this;
 switch (_that) {
 case _VendorImageDto() when $default != null:
 return $default(_that.id,_that.imageUrl,_that.altText,_that.displayOrder,_that.isPrimary,_that.imageType,_that.imageTypeName);case _:
@@ -544,7 +546,7 @@ return $default(_that.id,_that.imageUrl,_that.altText,_that.displayOrder,_that.i
 @JsonSerializable()
 
 class _VendorImageDto implements VendorImageDto {
-  const _VendorImageDto({this.id = 0, required this.imageUrl, this.altText, this.displayOrder = 0, required this.isPrimary, this.imageType = ImageType.gallery, this.imageTypeName = 'Gallery'});
+  const _VendorImageDto({this.id = 0, required this.imageUrl, this.altText, this.displayOrder = 0, required this.isPrimary, @JsonKey(unknownEnumValue: ImageType.gallery) this.imageType = ImageType.gallery, this.imageTypeName = 'Gallery'});
   factory _VendorImageDto.fromJson(Map<String, dynamic> json) => _$VendorImageDtoFromJson(json);
 
 @override@JsonKey() final  int id;
@@ -552,7 +554,9 @@ class _VendorImageDto implements VendorImageDto {
 @override final  String? altText;
 @override@JsonKey() final  int displayOrder;
 @override final  bool isPrimary;
-@override@JsonKey() final  ImageType imageType;
+// Tolerate missing/unknown values (e.g. a stray 0 from list endpoints)
+// instead of throwing during decode.
+@override@JsonKey(unknownEnumValue: ImageType.gallery) final  ImageType imageType;
 @override@JsonKey() final  String imageTypeName;
 
 /// Create a copy of VendorImageDto
@@ -588,7 +592,7 @@ abstract mixin class _$VendorImageDtoCopyWith<$Res> implements $VendorImageDtoCo
   factory _$VendorImageDtoCopyWith(_VendorImageDto value, $Res Function(_VendorImageDto) _then) = __$VendorImageDtoCopyWithImpl;
 @override @useResult
 $Res call({
- int id, String imageUrl, String? altText, int displayOrder, bool isPrimary, ImageType imageType, String imageTypeName
+ int id, String imageUrl, String? altText, int displayOrder, bool isPrimary,@JsonKey(unknownEnumValue: ImageType.gallery) ImageType imageType, String imageTypeName
 });
 
 

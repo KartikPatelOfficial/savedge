@@ -13,6 +13,10 @@ analyzer:
   exclude:
     - "**/*.g.dart"
     - "**/*.freezed.dart"
+  errors:
+    # False positive: freezed re-emits @JsonKey from factory params onto the
+    # generated field, so this fires on valid json_serializable usage.
+    invalid_annotation_target: ignore
 
 linter:
   # The lint rules applied to this project can be customized in the

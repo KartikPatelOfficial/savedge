@@ -41,7 +41,11 @@ abstract class VendorImageDto with _$VendorImageDto {
     String? altText,
     @Default(0) int displayOrder,
     required bool isPrimary,
-    @Default(ImageType.gallery) ImageType imageType,
+    // Tolerate missing/unknown values (e.g. a stray 0 from list endpoints)
+    // instead of throwing during decode.
+    @JsonKey(unknownEnumValue: ImageType.gallery)
+    @Default(ImageType.gallery)
+    ImageType imageType,
     @Default('Gallery') String imageTypeName,
   }) = _VendorImageDto;
 

@@ -74,7 +74,11 @@ _VendorImageDto _$VendorImageDtoFromJson(Map<String, dynamic> json) =>
       displayOrder: (json['displayOrder'] as num?)?.toInt() ?? 0,
       isPrimary: json['isPrimary'] as bool,
       imageType:
-          $enumDecodeNullable(_$ImageTypeEnumMap, json['imageType']) ??
+          $enumDecodeNullable(
+            _$ImageTypeEnumMap,
+            json['imageType'],
+            unknownValue: ImageType.gallery,
+          ) ??
           ImageType.gallery,
       imageTypeName: json['imageTypeName'] as String? ?? 'Gallery',
     );

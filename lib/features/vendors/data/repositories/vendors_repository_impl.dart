@@ -233,7 +233,10 @@ class VendorsRepositoryImpl implements VendorsRepository {
       altText: dto.altText,
       displayOrder: dto.displayOrder,
       isPrimary: dto.isPrimary,
-      imageType: dto.imageTypeName,
+      // Use the enum's canonical name ('logo', 'gallery', …). It decodes
+      // from the API's numeric type, unlike imageTypeName which can be
+      // missing/inconsistent and would mislabel logos as gallery shots.
+      imageType: dto.imageType.name,
       imageTypeName: dto.imageTypeName,
     );
   }
