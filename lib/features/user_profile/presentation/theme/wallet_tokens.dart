@@ -17,6 +17,19 @@ class WalletTokens {
   static const Color onInk = Colors.white;
   static const Color onInkMuted = Color(0xB3FFFFFF); // white 70%
   static const Color onInkFaint = Color(0x66FFFFFF); // white 40%
+  static const Color inkFrost = Color(0x14FFFFFF); // frosted fills on ink
+  static const Color inkFrostBorder = Color(0x1FFFFFFF);
+  static const Color inkHairline = Color(0x14FFFFFF);
+  // Light tints that keep 4.5:1 contrast against the ink hero
+  static const Color creditOnInk = Color(0xFF6EE7B7);
+  static const Color debitOnInk = Color(0xFFFDA4AF);
+  static const Color warnOnInk = Color(0xFFFBBF24);
+  static const Color onWarnPill = Color(0xFF451A03);
+  // Hero glows
+  static const Color glowPrimary = Color(0x596F3FCC);
+  static const Color glowPrimaryEnd = Color(0x006F3FCC);
+  static const Color glowSecondary = Color(0x269F7AEA);
+  static const Color glowSecondaryEnd = Color(0x009F7AEA);
 
   // Canvas & surfaces
   static const Color canvas = Color(0xFFF7F8FB);
@@ -29,6 +42,9 @@ class WalletTokens {
   static const Color textSecondary = Color(0xFF4A5568);
   static const Color textTertiary = Color(0xFF718096);
 
+  // Loading skeleton
+  static const Color skeleton = Color(0xFFE9ECF2);
+
   // Semantics — green strictly for credits, red for debits/expiry
   static const Color credit = Color(0xFF059669);
   static const Color creditSoft = Color(0xFFE6F9F0);
@@ -39,6 +55,8 @@ class WalletTokens {
   static const Color meal = Color(0xFFEA580C);
   static const Color mealSoft = Color(0xFFFFF4EC);
   static const Color mealBorder = Color(0xFFFFE0CC);
+  // Light meal tint that keeps 4.5:1 contrast against the ink hero
+  static const Color mealOnInk = Color(0xFFFDBA74);
 
   // Expiry / warning
   static const Color warn = Color(0xFFB45309);

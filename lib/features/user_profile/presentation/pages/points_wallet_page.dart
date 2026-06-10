@@ -3,13 +3,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 
 import 'package:savedge/core/injection/injection.dart';
+import 'package:savedge/features/points_payment/data/models/points_payment_models.dart';
 import 'package:savedge/features/points_payment/data/services/points_payment_service.dart';
 import 'package:savedge/features/user_profile/presentation/bloc/points_bloc.dart';
 import 'package:savedge/features/user_profile/presentation/theme/wallet_tokens.dart';
 import 'package:savedge/features/user_profile/presentation/widgets/wallet_activity.dart';
 import 'package:savedge/features/user_profile/presentation/widgets/wallet_balance_card.dart';
 import 'package:savedge/features/user_profile/presentation/widgets/wallet_insight_cards.dart';
-import 'package:savedge/features/user_profile/presentation/widgets/wallet_meal_points_card.dart';
 import 'package:savedge/shared/domain/entities/points.dart';
 import 'package:savedge/shared/widgets/common_widgets.dart';
 
@@ -38,27 +38,28 @@ class _PointsWalletView extends StatefulWidget {
 
 class _PointsWalletViewState extends State<_PointsWalletView> {
   WalletFilter _filter = WalletFilter.all;
-  int _mealPoints = 0;
+  UserPointsBalanceResponse? _balance;
 
   @override
   void initState() {
     super.initState();
-    _loadMealPoints();
+    _loadBalance();
   }
 
-  /// Meal points live in a separate bucket behind a different endpoint; a
-  /// failure here just hides the card.
-  Future<void> _loadMealPoints() async {
+  /// Per-bucket balances (incl. meal points) live behind a different
+  /// endpoint; a failure here just hides the meal summary line and the
+  /// card-back breakdown.
+  Future<void> _loadBalance() async {
     try {
       final balance = await GetIt.I<PointsPaymentService>().getBalance();
-      if (mounted) setState(() => _mealPoints = balance.mealAvailablePoints);
+      if (mounted) setState(() => _balance = balance);
     } catch (_) {}
   }
 
   Future<void> _refresh() async {
     final bloc = context.read<PointsBloc>();
     bloc.add(const RefreshPoints());
-    _loadMealPoints();
+    _loadBalance();
     await bloc.stream
         .firstWhere(
           (s) => s is PointsError || (s is PointsLoaded && !s.isRefreshing),
@@ -117,7 +118,7 @@ class _PointsWalletViewState extends State<_PointsWalletView> {
               ? null
               : () {
                   context.read<PointsBloc>().add(const RefreshPoints());
-                  _loadMealPoints();
+                  _loadBalance();
                 },
           icon: isRefreshing
               ? const SizedBox(
@@ -171,16 +172,10 @@ class _PointsWalletViewState extends State<_PointsWalletView> {
             points: state.points,
             monthEarned: stats.monthEarned,
             monthSpent: stats.monthSpent,
+            balance: _balance,
           ),
         ),
       ),
-      if (_mealPoints > 0)
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: WalletTokens.gutter.copyWith(top: WalletTokens.s3),
-            child: WalletMealPointsCard(points: _mealPoints),
-          ),
-        ),
       if (state.points.isExpiringSoon && !state.points.hasExpired)
         SliverToBoxAdapter(
           child: Padding(
@@ -433,7 +428,7 @@ class _WalletSkeletonState extends State<_WalletSkeleton>
       height: height,
       width: width ?? double.infinity,
       decoration: BoxDecoration(
-        color: const Color(0xFFE9ECF2),
+        color: WalletTokens.skeleton,
         borderRadius: BorderRadius.circular(radius),
       ),
     );

@@ -14,7 +14,6 @@ import 'package:savedge/features/favorites/presentation/bloc/favorites_bloc.dart
 import 'package:savedge/features/favorites/presentation/bloc/favorites_event.dart';
 import 'package:savedge/features/favorites/presentation/pages/favorites_page.dart';
 import 'package:savedge/features/notifications/presentation/bloc/notification_bloc.dart';
-import 'package:savedge/features/points_payment/data/services/points_payment_service.dart';
 import 'package:savedge/features/static_pages/presentation/pages/about_us_page.dart';
 import 'package:savedge/features/static_pages/presentation/pages/contact_us_page.dart';
 import 'package:savedge/features/stores/presentation/pages/stores_page.dart';
@@ -36,7 +35,6 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   bool _isLoading = true;
   UserProfileResponse3? _userProfile;
-  int _mealPointsBalance = 0;
   String? _error;
 
   AuthRepository get _authRepository => GetIt.I<AuthRepository>();
@@ -63,14 +61,11 @@ class _ProfilePageState extends State<ProfilePage> {
       }
 
       // Get user profile directly from API using new unified endpoint.
-      // Meal points live in a separate bucket not included in the profile's
-      // availablePoints, so they are fetched alongside it.
-      final mealPointsFuture = _loadMealPointsBalance();
+      // It carries both points buckets, so the total renders in one paint
+      // with no second balance request.
       final profile = await _authRepository.getCurrentUserProfile();
-      final mealPoints = await mealPointsFuture;
       setState(() {
         _userProfile = profile;
-        _mealPointsBalance = mealPoints;
       });
     } catch (e) {
       setState(() => _error = ErrorMessageMapper.map(e));
@@ -79,24 +74,13 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  /// A failure here must not block the profile, so errors collapse to zero
-  /// and the points card falls back to the Savedge-only balance.
-  Future<int> _loadMealPointsBalance() async {
-    try {
-      final balance = await GetIt.I<PointsPaymentService>().getBalance();
-      return balance.mealAvailablePoints;
-    } catch (_) {
-      return 0;
-    }
-  }
-
-  int get _totalPointsBalance =>
-      (_userProfile?.pointsBalance ?? 0) + _mealPointsBalance;
+  int get _totalPointsBalance => _userProfile?.totalPointsBalance ?? 0;
 
   /// Breakdown shown under the points total; meal points are a separate
   /// bucket, so the description only appears when the user has any.
-  String? get _pointsBreakdown => _mealPointsBalance > 0
-      ? '${_userProfile?.pointsBalance ?? 0} Savedge + $_mealPointsBalance Meal'
+  String? get _pointsBreakdown => (_userProfile?.mealPointsBalance ?? 0) > 0
+      ? '${_userProfile?.pointsBalance ?? 0} Savedge + '
+            '${_userProfile?.mealPointsBalance ?? 0} Meal'
       : null;
 
   @override
@@ -209,8 +193,11 @@ class _ProfilePageState extends State<ProfilePage> {
             surfaceTintColor: Colors.transparent,
             flexibleSpace: LayoutBuilder(
               builder: (context, constraints) {
-                final minHeight = kToolbarHeight + MediaQuery.of(context).padding.top;
-                final t = ((constraints.maxHeight - minHeight) / (140 - minHeight)).clamp(0.0, 1.0);
+                final minHeight =
+                    kToolbarHeight + MediaQuery.of(context).padding.top;
+                final t =
+                    ((constraints.maxHeight - minHeight) / (140 - minHeight))
+                        .clamp(0.0, 1.0);
                 return ColoredBox(
                   color: Color.lerp(Colors.white, Colors.transparent, t)!,
                   child: FlexibleSpaceBar(
@@ -317,159 +304,8 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                   ],
 
-                  // Employee-specific stats (only show for employees)
-                  if (_userProfile!.isEmployee &&
-                      _userProfile!.employeeInfo != null) ...[
-                    const SizedBox(height: 16),
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: const Color(0xFFE2E8F0),
-                          width: 1,
-                        ),
-                      ),
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              Container(
-                                width: 40,
-                                height: 40,
-                                decoration: BoxDecoration(
-                                  color: const Color(
-                                    0xFF6F3FCC,
-                                  ).withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: const Icon(
-                                  Icons.business_outlined,
-                                  color: Color(0xFF6F3FCC),
-                                  size: 22,
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      _userProfile!
-                                          .employeeInfo!
-                                          .organizationName,
-                                      style: const TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w700,
-                                        color: Color(0xFF1A202C),
-                                      ),
-                                    ),
-                                    Text(
-                                      _userProfile!.employeeInfo!.department,
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        color: Color(0xFF718096),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                          if (_userProfile!
-                                  .employeeInfo!
-                                  .employeeCode
-                                  .isNotEmpty ||
-                              _userProfile!
-                                  .employeeInfo!
-                                  .position
-                                  .isNotEmpty) ...[
-                            const SizedBox(height: 16),
-                            const Divider(
-                              color: Color(0xFFE2E8F0),
-                              height: 1,
-                              thickness: 1,
-                            ),
-                            const SizedBox(height: 16),
-                            Row(
-                              children: [
-                                if (_userProfile!
-                                    .employeeInfo!
-                                    .employeeCode
-                                    .isNotEmpty) ...[
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        const Text(
-                                          'Employee ID',
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: Color(0xFF718096),
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          _userProfile!
-                                              .employeeInfo!
-                                              .employeeCode,
-                                          style: const TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w600,
-                                            color: Color(0xFF2D3748),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                                if (_userProfile!
-                                    .employeeInfo!
-                                    .position
-                                    .isNotEmpty) ...[
-                                  if (_userProfile!
-                                      .employeeInfo!
-                                      .employeeCode
-                                      .isNotEmpty)
-                                    const SizedBox(width: 16),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        const Text(
-                                          'Position',
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: Color(0xFF718096),
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          _userProfile!.employeeInfo!.position,
-                                          style: const TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w600,
-                                            color: Color(0xFF2D3748),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ],
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                  ],
-
+                  // Employee identity (organization, ID, role) now lives in
+                  // the ProfileHeader chips instead of a separate card.
                   const SizedBox(height: 20),
 
                   if (_userProfile != null &&
@@ -487,6 +323,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     _buildMenuSection('Account', [
                       ProfileMenuItem(
                         icon: Icons.person,
+                        iconColor: const Color(0xFF3B82F6),
                         title: 'View Profile',
                         subtitle: _userProfile!.isEmployee
                             ? 'View your profile information'
@@ -496,6 +333,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       if (!_userProfile!.isEmployee) ...[
                         ProfileMenuItem(
                           icon: Icons.security,
+                          iconColor: const Color(0xFF0D9488),
                           title: 'Privacy & Security',
                           subtitle: 'Manage your account security',
                           onTap: _onPrivacyTap,
@@ -503,6 +341,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       ],
                       ProfileMenuItem(
                         icon: Icons.notifications,
+                        iconColor: const Color(0xFFD69E2E),
                         title: 'Notifications',
                         subtitle: 'Configure your notification preferences',
                         onTap: _onNotificationsTap,
@@ -515,6 +354,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       if (!_userProfile!.isEmployee) ...[
                         ProfileMenuItem(
                           icon: Icons.history,
+                          iconColor: const Color(0xFF0EA5E9),
                           title: 'Order History',
                           subtitle: 'View your past orders',
                           onTap: _onOrderHistoryTap,
@@ -522,18 +362,21 @@ class _ProfilePageState extends State<ProfilePage> {
                       ],
                       ProfileMenuItem(
                         icon: Icons.receipt_long_rounded,
+                        iconColor: const Color(0xFF64748B),
                         title: 'Invoices',
                         subtitle: 'View and download your invoices',
                         onTap: _onInvoicesTap,
                       ),
                       ProfileMenuItem(
                         icon: Icons.favorite,
+                        iconColor: const Color(0xFFE11D48),
                         title: 'Favorites',
                         subtitle: 'Your favorite restaurants and items',
                         onTap: _onFavoritesTap,
                       ),
                       ProfileMenuItem(
                         icon: Icons.card_giftcard,
+                        iconColor: const Color(0xFFEA580C),
                         title: 'Gift Cards',
                         subtitle: 'Browse and buy brand gift cards',
                         onTap: _onGiftCardsTap,
@@ -542,6 +385,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       if (_userProfile!.isEmployee) ...[
                         ProfileMenuItem(
                           icon: Icons.card_giftcard_outlined,
+                          iconColor: const Color(0xFFDB2777),
                           title: 'Send & Receive Gifts',
                           subtitle: 'Gift coupons or points to colleagues',
                           onTap: _onSendGiftsTap,
@@ -550,6 +394,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       if (_userProfile!.isEmployee) ...[
                         ProfileMenuItem(
                           icon: Icons.history_outlined,
+                          iconColor: const Color(0xFF38A169),
                           title: 'Redemption History',
                           subtitle: 'View your coupon redemptions',
                           onTap: _onRedemptionHistoryTap,
@@ -562,12 +407,14 @@ class _ProfilePageState extends State<ProfilePage> {
                     _buildMenuSection('Support', [
                       ProfileMenuItem(
                         icon: Icons.help,
+                        iconColor: const Color(0xFF06B6D4),
                         title: 'Help & Support',
                         subtitle: 'Get help with your account',
                         onTap: _onHelpTap,
                       ),
                       ProfileMenuItem(
                         icon: Icons.info,
+                        iconColor: const Color(0xFF607D8B),
                         title: 'About',
                         subtitle: 'App version and information',
                         onTap: _onAboutTap,
@@ -1050,11 +897,7 @@ class _DeleteAccountDialogState extends State<_DeleteAccountDialog> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(
-            Icons.close,
-            size: 20,
-            color: Color(0xFFE53E3E),
-          ),
+          const Icon(Icons.close, size: 20, color: Color(0xFFE53E3E)),
           const SizedBox(width: 8),
           Expanded(
             child: Text(

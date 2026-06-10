@@ -455,7 +455,7 @@ $SubscriptionInfoCopyWith<$Res>? get subscriptionInfo {
 /// @nodoc
 mixin _$EmployeeInfo {
 
- int get organizationId; String get organizationName; String get department; String get position; String get employeeCode; int get availablePoints;
+ int get organizationId; String get organizationName; String get department; String get position; String get employeeCode; int get availablePoints; int get mealAvailablePoints;
 /// Create a copy of EmployeeInfo
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -468,16 +468,16 @@ $EmployeeInfoCopyWith<EmployeeInfo> get copyWith => _$EmployeeInfoCopyWithImpl<E
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is EmployeeInfo&&(identical(other.organizationId, organizationId) || other.organizationId == organizationId)&&(identical(other.organizationName, organizationName) || other.organizationName == organizationName)&&(identical(other.department, department) || other.department == department)&&(identical(other.position, position) || other.position == position)&&(identical(other.employeeCode, employeeCode) || other.employeeCode == employeeCode)&&(identical(other.availablePoints, availablePoints) || other.availablePoints == availablePoints));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is EmployeeInfo&&(identical(other.organizationId, organizationId) || other.organizationId == organizationId)&&(identical(other.organizationName, organizationName) || other.organizationName == organizationName)&&(identical(other.department, department) || other.department == department)&&(identical(other.position, position) || other.position == position)&&(identical(other.employeeCode, employeeCode) || other.employeeCode == employeeCode)&&(identical(other.availablePoints, availablePoints) || other.availablePoints == availablePoints)&&(identical(other.mealAvailablePoints, mealAvailablePoints) || other.mealAvailablePoints == mealAvailablePoints));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,organizationId,organizationName,department,position,employeeCode,availablePoints);
+int get hashCode => Object.hash(runtimeType,organizationId,organizationName,department,position,employeeCode,availablePoints,mealAvailablePoints);
 
 @override
 String toString() {
-  return 'EmployeeInfo(organizationId: $organizationId, organizationName: $organizationName, department: $department, position: $position, employeeCode: $employeeCode, availablePoints: $availablePoints)';
+  return 'EmployeeInfo(organizationId: $organizationId, organizationName: $organizationName, department: $department, position: $position, employeeCode: $employeeCode, availablePoints: $availablePoints, mealAvailablePoints: $mealAvailablePoints)';
 }
 
 
@@ -488,7 +488,7 @@ abstract mixin class $EmployeeInfoCopyWith<$Res>  {
   factory $EmployeeInfoCopyWith(EmployeeInfo value, $Res Function(EmployeeInfo) _then) = _$EmployeeInfoCopyWithImpl;
 @useResult
 $Res call({
- int organizationId, String organizationName, String department, String position, String employeeCode, int availablePoints
+ int organizationId, String organizationName, String department, String position, String employeeCode, int availablePoints, int mealAvailablePoints
 });
 
 
@@ -505,7 +505,7 @@ class _$EmployeeInfoCopyWithImpl<$Res>
 
 /// Create a copy of EmployeeInfo
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? organizationId = null,Object? organizationName = null,Object? department = null,Object? position = null,Object? employeeCode = null,Object? availablePoints = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? organizationId = null,Object? organizationName = null,Object? department = null,Object? position = null,Object? employeeCode = null,Object? availablePoints = null,Object? mealAvailablePoints = null,}) {
   return _then(_self.copyWith(
 organizationId: null == organizationId ? _self.organizationId : organizationId // ignore: cast_nullable_to_non_nullable
 as int,organizationName: null == organizationName ? _self.organizationName : organizationName // ignore: cast_nullable_to_non_nullable
@@ -513,6 +513,7 @@ as String,department: null == department ? _self.department : department // igno
 as String,position: null == position ? _self.position : position // ignore: cast_nullable_to_non_nullable
 as String,employeeCode: null == employeeCode ? _self.employeeCode : employeeCode // ignore: cast_nullable_to_non_nullable
 as String,availablePoints: null == availablePoints ? _self.availablePoints : availablePoints // ignore: cast_nullable_to_non_nullable
+as int,mealAvailablePoints: null == mealAvailablePoints ? _self.mealAvailablePoints : mealAvailablePoints // ignore: cast_nullable_to_non_nullable
 as int,
   ));
 }
@@ -598,10 +599,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int organizationId,  String organizationName,  String department,  String position,  String employeeCode,  int availablePoints)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int organizationId,  String organizationName,  String department,  String position,  String employeeCode,  int availablePoints,  int mealAvailablePoints)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _EmployeeInfo() when $default != null:
-return $default(_that.organizationId,_that.organizationName,_that.department,_that.position,_that.employeeCode,_that.availablePoints);case _:
+return $default(_that.organizationId,_that.organizationName,_that.department,_that.position,_that.employeeCode,_that.availablePoints,_that.mealAvailablePoints);case _:
   return orElse();
 
 }
@@ -619,10 +620,10 @@ return $default(_that.organizationId,_that.organizationName,_that.department,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int organizationId,  String organizationName,  String department,  String position,  String employeeCode,  int availablePoints)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int organizationId,  String organizationName,  String department,  String position,  String employeeCode,  int availablePoints,  int mealAvailablePoints)  $default,) {final _that = this;
 switch (_that) {
 case _EmployeeInfo():
-return $default(_that.organizationId,_that.organizationName,_that.department,_that.position,_that.employeeCode,_that.availablePoints);case _:
+return $default(_that.organizationId,_that.organizationName,_that.department,_that.position,_that.employeeCode,_that.availablePoints,_that.mealAvailablePoints);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -639,10 +640,10 @@ return $default(_that.organizationId,_that.organizationName,_that.department,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int organizationId,  String organizationName,  String department,  String position,  String employeeCode,  int availablePoints)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int organizationId,  String organizationName,  String department,  String position,  String employeeCode,  int availablePoints,  int mealAvailablePoints)?  $default,) {final _that = this;
 switch (_that) {
 case _EmployeeInfo() when $default != null:
-return $default(_that.organizationId,_that.organizationName,_that.department,_that.position,_that.employeeCode,_that.availablePoints);case _:
+return $default(_that.organizationId,_that.organizationName,_that.department,_that.position,_that.employeeCode,_that.availablePoints,_that.mealAvailablePoints);case _:
   return null;
 
 }
@@ -654,7 +655,7 @@ return $default(_that.organizationId,_that.organizationName,_that.department,_th
 @JsonSerializable()
 
 class _EmployeeInfo implements EmployeeInfo {
-  const _EmployeeInfo({required this.organizationId, required this.organizationName, required this.department, required this.position, required this.employeeCode, required this.availablePoints});
+  const _EmployeeInfo({required this.organizationId, required this.organizationName, required this.department, required this.position, required this.employeeCode, required this.availablePoints, this.mealAvailablePoints = 0});
   factory _EmployeeInfo.fromJson(Map<String, dynamic> json) => _$EmployeeInfoFromJson(json);
 
 @override final  int organizationId;
@@ -663,6 +664,7 @@ class _EmployeeInfo implements EmployeeInfo {
 @override final  String position;
 @override final  String employeeCode;
 @override final  int availablePoints;
+@override@JsonKey() final  int mealAvailablePoints;
 
 /// Create a copy of EmployeeInfo
 /// with the given fields replaced by the non-null parameter values.
@@ -677,16 +679,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _EmployeeInfo&&(identical(other.organizationId, organizationId) || other.organizationId == organizationId)&&(identical(other.organizationName, organizationName) || other.organizationName == organizationName)&&(identical(other.department, department) || other.department == department)&&(identical(other.position, position) || other.position == position)&&(identical(other.employeeCode, employeeCode) || other.employeeCode == employeeCode)&&(identical(other.availablePoints, availablePoints) || other.availablePoints == availablePoints));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _EmployeeInfo&&(identical(other.organizationId, organizationId) || other.organizationId == organizationId)&&(identical(other.organizationName, organizationName) || other.organizationName == organizationName)&&(identical(other.department, department) || other.department == department)&&(identical(other.position, position) || other.position == position)&&(identical(other.employeeCode, employeeCode) || other.employeeCode == employeeCode)&&(identical(other.availablePoints, availablePoints) || other.availablePoints == availablePoints)&&(identical(other.mealAvailablePoints, mealAvailablePoints) || other.mealAvailablePoints == mealAvailablePoints));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,organizationId,organizationName,department,position,employeeCode,availablePoints);
+int get hashCode => Object.hash(runtimeType,organizationId,organizationName,department,position,employeeCode,availablePoints,mealAvailablePoints);
 
 @override
 String toString() {
-  return 'EmployeeInfo(organizationId: $organizationId, organizationName: $organizationName, department: $department, position: $position, employeeCode: $employeeCode, availablePoints: $availablePoints)';
+  return 'EmployeeInfo(organizationId: $organizationId, organizationName: $organizationName, department: $department, position: $position, employeeCode: $employeeCode, availablePoints: $availablePoints, mealAvailablePoints: $mealAvailablePoints)';
 }
 
 
@@ -697,7 +699,7 @@ abstract mixin class _$EmployeeInfoCopyWith<$Res> implements $EmployeeInfoCopyWi
   factory _$EmployeeInfoCopyWith(_EmployeeInfo value, $Res Function(_EmployeeInfo) _then) = __$EmployeeInfoCopyWithImpl;
 @override @useResult
 $Res call({
- int organizationId, String organizationName, String department, String position, String employeeCode, int availablePoints
+ int organizationId, String organizationName, String department, String position, String employeeCode, int availablePoints, int mealAvailablePoints
 });
 
 
@@ -714,7 +716,7 @@ class __$EmployeeInfoCopyWithImpl<$Res>
 
 /// Create a copy of EmployeeInfo
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? organizationId = null,Object? organizationName = null,Object? department = null,Object? position = null,Object? employeeCode = null,Object? availablePoints = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? organizationId = null,Object? organizationName = null,Object? department = null,Object? position = null,Object? employeeCode = null,Object? availablePoints = null,Object? mealAvailablePoints = null,}) {
   return _then(_EmployeeInfo(
 organizationId: null == organizationId ? _self.organizationId : organizationId // ignore: cast_nullable_to_non_nullable
 as int,organizationName: null == organizationName ? _self.organizationName : organizationName // ignore: cast_nullable_to_non_nullable
@@ -722,6 +724,7 @@ as String,department: null == department ? _self.department : department // igno
 as String,position: null == position ? _self.position : position // ignore: cast_nullable_to_non_nullable
 as String,employeeCode: null == employeeCode ? _self.employeeCode : employeeCode // ignore: cast_nullable_to_non_nullable
 as String,availablePoints: null == availablePoints ? _self.availablePoints : availablePoints // ignore: cast_nullable_to_non_nullable
+as int,mealAvailablePoints: null == mealAvailablePoints ? _self.mealAvailablePoints : mealAvailablePoints // ignore: cast_nullable_to_non_nullable
 as int,
   ));
 }

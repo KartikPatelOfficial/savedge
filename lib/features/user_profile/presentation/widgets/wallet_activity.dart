@@ -36,7 +36,8 @@ class WalletFilterChips extends StatelessWidget {
     return Row(
       children: [
         for (final filter in WalletFilter.values) ...[
-          if (filter != WalletFilter.all) const SizedBox(width: WalletTokens.s2),
+          if (filter != WalletFilter.all)
+            const SizedBox(width: WalletTokens.s2),
           _FilterPill(
             label: filter.label,
             isSelected: filter == selected,
@@ -61,28 +62,31 @@ class _FilterPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // The visual pill is 38px; the tappable area is padded out to 48px.
     return Semantics(
       button: true,
       selected: isSelected,
       label: 'Show $label activity',
-      child: Material(
-        color: isSelected ? WalletTokens.ink : WalletTokens.surface,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(WalletTokens.rChip),
-          side: BorderSide(
-            color: isSelected ? WalletTokens.ink : WalletTokens.border,
-          ),
-        ),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(WalletTokens.rChip),
-          child: Container(
-            constraints: const BoxConstraints(minHeight: 40),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(WalletTokens.rChip),
+        child: Container(
+          constraints: const BoxConstraints(minHeight: 48),
+          alignment: Alignment.center,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 150),
+            curve: Curves.easeOut,
             padding: const EdgeInsets.symmetric(
               horizontal: WalletTokens.s4,
-              vertical: WalletTokens.s2,
+              vertical: 9,
             ),
-            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: isSelected ? WalletTokens.ink : WalletTokens.surface,
+              borderRadius: BorderRadius.circular(WalletTokens.rChip),
+              border: Border.all(
+                color: isSelected ? WalletTokens.ink : WalletTokens.border,
+              ),
+            ),
             child: AnimatedDefaultTextStyle(
               duration: const Duration(milliseconds: 150),
               style: TextStyle(

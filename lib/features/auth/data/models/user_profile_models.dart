@@ -49,6 +49,7 @@ abstract class EmployeeInfo with _$EmployeeInfo {
     required String position,
     required String employeeCode,
     required int availablePoints,
+    @Default(0) int mealAvailablePoints,
   }) = _EmployeeInfo;
 
   factory EmployeeInfo.fromJson(Map<String, dynamic> json) =>
@@ -122,8 +123,14 @@ extension UserProfileResponse3Extensions on UserProfileResponse3 {
   /// Check if user is an employee with organization
   bool get isEmployeeWithOrganization => isEmployee && employeeInfo != null;
 
-  /// Get points balance (from employee info or 0 for others)
+  /// Get SavEdge points balance (from employee info or 0 for others)
   int get pointsBalance => employeeInfo?.availablePoints ?? 0;
+
+  /// Get meal points balance — a separate bucket from SavEdge points
+  int get mealPointsBalance => employeeInfo?.mealAvailablePoints ?? 0;
+
+  /// The single number users should see everywhere: SavEdge + Meal combined
+  int get totalPointsBalance => pointsBalance + mealPointsBalance;
 
   /// Get display name
   String get displayName {
@@ -160,7 +167,8 @@ extension UserProfileResponse3Extensions on UserProfileResponse3 {
   bool get hasActiveSubscription => subscriptionInfo?.isActive == true;
 
   /// Check if user has added occasion dates
-  bool get hasOccasionDates => this.dateOfBirth != null || this.anniversaryDate != null;
+  bool get hasOccasionDates =>
+      this.dateOfBirth != null || this.anniversaryDate != null;
 
   /// Check if user needs to add occasion dates for better experience
   bool get needsOccasionDates => !hasOccasionDates && isIndividual;
@@ -169,28 +177,44 @@ extension UserProfileResponse3Extensions on UserProfileResponse3 {
   bool isBirthdayWithinDays(int days) {
     if (this.dateOfBirth == null) return false;
     final now = DateTime.now();
-    final thisYearBirthday = DateTime(now.year, this.dateOfBirth!.month, this.dateOfBirth!.day);
-    final nextYearBirthday = DateTime(now.year + 1, this.dateOfBirth!.month, this.dateOfBirth!.day);
+    final thisYearBirthday = DateTime(
+      now.year,
+      this.dateOfBirth!.month,
+      this.dateOfBirth!.day,
+    );
+    final nextYearBirthday = DateTime(
+      now.year + 1,
+      this.dateOfBirth!.month,
+      this.dateOfBirth!.day,
+    );
 
     final daysUntilThisYear = thisYearBirthday.difference(now).inDays;
     final daysUntilNextYear = nextYearBirthday.difference(now).inDays;
 
     return (daysUntilThisYear >= 0 && daysUntilThisYear <= days) ||
-           (daysUntilNextYear >= 0 && daysUntilNextYear <= days);
+        (daysUntilNextYear >= 0 && daysUntilNextYear <= days);
   }
 
   /// Check if anniversary is within specified days
   bool isAnniversaryWithinDays(int days) {
     if (this.anniversaryDate == null) return false;
     final now = DateTime.now();
-    final thisYearAnniversary = DateTime(now.year, this.anniversaryDate!.month, this.anniversaryDate!.day);
-    final nextYearAnniversary = DateTime(now.year + 1, this.anniversaryDate!.month, this.anniversaryDate!.day);
+    final thisYearAnniversary = DateTime(
+      now.year,
+      this.anniversaryDate!.month,
+      this.anniversaryDate!.day,
+    );
+    final nextYearAnniversary = DateTime(
+      now.year + 1,
+      this.anniversaryDate!.month,
+      this.anniversaryDate!.day,
+    );
 
     final daysUntilThisYear = thisYearAnniversary.difference(now).inDays;
     final daysUntilNextYear = nextYearAnniversary.difference(now).inDays;
 
     return (daysUntilThisYear >= 0 && daysUntilThisYear <= days) ||
-           (daysUntilNextYear >= 0 && daysUntilNextYear <= days);
+        (daysUntilNextYear >= 0 && daysUntilNextYear <= days);
   }
 }
 

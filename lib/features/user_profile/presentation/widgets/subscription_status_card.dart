@@ -164,23 +164,7 @@ class SubscriptionStatusCard extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      const Color(0xFF6F3FCC),
-                      const Color(0xFF6F3FCC).withOpacity(0.8),
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(
-                  Icons.workspace_premium,
-                  color: Colors.white,
-                  size: 24,
-                ),
-              ),
+              _MembershipBadge(isExpired: hasExpired),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(
@@ -446,6 +430,60 @@ class SubscriptionStatusCard extends StatelessWidget {
       'Dec',
     ];
     return '${date.day} ${months[date.month - 1]}, ${date.year}';
+  }
+}
+
+/// Gold membership badge with a subtle sparkle; falls back to a muted grey
+/// when the subscription has expired so it doesn't read as premium.
+class _MembershipBadge extends StatelessWidget {
+  const _MembershipBadge({required this.isExpired});
+
+  final bool isExpired;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = isExpired
+        ? const [Color(0xFF94A3B8), Color(0xFF64748B)]
+        : const [Color(0xFFFBBF24), Color(0xFFD97706)];
+
+    return Container(
+      width: 56,
+      height: 56,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: colors,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: colors.last.withValues(alpha: 0.35),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          const Icon(
+            Icons.workspace_premium_rounded,
+            color: Colors.white,
+            size: 28,
+          ),
+          Positioned(
+            top: 7,
+            right: 7,
+            child: Icon(
+              Icons.auto_awesome,
+              color: Colors.white.withValues(alpha: 0.85),
+              size: 10,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 

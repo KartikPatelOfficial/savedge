@@ -5,6 +5,7 @@ import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
 import 'package:savedge/features/auth/data/models/user_profile_models.dart';
 import 'package:savedge/features/auth/domain/repositories/auth_repository.dart';
+import 'package:savedge/features/user_profile/presentation/pages/points_wallet_page.dart';
 
 const Color _primary = Color(0xFF6F3FCC);
 const Color _secondary = Color(0xFF8B5CF6);
@@ -103,6 +104,16 @@ class _EditProfilePageState extends State<EditProfilePage>
     super.initState();
     _initializeControllers();
     _setupAnimations();
+  }
+
+  /// SavEdge + Meal combined, served in one shot by /users/me so the page
+  /// never shows a partial balance that later jumps.
+  int get _totalPoints => _profile.totalPointsBalance;
+
+  void _onViewWalletTap() {
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (context) => const PointsWalletPage()));
   }
 
   void _initializeControllers() {
@@ -601,10 +612,8 @@ class _EditProfilePageState extends State<EditProfilePage>
                     accent: _heroAccent,
                   ),
                   _HeroMetricTile(
-                    value: _isEmployee
-                        ? '${_profile.pointsBalance}'
-                        : '$_occasionCount/2',
-                    label: _isEmployee ? 'points ready' : 'special dates',
+                    value: _isEmployee ? '$_totalPoints' : '$_occasionCount/2',
+                    label: _isEmployee ? 'total points' : 'special dates',
                     accent: _isEmployee ? _mint : _amber,
                   ),
                   rightFlex: 1,
@@ -944,10 +953,16 @@ class _EditProfilePageState extends State<EditProfilePage>
                 _ReadonlyTile(
                   accent: _mint,
                   icon: Icons.stars_rounded,
-                  label: 'Available points',
-                  value: '${_profile.pointsBalance}',
-                  hint: 'Current reward balance linked to your account.',
+                  label: 'Total points',
+                  value: '$_totalPoints',
+                  hint: 'SavEdge and Meal points combined.',
                 ),
+              ),
+              const SizedBox(height: 12),
+              _PointsBreakdownStrip(
+                savedgePoints: _profile.pointsBalance,
+                mealPoints: _profile.mealPointsBalance,
+                onTap: _onViewWalletTap,
               ),
             ],
           ),
@@ -1941,6 +1956,126 @@ class _FieldHeader extends StatelessWidget {
               fontWeight: FontWeight.w800,
               color: _textPrimary,
             ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Slim strip under the points tile answering "why this number?" — shows the
+/// SavEdge/Meal split and deep-links into the wallet for the full ledger.
+class _PointsBreakdownStrip extends StatelessWidget {
+  const _PointsBreakdownStrip({
+    required this.savedgePoints,
+    required this.mealPoints,
+    required this.onTap,
+  });
+
+  final int savedgePoints;
+  final int mealPoints;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label:
+          'Points breakdown: $savedgePoints SavEdge points and $mealPoints '
+          'meal points. Open wallet.',
+      child: Material(
+        color: Colors.white.withValues(alpha: 0.78),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(22),
+          side: const BorderSide(color: _border),
+        ),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(22),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Wrap(
+                    spacing: 14,
+                    runSpacing: 6,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      _PointsSource(
+                        accent: _primary,
+                        label: 'SavEdge',
+                        value: savedgePoints,
+                      ),
+                      _PointsSource(
+                        accent: _coral,
+                        label: 'Meal',
+                        value: mealPoints,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                const Text(
+                  'Wallet',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                    color: _primary,
+                  ),
+                ),
+                const Icon(
+                  Icons.chevron_right_rounded,
+                  size: 18,
+                  color: _primary,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Colored-dot + label + value cluster used inside the breakdown strip.
+class _PointsSource extends StatelessWidget {
+  const _PointsSource({
+    required this.accent,
+    required this.label,
+    required this.value,
+  });
+
+  final Color accent;
+  final String label;
+  final int value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 8,
+          height: 8,
+          decoration: BoxDecoration(color: accent, shape: BoxShape.circle),
+        ),
+        const SizedBox(width: 6),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w700,
+            color: _textPrimary.withValues(alpha: 0.55),
+          ),
+        ),
+        const SizedBox(width: 5),
+        Text(
+          '$value',
+          style: const TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w900,
+            color: _textPrimary,
           ),
         ),
       ],

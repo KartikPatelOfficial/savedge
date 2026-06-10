@@ -94,6 +94,7 @@ _EmployeeInfo _$EmployeeInfoFromJson(Map<String, dynamic> json) =>
       position: json['position'] as String,
       employeeCode: json['employeeCode'] as String,
       availablePoints: (json['availablePoints'] as num).toInt(),
+      mealAvailablePoints: (json['mealAvailablePoints'] as num?)?.toInt() ?? 0,
     );
 
 Map<String, dynamic> _$EmployeeInfoToJson(_EmployeeInfo instance) =>
@@ -104,6 +105,7 @@ Map<String, dynamic> _$EmployeeInfoToJson(_EmployeeInfo instance) =>
       'position': instance.position,
       'employeeCode': instance.employeeCode,
       'availablePoints': instance.availablePoints,
+      'mealAvailablePoints': instance.mealAvailablePoints,
     };
 
 _VendorInfo _$VendorInfoFromJson(Map<String, dynamic> json) => _VendorInfo(
