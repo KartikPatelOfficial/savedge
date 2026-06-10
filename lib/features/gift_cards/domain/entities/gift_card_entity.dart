@@ -5,6 +5,7 @@ class GiftCardCategoryEntity extends Equatable {
   final String name;
   final String? description;
   final String? imageUrl;
+  final String? blurHash;
   final bool isActive;
   final int productCount;
   final int? parentCategoryId;
@@ -15,6 +16,7 @@ class GiftCardCategoryEntity extends Equatable {
     required this.name,
     this.description,
     this.imageUrl,
+    this.blurHash,
     required this.isActive,
     required this.productCount,
     this.parentCategoryId,
@@ -27,6 +29,7 @@ class GiftCardCategoryEntity extends Equatable {
         name,
         description,
         imageUrl,
+        blurHash,
         isActive,
         productCount,
         parentCategoryId,
@@ -34,13 +37,33 @@ class GiftCardCategoryEntity extends Equatable {
       ];
 }
 
+class GiftCardThemeEntity extends Equatable {
+  final String sku;
+  final String? name;
+  final String? price;
+  final String? image;
+
+  const GiftCardThemeEntity({
+    required this.sku,
+    this.name,
+    this.price,
+    this.image,
+  });
+
+  @override
+  List<Object?> get props => [sku, name, price, image];
+}
+
 class GiftCardProductEntity extends Equatable {
   final int id;
   final String name;
   final String? description;
   final String sku;
-  final String? imageUrl;
-  final String? thumbnailUrl;
+  final String? imageUrl; // 450x158 main banner
+  final String? thumbnailUrl; // 22x32 — too small, do not display
+  final String? mobileImageUrl; // ~500x500 square
+  final String? smallImageUrl; // 200x120 landscape
+  final String? blurHash;
   final String priceType;
   final double minPrice;
   final double maxPrice;
@@ -48,10 +71,15 @@ class GiftCardProductEntity extends Equatable {
   final String? categoryName;
   final String? brandName;
   final String? denominations;
+  final List<double> parsedDenominations;
   final String? currencySymbol;
   final String? offerDescription;
   final String? formatExpiry;
+  final String? termsAndConditions;
+  final String? termsAndConditionsUrl;
   final double? discountPercentage;
+  final List<GiftCardThemeEntity> themes;
+  final int redemptionMode;
 
   const GiftCardProductEntity({
     required this.id,
@@ -60,6 +88,9 @@ class GiftCardProductEntity extends Equatable {
     required this.sku,
     this.imageUrl,
     this.thumbnailUrl,
+    this.mobileImageUrl,
+    this.smallImageUrl,
+    this.blurHash,
     required this.priceType,
     required this.minPrice,
     required this.maxPrice,
@@ -67,14 +98,53 @@ class GiftCardProductEntity extends Equatable {
     this.categoryName,
     this.brandName,
     this.denominations,
+    this.parsedDenominations = const [],
     this.currencySymbol,
     this.offerDescription,
     this.formatExpiry,
+    this.termsAndConditions,
+    this.termsAndConditionsUrl,
     this.discountPercentage,
+    this.themes = const [],
+    this.redemptionMode = 3,
   });
 
   bool get hasDiscount =>
       discountPercentage != null && discountPercentage! > 0;
+
+  /// Whether the product has any usable image at all (excludes the
+  /// near-useless 22×32 thumbnail).
+  bool get hasAnyImage =>
+      _isUsable(imageUrl) ||
+      _isUsable(mobileImageUrl) ||
+      _isUsable(smallImageUrl);
+
+  /// Best image for the **hero/banner** spot — large landscape areas.
+  /// Prefers the wide main banner (450×158), falls back to the square
+  /// mobile image, then the small landscape image.
+  String? get heroImageUrl =>
+      _firstUsable([imageUrl, mobileImageUrl, smallImageUrl]);
+
+  /// Best image for **square card slots** (grid tiles, my-cards rail).
+  /// Prefers the square mobile image (500×500), falls back to the wide
+  /// main banner, then small.
+  String? get squareImageUrl =>
+      _firstUsable([mobileImageUrl, imageUrl, smallImageUrl]);
+
+  /// Best image for **small list/row thumbnails** (e.g., trending tile).
+  /// Prefers the small landscape image, falls back to mobile, then main.
+  String? get listImageUrl =>
+      _firstUsable([smallImageUrl, mobileImageUrl, imageUrl]);
+
+  static String? _firstUsable(List<String?> candidates) {
+    for (final c in candidates) {
+      if (_isUsable(c)) return c;
+    }
+    return null;
+  }
+
+  static bool _isUsable(String? url) =>
+      url != null && url.trim().isNotEmpty;
 
   double calculatePayable(double amount) {
     if (!hasDiscount) return amount;
@@ -94,6 +164,9 @@ class GiftCardProductEntity extends Equatable {
         sku,
         imageUrl,
         thumbnailUrl,
+        mobileImageUrl,
+        smallImageUrl,
+        blurHash,
         priceType,
         minPrice,
         maxPrice,
@@ -101,10 +174,15 @@ class GiftCardProductEntity extends Equatable {
         categoryName,
         brandName,
         denominations,
+        parsedDenominations,
         currencySymbol,
         offerDescription,
         formatExpiry,
+        termsAndConditions,
+        termsAndConditionsUrl,
         discountPercentage,
+        themes,
+        redemptionMode,
       ];
 }
 
@@ -114,6 +192,7 @@ class GiftCardOrderEntity extends Equatable {
   final int giftCardProductId;
   final String productName;
   final String? productImageUrl;
+  final int quantity;
   final double requestedAmount;
   final double discountPercentage;
   final double discountAmount;
@@ -130,7 +209,13 @@ class GiftCardOrderEntity extends Equatable {
   final String? woohooActivationUrl;
   final double? woohooActivatedAmount;
   final DateTime? woohooCardExpiry;
+  final List<GiftCardIssuedCardEntity> issuedCards;
   final String? failureReason;
+  final String? razorpayRefundId;
+  final double? refundAmount;
+  final String? refundStatus;
+  final DateTime? refundedAt;
+  final int? pointsRefunded;
   final DateTime created;
 
   const GiftCardOrderEntity({
@@ -139,6 +224,7 @@ class GiftCardOrderEntity extends Equatable {
     required this.giftCardProductId,
     required this.productName,
     this.productImageUrl,
+    this.quantity = 1,
     required this.requestedAmount,
     required this.discountPercentage,
     required this.discountAmount,
@@ -155,7 +241,13 @@ class GiftCardOrderEntity extends Equatable {
     this.woohooActivationUrl,
     this.woohooActivatedAmount,
     this.woohooCardExpiry,
+    this.issuedCards = const [],
     this.failureReason,
+    this.razorpayRefundId,
+    this.refundAmount,
+    this.refundStatus,
+    this.refundedAt,
+    this.pointsRefunded,
     required this.created,
   });
 
@@ -163,7 +255,11 @@ class GiftCardOrderEntity extends Equatable {
   bool get isPending => status == GiftCardOrderStatusEntity.pending;
   bool get isFailed => status == GiftCardOrderStatusEntity.failed;
   bool get hasCardDetails =>
-      woohooCardNumber != null && woohooCardNumber!.isNotEmpty;
+      (woohooCardNumber != null && woohooCardNumber!.isNotEmpty) ||
+      (woohooCardPin != null && woohooCardPin!.isNotEmpty) ||
+      (woohooActivationUrl != null && woohooActivationUrl!.isNotEmpty);
+  bool get isRefunded => status == GiftCardOrderStatusEntity.refunded;
+  bool get hasRefundDetails => razorpayRefundId != null || (pointsRefunded != null && pointsRefunded! > 0);
 
   @override
   List<Object?> get props => [
@@ -172,6 +268,7 @@ class GiftCardOrderEntity extends Equatable {
         giftCardProductId,
         productName,
         productImageUrl,
+        quantity,
         requestedAmount,
         discountPercentage,
         discountAmount,
@@ -188,9 +285,93 @@ class GiftCardOrderEntity extends Equatable {
         woohooActivationUrl,
         woohooActivatedAmount,
         woohooCardExpiry,
+        issuedCards,
         failureReason,
+        razorpayRefundId,
+        refundAmount,
+        refundStatus,
+        refundedAt,
+        pointsRefunded,
         created,
       ];
+}
+
+class GiftCardIssuedCardEntity extends Equatable {
+  final int id;
+  final int sequenceIndex;
+  final String? cardNumber;
+  final String? cardPin;
+  final String? activationCode;
+  final String? activationUrl;
+  final String? barcode;
+  final double? activatedAmount;
+  final DateTime? cardExpiry;
+  final DateTime? issuanceDate;
+
+  const GiftCardIssuedCardEntity({
+    required this.id,
+    required this.sequenceIndex,
+    this.cardNumber,
+    this.cardPin,
+    this.activationCode,
+    this.activationUrl,
+    this.barcode,
+    this.activatedAmount,
+    this.cardExpiry,
+    this.issuanceDate,
+  });
+
+  bool get hasAnyCredential =>
+      (cardNumber != null && cardNumber!.isNotEmpty) ||
+      (cardPin != null && cardPin!.isNotEmpty) ||
+      (activationUrl != null && activationUrl!.isNotEmpty);
+
+  @override
+  List<Object?> get props => [
+        id,
+        sequenceIndex,
+        cardNumber,
+        cardPin,
+        activationCode,
+        activationUrl,
+        barcode,
+        activatedAmount,
+        cardExpiry,
+        issuanceDate,
+      ];
+}
+
+class GiftCardRelatedProductEntity extends Equatable {
+  final int id;
+  final int giftCardProductId;
+  final String relatedSku;
+  final String relatedName;
+  final String? relatedUrl;
+  final String? minPrice;
+  final String? maxPrice;
+  final String? offerShortDesc;
+  final String? thumbnailUrl;
+  final String? mobileImageUrl;
+  final String currencyCode;
+  final bool hasPromo;
+
+  const GiftCardRelatedProductEntity({
+    required this.id,
+    required this.giftCardProductId,
+    required this.relatedSku,
+    required this.relatedName,
+    this.relatedUrl,
+    this.minPrice,
+    this.maxPrice,
+    this.offerShortDesc,
+    this.thumbnailUrl,
+    this.mobileImageUrl,
+    this.currencyCode = 'INR',
+    this.hasPromo = false,
+  });
+
+  @override
+  List<Object?> get props => [id, giftCardProductId, relatedSku, relatedName, relatedUrl, minPrice, maxPrice, offerShortDesc, thumbnailUrl, mobileImageUrl, currencyCode, hasPromo];
 }
 
 enum GiftCardOrderStatusEntity {

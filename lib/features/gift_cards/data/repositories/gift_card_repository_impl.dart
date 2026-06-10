@@ -25,6 +25,17 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
   }
 
   @override
+  Future<Either<Failure, List<GiftCardProductEntity>>> getHotDeals() async {
+    try {
+      final response = await _service.getHotDeals();
+      final entities = response.map(_mapProductToEntity).toList();
+      return Right(entities);
+    } catch (e) {
+      return Left(ServerFailure(ErrorMessageMapper.map(e)));
+    }
+  }
+
+  @override
   Future<Either<Failure, List<GiftCardProductEntity>>> getProducts({
     int? categoryId,
     String? searchTerm,
@@ -59,11 +70,15 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
   Future<Either<Failure, GiftCardPriceBreakdown>> getPriceBreakdown({
     required int productId,
     required double amount,
+    int pointsToUse = 0,
+    int quantity = 1,
   }) async {
     try {
       final response = await _service.getPriceBreakdown(
         productId: productId,
         amount: amount,
+        pointsToUse: pointsToUse,
+        quantity: quantity,
       );
       return Right(response);
     } catch (e) {
@@ -76,12 +91,16 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
     required int giftCardProductId,
     required double amount,
     required GiftCardPaymentMethodEntity paymentMethod,
+    int quantity = 1,
+    String? themeSku,
   }) async {
     try {
       final request = CreateGiftCardOrderRequest(
         giftCardProductId: giftCardProductId,
         amount: amount,
+        quantity: quantity,
         paymentMethod: _mapPaymentMethodToModel(paymentMethod),
+        themeSku: themeSku,
       );
       final response = await _service.createOrder(request);
       return Right(_mapOrderToEntity(response));
@@ -95,11 +114,17 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
   createPaymentOrder({
     required int giftCardProductId,
     required double amount,
+    int pointsToUse = 0,
+    int quantity = 1,
+    String? themeSku,
   }) async {
     try {
       final request = CreateGiftCardPaymentOrderRequest(
         giftCardProductId: giftCardProductId,
         amount: amount,
+        quantity: quantity,
+        pointsToUse: pointsToUse,
+        themeSku: themeSku,
       );
       final response = await _service.createPaymentOrder(request);
       return Right(response);
@@ -109,7 +134,7 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
   }
 
   @override
-  Future<Either<Failure, GiftCardOrderEntity>> verifyPayment({
+  Future<Either<Failure, VerifyGiftCardPaymentResponse>> verifyPayment({
     required int orderId,
     required String razorpayOrderId,
     required String razorpayPaymentId,
@@ -123,7 +148,7 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
         razorpaySignature: razorpaySignature,
       );
       final response = await _service.verifyPayment(request);
-      return Right(_mapOrderToEntity(response));
+      return Right(response);
     } catch (e) {
       return Left(ServerFailure(ErrorMessageMapper.map(e)));
     }
@@ -166,6 +191,7 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
       name: model.name,
       description: model.description,
       imageUrl: model.imageUrl,
+      blurHash: model.blurHash,
       isActive: model.isActive,
       productCount: model.productCount,
       parentCategoryId: model.parentCategoryId,
@@ -181,6 +207,9 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
       sku: model.sku,
       imageUrl: model.imageUrl,
       thumbnailUrl: model.thumbnailUrl,
+      mobileImageUrl: model.mobileImageUrl,
+      smallImageUrl: model.smallImageUrl,
+      blurHash: model.blurHash,
       priceType: model.priceType,
       minPrice: model.minPrice,
       maxPrice: model.maxPrice,
@@ -188,10 +217,22 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
       categoryName: model.categoryName,
       brandName: model.brandName,
       denominations: model.denominations,
+      parsedDenominations: model.parsedDenominations,
       currencySymbol: model.currencySymbol,
       offerDescription: model.offerDescription,
       formatExpiry: model.formatExpiry,
+      termsAndConditions: model.termsAndConditions,
+      termsAndConditionsUrl: model.termsAndConditionsUrl,
       discountPercentage: model.discountPercentage,
+      redemptionMode: model.redemptionMode,
+      themes: model.parsedThemes
+          .map((t) => GiftCardThemeEntity(
+                sku: t.sku,
+                name: t.name,
+                price: t.price,
+                image: t.image,
+              ))
+          .toList(),
     );
   }
 
@@ -202,6 +243,7 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
       giftCardProductId: model.giftCardProductId,
       productName: model.productName,
       productImageUrl: model.productImageUrl,
+      quantity: model.quantity,
       requestedAmount: model.requestedAmount,
       discountPercentage: model.discountPercentage,
       discountAmount: model.discountAmount,
@@ -218,7 +260,26 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
       woohooActivationUrl: model.woohooActivationUrl,
       woohooActivatedAmount: model.woohooActivatedAmount,
       woohooCardExpiry: model.woohooCardExpiry,
+      issuedCards: model.issuedCards
+          .map((c) => GiftCardIssuedCardEntity(
+                id: c.id,
+                sequenceIndex: c.sequenceIndex,
+                cardNumber: c.cardNumber,
+                cardPin: c.cardPin,
+                activationCode: c.activationCode,
+                activationUrl: c.activationUrl,
+                barcode: c.barcode,
+                activatedAmount: c.activatedAmount,
+                cardExpiry: c.cardExpiry,
+                issuanceDate: c.issuanceDate,
+              ))
+          .toList(),
       failureReason: model.failureReason,
+      razorpayRefundId: model.razorpayRefundId,
+      refundAmount: model.refundAmount,
+      refundStatus: model.refundStatus,
+      refundedAt: model.refundedAt,
+      pointsRefunded: model.pointsRefunded,
       created: model.created,
     );
   }
@@ -283,6 +344,34 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
       case GiftCardPaymentMethodEntity.razorpay:
         return GiftCardPaymentMethod.razorpay;
     }
+  }
+
+  @override
+  Future<Either<Failure, List<GiftCardRelatedProductEntity>>> getRelatedProducts(int productId) async {
+    try {
+      final response = await _service.getRelatedProducts(productId);
+      final entities = response.map(_mapRelatedProductToEntity).toList();
+      return Right(entities);
+    } catch (e) {
+      return Left(ServerFailure(ErrorMessageMapper.map(e)));
+    }
+  }
+
+  GiftCardRelatedProductEntity _mapRelatedProductToEntity(GiftCardRelatedProduct model) {
+    return GiftCardRelatedProductEntity(
+      id: model.id,
+      giftCardProductId: model.giftCardProductId,
+      relatedSku: model.relatedSku,
+      relatedName: model.relatedName,
+      relatedUrl: model.relatedUrl,
+      minPrice: model.minPrice,
+      maxPrice: model.maxPrice,
+      offerShortDesc: model.offerShortDesc,
+      thumbnailUrl: model.thumbnailUrl,
+      mobileImageUrl: model.mobileImageUrl,
+      currencyCode: model.currencyCode,
+      hasPromo: model.hasPromo,
+    );
   }
 
   int _mapStatusToInt(GiftCardOrderStatusEntity status) {

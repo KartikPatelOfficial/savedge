@@ -1,47 +1,19 @@
 import 'dart:async';
+import 'dart:math' as math;
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_blurhash/flutter_blurhash.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:savedge/core/injection/injection.dart';
 import 'package:savedge/features/stores/presentation/pages/vendor_detail_page.dart';
 import 'package:savedge/features/vendors/domain/entities/coupon.dart';
 import 'package:savedge/features/vendors/presentation/bloc/coupons_bloc.dart';
 
-/// Hot deals section widget with real coupon data
-class HotDealsSection extends StatefulWidget {
+class HotDealsSection extends StatelessWidget {
   const HotDealsSection({super.key});
-
-  // final List<HotDeal> deals;
-
-  @override
-  State<HotDealsSection> createState() => _HotDealsSectionState();
-}
-
-class _HotDealsSectionState extends State<HotDealsSection> {
-  bool _dispatched = false;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    // If a CouponsBloc is already provided up the tree, trigger special offers load once
-    final existingBloc = context.read<CouponsBloc?>();
-    if (existingBloc != null && !_dispatched) {
-      existingBloc.add(const LoadSpecialOfferCoupons());
-      _dispatched = true;
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
-    // Use existing BLoC if available; otherwise create one and load specials
-    final couponsBloc = context.read<CouponsBloc?>();
-    if (couponsBloc == null) {
-      return BlocProvider(
-        create: (context) =>
-            getIt<CouponsBloc>()..add(const LoadSpecialOfferCoupons()),
-        child: const HotDealsView(),
-      );
-    }
     return const HotDealsView();
   }
 }
@@ -75,7 +47,7 @@ class HotDealsView extends StatelessWidget {
   Widget _wrap(Widget child) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 20),
-      child: SizedBox(height: 260, child: child),
+      child: SizedBox(height: 280, child: child),
     );
   }
 
@@ -309,7 +281,7 @@ class _StackedDealsCardsState extends State<StackedDealsCards>
       children: [
         // Main stacked cards
         SizedBox(
-          height: 220,
+          height: 240,
           child: NotificationListener<ScrollNotification>(
             onNotification: (notification) {
               if (notification is ScrollStartNotification) {
@@ -357,114 +329,247 @@ class _StackedDealsCardsState extends State<StackedDealsCards>
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeOut,
-      margin: EdgeInsets.symmetric(vertical: isCenter ? 0 : 10),
+      margin: EdgeInsets.symmetric(
+        vertical: isCenter ? 0 : 10,
+        horizontal: 6,
+      ),
       child: Transform.scale(
-        scale: isCenter ? 1.0 : 0.85,
+        scale: isCenter ? 1.0 : 0.88,
         child: GestureDetector(
           onTap: () => widget.onCouponTap?.call(coupon),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(24),
-            child: coupon.isSpecialOffer && coupon.specialOfferImageUrl != null
-                ? _buildSpecialOfferImage(coupon)
-                : Stack(
-                    children: [
-                      // Gradient background
-                      _buildGradientBackground(coupon, index),
-                      // Decorative elements
-                      _buildDecorations(index),
-                      // Content
-                      _buildCardContent(coupon),
-                    ],
-                  ),
-          ),
+          child: coupon.isSpecialOffer && coupon.specialOfferImageUrl != null
+              ? _buildSpecialOfferImage(coupon)
+              : _buildCouponTicket(coupon, index),
         ),
       ),
     );
   }
 
   Widget _buildSpecialOfferImage(Coupon coupon) {
-    // If special image exists, render image only. On error, fallback to current UI.
-    return Image.network(
-      coupon.specialOfferImageUrl!,
-      fit: BoxFit.cover,
-      errorBuilder: (context, error, stackTrace) {
-        return Stack(
-          children: [
-            _buildGradientBackground(coupon, _currentIndex),
-            _buildDecorations(_currentIndex),
-            _buildCardContent(coupon),
-          ],
-        );
-      },
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(24),
+      child: CachedNetworkImage(
+        imageUrl: coupon.specialOfferImageUrl!,
+        fit: BoxFit.cover,
+        width: double.infinity,
+        height: double.infinity,
+        placeholder: (context, url) => coupon.specialOfferBlurHash != null
+            ? BlurHash(hash: coupon.specialOfferBlurHash!)
+            : Container(color: Colors.grey[300]),
+        errorWidget: (context, url, error) =>
+            _buildCouponTicket(coupon, _currentIndex),
+      ),
     );
   }
 
-  Widget _buildGradientBackground(Coupon coupon, int index) {
-    final gradients = [
-      [const Color(0xFF6F3FCC), const Color(0xFF9F7AEA)],
-      [const Color(0xFF38B2AC), const Color(0xFF4FD1C7)],
-      [const Color(0xFFED8936), const Color(0xFFF56500)],
-      [const Color(0xFFE53E3E), const Color(0xFFF56565)],
-      [const Color(0xFF3182CE), const Color(0xFF63B3ED)],
-    ];
+  Widget _buildCouponTicket(Coupon coupon, int index) {
+    final palette = _dealPalettes[index % _dealPalettes.length];
+    final daysLeft = coupon.validTo.difference(DateTime.now()).inDays;
+    String? expText;
+    if (daysLeft >= 0 && daysLeft <= 30) {
+      if (daysLeft == 0) {
+        expText = 'Ends today';
+      } else if (daysLeft == 1) {
+        expText = '1 day left';
+      } else {
+        expText = '$daysLeft days left';
+      }
+    }
+    final minText = coupon.minimumAmountDisplay.isEmpty
+        ? 'No minimum order'
+        : coupon.minimumAmountDisplay;
 
-    final colors = gradients[index % gradients.length];
-
-    return Container(
+    return DecoratedBox(
       decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: colors,
+          colors: palette.gradient,
+          stops: const [0.0, 0.55, 1.0],
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: palette.gradient[1].withOpacity(0.45),
+            blurRadius: 22,
+            offset: const Offset(0, 10),
+            spreadRadius: -4,
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: Stack(
+          children: [
+            // Soft top-right glow
+            Positioned(
+              top: -60,
+              right: -50,
+              child: Container(
+                width: 170,
+                height: 170,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(
+                    colors: [
+                      Colors.white.withOpacity(0.20),
+                      Colors.white.withOpacity(0.0),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            // Big Savedge logo watermark — half cut at the bottom-left,
+            // masked to a soft white tint so it reads as a watermark.
+            Positioned(
+              left: -70,
+              bottom: -55,
+              child: IgnorePointer(
+                child: Transform.rotate(
+                  angle: -0.10,
+                  child: Image.asset(
+                    'assets/images/logo_transparant.png',
+                    width: 220,
+                    height: 220,
+                    fit: BoxFit.contain,
+                    color: Colors.white.withOpacity(0.10),
+                    colorBlendMode: BlendMode.srcIn,
+                  ),
+                ),
+              ),
+            ),
+            // Sparkle / dot pattern
+            Positioned.fill(
+              child: IgnorePointer(
+                child: CustomPaint(painter: _SparklesPainter()),
+              ),
+            ),
+            // Content
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Top row: category badge (left) + title & subtitle (right)
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildCategoryBadge(palette),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              coupon.title,
+                              textAlign: TextAlign.right,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: -0.2,
+                                height: 1.15,
+                                shadows: [
+                                  Shadow(
+                                    color: Colors.black26,
+                                    blurRadius: 6,
+                                    offset: Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            if (coupon.description.isNotEmpty) ...[
+                              const SizedBox(height: 3),
+                              Text(
+                                coupon.description,
+                                textAlign: TextAlign.right,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: Colors.white.withOpacity(0.85),
+                                  fontSize: 11.5,
+                                  fontWeight: FontWeight.w500,
+                                  height: 1.2,
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  // Center: hero discount seal
+                  Expanded(
+                    child: Center(
+                      child: _buildDiscountSeal(coupon, palette),
+                    ),
+                  ),
+                  // Bottom row: minimum (left) + countdown + CTA (right)
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.shopping_bag_outlined,
+                        color: Colors.white.withOpacity(0.9),
+                        size: 13,
+                      ),
+                      const SizedBox(width: 5),
+                      Flexible(
+                        child: Text(
+                          minText,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.95),
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      const Spacer(),
+                      if (expText != null) ...[
+                        _buildCountdownLabel(expText),
+                        const SizedBox(width: 8),
+                      ],
+                      _buildGrabCta(palette),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildDecorations(int index) {
-    return Positioned.fill(
-      child: Stack(
+  Widget _buildCategoryBadge(_DealPalette palette) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: palette.accent,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: palette.accent.withOpacity(0.45),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          // Circular decorations
-          Positioned(
-            top: -30,
-            right: -30,
-            child: Container(
-              width: 100,
-              height: 100,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.1),
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: -40,
-            left: -40,
-            child: Container(
-              width: 120,
-              height: 120,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.05),
-              ),
-            ),
-          ),
-          // Floating icons
-          Positioned(
-            top: 20,
-            right: 20,
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Icon(
-                Icons.local_fire_department,
-                color: Colors.white,
-                size: 20,
-              ),
+          Icon(palette.icon, color: palette.accentInk, size: 12),
+          const SizedBox(width: 4),
+          Text(
+            palette.label,
+            style: TextStyle(
+              color: palette.accentInk,
+              fontSize: 9.5,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 1.2,
             ),
           ),
         ],
@@ -472,141 +577,234 @@ class _StackedDealsCardsState extends State<StackedDealsCards>
     );
   }
 
-  Widget _buildCardContent(Coupon coupon) {
-    String discountText;
-    if (coupon.discountType.toLowerCase() == 'percentage') {
-      discountText = '${coupon.discountValue.toInt()}% OFF';
-    } else {
-      discountText = '₹${coupon.discountValue.toInt()} OFF';
-    }
+  Widget _buildCountdownLabel(String text) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(
+          Icons.access_time_rounded,
+          color: Colors.white.withOpacity(0.85),
+          size: 12,
+        ),
+        const SizedBox(width: 4),
+        Text(
+          text,
+          style: TextStyle(
+            color: Colors.white.withOpacity(0.95),
+            fontSize: 11,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ],
+    );
+  }
 
-    return Padding(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Discount badge
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.95),
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.15),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Text(
-              discountText,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w800,
-                color: Color(0xFF1A202C),
-                letterSpacing: 0.5,
-              ),
-            ),
-          ),
-          const Spacer(),
-          // Title
-          Flexible(
-            child: Text(
-              coupon.title,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 26,
-                fontWeight: FontWeight.w800,
-                letterSpacing: -0.5,
-                height: 1.1,
-                shadows: [
-                  Shadow(
-                    color: Colors.black45,
-                    blurRadius: 8,
-                    offset: Offset(0, 2),
-                  ),
-                ],
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          const SizedBox(height: 8),
-          // Description
-          if (coupon.description.isNotEmpty)
-            Text(
-              coupon.description,
-              style: TextStyle(
-                color: Colors.white.withOpacity(0.9),
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                shadows: const [
-                  Shadow(
-                    color: Colors.black26,
-                    blurRadius: 4,
-                    offset: Offset(0, 1),
-                  ),
-                ],
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          const SizedBox(height: 12),
-          // Minimum amount info
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.25),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.white.withOpacity(0.4)),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.shopping_bag_outlined,
-                      color: Colors.white,
-                      size: 16,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      coupon.minimumAmountDisplay.isEmpty
-                          ? 'No minimum'
-                          : coupon.minimumAmountDisplay,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const Spacer(),
-              // Arrow indicator
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.25),
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white.withOpacity(0.4)),
-                ),
-                child: const Icon(
-                  Icons.arrow_forward_rounded,
-                  color: Colors.white,
-                  size: 20,
-                ),
-              ),
-            ],
+  Widget _buildGrabCta(_DealPalette palette) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(12, 7, 8, 7),
+      decoration: BoxDecoration(
+        color: palette.accent,
+        borderRadius: BorderRadius.circular(30),
+        boxShadow: [
+          BoxShadow(
+            color: palette.accent.withOpacity(0.55),
+            blurRadius: 14,
+            offset: const Offset(0, 4),
           ),
         ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            'Grab',
+            style: TextStyle(
+              color: palette.accentInk,
+              fontSize: 12,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 0.3,
+            ),
+          ),
+          const SizedBox(width: 4),
+          Container(
+            width: 18,
+            height: 18,
+            decoration: BoxDecoration(
+              color: palette.accentInk,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.arrow_forward_rounded,
+              color: palette.accent,
+              size: 12,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Hero centerpiece — a stamped circular seal with the discount value.
+  /// Outer dashed ring + inner accent-colored disc, slightly tilted for
+  /// hand-stamped character.
+  Widget _buildDiscountSeal(Coupon coupon, _DealPalette palette) {
+    final type = coupon.discountType.toLowerCase();
+    final ink = palette.accentInk;
+
+    Widget innerContent;
+    if (type == 'freeitem') {
+      innerContent = Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.card_giftcard_rounded, color: ink, size: 26),
+          const SizedBox(height: 1),
+          Text(
+            'FREE',
+            style: TextStyle(
+              color: ink,
+              fontSize: 20,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 1,
+              height: 1,
+            ),
+          ),
+          Text(
+            'GIFT',
+            style: TextStyle(
+              color: ink.withOpacity(0.7),
+              fontSize: 9,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 2.5,
+              height: 1.4,
+            ),
+          ),
+        ],
+      );
+    } else {
+      final isPercent = type == 'percentage';
+      final value = coupon.discountValue.toInt().toString();
+
+      innerContent = Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            'FLAT',
+            style: TextStyle(
+              color: ink.withOpacity(0.7),
+              fontSize: 9,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 3,
+              height: 1,
+            ),
+          ),
+          const SizedBox(height: 2),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (!isPercent)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 6, right: 1),
+                    child: Text(
+                      '₹',
+                      style: TextStyle(
+                        color: ink,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                        height: 1,
+                      ),
+                    ),
+                  ),
+                Text(
+                  value,
+                  style: TextStyle(
+                    color: ink,
+                    fontSize: 40,
+                    fontWeight: FontWeight.w900,
+                    height: 0.92,
+                    letterSpacing: -1.5,
+                  ),
+                ),
+                if (isPercent)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 6, left: 1),
+                    child: Text(
+                      '%',
+                      style: TextStyle(
+                        color: ink,
+                        fontSize: 22,
+                        fontWeight: FontWeight.w900,
+                        height: 1,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 1),
+          Text(
+            'OFF',
+            style: TextStyle(
+              color: ink.withOpacity(0.7),
+              fontSize: 9,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 4,
+              height: 1,
+            ),
+          ),
+        ],
+      );
+    }
+
+    return Transform.rotate(
+      angle: -0.10,
+      child: SizedBox(
+        width: 116,
+        height: 116,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            // Outer dashed ring — stamp-style perforation
+            CustomPaint(
+              size: const Size(116, 116),
+              painter: _DashedCirclePainter(
+                color: Colors.white.withOpacity(0.7),
+                strokeWidth: 1.6,
+                dashLengthDeg: 6,
+                gapLengthDeg: 4,
+              ),
+            ),
+            // Inner solid accent disc
+            Container(
+              width: 96,
+              height: 96,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: [
+                    Color.lerp(palette.accent, Colors.white, 0.08)!,
+                    palette.accent,
+                  ],
+                  stops: const [0, 1],
+                ),
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.45),
+                  width: 1.5,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: palette.accent.withOpacity(0.6),
+                    blurRadius: 26,
+                    spreadRadius: 1,
+                  ),
+                ],
+              ),
+              child: Center(child: innerContent),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -672,9 +870,9 @@ class _HotDealsShimmerState extends State<_HotDealsShimmer>
             children: [
               // Main card shimmer
               Container(
-                height: 200,
+                height: 220,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(24),
                   gradient: LinearGradient(
                     begin: Alignment(-1.0 + 2.0 * _ctrl.value, 0),
                     end: Alignment(-1.0 + 2.0 * _ctrl.value + 1, 0),
@@ -706,4 +904,165 @@ class _HotDealsShimmerState extends State<_HotDealsShimmer>
       },
     );
   }
+}
+
+// ─── Coupon ticket design helpers ───────────────────────────────────────
+
+class _DealPalette {
+  const _DealPalette({
+    required this.gradient,
+    required this.accent,
+    required this.accentInk,
+    required this.icon,
+    required this.label,
+  });
+
+  final List<Color> gradient;
+  final Color accent;
+  final Color accentInk;
+  final IconData icon;
+  final String label;
+}
+
+const List<_DealPalette> _dealPalettes = [
+  _DealPalette(
+    gradient: [Color(0xFF4C1D95), Color(0xFF7C3AED), Color(0xFFEC4899)],
+    accent: Color(0xFFFCD34D),
+    accentInk: Color(0xFF3B0764),
+    icon: Icons.local_fire_department_rounded,
+    label: 'HOT DEAL',
+  ),
+  _DealPalette(
+    gradient: [Color(0xFF064E3B), Color(0xFF10B981), Color(0xFFA3E635)],
+    accent: Color(0xFFFEF9C3),
+    accentInk: Color(0xFF064E3B),
+    icon: Icons.bolt_rounded,
+    label: 'FRESH PICK',
+  ),
+  _DealPalette(
+    gradient: [Color(0xFF7C2D12), Color(0xFFEA580C), Color(0xFFFACC15)],
+    accent: Color(0xFFFFFBEB),
+    accentInk: Color(0xFF7C2D12),
+    icon: Icons.flash_on_rounded,
+    label: 'FLASH SALE',
+  ),
+  _DealPalette(
+    gradient: [Color(0xFF0C4A6E), Color(0xFF0EA5E9), Color(0xFF22D3EE)],
+    accent: Color(0xFFFEF08A),
+    accentInk: Color(0xFF0C4A6E),
+    icon: Icons.diamond_rounded,
+    label: 'PREMIUM',
+  ),
+  _DealPalette(
+    gradient: [Color(0xFF881337), Color(0xFFE11D48), Color(0xFFFB923C)],
+    accent: Color(0xFFFFF7ED),
+    accentInk: Color(0xFF881337),
+    icon: Icons.favorite_rounded,
+    label: 'TOP PICK',
+  ),
+];
+
+/// Subtle decorative dots and "+" sparkles to break up the gradient.
+/// Dashed circle around the centerpiece seal — gives it a postage-stamp
+/// "perforated" feel without notching the card itself.
+class _DashedCirclePainter extends CustomPainter {
+  _DashedCirclePainter({
+    required this.color,
+    this.strokeWidth = 1.5,
+    this.dashLengthDeg = 6,
+    this.gapLengthDeg = 4,
+  });
+
+  final Color color;
+  final double strokeWidth;
+  final double dashLengthDeg;
+  final double gapLengthDeg;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = strokeWidth
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = math.min(size.width, size.height) / 2 - strokeWidth;
+    final rect = Rect.fromCircle(center: center, radius: radius);
+
+    final stepDeg = dashLengthDeg + gapLengthDeg;
+    final segments = (360 / stepDeg).floor();
+    final actualStepDeg = 360.0 / segments;
+    final dashRad = dashLengthDeg * math.pi / 180;
+    final stepRad = actualStepDeg * math.pi / 180;
+
+    for (var i = 0; i < segments; i++) {
+      canvas.drawArc(rect, i * stepRad, dashRad, false, paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _DashedCirclePainter old) =>
+      old.color != color ||
+      old.strokeWidth != strokeWidth ||
+      old.dashLengthDeg != dashLengthDeg ||
+      old.gapLengthDeg != gapLengthDeg;
+}
+
+class _SparklesPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final dot = Paint()..color = Colors.white.withOpacity(0.16);
+    final ring = Paint()
+      ..color = Colors.white.withOpacity(0.18)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.2;
+    final sparkle = Paint()
+      ..color = Colors.white.withOpacity(0.22)
+      ..strokeWidth = 1.4
+      ..strokeCap = StrokeCap.round;
+
+    final dots = <(Offset, double)>[
+      (Offset(size.width * 0.18, size.height * 0.22), 2.5),
+      (Offset(size.width * 0.72, size.height * 0.14), 1.8),
+      (Offset(size.width * 0.88, size.height * 0.58), 3.0),
+      (Offset(size.width * 0.52, size.height * 0.82), 2.2),
+      (Offset(size.width * 0.28, size.height * 0.7), 2.6),
+      (Offset(size.width * 0.94, size.height * 0.86), 1.6),
+    ];
+    for (final d in dots) {
+      canvas.drawCircle(d.$1, d.$2, dot);
+    }
+
+    canvas.drawCircle(
+      Offset(size.width * 0.62, size.height * 0.32),
+      6,
+      ring,
+    );
+    canvas.drawCircle(
+      Offset(size.width * 0.08, size.height * 0.55),
+      4,
+      ring,
+    );
+
+    void drawSparkle(Offset center, double s) {
+      canvas.drawLine(
+        Offset(center.dx - s, center.dy),
+        Offset(center.dx + s, center.dy),
+        sparkle,
+      );
+      canvas.drawLine(
+        Offset(center.dx, center.dy - s),
+        Offset(center.dx, center.dy + s),
+        sparkle,
+      );
+    }
+
+    drawSparkle(Offset(size.width * 0.42, size.height * 0.18), 4);
+    drawSparkle(Offset(size.width * 0.86, size.height * 0.4), 5);
+    drawSparkle(Offset(size.width * 0.6, size.height * 0.62), 3);
+  }
+
+  @override
+  bool shouldRepaint(covariant _SparklesPainter oldDelegate) => false;
 }

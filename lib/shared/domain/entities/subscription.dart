@@ -10,6 +10,7 @@ class SubscriptionPlan extends Equatable {
     this.description,
     this.features,
     this.imageUrl,
+    this.blurHash,
     this.isActive = true,
   });
 
@@ -20,6 +21,7 @@ class SubscriptionPlan extends Equatable {
   final int durationMonths;
   final String? features;
   final String? imageUrl;
+  final String? blurHash;
   final bool isActive;
 
   /// Get features as a list
@@ -48,6 +50,7 @@ class SubscriptionPlan extends Equatable {
     durationMonths,
     features,
     imageUrl,
+    blurHash,
     isActive,
   ];
 }

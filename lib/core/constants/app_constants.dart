@@ -40,7 +40,7 @@ class AppConstants {
 
   static const String apiVersion = 'v1';
   static const Duration connectionTimeout = Duration(seconds: 30);
-  static const Duration receiveTimeout = Duration(seconds: 30);
+  static const Duration receiveTimeout = Duration(seconds: 60);
 
   // Storage Keys
   static const String authTokenKey = 'auth_token';
@@ -49,7 +49,6 @@ class AppConstants {
 
   // App Info
   static const String appName = 'Savedge';
-  static const String appVersion = '1.0.0';
 
   // Validation
   static const int minPasswordLength = 8;

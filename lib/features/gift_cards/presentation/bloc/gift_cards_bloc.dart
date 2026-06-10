@@ -27,6 +27,7 @@ class GiftCardsBloc extends Bloc<GiftCardsEvent, GiftCardsState> {
     required this.giftCardRepository,
   }) : super(GiftCardsInitial()) {
     on<LoadGiftCardCategories>(_onLoadCategories);
+    on<LoadHotDeals>(_onLoadHotDeals);
     on<LoadGiftCardProducts>(_onLoadProducts);
     on<LoadGiftCardProduct>(_onLoadProduct);
     on<LoadPriceBreakdown>(_onLoadPriceBreakdown);
@@ -34,6 +35,7 @@ class GiftCardsBloc extends Bloc<GiftCardsEvent, GiftCardsState> {
     on<CreateGiftCardPaymentOrder>(_onCreatePaymentOrder);
     on<VerifyGiftCardPayment>(_onVerifyPayment);
     on<LoadGiftCardOrders>(_onLoadOrders);
+    on<LoadRelatedProducts>(_onLoadRelatedProducts);
   }
 
   Future<void> _onLoadCategories(
@@ -47,6 +49,17 @@ class GiftCardsBloc extends Bloc<GiftCardsEvent, GiftCardsState> {
     result.fold(
       (failure) => emit(GiftCardCategoriesError(FailureMessageMapper.mapFailureToMessage(failure))),
       (categories) => emit(GiftCardCategoriesLoaded(categories)),
+    );
+  }
+
+  Future<void> _onLoadHotDeals(
+    LoadHotDeals event,
+    Emitter<GiftCardsState> emit,
+  ) async {
+    final result = await giftCardRepository.getHotDeals();
+    result.fold(
+      (failure) => {}, // Silently fail - hot deals are non-critical
+      (hotDeals) => emit(HotDealsLoaded(hotDeals)),
     );
   }
 
@@ -92,6 +105,8 @@ class GiftCardsBloc extends Bloc<GiftCardsEvent, GiftCardsState> {
     final result = await giftCardRepository.getPriceBreakdown(
       productId: event.productId,
       amount: event.amount,
+      pointsToUse: event.pointsToUse,
+      quantity: event.quantity,
     );
 
     result.fold(
@@ -111,6 +126,8 @@ class GiftCardsBloc extends Bloc<GiftCardsEvent, GiftCardsState> {
         giftCardProductId: event.giftCardProductId,
         amount: event.amount,
         paymentMethod: event.paymentMethod,
+        quantity: event.quantity,
+        themeSku: event.themeSku,
       ),
     );
 
@@ -129,6 +146,9 @@ class GiftCardsBloc extends Bloc<GiftCardsEvent, GiftCardsState> {
     final result = await giftCardRepository.createPaymentOrder(
       giftCardProductId: event.giftCardProductId,
       amount: event.amount,
+      pointsToUse: event.pointsToUse,
+      quantity: event.quantity,
+      themeSku: event.themeSku,
     );
 
     result.fold(
@@ -165,7 +185,10 @@ class GiftCardsBloc extends Bloc<GiftCardsEvent, GiftCardsState> {
 
     result.fold(
       (failure) => emit(GiftCardPaymentError(FailureMessageMapper.mapFailureToMessage(failure))),
-      (order) => emit(GiftCardPaymentVerified(order)),
+      (response) => emit(GiftCardPaymentVerified(
+        success: response.success,
+        message: response.message,
+      )),
     );
   }
 
@@ -186,6 +209,18 @@ class GiftCardsBloc extends Bloc<GiftCardsEvent, GiftCardsState> {
     result.fold(
       (failure) => emit(GiftCardOrdersError(FailureMessageMapper.mapFailureToMessage(failure))),
       (orders) => emit(GiftCardOrdersLoaded(orders)),
+    );
+  }
+
+  Future<void> _onLoadRelatedProducts(
+    LoadRelatedProducts event,
+    Emitter<GiftCardsState> emit,
+  ) async {
+    emit(RelatedProductsLoading());
+    final result = await giftCardRepository.getRelatedProducts(event.productId);
+    result.fold(
+      (failure) => emit(RelatedProductsError(failure.message ?? 'Failed to load related products')),
+      (products) => emit(RelatedProductsLoaded(products)),
     );
   }
 }

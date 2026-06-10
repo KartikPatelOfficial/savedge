@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
+import 'package:savedge/core/widgets/animated_blur_background.dart';
 import 'package:savedge/features/auth/data/models/user_profile_models.dart';
 import 'package:savedge/features/auth/domain/repositories/auth_repository.dart';
 import 'package:savedge/features/city/domain/entities/city.dart';
@@ -17,6 +18,7 @@ import 'package:savedge/features/home/presentation/pages/home_content_page.dart'
 import 'package:savedge/features/home/presentation/widgets/widgets.dart';
 import 'package:savedge/features/notifications/presentation/bloc/notification_bloc.dart';
 import 'package:savedge/features/user_profile/presentation/pages/profile_page.dart';
+import 'package:savedge/shared/widgets/home_skeleton.dart';
 
 /// Main navigation wrapper that handles bottom navigation
 class MainNavigationPage extends StatefulWidget {
@@ -48,8 +50,8 @@ class _MainNavigationPageState extends State<MainNavigationPage> with SingleTick
   bool _citySelectionShown = false;
   UserProfileResponse3? _userProfile;
   late List<Widget> _pages;
-  bool _isNavBarVisible = true;
-  
+  final ValueNotifier<bool> _isNavBarVisible = ValueNotifier<bool>(true);
+
   bool _isDrawerOpen = false;
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
@@ -102,6 +104,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> with SingleTick
 
   @override
   void dispose() {
+    _isNavBarVisible.dispose();
     _animationController.dispose();
     super.dispose();
   }
@@ -199,11 +202,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> with SingleTick
   @override
   Widget build(BuildContext context) {
     if (_isLoadingProfile) {
-      return const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(color: Color(0xFF6F3FCC)),
-        ),
-      );
+      return const HomeSkeleton();
     }
 
     return BlocConsumer<CityBloc, CityState>(
@@ -217,26 +216,13 @@ class _MainNavigationPageState extends State<MainNavigationPage> with SingleTick
           if (cityState is CityInitial) {
             context.read<CityBloc>().add(const LoadCities());
           }
-          return const Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(color: Color(0xFF6F3FCC)),
-            ),
-          );
+          return const HomeSkeleton();
         }
 
         // If "Other" city is selected, show region unavailable page
         if (cityState is CitiesLoaded &&
             cityState.selectedCityId == City.otherCityId) {
-          return RegionUnavailablePage(
-            onNavigateToGiftVouchers: () {
-              // Navigate to gift vouchers - this will be handled by the page
-              Navigator.pushNamed(context, '/voucher-orders');
-            },
-            onNavigateToBrandVouchers: () {
-              // Navigate to brand vouchers - this will be handled by the page
-              Navigator.pushNamed(context, '/voucher-orders');
-            },
-          );
+          return const RegionUnavailablePage();
         }
 
         // Check if city selection is needed
@@ -253,9 +239,9 @@ class _MainNavigationPageState extends State<MainNavigationPage> with SingleTick
                 NotificationListener<UserScrollNotification>(
                   onNotification: (notification) {
                     if (notification.direction == ScrollDirection.forward) {
-                      if (!_isNavBarVisible) setState(() => _isNavBarVisible = true);
+                      if (!_isNavBarVisible.value) _isNavBarVisible.value = true;
                     } else if (notification.direction == ScrollDirection.reverse) {
-                      if (_isNavBarVisible) setState(() => _isNavBarVisible = false);
+                      if (_isNavBarVisible.value) _isNavBarVisible.value = false;
                     }
                     return false;
                   },
@@ -265,10 +251,16 @@ class _MainNavigationPageState extends State<MainNavigationPage> with SingleTick
                   left: 0,
                   right: 0,
                   bottom: 0,
-                  child: AnimatedSlide(
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeOutCubic,
-                    offset: _isNavBarVisible ? Offset.zero : const Offset(0, 1.5),
+                  child: ValueListenableBuilder<bool>(
+                    valueListenable: _isNavBarVisible,
+                    builder: (context, visible, child) {
+                      return AnimatedSlide(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeOutCubic,
+                        offset: visible ? Offset.zero : const Offset(0, 1.5),
+                        child: child!,
+                      );
+                    },
                     child: widget.isGuest
                         ? _buildGuestBottomBar()
                         : HomeBottomNavBar(
@@ -348,6 +340,9 @@ class _MainNavigationPageState extends State<MainNavigationPage> with SingleTick
   void _onBottomNavTap(int index) {
     if (_isDrawerOpen) {
       _toggleDrawer();
+    }
+    if (_currentIndex != index) {
+      AnimatedBlurBackground.triggerAnimation();
     }
     setState(() {
       _currentIndex = index;

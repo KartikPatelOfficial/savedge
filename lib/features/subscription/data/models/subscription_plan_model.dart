@@ -9,6 +9,7 @@ class SubscriptionPlanModel {
     required this.durationMonths,
     this.features,
     this.imageUrl,
+    this.blurHash,
     this.isActive =
         true, // Default to true since API doesn't provide this field
   });
@@ -20,6 +21,7 @@ class SubscriptionPlanModel {
   final int durationMonths;
   final String? features;
   final String? imageUrl;
+  final String? blurHash;
   final bool isActive;
 
   factory SubscriptionPlanModel.fromJson(Map<String, dynamic> json) {
@@ -35,6 +37,7 @@ class SubscriptionPlanModel {
       imageUrl: (json['imageUrl'] as String?)?.isEmpty == true
           ? null
           : json['imageUrl'] as String?,
+      blurHash: json['blurHash'] as String?,
       // Note: API doesn't provide isActive field, so we default to true
     );
   }
@@ -48,6 +51,7 @@ class SubscriptionPlanModel {
       'durationMonths': durationMonths,
       'features': features,
       'imageUrl': imageUrl,
+      'blurHash': blurHash,
       'isActive': isActive,
     };
   }
@@ -60,6 +64,7 @@ class SubscriptionPlanModel {
     durationMonths: durationMonths,
     features: features,
     imageUrl: imageUrl,
+    blurHash: blurHash,
     isActive: isActive,
   );
 }

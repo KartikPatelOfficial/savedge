@@ -49,6 +49,10 @@ _UserProfileResponse3 _$UserProfileResponse3FromJson(
   anniversaryDate: json['anniversaryDate'] == null
       ? null
       : DateTime.parse(json['anniversaryDate'] as String),
+  emailNotifications: json['emailNotifications'] as bool? ?? true,
+  smsNotifications: json['smsNotifications'] as bool? ?? true,
+  pushNotifications: json['pushNotifications'] as bool? ?? true,
+  whatsAppNotifications: json['whatsAppNotifications'] as bool? ?? false,
 );
 
 Map<String, dynamic> _$UserProfileResponse3ToJson(
@@ -76,6 +80,10 @@ Map<String, dynamic> _$UserProfileResponse3ToJson(
   'pinCode': instance.pinCode,
   'dateOfBirth': instance.dateOfBirth?.toIso8601String(),
   'anniversaryDate': instance.anniversaryDate?.toIso8601String(),
+  'emailNotifications': instance.emailNotifications,
+  'smsNotifications': instance.smsNotifications,
+  'pushNotifications': instance.pushNotifications,
+  'whatsAppNotifications': instance.whatsAppNotifications,
 };
 
 _EmployeeInfo _$EmployeeInfoFromJson(Map<String, dynamic> json) =>
@@ -168,6 +176,10 @@ _UpdateUserProfileRequest3 _$UpdateUserProfileRequest3FromJson(
   anniversaryDate: json['anniversaryDate'] == null
       ? null
       : DateTime.parse(json['anniversaryDate'] as String),
+  emailNotifications: json['emailNotifications'] as bool?,
+  smsNotifications: json['smsNotifications'] as bool?,
+  pushNotifications: json['pushNotifications'] as bool?,
+  whatsAppNotifications: json['whatsAppNotifications'] as bool?,
 );
 
 Map<String, dynamic> _$UpdateUserProfileRequest3ToJson(
@@ -185,4 +197,8 @@ Map<String, dynamic> _$UpdateUserProfileRequest3ToJson(
   'pinCode': instance.pinCode,
   'dateOfBirth': instance.dateOfBirth?.toIso8601String(),
   'anniversaryDate': instance.anniversaryDate?.toIso8601String(),
+  'emailNotifications': instance.emailNotifications,
+  'smsNotifications': instance.smsNotifications,
+  'pushNotifications': instance.pushNotifications,
+  'whatsAppNotifications': instance.whatsAppNotifications,
 };

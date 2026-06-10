@@ -39,9 +39,10 @@ class CouponCard extends StatelessWidget {
         child: ColorFiltered(
           colorFilter: _isInactive
               ? const ColorFilter.matrix(<double>[
-                  0.2126, 0.7152, 0.0722, 0, 0,
-                  0.2126, 0.7152, 0.0722, 0, 0,
-                  0.2126, 0.7152, 0.0722, 0, 0,
+                  // Greyscale with slight brightness boost to wash out colors
+                  0.2126, 0.7152, 0.0722, 0, 30,
+                  0.2126, 0.7152, 0.0722, 0, 30,
+                  0.2126, 0.7152, 0.0722, 0, 30,
                   0, 0, 0, 1, 0,
                 ])
               : const ColorFilter.mode(
@@ -63,16 +64,6 @@ class CouponCard extends StatelessWidget {
 
               // Dashed line between cutouts
               _buildDashedDivider(),
-
-              // Inactive overlay
-              if (_isInactive)
-                Positioned.fill(
-                  child: IgnorePointer(
-                    child: Container(
-                      color: Colors.white.withValues(alpha: 0.3),
-                    ),
-                  ),
-                ),
             ],
           ),
         ),

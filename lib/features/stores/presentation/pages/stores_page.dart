@@ -1,5 +1,7 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_blurhash/flutter_blurhash.dart';
 import 'package:savedge/core/constants/categories_constants.dart';
 import 'package:savedge/core/injection/injection.dart';
 import 'package:savedge/features/home/presentation/widgets/categories_bottom_sheet.dart';
@@ -139,7 +141,7 @@ class _StoresViewState extends State<StoresView> {
               _buildSliverHeader(),
               SliverToBoxAdapter(child: _buildSearchBar()),
               SliverToBoxAdapter(child: _buildCategorySection()),
-              // Popular Picks — owns its own VendorsBloc, hides when empty
+              // Popular Picks - owns its own VendorsBloc, hides when empty
               SliverToBoxAdapter(
                 child: _PopularPicksSection(
                   selectedCategory: _selectedCategory,
@@ -259,7 +261,7 @@ class _StoresViewState extends State<StoresView> {
   }
 
   // ─── Search bar ────────────────────────────────────────
-  // Flat tinted field — no border, no shadow, unified look
+  // Flat tinted field - no border, no shadow, unified look
 
   Widget _buildSearchBar() {
     return Padding(
@@ -409,7 +411,7 @@ class _StoresViewState extends State<StoresView> {
             ),
           ),
           const SizedBox(height: 16),
-          // Circle icon row — horizontally scrollable
+          // Circle icon row - horizontally scrollable
           SizedBox(
             height: 82,
             child: ListView.separated(
@@ -895,7 +897,7 @@ class _StoresViewState extends State<StoresView> {
 }
 
 // ─────────────────────────────────────────────────────────
-// Popular Picks — owns its own VendorsBloc using LoadTopOfferVendors
+// Popular Picks - owns its own VendorsBloc using LoadTopOfferVendors
 // Filters by selectedCategory and hides itself when the result is empty
 // ─────────────────────────────────────────────────────────
 
@@ -1010,7 +1012,7 @@ class _PopularPicksSectionState extends State<_PopularPicksSection> {
 }
 
 // ─────────────────────────────────────────────────────────
-// Featured portrait card — horizontal scroll
+// Featured portrait card - horizontal scroll
 // ─────────────────────────────────────────────────────────
 
 class _FeaturedStoreCard extends StatefulWidget {
@@ -1028,9 +1030,10 @@ class _FeaturedStoreCardState extends State<_FeaturedStoreCard> {
 
   @override
   Widget build(BuildContext context) {
-    final imageUrl = widget.vendor.images.isNotEmpty
-        ? widget.vendor.images[0].imageUrl
+    final primaryImage = widget.vendor.images.isNotEmpty
+        ? widget.vendor.images[0]
         : null;
+    final imageUrl = primaryImage?.imageUrl;
 
     return GestureDetector(
       onTapDown: (_) => setState(() => _pressed = true),
@@ -1065,10 +1068,13 @@ class _FeaturedStoreCardState extends State<_FeaturedStoreCard> {
                     fit: StackFit.expand,
                     children: [
                       imageUrl != null
-                          ? Image.network(
-                              imageUrl,
+                          ? CachedNetworkImage(
+                              imageUrl: imageUrl,
                               fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => _buildPlaceholder(),
+                              placeholder: (context, url) => primaryImage?.blurHash != null
+                                  ? BlurHash(hash: primaryImage!.blurHash!)
+                                  : _buildPlaceholder(),
+                              errorWidget: (_, __, ___) => _buildPlaceholder(),
                             )
                           : _buildPlaceholder(),
                     ],
@@ -1157,9 +1163,10 @@ class _ModernVendorCardState extends State<ModernVendorCard> {
 
   @override
   Widget build(BuildContext context) {
-    final imageUrl = widget.vendor.images.isNotEmpty
-        ? widget.vendor.images[0].imageUrl
+    final primaryImage = widget.vendor.images.isNotEmpty
+        ? widget.vendor.images[0]
         : null;
+    final imageUrl = primaryImage?.imageUrl;
 
     return GestureDetector(
       onTapDown: (_) => setState(() => _pressed = true),
@@ -1190,10 +1197,13 @@ class _ModernVendorCardState extends State<ModernVendorCard> {
                     fit: StackFit.expand,
                     children: [
                       imageUrl != null
-                          ? Image.network(
-                              imageUrl,
+                          ? CachedNetworkImage(
+                              imageUrl: imageUrl,
                               fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) =>
+                              placeholder: (context, url) => primaryImage?.blurHash != null
+                                  ? BlurHash(hash: primaryImage!.blurHash!)
+                                  : _buildPlaceholderImage(),
+                              errorWidget: (_, __, ___) =>
                                   _buildPlaceholderImage(),
                             )
                           : _buildPlaceholderImage(),

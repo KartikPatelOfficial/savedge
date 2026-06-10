@@ -8,6 +8,7 @@ class FavoriteVendor extends Equatable {
     required this.category,
     this.description,
     this.imageUrl,
+    this.blurHash,
     this.address,
     this.city,
     this.state,
@@ -20,6 +21,7 @@ class FavoriteVendor extends Equatable {
   final String category;
   final String? description;
   final String? imageUrl;
+  final String? blurHash;
   final String? address;
   final String? city;
   final String? state;
@@ -33,6 +35,7 @@ class FavoriteVendor extends Equatable {
         category,
         description,
         imageUrl,
+        blurHash,
         address,
         city,
         state,

@@ -253,6 +253,10 @@ class AuthRepositoryImpl implements AuthRepository {
     String? pinCode,
     DateTime? dateOfBirth,
     DateTime? anniversaryDate,
+    bool? emailNotifications,
+    bool? smsNotifications,
+    bool? pushNotifications,
+    bool? whatsAppNotifications,
   }) async {
     return await _remote.updateUserProfile(
       UpdateUserProfileRequest3(
@@ -268,6 +272,10 @@ class AuthRepositoryImpl implements AuthRepository {
         pinCode: pinCode,
         dateOfBirth: dateOfBirth,
         anniversaryDate: anniversaryDate,
+        emailNotifications: emailNotifications,
+        smsNotifications: smsNotifications,
+        pushNotifications: pushNotifications,
+        whatsAppNotifications: whatsAppNotifications,
       ),
     );
   }

@@ -4,11 +4,14 @@ import '../../../../core/error/failures.dart';
 import '../../data/models/gift_card_models.dart'
     show
         CreateGiftCardPaymentOrderResponse,
-        GiftCardPriceBreakdown;
+        GiftCardPriceBreakdown,
+        VerifyGiftCardPaymentResponse;
 import '../entities/gift_card_entity.dart';
 
 abstract class GiftCardRepository {
   Future<Either<Failure, List<GiftCardCategoryEntity>>> getCategories();
+
+  Future<Either<Failure, List<GiftCardProductEntity>>> getHotDeals();
 
   Future<Either<Failure, List<GiftCardProductEntity>>> getProducts({
     int? categoryId,
@@ -22,21 +25,28 @@ abstract class GiftCardRepository {
   Future<Either<Failure, GiftCardPriceBreakdown>> getPriceBreakdown({
     required int productId,
     required double amount,
+    int pointsToUse = 0,
+    int quantity = 1,
   });
 
   Future<Either<Failure, GiftCardOrderEntity>> createOrder({
     required int giftCardProductId,
     required double amount,
     required GiftCardPaymentMethodEntity paymentMethod,
+    int quantity = 1,
+    String? themeSku,
   });
 
   Future<Either<Failure, CreateGiftCardPaymentOrderResponse>>
       createPaymentOrder({
     required int giftCardProductId,
     required double amount,
+    int pointsToUse = 0,
+    int quantity = 1,
+    String? themeSku,
   });
 
-  Future<Either<Failure, GiftCardOrderEntity>> verifyPayment({
+  Future<Either<Failure, VerifyGiftCardPaymentResponse>> verifyPayment({
     required int orderId,
     required String razorpayOrderId,
     required String razorpayPaymentId,
@@ -50,4 +60,6 @@ abstract class GiftCardRepository {
   });
 
   Future<Either<Failure, GiftCardOrderEntity>> getOrder(int id);
+
+  Future<Either<Failure, List<GiftCardRelatedProductEntity>>> getRelatedProducts(int productId);
 }

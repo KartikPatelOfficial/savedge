@@ -16,6 +16,7 @@ _SubscriptionPlanModel _$SubscriptionPlanModelFromJson(
   durationMonths: (json['durationMonths'] as num).toInt(),
   features: json['features'] as String?,
   imageUrl: json['imageUrl'] as String?,
+  blurHash: json['blurHash'] as String?,
   isActive: json['isActive'] as bool? ?? true,
 );
 
@@ -29,6 +30,7 @@ Map<String, dynamic> _$SubscriptionPlanModelToJson(
   'durationMonths': instance.durationMonths,
   'features': instance.features,
   'imageUrl': instance.imageUrl,
+  'blurHash': instance.blurHash,
   'isActive': instance.isActive,
 };
 

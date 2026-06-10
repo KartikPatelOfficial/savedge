@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$SubscriptionPlanModel {
 
- int get id; String get name; String? get description; double get price;@JsonKey(name: 'durationMonths') int get durationMonths; String? get features;@JsonKey(name: 'imageUrl') String? get imageUrl; bool get isActive;
+ int get id; String get name; String? get description; double get price;@JsonKey(name: 'durationMonths') int get durationMonths; String? get features;@JsonKey(name: 'imageUrl') String? get imageUrl; String? get blurHash; bool get isActive;
 /// Create a copy of SubscriptionPlanModel
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $SubscriptionPlanModelCopyWith<SubscriptionPlanModel> get copyWith => _$Subscrip
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SubscriptionPlanModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.price, price) || other.price == price)&&(identical(other.durationMonths, durationMonths) || other.durationMonths == durationMonths)&&(identical(other.features, features) || other.features == features)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.isActive, isActive) || other.isActive == isActive));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SubscriptionPlanModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.price, price) || other.price == price)&&(identical(other.durationMonths, durationMonths) || other.durationMonths == durationMonths)&&(identical(other.features, features) || other.features == features)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.blurHash, blurHash) || other.blurHash == blurHash)&&(identical(other.isActive, isActive) || other.isActive == isActive));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,description,price,durationMonths,features,imageUrl,isActive);
+int get hashCode => Object.hash(runtimeType,id,name,description,price,durationMonths,features,imageUrl,blurHash,isActive);
 
 @override
 String toString() {
-  return 'SubscriptionPlanModel(id: $id, name: $name, description: $description, price: $price, durationMonths: $durationMonths, features: $features, imageUrl: $imageUrl, isActive: $isActive)';
+  return 'SubscriptionPlanModel(id: $id, name: $name, description: $description, price: $price, durationMonths: $durationMonths, features: $features, imageUrl: $imageUrl, blurHash: $blurHash, isActive: $isActive)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $SubscriptionPlanModelCopyWith<$Res>  {
   factory $SubscriptionPlanModelCopyWith(SubscriptionPlanModel value, $Res Function(SubscriptionPlanModel) _then) = _$SubscriptionPlanModelCopyWithImpl;
 @useResult
 $Res call({
- int id, String name, String? description, double price,@JsonKey(name: 'durationMonths') int durationMonths, String? features,@JsonKey(name: 'imageUrl') String? imageUrl, bool isActive
+ int id, String name, String? description, double price,@JsonKey(name: 'durationMonths') int durationMonths, String? features,@JsonKey(name: 'imageUrl') String? imageUrl, String? blurHash, bool isActive
 });
 
 
@@ -65,7 +65,7 @@ class _$SubscriptionPlanModelCopyWithImpl<$Res>
 
 /// Create a copy of SubscriptionPlanModel
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? description = freezed,Object? price = null,Object? durationMonths = null,Object? features = freezed,Object? imageUrl = freezed,Object? isActive = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? description = freezed,Object? price = null,Object? durationMonths = null,Object? features = freezed,Object? imageUrl = freezed,Object? blurHash = freezed,Object? isActive = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -74,6 +74,7 @@ as String?,price: null == price ? _self.price : price // ignore: cast_nullable_t
 as double,durationMonths: null == durationMonths ? _self.durationMonths : durationMonths // ignore: cast_nullable_to_non_nullable
 as int,features: freezed == features ? _self.features : features // ignore: cast_nullable_to_non_nullable
 as String?,imageUrl: freezed == imageUrl ? _self.imageUrl : imageUrl // ignore: cast_nullable_to_non_nullable
+as String?,blurHash: freezed == blurHash ? _self.blurHash : blurHash // ignore: cast_nullable_to_non_nullable
 as String?,isActive: null == isActive ? _self.isActive : isActive // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
@@ -160,10 +161,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String name,  String? description,  double price, @JsonKey(name: 'durationMonths')  int durationMonths,  String? features, @JsonKey(name: 'imageUrl')  String? imageUrl,  bool isActive)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int id,  String name,  String? description,  double price, @JsonKey(name: 'durationMonths')  int durationMonths,  String? features, @JsonKey(name: 'imageUrl')  String? imageUrl,  String? blurHash,  bool isActive)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _SubscriptionPlanModel() when $default != null:
-return $default(_that.id,_that.name,_that.description,_that.price,_that.durationMonths,_that.features,_that.imageUrl,_that.isActive);case _:
+return $default(_that.id,_that.name,_that.description,_that.price,_that.durationMonths,_that.features,_that.imageUrl,_that.blurHash,_that.isActive);case _:
   return orElse();
 
 }
@@ -181,10 +182,10 @@ return $default(_that.id,_that.name,_that.description,_that.price,_that.duration
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String name,  String? description,  double price, @JsonKey(name: 'durationMonths')  int durationMonths,  String? features, @JsonKey(name: 'imageUrl')  String? imageUrl,  bool isActive)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int id,  String name,  String? description,  double price, @JsonKey(name: 'durationMonths')  int durationMonths,  String? features, @JsonKey(name: 'imageUrl')  String? imageUrl,  String? blurHash,  bool isActive)  $default,) {final _that = this;
 switch (_that) {
 case _SubscriptionPlanModel():
-return $default(_that.id,_that.name,_that.description,_that.price,_that.durationMonths,_that.features,_that.imageUrl,_that.isActive);case _:
+return $default(_that.id,_that.name,_that.description,_that.price,_that.durationMonths,_that.features,_that.imageUrl,_that.blurHash,_that.isActive);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -201,10 +202,10 @@ return $default(_that.id,_that.name,_that.description,_that.price,_that.duration
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String name,  String? description,  double price, @JsonKey(name: 'durationMonths')  int durationMonths,  String? features, @JsonKey(name: 'imageUrl')  String? imageUrl,  bool isActive)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int id,  String name,  String? description,  double price, @JsonKey(name: 'durationMonths')  int durationMonths,  String? features, @JsonKey(name: 'imageUrl')  String? imageUrl,  String? blurHash,  bool isActive)?  $default,) {final _that = this;
 switch (_that) {
 case _SubscriptionPlanModel() when $default != null:
-return $default(_that.id,_that.name,_that.description,_that.price,_that.durationMonths,_that.features,_that.imageUrl,_that.isActive);case _:
+return $default(_that.id,_that.name,_that.description,_that.price,_that.durationMonths,_that.features,_that.imageUrl,_that.blurHash,_that.isActive);case _:
   return null;
 
 }
@@ -216,7 +217,7 @@ return $default(_that.id,_that.name,_that.description,_that.price,_that.duration
 @JsonSerializable()
 
 class _SubscriptionPlanModel implements SubscriptionPlanModel {
-  const _SubscriptionPlanModel({required this.id, required this.name, this.description, required this.price, @JsonKey(name: 'durationMonths') required this.durationMonths, this.features, @JsonKey(name: 'imageUrl') this.imageUrl, this.isActive = true});
+  const _SubscriptionPlanModel({required this.id, required this.name, this.description, required this.price, @JsonKey(name: 'durationMonths') required this.durationMonths, this.features, @JsonKey(name: 'imageUrl') this.imageUrl, this.blurHash, this.isActive = true});
   factory _SubscriptionPlanModel.fromJson(Map<String, dynamic> json) => _$SubscriptionPlanModelFromJson(json);
 
 @override final  int id;
@@ -226,6 +227,7 @@ class _SubscriptionPlanModel implements SubscriptionPlanModel {
 @override@JsonKey(name: 'durationMonths') final  int durationMonths;
 @override final  String? features;
 @override@JsonKey(name: 'imageUrl') final  String? imageUrl;
+@override final  String? blurHash;
 @override@JsonKey() final  bool isActive;
 
 /// Create a copy of SubscriptionPlanModel
@@ -241,16 +243,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SubscriptionPlanModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.price, price) || other.price == price)&&(identical(other.durationMonths, durationMonths) || other.durationMonths == durationMonths)&&(identical(other.features, features) || other.features == features)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.isActive, isActive) || other.isActive == isActive));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SubscriptionPlanModel&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.description, description) || other.description == description)&&(identical(other.price, price) || other.price == price)&&(identical(other.durationMonths, durationMonths) || other.durationMonths == durationMonths)&&(identical(other.features, features) || other.features == features)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&(identical(other.blurHash, blurHash) || other.blurHash == blurHash)&&(identical(other.isActive, isActive) || other.isActive == isActive));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,name,description,price,durationMonths,features,imageUrl,isActive);
+int get hashCode => Object.hash(runtimeType,id,name,description,price,durationMonths,features,imageUrl,blurHash,isActive);
 
 @override
 String toString() {
-  return 'SubscriptionPlanModel(id: $id, name: $name, description: $description, price: $price, durationMonths: $durationMonths, features: $features, imageUrl: $imageUrl, isActive: $isActive)';
+  return 'SubscriptionPlanModel(id: $id, name: $name, description: $description, price: $price, durationMonths: $durationMonths, features: $features, imageUrl: $imageUrl, blurHash: $blurHash, isActive: $isActive)';
 }
 
 
@@ -261,7 +263,7 @@ abstract mixin class _$SubscriptionPlanModelCopyWith<$Res> implements $Subscript
   factory _$SubscriptionPlanModelCopyWith(_SubscriptionPlanModel value, $Res Function(_SubscriptionPlanModel) _then) = __$SubscriptionPlanModelCopyWithImpl;
 @override @useResult
 $Res call({
- int id, String name, String? description, double price,@JsonKey(name: 'durationMonths') int durationMonths, String? features,@JsonKey(name: 'imageUrl') String? imageUrl, bool isActive
+ int id, String name, String? description, double price,@JsonKey(name: 'durationMonths') int durationMonths, String? features,@JsonKey(name: 'imageUrl') String? imageUrl, String? blurHash, bool isActive
 });
 
 
@@ -278,7 +280,7 @@ class __$SubscriptionPlanModelCopyWithImpl<$Res>
 
 /// Create a copy of SubscriptionPlanModel
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? description = freezed,Object? price = null,Object? durationMonths = null,Object? features = freezed,Object? imageUrl = freezed,Object? isActive = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? description = freezed,Object? price = null,Object? durationMonths = null,Object? features = freezed,Object? imageUrl = freezed,Object? blurHash = freezed,Object? isActive = null,}) {
   return _then(_SubscriptionPlanModel(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as int,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -287,6 +289,7 @@ as String?,price: null == price ? _self.price : price // ignore: cast_nullable_t
 as double,durationMonths: null == durationMonths ? _self.durationMonths : durationMonths // ignore: cast_nullable_to_non_nullable
 as int,features: freezed == features ? _self.features : features // ignore: cast_nullable_to_non_nullable
 as String?,imageUrl: freezed == imageUrl ? _self.imageUrl : imageUrl // ignore: cast_nullable_to_non_nullable
+as String?,blurHash: freezed == blurHash ? _self.blurHash : blurHash // ignore: cast_nullable_to_non_nullable
 as String?,isActive: null == isActive ? _self.isActive : isActive // ignore: cast_nullable_to_non_nullable
 as bool,
   ));

@@ -142,6 +142,7 @@ class CouponsRepositoryImpl implements CouponsRepository {
       specialOfferEndDate: response.specialOfferEndDate,
       specialOfferPriority: response.specialOfferPriority,
       specialOfferImageUrl: response.specialOfferImageUrl,
+      specialOfferBlurHash: response.specialOfferBlurHash,
       displayOrder: response.displayOrder,
     );
   }

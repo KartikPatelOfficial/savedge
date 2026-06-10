@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:savedge/features/coupons/presentation/pages/redemption_history_page.dart';
 import 'package:savedge/features/static_pages/presentation/pages/about_us_page.dart';
 import 'package:savedge/features/static_pages/presentation/pages/contact_us_page.dart';
@@ -54,9 +55,27 @@ class HomeDrawer extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Premium Header
-              _PremiumUserProfileSection(
-                  userName: userName, userAvatar: userAvatar),
-              const SizedBox(height: 40),
+              if (!isGuest) ...[
+                _PremiumUserProfileSection(
+                    userName: userName, userAvatar: userAvatar),
+                const SizedBox(height: 40),
+              ] else ...[
+                Padding(
+                  padding: const EdgeInsets.only(right: 24.0),
+                  child: ColorFiltered(
+                    colorFilter: const ColorFilter.mode(
+                      Color(0xFF6F3FCC),
+                      BlendMode.srcIn,
+                    ),
+                    child: Image.asset(
+                      'assets/images/logo_transparant.png',
+                      height: 120,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+              ],
               // Menu Items List - left aligned
               Expanded(
                 child: SizedBox(
@@ -68,14 +87,20 @@ class HomeDrawer extends StatelessWidget {
                 ),
               ),
               // Footer element
-              Text(
-                'Savedge App v1.0.0',
-                style: TextStyle(
-                  color: const Color(0xFF6F3FCC).withOpacity(0.4),
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  letterSpacing: 1.0,
-                ),
+              FutureBuilder<PackageInfo>(
+                future: PackageInfo.fromPlatform(),
+                builder: (context, snapshot) {
+                  final version = snapshot.data?.version ?? '';
+                  return Text(
+                    'Savedge App${version.isNotEmpty ? ' v$version' : ''}',
+                    style: TextStyle(
+                      color: const Color(0xFF6F3FCC).withOpacity(0.4),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      letterSpacing: 1.0,
+                    ),
+                  );
+                },
               ),
             ],
           ),
@@ -132,57 +157,48 @@ class HomeDrawer extends StatelessWidget {
     return items;
   }
 
+  /// Close drawer first, wait for animation, then navigate.
+  Future<void> _closeAndNavigate(BuildContext context, Widget page) async {
+    onMenuItemTap?.call('');
+    // Wait for the drawer close animation to finish (300ms + buffer)
+    await Future.delayed(const Duration(milliseconds: 350));
+    if (!context.mounted) return;
+    Navigator.push(context, MaterialPageRoute(builder: (_) => page));
+  }
+
+  Future<void> _closeAndNavigateNamed(BuildContext context, String route) async {
+    onMenuItemTap?.call('');
+    await Future.delayed(const Duration(milliseconds: 350));
+    if (!context.mounted) return;
+    Navigator.pushNamed(context, route);
+  }
+
   void _navigateToSignIn(BuildContext context) {
-    onMenuItemTap?.call('Sign In');
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const PhoneVerificationPage()),
-    );
+    _closeAndNavigate(context, const PhoneVerificationPage());
   }
 
   void _navigateToRedemptionHistory(BuildContext context) {
-    onMenuItemTap?.call('Redemption History');
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const RedemptionHistoryPage()),
-    );
+    _closeAndNavigate(context, const RedemptionHistoryPage());
   }
 
   void _navigateToStores(BuildContext context) {
-    onMenuItemTap?.call('Stores');
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const StoresPage()),
-    );
+    _closeAndNavigate(context, const StoresPage());
   }
 
   void _navigateToAboutUs(BuildContext context) {
-    onMenuItemTap?.call('About Us');
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const AboutUsPage()),
-    );
+    _closeAndNavigate(context, const AboutUsPage());
   }
 
   void _navigateToContactUs(BuildContext context) {
-    onMenuItemTap?.call('Contact Us');
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const ContactUsPage()),
-    );
+    _closeAndNavigate(context, const ContactUsPage());
   }
 
   void _navigateToFollowUs(BuildContext context) {
-    onMenuItemTap?.call('Follow Us');
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const FollowUsPage()),
-    );
+    _closeAndNavigate(context, const FollowUsPage());
   }
 
   void _navigateToGiftCards(BuildContext context) {
-    onMenuItemTap?.call('Gift Cards');
-    Navigator.pushNamed(context, '/gift-cards');
+    _closeAndNavigateNamed(context, '/gift-cards');
   }
 }
 

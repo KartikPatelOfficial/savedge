@@ -5,19 +5,19 @@ import 'package:savedge/core/themes/app_theme.dart';
 import 'package:savedge/features/auth/presentation/bloc/otp_auth_cubit.dart';
 import 'package:savedge/features/auth/presentation/widgets/auth_wrapper.dart';
 import 'package:savedge/features/app/presentation/navigation/main_navigation_page.dart';
-import 'package:savedge/features/brand_vouchers/presentation/pages/voucher_purchase_page.dart';
-import 'package:savedge/features/brand_vouchers/presentation/pages/voucher_orders_page.dart';
-import 'package:savedge/features/brand_vouchers/domain/entities/brand_voucher_entity.dart';
 import 'package:savedge/features/gift_cards/presentation/pages/gift_cards_page.dart';
 import 'package:savedge/features/gift_cards/presentation/pages/gift_card_detail_page.dart';
 import 'package:savedge/features/gift_cards/presentation/pages/gift_card_checkout_page.dart';
 import 'package:savedge/features/gift_cards/presentation/pages/gift_card_orders_page.dart';
+import 'package:savedge/features/gift_cards/presentation/pages/gift_card_favorites_page.dart';
+import 'package:savedge/features/gift_cards/presentation/pages/gift_card_view_page.dart';
 import 'package:savedge/features/gift_cards/domain/entities/gift_card_entity.dart';
 import 'package:savedge/features/city/presentation/bloc/city_bloc.dart';
 import 'package:savedge/features/city/presentation/bloc/city_event.dart';
 import 'package:savedge/features/notifications/presentation/bloc/notification_bloc.dart';
 import 'package:savedge/features/invoices/presentation/pages/invoices_page.dart';
 import 'package:savedge/features/notifications/presentation/pages/notification_center_page.dart';
+import 'package:savedge/features/notifications/presentation/pages/notification_preferences_page.dart';
 import 'package:savedge/core/widgets/animated_blur_background.dart';
 
 /// Main application widget
@@ -73,20 +73,14 @@ class SavedgeApp extends StatelessWidget {
             goToCoupons: goToCoupons,
           ),
         );
-      case '/voucher-purchase':
-        final voucher = settings.arguments as BrandVoucherEntity;
-        return MaterialPageRoute(
-          builder: (_) => VoucherPurchasePage(voucher: voucher),
-          settings: settings,
-        );
-      case '/voucher-orders':
-        return MaterialPageRoute(
-          builder: (_) => const VoucherOrdersPage(),
-          settings: settings,
-        );
       case '/notifications':
         return MaterialPageRoute(
           builder: (_) => const NotificationCenterPage(),
+          settings: settings,
+        );
+      case '/notification-preferences':
+        return MaterialPageRoute(
+          builder: (_) => const NotificationPreferencesPage(),
           settings: settings,
         );
       case '/invoices':
@@ -111,12 +105,24 @@ class SavedgeApp extends StatelessWidget {
           builder: (_) => GiftCardCheckoutPage(
             product: args['product'] as GiftCardProductEntity,
             amount: args['amount'] as double,
+            themeSku: args['themeSku'] as String?,
           ),
           settings: settings,
         );
       case '/gift-card-orders':
         return MaterialPageRoute(
           builder: (_) => const GiftCardOrdersPage(),
+          settings: settings,
+        );
+      case '/gift-card-view':
+        final order = settings.arguments as GiftCardOrderEntity;
+        return MaterialPageRoute(
+          builder: (_) => GiftCardViewPage(order: order),
+          settings: settings,
+        );
+      case '/gift-card-favorites':
+        return MaterialPageRoute(
+          builder: (_) => const GiftCardFavoritesPage(),
           settings: settings,
         );
       default:

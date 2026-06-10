@@ -29,6 +29,10 @@ abstract class UserProfileResponse3 with _$UserProfileResponse3 {
     String? pinCode,
     DateTime? dateOfBirth,
     DateTime? anniversaryDate,
+    @Default(true) bool emailNotifications,
+    @Default(true) bool smsNotifications,
+    @Default(true) bool pushNotifications,
+    @Default(false) bool whatsAppNotifications,
   }) = _UserProfileResponse3;
 
   factory UserProfileResponse3.fromJson(Map<String, dynamic> json) =>
@@ -206,6 +210,10 @@ abstract class UpdateUserProfileRequest3 with _$UpdateUserProfileRequest3 {
     String? pinCode,
     DateTime? dateOfBirth,
     DateTime? anniversaryDate,
+    bool? emailNotifications,
+    bool? smsNotifications,
+    bool? pushNotifications,
+    bool? whatsAppNotifications,
   }) = _UpdateUserProfileRequest3;
 
   factory UpdateUserProfileRequest3.fromJson(Map<String, dynamic> json) =>

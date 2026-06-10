@@ -30,6 +30,16 @@ class GiftCardCategoriesError extends GiftCardsState {
   List<Object> get props => [message];
 }
 
+// Hot Deals
+class HotDealsLoaded extends GiftCardsState {
+  final List<GiftCardProductEntity> hotDeals;
+
+  const HotDealsLoaded(this.hotDeals);
+
+  @override
+  List<Object> get props => [hotDeals];
+}
+
 // Products
 class GiftCardProductsLoading extends GiftCardsState {}
 
@@ -170,12 +180,13 @@ class GiftCardRazorpayOrderError extends GiftCardsState {
 class GiftCardPaymentVerifying extends GiftCardsState {}
 
 class GiftCardPaymentVerified extends GiftCardsState {
-  final GiftCardOrderEntity order;
+  final bool success;
+  final String message;
 
-  const GiftCardPaymentVerified(this.order);
+  const GiftCardPaymentVerified({required this.success, required this.message});
 
   @override
-  List<Object> get props => [order];
+  List<Object> get props => [success, message];
 }
 
 class GiftCardPaymentError extends GiftCardsState {
@@ -204,6 +215,23 @@ class GiftCardOrdersError extends GiftCardsState {
 
   const GiftCardOrdersError(this.message);
 
+  @override
+  List<Object> get props => [message];
+}
+
+// Related products
+class RelatedProductsLoading extends GiftCardsState {}
+
+class RelatedProductsLoaded extends GiftCardsState {
+  final List<GiftCardRelatedProductEntity> products;
+  const RelatedProductsLoaded(this.products);
+  @override
+  List<Object> get props => [products];
+}
+
+class RelatedProductsError extends GiftCardsState {
+  final String message;
+  const RelatedProductsError(this.message);
   @override
   List<Object> get props => [message];
 }

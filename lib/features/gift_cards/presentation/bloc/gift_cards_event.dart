@@ -11,6 +11,10 @@ class LoadGiftCardCategories extends GiftCardsEvent {
   const LoadGiftCardCategories();
 }
 
+class LoadHotDeals extends GiftCardsEvent {
+  const LoadHotDeals();
+}
+
 class LoadGiftCardProducts extends GiftCardsEvent {
   final int? categoryId;
   final String? searchTerm;
@@ -36,42 +40,58 @@ class LoadGiftCardProduct extends GiftCardsEvent {
 class LoadPriceBreakdown extends GiftCardsEvent {
   final int productId;
   final double amount;
+  final int pointsToUse;
+  final int quantity;
 
   const LoadPriceBreakdown({
     required this.productId,
     required this.amount,
+    this.pointsToUse = 0,
+    this.quantity = 1,
   });
 
   @override
-  List<Object> get props => [productId, amount];
+  List<Object> get props => [productId, amount, pointsToUse, quantity];
 }
 
 class CreateGiftCardOrder extends GiftCardsEvent {
   final int giftCardProductId;
   final double amount;
   final GiftCardPaymentMethodEntity paymentMethod;
+  final int quantity;
+  final String? themeSku;
 
   const CreateGiftCardOrder({
     required this.giftCardProductId,
     required this.amount,
     required this.paymentMethod,
+    this.quantity = 1,
+    this.themeSku,
   });
 
   @override
-  List<Object> get props => [giftCardProductId, amount, paymentMethod];
+  List<Object?> get props =>
+      [giftCardProductId, amount, paymentMethod, quantity, themeSku];
 }
 
 class CreateGiftCardPaymentOrder extends GiftCardsEvent {
   final int giftCardProductId;
   final double amount;
+  final int pointsToUse;
+  final int quantity;
+  final String? themeSku;
 
   const CreateGiftCardPaymentOrder({
     required this.giftCardProductId,
     required this.amount,
+    this.pointsToUse = 0,
+    this.quantity = 1,
+    this.themeSku,
   });
 
   @override
-  List<Object> get props => [giftCardProductId, amount];
+  List<Object?> get props =>
+      [giftCardProductId, amount, pointsToUse, quantity, themeSku];
 }
 
 class VerifyGiftCardPayment extends GiftCardsEvent {
@@ -90,6 +110,13 @@ class VerifyGiftCardPayment extends GiftCardsEvent {
   @override
   List<Object> get props =>
       [orderId, razorpayOrderId, razorpayPaymentId, razorpaySignature];
+}
+
+class LoadRelatedProducts extends GiftCardsEvent {
+  final int productId;
+  const LoadRelatedProducts({required this.productId});
+  @override
+  List<Object> get props => [productId];
 }
 
 class LoadGiftCardOrders extends GiftCardsEvent {

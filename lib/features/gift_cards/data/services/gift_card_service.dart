@@ -15,6 +15,9 @@ abstract class GiftCardService {
   @GET('/api/gift-cards/categories')
   Future<List<GiftCardCategory>> getCategories();
 
+  @GET('/api/gift-cards/hot-deals')
+  Future<List<GiftCardProduct>> getHotDeals();
+
   @GET('/api/gift-cards/products')
   Future<PaginatedGiftCardProductResponse> getProducts({
     @Query('categoryId') int? categoryId,
@@ -26,10 +29,15 @@ abstract class GiftCardService {
   @GET('/api/gift-cards/products/{id}')
   Future<GiftCardProduct> getProduct(@Path('id') int id);
 
+  @GET('/api/gift-cards/products/{id}/related')
+  Future<List<GiftCardRelatedProduct>> getRelatedProducts(@Path('id') int id);
+
   @GET('/api/gift-card-orders/price-breakdown')
   Future<GiftCardPriceBreakdown> getPriceBreakdown({
     @Query('productId') required int productId,
     @Query('amount') required double amount,
+    @Query('pointsToUse') int pointsToUse = 0,
+    @Query('quantity') int quantity = 1,
   });
 
   @POST('/api/gift-card-orders')
@@ -43,7 +51,7 @@ abstract class GiftCardService {
   );
 
   @POST('/api/gift-card-orders/verify-payment')
-  Future<GiftCardOrder> verifyPayment(
+  Future<VerifyGiftCardPaymentResponse> verifyPayment(
     @Body() VerifyGiftCardPaymentRequest request,
   );
 

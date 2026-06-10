@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_blurhash/flutter_blurhash.dart';
 import 'package:flutter/services.dart';
 
 import '../../domain/entities/favorite_vendor.dart';
@@ -53,15 +54,17 @@ class FavoriteVendorCard extends StatelessWidget {
                       ? CachedNetworkImage(
                           imageUrl: favorite.imageUrl!,
                           fit: BoxFit.cover,
-                          placeholder: (context, url) => Container(
-                            color: Colors.grey[300],
-                            child: const Center(
-                              child: CircularProgressIndicator(
-                                color: Color(0xFF6F3FCC),
-                                strokeWidth: 2,
-                              ),
-                            ),
-                          ),
+                          placeholder: (context, url) => favorite.blurHash != null
+                              ? BlurHash(hash: favorite.blurHash!)
+                              : Container(
+                                  color: Colors.grey[300],
+                                  child: const Center(
+                                    child: CircularProgressIndicator(
+                                      color: Color(0xFF6F3FCC),
+                                      strokeWidth: 2,
+                                    ),
+                                  ),
+                                ),
                           errorWidget: (context, url, error) => Container(
                             color: Colors.grey[300],
                             child: Icon(

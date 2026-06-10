@@ -1,5 +1,7 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_blurhash/flutter_blurhash.dart';
 import 'package:savedge/core/constants/categories_constants.dart';
 import 'package:savedge/core/injection/injection.dart';
 import 'package:savedge/features/vendors/domain/entities/vendor.dart';
@@ -31,15 +33,15 @@ class _TopOffersSectionState extends State<TopOffersSection> {
   void initState() {
     super.initState();
     // Use a dedicated bloc so regular vendor loads don't overwrite top offers
-    // Don't filter by city — show all featured vendors regardless of location
-    _topOffersBloc = getIt<VendorsBloc>()..add(const LoadTopOfferVendors());
+    _topOffersBloc = getIt<VendorsBloc>()
+      ..add(LoadTopOfferVendors(cityId: widget.cityId));
   }
 
   @override
   void didUpdateWidget(TopOffersSection oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.key != widget.key) {
-      _topOffersBloc.add(const LoadTopOfferVendors());
+    if (oldWidget.key != widget.key || oldWidget.cityId != widget.cityId) {
+      _topOffersBloc.add(LoadTopOfferVendors(cityId: widget.cityId));
     }
   }
 
@@ -61,7 +63,7 @@ class _TopOffersSectionState extends State<TopOffersSection> {
   }
 }
 
-/// Top offers view — image background cards with content overlay
+/// Top offers view - image background cards with content overlay
 class TopOffersView extends StatelessWidget {
   const TopOffersView({super.key, required this.title, this.onVendorTap});
 
@@ -80,18 +82,13 @@ class TopOffersView extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Row(
               children: [
-                ShaderMask(
-                  shaderCallback: (bounds) => const LinearGradient(
-                    colors: [Color(0xFF6F3FCC), Color(0xFF9F6BFF)],
-                  ).createShader(bounds),
-                  child: Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w800,
-                      color: Colors.white,
-                      letterSpacing: -0.5,
-                    ),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                    color: Color(0xFF1A202C),
+                    letterSpacing: -0.5,
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -202,7 +199,7 @@ class TopOffersView extends StatelessWidget {
           Text('🏪', style: TextStyle(fontSize: 24)),
           SizedBox(width: 12),
           Text(
-            'No offers right now — check back soon!',
+            'No offers right now - check back soon!',
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
@@ -454,10 +451,13 @@ class _TopVendorCard extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(18),
         child: primaryImage.imageUrl.isNotEmpty
-            ? Image.network(
-                primaryImage.imageUrl,
+            ? CachedNetworkImage(
+                imageUrl: primaryImage.imageUrl,
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => _buildFallbackIcon(),
+                placeholder: (context, url) => primaryImage.blurHash != null
+                    ? BlurHash(hash: primaryImage.blurHash!)
+                    : Container(color: const Color(0xFF1A202C)),
+                errorWidget: (_, __, ___) => _buildFallbackIcon(),
               )
             : _buildFallbackIcon(),
       ),

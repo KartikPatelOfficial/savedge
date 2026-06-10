@@ -51,6 +51,37 @@ class _GiftCardService implements GiftCardService {
   }
 
   @override
+  Future<List<GiftCardProduct>> getHotDeals() async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<List<GiftCardProduct>>(
+      Options(method: 'GET', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/api/gift-cards/hot-deals',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<List<dynamic>>(_options);
+    late List<GiftCardProduct> _value;
+    try {
+      _value = _result.data!
+          .map(
+            (dynamic i) => GiftCardProduct.fromJson(i as Map<String, dynamic>),
+          )
+          .toList();
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
   Future<PaginatedGiftCardProductResponse> getProducts({
     int? categoryId,
     String? searchTerm,
@@ -116,14 +147,50 @@ class _GiftCardService implements GiftCardService {
   }
 
   @override
+  Future<List<GiftCardRelatedProduct>> getRelatedProducts(int id) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<List<GiftCardRelatedProduct>>(
+      Options(method: 'GET', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/api/gift-cards/products/${id}/related',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<List<dynamic>>(_options);
+    late List<GiftCardRelatedProduct> _value;
+    try {
+      _value = _result.data!
+          .map(
+            (dynamic i) =>
+                GiftCardRelatedProduct.fromJson(i as Map<String, dynamic>),
+          )
+          .toList();
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
   Future<GiftCardPriceBreakdown> getPriceBreakdown({
     required int productId,
     required double amount,
+    int pointsToUse = 0,
+    int quantity = 1,
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{
       r'productId': productId,
       r'amount': amount,
+      r'pointsToUse': pointsToUse,
+      r'quantity': quantity,
     };
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
@@ -205,14 +272,14 @@ class _GiftCardService implements GiftCardService {
   }
 
   @override
-  Future<GiftCardOrder> verifyPayment(
+  Future<VerifyGiftCardPaymentResponse> verifyPayment(
     VerifyGiftCardPaymentRequest request,
   ) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     final _data = request;
-    final _options = _setStreamType<GiftCardOrder>(
+    final _options = _setStreamType<VerifyGiftCardPaymentResponse>(
       Options(method: 'POST', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
@@ -223,9 +290,9 @@ class _GiftCardService implements GiftCardService {
           .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
     );
     final _result = await _dio.fetch<Map<String, dynamic>>(_options);
-    late GiftCardOrder _value;
+    late VerifyGiftCardPaymentResponse _value;
     try {
-      _value = GiftCardOrder.fromJson(_result.data!);
+      _value = VerifyGiftCardPaymentResponse.fromJson(_result.data!);
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options);
       rethrow;

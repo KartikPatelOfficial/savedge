@@ -492,17 +492,12 @@ class _ProfilePageState extends State<ProfilePage> {
                         subtitle: 'Your favorite restaurants and items',
                         onTap: _onFavoritesTap,
                       ),
-                      // Gift Cards & Coupons - hidden until feature is ready
-                      // ProfileMenuItem(
-                      //   icon: Icons.card_giftcard,
-                      //   title: _userProfile!.isEmployee
-                      //       ? 'Coupons & Benefits'
-                      //       : 'Gift Cards & Coupons',
-                      //   subtitle: _userProfile!.isEmployee
-                      //       ? 'View your employee benefits and coupons'
-                      //       : 'Manage your rewards',
-                      //   onTap: _onGiftCardsTap,
-                      // ),
+                      ProfileMenuItem(
+                        icon: Icons.card_giftcard,
+                        title: 'Gift Cards',
+                        subtitle: 'Browse and buy brand gift cards',
+                        onTap: _onGiftCardsTap,
+                      ),
                       // Gift to colleagues (show for employees only)
                       if (_userProfile!.isEmployee) ...[
                         ProfileMenuItem(
@@ -655,11 +650,13 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _onNotificationsTap() {
-    Navigator.of(context).pushNamed('/notifications');
+    Navigator.of(context).pushNamed('/notification-preferences');
   }
 
   void _onOrderHistoryTap() {
-    Navigator.of(context).pushNamed('/voucher-orders');
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) => const RedemptionHistoryPage()),
+    );
   }
 
   void _onInvoicesTap() {
@@ -679,8 +676,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _onGiftCardsTap() {
-    debugPrint('Gift Cards tapped');
-    // TODO: Navigate to gift cards/coupons
+    Navigator.of(context).pushNamed('/gift-cards');
   }
 
   void _onSendGiftsTap() {

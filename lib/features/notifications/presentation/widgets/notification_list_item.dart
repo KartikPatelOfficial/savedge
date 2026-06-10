@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:savedge/features/notifications/domain/entities/notification_entity.dart';
 
-/// Widget to display a single notification item
 class NotificationListItem extends StatelessWidget {
   final NotificationEntity notification;
   final VoidCallback? onTap;
@@ -17,172 +16,198 @@ class NotificationListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final isRead = notification.isRead;
+    final accent = _accentFor(notification.type);
 
-    return Dismissible(
-      key: Key('notification_${notification.id}'),
-      direction: DismissDirection.endToStart,
-      onDismissed: (_) => onDismiss?.call(),
-      background: Container(
-        alignment: Alignment.centerRight,
-        padding: const EdgeInsets.only(right: 20),
-        color: Colors.red,
-        child: const Icon(Icons.delete, color: Colors.white),
-      ),
-      child: InkWell(
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: Dismissible(
+        key: Key('notification_${notification.id}'),
+        direction: DismissDirection.endToStart,
+        onDismissed: (_) => onDismiss?.call(),
+        background: Container(
+          alignment: Alignment.centerRight,
+          padding: const EdgeInsets.only(right: 24),
           decoration: BoxDecoration(
-            color: isRead
-                ? theme.scaffoldBackgroundColor
-                : theme.colorScheme.primary.withOpacity(0.05),
-            border: Border(
-              bottom: BorderSide(
-                color: theme.dividerColor.withOpacity(0.1),
-              ),
-            ),
+            color: const Color(0xFFEF4444).withValues(alpha: 0.10),
+            borderRadius: BorderRadius.circular(16),
           ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Notification icon
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: _getIconBackgroundColor(notification.type),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(
-                  _getIcon(notification.type),
-                  color: Colors.white,
-                  size: 24,
+          child: const Icon(
+            Icons.delete_outline_rounded,
+            color: Color(0xFFEF4444),
+            size: 24,
+          ),
+        ),
+        child: Material(
+          color: isRead ? Colors.white : const Color(0xFFFCFBFF),
+          borderRadius: BorderRadius.circular(16),
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(16),
+            child: Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: isRead
+                      ? const Color(0xFFF0F0F0)
+                      : const Color(0xFF6F3FCC).withValues(alpha: 0.10),
                 ),
               ),
-              const SizedBox(width: 12),
-              // Content
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Type icon
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: accent.withValues(alpha: 0.10),
+                      borderRadius: BorderRadius.circular(13),
+                    ),
+                    child: Icon(
+                      _iconFor(notification.type),
+                      color: accent,
+                      size: 22,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  // Content
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(
-                          child: Text(
-                            notification.title,
-                            style: theme.textTheme.titleSmall?.copyWith(
-                              fontWeight: isRead ? FontWeight.normal : FontWeight.bold,
+                        // Title row + unread dot
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                notification.title,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight:
+                                      isRead ? FontWeight.w600 : FontWeight.w800,
+                                  color: const Color(0xFF1A202C),
+                                ),
+                              ),
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                            if (!isRead) ...[
+                              const SizedBox(width: 8),
+                              Container(
+                                width: 7,
+                                height: 7,
+                                decoration: const BoxDecoration(
+                                  color: Color(0xFF6F3FCC),
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        // Body
+                        Text(
+                          notification.body,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w400,
+                            color: const Color(0xFF1A202C).withValues(alpha: 0.5),
+                            height: 1.4,
                           ),
                         ),
-                        if (!isRead)
-                          Container(
-                            width: 8,
-                            height: 8,
-                            decoration: BoxDecoration(
-                              color: theme.colorScheme.primary,
-                              shape: BoxShape.circle,
-                            ),
+                        const SizedBox(height: 8),
+                        // Time
+                        Text(
+                          _formatTime(notification.sentAt),
+                          style: const TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFFB0B7C3),
                           ),
+                        ),
                       ],
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      notification.body,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.textTheme.bodySmall?.color,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      _formatTime(notification.sentAt),
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.textTheme.bodySmall?.color?.withOpacity(0.6),
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  IconData _getIcon(NotificationType type) {
+  Color _accentFor(NotificationType type) {
     switch (type) {
       case NotificationType.welcome:
-        return Icons.celebration;
+        return const Color(0xFF10B981);
       case NotificationType.reEngagement:
-        return Icons.waving_hand;
+        return const Color(0xFF3B82F6);
       case NotificationType.newDeal:
-        return Icons.local_offer;
+        return const Color(0xFFF59E0B);
       case NotificationType.expiringCoupon:
-        return Icons.access_time;
+        return const Color(0xFFEF4444);
       case NotificationType.abandonedCoupon:
-        return Icons.bookmark;
+        return const Color(0xFF6F3FCC);
       case NotificationType.birthday:
-        return Icons.cake;
+        return const Color(0xFFEC407A);
       case NotificationType.anniversary:
-        return Icons.favorite;
+        return const Color(0xFFEF4444);
       case NotificationType.milestoneReward:
-        return Icons.emoji_events;
+        return const Color(0xFFF59E0B);
       case NotificationType.weeklyDigest:
-        return Icons.summarize;
+        return const Color(0xFF00BCD4);
       case NotificationType.pointsExpiring:
-        return Icons.stars;
+        return const Color(0xFFFF6B6B);
       case NotificationType.custom:
-        return Icons.notifications;
+        return const Color(0xFF6F3FCC);
     }
   }
 
-  Color _getIconBackgroundColor(NotificationType type) {
+  IconData _iconFor(NotificationType type) {
     switch (type) {
       case NotificationType.welcome:
-        return Colors.green;
+        return Icons.celebration_rounded;
       case NotificationType.reEngagement:
-        return Colors.blue;
+        return Icons.waving_hand_rounded;
       case NotificationType.newDeal:
-        return Colors.orange;
+        return Icons.local_offer_rounded;
       case NotificationType.expiringCoupon:
-        return Colors.red;
+        return Icons.schedule_rounded;
       case NotificationType.abandonedCoupon:
-        return Colors.purple;
+        return Icons.bookmark_rounded;
       case NotificationType.birthday:
-        return Colors.pink;
+        return Icons.cake_rounded;
       case NotificationType.anniversary:
-        return Colors.red;
+        return Icons.favorite_rounded;
       case NotificationType.milestoneReward:
-        return Colors.amber;
+        return Icons.emoji_events_rounded;
       case NotificationType.weeklyDigest:
-        return Colors.teal;
+        return Icons.summarize_rounded;
       case NotificationType.pointsExpiring:
-        return Colors.deepOrange;
+        return Icons.stars_rounded;
       case NotificationType.custom:
-        return Colors.blueGrey;
+        return Icons.notifications_rounded;
     }
   }
 
   String _formatTime(DateTime dateTime) {
-    // API returns UTC time without 'Z' suffix, so we need to treat it as UTC
-    // and convert to local time for display
-    final utcDateTime = dateTime.isUtc ? dateTime : DateTime.utc(
-      dateTime.year,
-      dateTime.month,
-      dateTime.day,
-      dateTime.hour,
-      dateTime.minute,
-      dateTime.second,
-      dateTime.millisecond,
-      dateTime.microsecond,
-    );
+    final utcDateTime = dateTime.isUtc
+        ? dateTime
+        : DateTime.utc(
+            dateTime.year,
+            dateTime.month,
+            dateTime.day,
+            dateTime.hour,
+            dateTime.minute,
+            dateTime.second,
+            dateTime.millisecond,
+            dateTime.microsecond,
+          );
     final localDateTime = utcDateTime.toLocal();
     final now = DateTime.now();
     final difference = now.difference(localDateTime);

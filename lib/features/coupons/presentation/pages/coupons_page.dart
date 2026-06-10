@@ -314,7 +314,10 @@ class _CouponsViewState extends State<CouponsView> {
               onTap: _handleCouponTap,
             ),
           );
-        }, childCount: groups.length),
+        },
+          childCount: groups.length,
+          addAutomaticKeepAlives: false,
+        ),
       ),
     );
   }

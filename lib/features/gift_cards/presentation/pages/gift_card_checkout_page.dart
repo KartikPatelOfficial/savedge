@@ -1,61 +1,95 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_blurhash/flutter_blurhash.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get_it/get_it.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 
-import '../../../../core/injection/injection.dart';
-import '../../../auth/domain/repositories/auth_repository.dart';
-import '../../../auth/data/models/user_profile_models.dart';
-import '../../domain/entities/gift_card_entity.dart';
-import '../bloc/gift_cards_bloc.dart';
+import 'package:savedge/core/injection/injection.dart';
+import 'package:savedge/core/storage/secure_storage_service.dart';
+import 'package:savedge/core/widgets/login_prompt.dart';
+import 'package:savedge/features/auth/data/models/user_profile_models.dart';
+import 'package:savedge/features/auth/domain/repositories/auth_repository.dart';
+import 'package:savedge/features/gift_cards/data/models/gift_card_models.dart'
+    show GiftCardPriceBreakdown;
+import 'package:savedge/features/gift_cards/domain/entities/gift_card_entity.dart';
+import 'package:savedge/features/gift_cards/domain/repositories/gift_card_repository.dart';
+import 'package:savedge/features/gift_cards/presentation/bloc/gift_cards_bloc.dart';
+
+import '../theme/gc_tokens.dart';
+import '../widgets/gc_palette_extractor.dart';
+import '../widgets/gc_payment_method_tile.dart';
+import '../widgets/gc_price_breakdown_card.dart';
+import '../widgets/gc_quantity_stepper.dart';
 
 class GiftCardCheckoutPage extends StatelessWidget {
-  final GiftCardProductEntity product;
-  final double amount;
-
   const GiftCardCheckoutPage({
     super.key,
     required this.product,
     required this.amount,
+    this.themeSku,
   });
+
+  final GiftCardProductEntity product;
+  final double amount;
+  final String? themeSku;
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => getIt<GiftCardsBloc>(),
-      child: GiftCardCheckoutView(product: product, amount: amount),
+      create: (_) => getIt<GiftCardsBloc>(),
+      child: _CheckoutView(
+        product: product,
+        amount: amount,
+        themeSku: themeSku,
+      ),
     );
   }
 }
 
-class GiftCardCheckoutView extends StatefulWidget {
-  final GiftCardProductEntity product;
-  final double amount;
+enum _PayMethod { points, online }
 
-  const GiftCardCheckoutView({
-    super.key,
+class _CheckoutView extends StatefulWidget {
+  const _CheckoutView({
     required this.product,
     required this.amount,
+    required this.themeSku,
   });
 
+  final GiftCardProductEntity product;
+  final double amount;
+  final String? themeSku;
+
   @override
-  State<GiftCardCheckoutView> createState() => _GiftCardCheckoutViewState();
+  State<_CheckoutView> createState() => _CheckoutViewState();
 }
 
-class _GiftCardCheckoutViewState extends State<GiftCardCheckoutView> {
-  bool _isEmployee = false;
-  bool _isLoadingProfile = true;
-  UserProfileResponse3? _userProfile;
-  bool _payWithPoints = false;
+class _CheckoutViewState extends State<_CheckoutView> {
   Razorpay? _razorpay;
+  bool _loadingProfile = true;
+  UserProfileResponse3? _profile;
+  bool _isEmployee = false;
+  GiftCardPriceBreakdown? _breakdown;
+  _PayMethod _method = _PayMethod.online;
+  int _quantity = 1;
   int? _currentOrderId;
+  Color _accent = GcTokens.primary;
 
   @override
   void initState() {
     super.initState();
-    _loadUserProfile();
     _initRazorpay();
+    _loadProfile();
+    _accent = GcTokens.accentFor(widget.product.id);
+    _resolvePalette();
+  }
+
+  Future<void> _resolvePalette() async {
+    final picked = await GcPaletteExtractor.resolve(
+      widget.product.heroImageUrl,
+      _accent,
+    );
+    if (mounted && picked != _accent) setState(() => _accent = picked);
   }
 
   @override
@@ -71,20 +105,51 @@ class _GiftCardCheckoutViewState extends State<GiftCardCheckoutView> {
     _razorpay!.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
   }
 
-  Future<void> _loadUserProfile() async {
+  Future<void> _loadProfile() async {
     try {
-      final authRepository = getIt<AuthRepository>();
-      final profile = await authRepository.getCurrentUserProfile();
+      final repo = getIt<AuthRepository>();
+      final profile = await repo.getCurrentUserProfile();
       setState(() {
-        _userProfile = profile;
+        _profile = profile;
         _isEmployee = profile.isEmployee;
-        _payWithPoints = _isEmployee;
-        _isLoadingProfile = false;
+        _loadingProfile = false;
+        if (_isEmployee && (profile.pointsBalance) > 0) {
+          _method = _PayMethod.points;
+        }
       });
-    } catch (e) {
-      setState(() => _isLoadingProfile = false);
+      _fetchBreakdown();
+    } catch (_) {
+      setState(() => _loadingProfile = false);
+      _fetchBreakdown();
     }
   }
+
+  void _fetchBreakdown() {
+    final usePoints = _method == _PayMethod.points;
+    final pts = usePoints ? (_profile?.pointsBalance ?? 0) : 0;
+    context.read<GiftCardsBloc>().add(
+          LoadPriceBreakdown(
+            productId: widget.product.id,
+            amount: widget.amount,
+            pointsToUse: pts,
+            quantity: _quantity,
+          ),
+        );
+  }
+
+  void _selectMethod(_PayMethod m) {
+    if (_method == m) return;
+    setState(() => _method = m);
+    _fetchBreakdown();
+  }
+
+  void _setQuantity(int q) {
+    if (q < 1 || q > 5 || q == _quantity) return;
+    setState(() => _quantity = q);
+    _fetchBreakdown();
+  }
+
+  // ── Razorpay handlers (preserved verbatim from original) ───────────────
 
   void _handlePaymentSuccess(PaymentSuccessResponse response) {
     if (_currentOrderId != null &&
@@ -105,9 +170,8 @@ class _GiftCardCheckoutViewState extends State<GiftCardCheckoutView> {
   void _handlePaymentError(PaymentFailureResponse response) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content:
-            Text(response.message ?? 'Payment failed. Please try again.'),
-        backgroundColor: const Color(0xFFEF4444),
+        content: Text(response.message ?? 'Payment failed. Please try again.'),
+        backgroundColor: GcTokens.danger,
       ),
     );
   }
@@ -116,7 +180,6 @@ class _GiftCardCheckoutViewState extends State<GiftCardCheckoutView> {
 
   void _openRazorpayCheckout(GiftCardRazorpayOrderCreated state) {
     _currentOrderId = state.orderId;
-
     final options = {
       'key': state.razorpayKeyId,
       'amount': state.razorpayAmountInPaise,
@@ -124,24 +187,37 @@ class _GiftCardCheckoutViewState extends State<GiftCardCheckoutView> {
       'order_id': state.razorpayOrderId,
       'name': 'SavEdge',
       'description':
-          '${state.productName} - ₹${state.requestedAmount.toStringAsFixed(0)}',
+          '${state.productName} - \u20B9${state.requestedAmount.toStringAsFixed(0)}${_quantity > 1 ? " x $_quantity" : ""}',
       'prefill': {
-        'contact': _userProfile?.phoneNumber ?? '',
-        'email': _userProfile?.email ?? '',
+        'contact': _profile?.phoneNumber ?? '',
+        'email': _profile?.email ?? '',
       },
       'theme': {'color': '#6F3FCC'},
     };
-
     _razorpay?.open(options);
   }
 
-  void _handlePurchase() {
-    if (_payWithPoints) {
+  Future<void> _onPay() async {
+    final secureStorage = getIt<SecureStorageService>();
+    final isAuth = await secureStorage.isAuthenticated();
+    if (!isAuth) {
+      if (!mounted) return;
+      LoginPrompt.show(context, message: 'Please sign in to purchase gift cards');
+      return;
+    }
+
+    final usePoints = _method == _PayMethod.points;
+    final pts = usePoints ? (_profile?.pointsBalance ?? 0) : 0;
+    final breakdown = _breakdown;
+
+    if (usePoints && breakdown != null && breakdown.finalPayableAmount <= 0) {
       context.read<GiftCardsBloc>().add(
             CreateGiftCardOrder(
               giftCardProductId: widget.product.id,
               amount: widget.amount,
               paymentMethod: GiftCardPaymentMethodEntity.points,
+              quantity: _quantity,
+              themeSku: widget.themeSku,
             ),
           );
     } else {
@@ -149,337 +225,362 @@ class _GiftCardCheckoutViewState extends State<GiftCardCheckoutView> {
             CreateGiftCardPaymentOrder(
               giftCardProductId: widget.product.id,
               amount: widget.amount,
+              pointsToUse: pts,
+              quantity: _quantity,
+              themeSku: widget.themeSku,
             ),
           );
     }
   }
 
+  // ── UI ────────────────────────────────────────────────────────────────
+
   @override
   Widget build(BuildContext context) {
-    final discountAmount = widget.product.calculateDiscount(widget.amount);
-    final payableAmount = widget.product.calculatePayable(widget.amount);
+    final p = widget.product;
+    final currency = p.currencySymbol ?? '\u20B9';
+    final pointsBalance = _profile?.pointsBalance ?? 0;
+    final pointsAvailable = _isEmployee && pointsBalance > 0;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: GcTokens.background,
       appBar: AppBar(
+        backgroundColor: GcTokens.background,
+        surfaceTintColor: GcTokens.background,
         elevation: 0,
-        backgroundColor: const Color(0xFF6F3FCC),
-        surfaceTintColor: const Color(0xFF6F3FCC),
-        systemOverlayStyle: SystemUiOverlayStyle.light,
-        leading: IconButton(
-          onPressed: () => Navigator.pop(context),
-          icon: const Icon(Icons.arrow_back_ios_rounded,
-              color: Colors.white, size: 18),
-        ),
+        systemOverlayStyle: SystemUiOverlayStyle.dark,
         title: const Text(
           'Checkout',
           style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
+            fontSize: 17,
+            fontWeight: FontWeight.w900,
+            color: GcTokens.textPrimary,
           ),
         ),
         centerTitle: true,
+        leading: IconButton(
+          onPressed: () => Navigator.pop(context),
+          icon: const Icon(
+            Icons.arrow_back_ios_new_rounded,
+            size: 18,
+            color: GcTokens.textPrimary,
+          ),
+        ),
       ),
-      body: BlocListener<GiftCardsBloc, GiftCardsState>(
+      body: BlocConsumer<GiftCardsBloc, GiftCardsState>(
         listener: (context, state) {
           if (state is GiftCardOrderCreated) {
             _showSuccessDialog(context, state.order);
           } else if (state is GiftCardOrderError) {
-            _showError(context, state.message);
+            _showError(state.message);
           } else if (state is GiftCardRazorpayOrderCreated) {
-            _openRazorpayCheckout(state);
+            if (state.razorpayOrderId.isEmpty) {
+              _currentOrderId = state.orderId;
+              _resolveAndShowSuccess();
+            } else {
+              _openRazorpayCheckout(state);
+            }
           } else if (state is GiftCardRazorpayOrderError) {
-            _showError(context, state.message);
+            _showError(state.message);
           } else if (state is GiftCardPaymentVerified) {
-            _showSuccessDialog(context, state.order);
+            if (state.success) {
+              _resolveAndShowSuccess(message: state.message);
+            } else {
+              _showFailureDialog(state.message);
+            }
           } else if (state is GiftCardPaymentError) {
-            _showError(context, state.message);
+            _showError(state.message);
+          } else if (state is PriceBreakdownLoaded) {
+            setState(() => _breakdown = state.breakdown);
           }
         },
-        child: _isLoadingProfile
-            ? const Center(
-                child: CircularProgressIndicator(color: Color(0xFF6F3FCC)))
-            : Column(
-                children: [
-                  // Purple header summary
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
-                    decoration: const BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [Color(0xFF6F3FCC), Color(0xFF5B21B6)],
+        builder: (context, state) {
+          if (_loadingProfile) {
+            return const Center(
+              child: CircularProgressIndicator(color: GcTokens.primary),
+            );
+          }
+
+          final breakdown = _breakdown;
+          final payable = breakdown?.finalPayableAmount ??
+              widget.product.calculatePayable(widget.amount);
+          final discount = breakdown?.discountAmount ??
+              widget.product.calculateDiscount(widget.amount);
+          final pointsDiscount = breakdown?.pointsDiscount ?? 0;
+          final isLoading = state is GiftCardOrderCreating ||
+              state is GiftCardRazorpayOrderCreating ||
+              state is GiftCardPaymentVerifying;
+
+          return Column(
+            children: [
+              Expanded(
+                child: ListView(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+                  children: [
+                    _buildOrderSummary(p, currency),
+                    const SizedBox(height: 18),
+                    if (pointsAvailable)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: GcPaymentMethodTile(
+                          icon: Icons.stars_rounded,
+                          title: 'Pay with magicPoints',
+                          subtitle: 'Balance: $pointsBalance pts',
+                          selected: _method == _PayMethod.points,
+                          onTap: () => _selectMethod(_PayMethod.points),
+                          accent: _accent,
+                        ),
                       ),
-                      borderRadius: BorderRadius.vertical(
-                        bottom: Radius.circular(24),
-                      ),
+                    GcPaymentMethodTile(
+                      icon: Icons.credit_card_rounded,
+                      title: 'Pay online',
+                      subtitle: 'Cards, UPI, Net banking, Wallets',
+                      selected: _method == _PayMethod.online,
+                      onTap: () => _selectMethod(_PayMethod.online),
+                      accent: _accent,
                     ),
-                    child: Column(
-                      children: [
-                        Text(
-                          '${widget.product.currencySymbol ?? '₹'}${widget.amount.toStringAsFixed(0)}',
-                          style: const TextStyle(
-                            fontSize: 36,
-                            fontWeight: FontWeight.w800,
-                            color: Colors.white,
-                          ),
-                        ),
-                        Text(
-                          widget.product.name,
-                          style: TextStyle(
-                            fontSize: 15,
-                            color: Colors.white.withOpacity(0.8),
-                          ),
-                        ),
-                        if (widget.product.hasDiscount) ...[
-                          const SizedBox(height: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF059669),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              'Save ₹${discountAmount.toStringAsFixed(0)}',
-                              style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ],
+                    const SizedBox(height: 18),
+                    GcQuantityStepper(
+                      value: _quantity,
+                      onChanged: _setQuantity,
+                      accent: _accent,
+                    ),
+                    const SizedBox(height: 18),
+                    GcPriceBreakdownCard(
+                      amount: widget.amount,
+                      discountPercentage: widget.product.discountPercentage ?? 0,
+                      discountAmount: discount,
+                      pointsDiscount: pointsDiscount,
+                      totalPayable: payable,
+                      currencySymbol: currency,
+                      quantity: _quantity,
+                      accent: _accent,
+                    ),
+                  ],
+                ),
+              ),
+              _buildBottomBar(
+                isLoading: isLoading,
+                payable: payable,
+                currency: currency,
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildOrderSummary(GiftCardProductEntity p, String currency) {
+    final accent = _accent;
+    final bg = Color.lerp(_accent, Colors.white, 0.85)!;
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(GcTokens.rCard),
+        border: Border.all(color: const Color(0xFFEFEAFB)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 70,
+            height: 70,
+            decoration: BoxDecoration(
+              color: bg,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(14),
+              child: p.squareImageUrl != null
+                  ? CachedNetworkImage(
+                      imageUrl: p.squareImageUrl!,
+                      fit: BoxFit.cover,
+                      placeholder: (_, __) => p.blurHash != null
+                          ? ClipRRect(
+                              borderRadius: BorderRadius.circular(14),
+                              child: BlurHash(hash: p.blurHash!),
+                            )
+                          : Container(color: bg),
+                      errorWidget: (_, __, ___) => Container(color: bg),
+                    )
+                  : Container(color: bg),
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  p.brandName ?? p.name,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w900,
+                    color: GcTokens.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'E-Voucher · Instant delivery',
+                  style: TextStyle(
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w600,
+                    color: accent,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 5,
+                  ),
+                  decoration: BoxDecoration(
+                    color: accent.withValues(alpha: 0.10),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    '$currency${widget.amount.toStringAsFixed(0)}',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w900,
+                      color: accent,
                     ),
                   ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
-                  Expanded(
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.all(20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Price breakdown
-                          Container(
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFFAFAFA),
-                              borderRadius: BorderRadius.circular(14),
-                              border: Border.all(color: Colors.grey[200]!),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  'Price Breakdown',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                    color: Color(0xFF1A202C),
-                                  ),
-                                ),
-                                const SizedBox(height: 12),
-                                _buildRow('Gift Card Value',
-                                    '₹${widget.amount.toStringAsFixed(0)}'),
-                                if (widget.product.hasDiscount) ...[
-                                  const SizedBox(height: 6),
-                                  _buildRow(
-                                    'Discount (${widget.product.discountPercentage!.toStringAsFixed(0)}%)',
-                                    '-₹${discountAmount.toStringAsFixed(0)}',
-                                    valueColor: const Color(0xFF059669),
-                                  ),
-                                ],
-                                const Divider(height: 20),
-                                _buildRow(
-                                  'Total',
-                                  '₹${payableAmount.toStringAsFixed(0)}',
-                                  isBold: true,
-                                  valueColor: const Color(0xFF6F3FCC),
-                                ),
-                              ],
-                            ),
+  Widget _buildBottomBar({
+    required bool isLoading,
+    required double payable,
+    required String currency,
+  }) {
+    final isPointsOnly = _method == _PayMethod.points && payable <= 0;
+    final label = isPointsOnly
+        ? 'Pay with Points'
+        : 'Pay $currency${payable.toStringAsFixed(0)}';
+
+    return Material(
+      color: Colors.white,
+      elevation: 12,
+      shadowColor: Colors.black.withValues(alpha: 0.08),
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                width: double.infinity,
+                height: 56,
+                child: ElevatedButton(
+                  onPressed: isLoading ? null : _onPay,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: _accent,
+                    disabledBackgroundColor:
+                        _accent.withValues(alpha: 0.45),
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    padding: EdgeInsets.zero,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                  child: isLoading
+                      ? const SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2.4,
                           ),
-                          const SizedBox(height: 20),
-
-                          // Payment method
-                          if (_isEmployee) ...[
-                            const Text(
-                              'Payment Method',
-                              style: TextStyle(
+                        )
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.lock_rounded,
+                              size: 16,
+                              color: Colors.white,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              label,
+                              style: const TextStyle(
                                 fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF1A202C),
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 0.2,
                               ),
                             ),
-                            const SizedBox(height: 12),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: _buildPaymentOption(
-                                    isSelected: _payWithPoints,
-                                    icon: Icons.stars_rounded,
-                                    title: 'Points',
-                                    subtitle: _userProfile != null
-                                        ? '${_userProfile!.pointsBalance} available'
-                                        : '',
-                                    onTap: () =>
-                                        setState(() => _payWithPoints = true),
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: _buildPaymentOption(
-                                    isSelected: !_payWithPoints,
-                                    icon: Icons.payment_rounded,
-                                    title: 'Pay Online',
-                                    subtitle: 'Credit/Debit/UPI',
-                                    onTap: () =>
-                                        setState(() => _payWithPoints = false),
-                                  ),
-                                ),
-                              ],
+                            const SizedBox(width: 10),
+                            const Icon(
+                              Icons.arrow_forward_rounded,
+                              size: 18,
+                              color: Colors.white,
                             ),
                           ],
-                        ],
-                      ),
-                    ),
-                  ),
-
-                  // Bottom CTA
-                  SafeArea(
-                    child: Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        border: Border(
-                          top: BorderSide(color: Color(0xFFF3F4F6), width: 1.5),
                         ),
-                      ),
-                      child: BlocBuilder<GiftCardsBloc, GiftCardsState>(
-                        builder: (context, state) {
-                          final isLoading = state is GiftCardOrderCreating ||
-                              state is GiftCardRazorpayOrderCreating ||
-                              state is GiftCardPaymentVerifying;
-
-                          return ElevatedButton(
-                            onPressed: isLoading ? null : _handlePurchase,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF6F3FCC),
-                              foregroundColor: Colors.white,
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 16),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(14),
-                              ),
-                              elevation: 0,
-                              minimumSize:
-                                  const Size(double.infinity, 52),
-                            ),
-                            child: isLoading
-                                ? const SizedBox(
-                                    height: 20,
-                                    width: 20,
-                                    child: CircularProgressIndicator(
-                                      color: Colors.white,
-                                      strokeWidth: 2,
-                                    ),
-                                  )
-                                : Text(
-                                    _payWithPoints
-                                        ? 'Pay ${payableAmount.toStringAsFixed(0)} Points'
-                                        : 'Pay ₹${payableAmount.toStringAsFixed(0)}',
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                          );
-                        },
-                      ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.verified_user_rounded,
+                    size: 12,
+                    color: GcTokens.textTertiary.withValues(alpha: 0.7),
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    '256-bit secure  ·  Powered by Razorpay',
+                    style: TextStyle(
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w700,
+                      color: GcTokens.textTertiary.withValues(alpha: 0.85),
+                      letterSpacing: 0.2,
                     ),
                   ),
                 ],
               ),
+            ],
+          ),
+        ),
       ),
     );
   }
 
-  Widget _buildRow(String label, String value,
-      {bool isBold = false, Color? valueColor}) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: isBold ? 15 : 14,
-            fontWeight: isBold ? FontWeight.w700 : FontWeight.w500,
-            color: isBold ? const Color(0xFF1A202C) : Colors.grey[600],
-          ),
-        ),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: isBold ? 16 : 14,
-            fontWeight: isBold ? FontWeight.w700 : FontWeight.w600,
-            color: valueColor ?? const Color(0xFF1A202C),
-          ),
-        ),
-      ],
+  // ── Dialogs / errors ───────────────────────────────────────────────────
+
+  void _showError(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(msg), backgroundColor: GcTokens.danger),
     );
   }
 
-  Widget _buildPaymentOption({
-    required bool isSelected,
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? const Color(0xFF6F3FCC).withOpacity(0.08)
-              : const Color(0xFFFAFAFA),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isSelected ? const Color(0xFF6F3FCC) : Colors.grey[200]!,
-            width: isSelected ? 2 : 1,
-          ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(icon,
-                size: 28,
-                color: isSelected
-                    ? const Color(0xFF6F3FCC)
-                    : Colors.grey[600]),
-            const SizedBox(height: 8),
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-                color: isSelected
-                    ? const Color(0xFF6F3FCC)
-                    : const Color(0xFF1A202C),
-              ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              subtitle,
-              style: TextStyle(fontSize: 12, color: Colors.grey[500]),
-            ),
-          ],
-        ),
-      ),
+  Future<void> _resolveAndShowSuccess({String? message}) async {
+    GiftCardOrderEntity? order;
+    if (_currentOrderId != null) {
+      try {
+        final result =
+            await getIt<GiftCardRepository>().getOrder(_currentOrderId!);
+        result.fold((_) => null, (o) => order = o);
+      } catch (_) {
+        // ignore — fall through to no-order success state
+      }
+    }
+    if (!mounted) return;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => _SuccessDialog(message: message, order: order),
     );
   }
 
@@ -487,54 +588,72 @@ class _GiftCardCheckoutViewState extends State<GiftCardCheckoutView> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      builder: (_) => _SuccessDialog(
+        order: order,
+        message: order.isCompleted
+            ? 'Your gift card is ready. Tap below to reveal it.'
+            : 'Your gift card order #${order.id} is being processed.',
+      ),
+    );
+  }
+
+  void _showFailureDialog(String message) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => AlertDialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 60,
-              height: 60,
+              width: 64,
+              height: 64,
               decoration: BoxDecoration(
-                color: const Color(0xFF059669).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(30),
+                color: GcTokens.danger.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(32),
               ),
-              child: const Icon(Icons.check_circle_rounded,
-                  size: 40, color: Color(0xFF059669)),
+              child: const Icon(
+                Icons.error_outline_rounded,
+                color: GcTokens.danger,
+                size: 36,
+              ),
             ),
-            const SizedBox(height: 16),
-            Text(
-              order.isCompleted
-                  ? 'Gift Card Issued!'
-                  : 'Order Placed Successfully!',
-              style: const TextStyle(
+            const SizedBox(height: 14),
+            const Text(
+              'Order Failed',
+              style: TextStyle(
                 fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF1A202C),
+                fontWeight: FontWeight.w900,
+                color: GcTokens.textPrimary,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             Text(
-              order.isCompleted
-                  ? 'Your gift card is ready. Check your orders to view the card details.'
-                  : 'Your gift card order #${order.id} is being processed.',
-              style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+              message,
               textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: GcTokens.textTertiary,
+                fontSize: 13,
+              ),
             ),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.pop(context); // Close dialog
-              Navigator.popUntil(context, (route) => route.isFirst);
+              Navigator.pop(context);
+              _popToGiftCardsListing(context);
             },
             child: const Text('OK'),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              Navigator.popUntil(context, (route) => route.isFirst);
+              _popToGiftCardsListing(context);
               Navigator.pushNamed(context, '/gift-card-orders');
             },
             child: const Text('View Orders'),
@@ -543,13 +662,94 @@ class _GiftCardCheckoutViewState extends State<GiftCardCheckoutView> {
       ),
     );
   }
+}
 
-  void _showError(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: const Color(0xFFEF4444),
+void _popToGiftCardsListing(BuildContext context) {
+  Navigator.popUntil(
+    context,
+    (r) => r.settings.name == '/gift-cards' || r.isFirst,
+  );
+}
+
+class _SuccessDialog extends StatelessWidget {
+  const _SuccessDialog({this.message, this.order});
+  final String? message;
+  final GiftCardOrderEntity? order;
+
+  bool get _canShowCard =>
+      order != null &&
+      (order!.woohooCardNumber != null &&
+          order!.woohooCardNumber!.isNotEmpty);
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 72,
+            height: 72,
+            decoration: BoxDecoration(
+              color: GcTokens.success.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(36),
+            ),
+            child: const Icon(
+              Icons.check_circle_rounded,
+              color: GcTokens.success,
+              size: 42,
+            ),
+          ),
+          const SizedBox(height: 14),
+          const Text(
+            'Order placed!',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w900,
+              color: GcTokens.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            message ??
+                'Your gift card is being issued. Check your orders for details.',
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: GcTokens.textTertiary,
+              fontSize: 13,
+              height: 1.4,
+            ),
+          ),
+        ],
       ),
+      actionsPadding: const EdgeInsets.symmetric(horizontal: 12),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context);
+            _popToGiftCardsListing(context);
+          },
+          child: const Text('OK'),
+        ),
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context);
+            _popToGiftCardsListing(context);
+            if (_canShowCard) {
+              Navigator.pushNamed(
+                context,
+                '/gift-card-view',
+                arguments: order,
+              );
+            } else {
+              Navigator.pushNamed(context, '/gift-card-orders');
+            }
+          },
+          child: Text(_canShowCard ? 'Show Card' : 'View Orders'),
+        ),
+      ],
     );
   }
 }

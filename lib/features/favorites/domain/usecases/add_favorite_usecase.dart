@@ -27,6 +27,14 @@ class AddFavoriteUseCase extends UseCase<void, AddFavoriteParams> {
                 )
                 .imageUrl
           : null,
+      blurHash: params.vendor.images.isNotEmpty
+          ? params.vendor.images
+                .firstWhere(
+                  (img) => img.isPrimary,
+                  orElse: () => params.vendor.images.first,
+                )
+                .blurHash
+          : null,
       address: params.vendor.address,
       city: params.vendor.city,
       state: params.vendor.state,

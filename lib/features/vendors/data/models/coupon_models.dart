@@ -44,6 +44,7 @@ class CouponResponse {
           : null,
       specialOfferPriority: json['specialOfferPriority'] as int? ?? 0,
       specialOfferImageUrl: json['specialOfferImageUrl'] as String?,
+      specialOfferBlurHash: json['specialOfferBlurHash'] as String?,
       occasionType: _mapOccasionTypeFromInt(json['occasionType'] as int? ?? 0),
       daysBeforeOccasion: json['daysBeforeOccasion'] as int?,
       daysAfterOccasion: json['daysAfterOccasion'] as int?,
@@ -83,6 +84,7 @@ class CouponResponse {
     this.specialOfferEndDate,
     this.specialOfferPriority = 0,
     this.specialOfferImageUrl,
+    this.specialOfferBlurHash,
     this.occasionType = CouponOccasionType.regular,
     this.daysBeforeOccasion,
     this.daysAfterOccasion,
@@ -121,6 +123,7 @@ class CouponResponse {
   final DateTime? specialOfferEndDate;
   final int specialOfferPriority;
   final String? specialOfferImageUrl;
+  final String? specialOfferBlurHash;
   final CouponOccasionType occasionType;
   final int? daysBeforeOccasion;
   final int? daysAfterOccasion;

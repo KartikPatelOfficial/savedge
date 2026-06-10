@@ -231,6 +231,7 @@ class VendorsRepositoryImpl implements VendorsRepository {
       id: dto.id,
       imageUrl: dto.imageUrl,
       altText: dto.altText,
+      blurHash: dto.blurHash,
       displayOrder: dto.displayOrder,
       isPrimary: dto.isPrimary,
       // Use the enum's canonical name ('logo', 'gallery', …). It decodes
