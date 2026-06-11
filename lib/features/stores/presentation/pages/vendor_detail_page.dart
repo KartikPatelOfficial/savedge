@@ -184,21 +184,42 @@ class _VendorDetailViewState extends State<_VendorDetailView> {
 
   /// Everything except the logo, gallery shots first, stable order.
   List<VendorImage> get _displayImages {
-    final images = widget.vendor.images
+    var images = widget.vendor.images
         .where((img) => img.imageType.toLowerCase() != 'logo')
-        .toList()
-      ..sort((a, b) {
-        final aGallery = a.imageType.toLowerCase() == 'gallery' ? 0 : 1;
-        final bGallery = b.imageType.toLowerCase() == 'gallery' ? 0 : 1;
-        if (aGallery != bGallery) return aGallery - bGallery;
-        return a.displayOrder.compareTo(b.displayOrder);
-      });
+        .toList();
+
+    // Vendor media frequently arrives with every image mis-typed as 'logo'
+    // (the API returns numeric type 1 for all of them), which would leave the
+    // carousel empty. When the type filter yields nothing, fall back to the
+    // reliable signal: the primary image is the logo, everything else is a
+    // gallery shot. This is a no-op for correctly-typed vendors.
+    if (images.isEmpty) {
+      images = widget.vendor.images.where((img) => !img.isPrimary).toList();
+    }
+
+    images.sort((a, b) {
+      final aGallery = a.imageType.toLowerCase() == 'gallery' ? 0 : 1;
+      final bGallery = b.imageType.toLowerCase() == 'gallery' ? 0 : 1;
+      if (aGallery != bGallery) return aGallery - bGallery;
+      return a.displayOrder.compareTo(b.displayOrder);
+    });
     return images;
   }
 
   String? get _logoUrl {
-    for (final img in widget.vendor.images) {
+    final images = widget.vendor.images;
+    // Prefer the primary logo so it stays consistent with _displayImages,
+    // which treats the primary image as the logo when types are unreliable.
+    for (final img in images) {
+      if (img.imageType.toLowerCase() == 'logo' && img.isPrimary) {
+        return img.imageUrl;
+      }
+    }
+    for (final img in images) {
       if (img.imageType.toLowerCase() == 'logo') return img.imageUrl;
+    }
+    for (final img in images) {
+      if (img.isPrimary) return img.imageUrl;
     }
     return null;
   }

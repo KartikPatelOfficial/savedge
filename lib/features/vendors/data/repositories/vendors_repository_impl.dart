@@ -3,6 +3,7 @@ import 'package:savedge/core/error/error_message_mapper.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:savedge/core/error/failures.dart';
+import 'package:savedge/core/utils/extensions.dart';
 import 'package:savedge/features/vendors/data/datasources/vendors_remote_data_source.dart';
 import 'package:savedge/features/vendors/data/models/coupon_models.dart';
 import 'package:savedge/features/vendors/data/models/vendor_models.dart';
@@ -232,7 +233,7 @@ class VendorsRepositoryImpl implements VendorsRepository {
   VendorImage _mapVendorImageDtoToEntity(VendorImageDto dto) {
     return VendorImage(
       id: dto.id,
-      imageUrl: dto.imageUrl,
+      imageUrl: dto.imageUrl.toSecureImageUrl,
       altText: dto.altText,
       blurHash: dto.blurHash,
       displayOrder: dto.displayOrder,

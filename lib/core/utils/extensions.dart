@@ -69,4 +69,18 @@ extension StringExtensions on String {
     if (isEmpty) return this;
     return '${this[0].toUpperCase()}${substring(1)}';
   }
+
+  /// Upgrade a cleartext `http://` URL to `https://`.
+  ///
+  /// Some image URLs are persisted with an `http://` scheme (e.g. the
+  /// ImageProxy links returned for vendor media). Android 9+ blocks cleartext
+  /// traffic by default, so those requests fail before the server's 301 → HTTPS
+  /// redirect can fire and images silently fall back to a placeholder.
+  /// The host already serves the same path over HTTPS, so rewrite the scheme
+  /// up front. Protocol-relative (`//host/…`) URLs are also normalised.
+  String get toSecureImageUrl {
+    if (startsWith('http://')) return replaceFirst('http://', 'https://');
+    if (startsWith('//')) return 'https:$this';
+    return this;
+  }
 }
