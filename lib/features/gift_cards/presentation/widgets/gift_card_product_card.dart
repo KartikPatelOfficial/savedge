@@ -55,14 +55,18 @@ class GiftCardProductCard extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Stack(
+                      fit: StackFit.expand,
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.all(18),
-                          child: Center(
-                            child: _ProductImage(
-                              product: product,
-                              accent: brand == accent ? accent : brand,
-                            ),
+                        // Full-bleed gift-card art (base image), rounded to match
+                        // the card's top corners. Center-cropped so the brand —
+                        // which sits centered on the artwork — is always kept.
+                        ClipRRect(
+                          borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(GcTokens.rCard),
+                          ),
+                          child: _ProductImage(
+                            product: product,
+                            accent: brand == accent ? accent : brand,
                           ),
                         ),
                         if (product.hasDiscount)
@@ -200,8 +204,13 @@ class _ProductImage extends StatelessWidget {
     if (!_hasUrl) return _fallback();
     return CachedNetworkImage(
       imageUrl: _bestUrl!,
+      // Mobile (square) variant, contained so the whole card is always visible and
+      // never cropped. Full-bleed area (no inner padding) keeps it from looking shrunk.
       fit: BoxFit.contain,
-      memCacheWidth: 300,
+      width: double.infinity,
+      height: double.infinity,
+      alignment: Alignment.center,
+      memCacheWidth: 600,
       placeholder: (_, __) => product.blurHash != null
           ? BlurHash(hash: product.blurHash!)
           : _fallback(),

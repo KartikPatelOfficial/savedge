@@ -54,21 +54,20 @@ class GcCategoryGridSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: 6,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
-        childAspectRatio: 1,
-      ),
-      itemBuilder: (_, __) => const GcSkeleton(
-        width: double.infinity,
-        height: double.infinity,
-        radius: 18,
+    // Mirrors the wrapping pill set in GcCategoryGrid.
+    return const Padding(
+      padding: EdgeInsets.fromLTRB(16, 2, 16, 4),
+      child: Wrap(
+        spacing: 8,
+        runSpacing: 8,
+        children: [
+          GcSkeleton(width: 64, height: 38, radius: 999),
+          GcSkeleton(width: 112, height: 38, radius: 999),
+          GcSkeleton(width: 96, height: 38, radius: 999),
+          GcSkeleton(width: 124, height: 38, radius: 999),
+          GcSkeleton(width: 88, height: 38, radius: 999),
+          GcSkeleton(width: 80, height: 38, radius: 999),
+        ],
       ),
     );
   }
