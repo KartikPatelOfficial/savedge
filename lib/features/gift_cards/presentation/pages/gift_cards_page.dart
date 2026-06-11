@@ -1,26 +1,26 @@
+import 'dart:async';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-import '../../../../core/injection/injection.dart';
-import '../../../../core/storage/secure_storage_service.dart';
-import '../../../../core/widgets/login_prompt.dart';
-import '../../data/services/gift_card_favorites_service.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-
-import '../../domain/entities/gift_card_entity.dart';
-import '../bloc/gift_cards_bloc.dart';
-import '../theme/gc_tokens.dart';
-import '../widgets/gc_category_grid.dart';
-import '../widgets/gc_empty_state.dart';
-import '../widgets/gc_hero_carousel.dart';
-import '../widgets/gc_quick_filter_chips.dart';
-import '../widgets/gc_search_bar.dart';
-import '../widgets/gc_section_header.dart';
-import '../widgets/gc_skeleton.dart';
-import '../widgets/gc_palette_extractor.dart';
-import '../widgets/gc_trending_brand_tile.dart';
-import '../widgets/gift_card_product_card.dart';
+import 'package:savedge/core/injection/injection.dart';
+import 'package:savedge/core/storage/secure_storage_service.dart';
+import 'package:savedge/core/widgets/login_prompt.dart';
+import 'package:savedge/features/gift_cards/data/services/gift_card_favorites_service.dart';
+import 'package:savedge/features/gift_cards/domain/entities/gift_card_entity.dart';
+import 'package:savedge/features/gift_cards/presentation/bloc/gift_cards_bloc.dart';
+import 'package:savedge/features/gift_cards/presentation/theme/gc_tokens.dart';
+import 'package:savedge/features/gift_cards/presentation/widgets/gc_category_grid.dart';
+import 'package:savedge/features/gift_cards/presentation/widgets/gc_empty_state.dart';
+import 'package:savedge/features/gift_cards/presentation/widgets/gc_hero_carousel.dart';
+import 'package:savedge/features/gift_cards/presentation/widgets/gc_palette_extractor.dart';
+import 'package:savedge/features/gift_cards/presentation/widgets/gc_quick_filter_chips.dart';
+import 'package:savedge/features/gift_cards/presentation/widgets/gc_search_bar.dart';
+import 'package:savedge/features/gift_cards/presentation/widgets/gc_section_header.dart';
+import 'package:savedge/features/gift_cards/presentation/widgets/gc_skeleton.dart';
+import 'package:savedge/features/gift_cards/presentation/widgets/gc_trending_brand_tile.dart';
+import 'package:savedge/features/gift_cards/presentation/widgets/gift_card_product_card.dart';
 
 class GiftCardsPage extends StatelessWidget {
   const GiftCardsPage({super.key});
@@ -32,7 +32,12 @@ class GiftCardsPage extends StatelessWidget {
         ..add(const LoadGiftCardCategories())
         ..add(const LoadHotDeals())
         ..add(const LoadGiftCardProducts())
-        ..add(const LoadGiftCardOrders(status: GiftCardOrderStatusEntity.completed, pageSize: 10)),
+        ..add(
+          const LoadGiftCardOrders(
+            status: GiftCardOrderStatusEntity.completed,
+            pageSize: 10,
+          ),
+        ),
       child: const _GiftCardsView(),
     );
   }
@@ -48,6 +53,7 @@ class _GiftCardsView extends StatefulWidget {
 class _GiftCardsViewState extends State<_GiftCardsView> {
   final _searchController = TextEditingController();
   final _favorites = getIt<GiftCardFavoritesService>();
+  Timer? _searchDebounce;
 
   List<GiftCardCategoryEntity> _categories = [];
   List<GiftCardProductEntity> _products = [];
@@ -56,12 +62,17 @@ class _GiftCardsViewState extends State<_GiftCardsView> {
 
   GiftCardCategoryEntity? _selectedCategory;
   GcQuickFilter? _quickFilter;
+  String? _activeSearchTerm;
 
   bool _loadingCategories = true;
   bool _loadingProducts = true;
 
+  String get _searchTerm => _searchController.text.trim();
+  bool get _isSearchMode => _searchTerm.isNotEmpty;
+
   @override
   void dispose() {
+    _searchDebounce?.cancel();
     _searchController.dispose();
     super.dispose();
   }
@@ -80,9 +91,7 @@ class _GiftCardsViewState extends State<_GiftCardsView> {
           list = list.where((p) => p.minPrice < 500);
           break;
         case GcQuickFilter.from500to2000:
-          list = list.where(
-            (p) => p.minPrice >= 500 && p.minPrice <= 2000,
-          );
+          list = list.where((p) => p.minPrice >= 500 && p.minPrice <= 2000);
           break;
         case GcQuickFilter.above2000:
           list = list.where((p) => p.minPrice > 2000);
@@ -96,20 +105,85 @@ class _GiftCardsViewState extends State<_GiftCardsView> {
     return list.toList();
   }
 
+  void _loadProducts({String? searchTerm}) {
+    final normalizedSearchTerm = searchTerm?.trim();
+    final hasSearch =
+        normalizedSearchTerm != null && normalizedSearchTerm.isNotEmpty;
+    context.read<GiftCardsBloc>().add(
+      LoadGiftCardProducts(
+        searchTerm: hasSearch ? normalizedSearchTerm : null,
+        categoryId: hasSearch ? null : _selectedCategory?.id,
+      ),
+    );
+  }
+
   void _onSearchSubmitted(String value) {
-    context
-        .read<GiftCardsBloc>()
-        .add(LoadGiftCardProducts(
-          searchTerm: value.trim().isEmpty ? null : value.trim(),
-          categoryId: _selectedCategory?.id,
-        ));
+    final term = value.trim();
+    _searchDebounce?.cancel();
+    FocusScope.of(context).unfocus();
+
+    if (term.isEmpty) {
+      _clearSearch();
+      return;
+    }
+
+    setState(() {
+      _activeSearchTerm = term;
+      _selectedCategory = null;
+      _quickFilter = null;
+      _products = [];
+      _loadingProducts = true;
+    });
+    _loadProducts(searchTerm: term);
+  }
+
+  void _onSearchChanged(String value) {
+    final term = value.trim();
+    _searchDebounce?.cancel();
+
+    if (term.isEmpty) {
+      setState(() {
+        _activeSearchTerm = null;
+        _quickFilter = null;
+        _loadingProducts = true;
+      });
+      _loadProducts();
+      return;
+    }
+
+    setState(() {
+      _activeSearchTerm = term;
+      _selectedCategory = null;
+      _quickFilter = null;
+      _products = [];
+      _loadingProducts = true;
+    });
+
+    _searchDebounce = Timer(const Duration(milliseconds: 350), () {
+      if (!mounted) return;
+      _loadProducts(searchTerm: term);
+    });
+  }
+
+  void _clearSearch() {
+    _searchDebounce?.cancel();
+    final hadSearch =
+        _searchController.text.trim().isNotEmpty ||
+        (_activeSearchTerm?.isNotEmpty ?? false);
+    setState(() {
+      _searchController.clear();
+      _activeSearchTerm = null;
+      _quickFilter = null;
+      _loadingProducts = true;
+    });
+    if (hadSearch) {
+      _loadProducts();
+    }
   }
 
   void _onCategorySelected(GiftCardCategoryEntity? category) {
     setState(() => _selectedCategory = category);
-    context
-        .read<GiftCardsBloc>()
-        .add(LoadGiftCardProducts(categoryId: category?.id));
+    _loadProducts(searchTerm: _activeSearchTerm);
   }
 
   void _openDetail(GiftCardProductEntity p) {
@@ -126,8 +200,7 @@ class _GiftCardsViewState extends State<_GiftCardsView> {
           listeners: [
             BlocListener<GiftCardsBloc, GiftCardsState>(
               listenWhen: (_, s) =>
-                  s is GiftCardCategoriesLoaded ||
-                  s is GiftCardCategoriesError,
+                  s is GiftCardCategoriesLoaded || s is GiftCardCategoriesError,
               listener: (_, s) {
                 if (s is GiftCardCategoriesLoaded) {
                   setState(() {
@@ -178,82 +251,90 @@ class _GiftCardsViewState extends State<_GiftCardsView> {
             children: [
               RefreshIndicator(
                 onRefresh: () async {
-                  context
-                      .read<GiftCardsBloc>()
-                      .add(const LoadGiftCardCategories());
+                  final searchTerm = _searchTerm;
+                  setState(() {
+                    _activeSearchTerm = searchTerm.isEmpty ? null : searchTerm;
+                    if (searchTerm.isNotEmpty) {
+                      _selectedCategory = null;
+                    }
+                  });
+                  context.read<GiftCardsBloc>().add(
+                    const LoadGiftCardCategories(),
+                  );
                   context.read<GiftCardsBloc>().add(const LoadHotDeals());
-                  context
-                      .read<GiftCardsBloc>()
-                      .add(LoadGiftCardProducts(
-                        categoryId: _selectedCategory?.id,
-                        searchTerm: _searchController.text.trim().isEmpty
-                            ? null
-                            : _searchController.text.trim(),
-                      ));
+                  _loadProducts(searchTerm: searchTerm);
                 },
                 color: GcTokens.primary,
                 child: CustomScrollView(
                   slivers: [
                     _buildAppBar(),
                     SliverToBoxAdapter(child: _buildSearchBar()),
-                    SliverToBoxAdapter(child: const SizedBox(height: 18)),
-                    SliverToBoxAdapter(child: _buildHero()),
-                    // Hidden entirely until the backend has user-visible
-                    // categories (e.g. before the admin organizes the catalog).
-                    if (_loadingCategories || _categories.isNotEmpty) ...[
-                      const SliverToBoxAdapter(
-                        child: GcSectionHeader(
-                          title: 'Deal by category',
-                          subtitle: 'Pick a category to start saving',
+                    if (_isSearchMode) ...[
+                      SliverToBoxAdapter(child: _buildSearchHeader()),
+                      if (!_loadingProducts && _products.isNotEmpty)
+                        SliverToBoxAdapter(child: _buildQuickFilters()),
+                      _buildProductResultsSliver(asList: true),
+                    ] else ...[
+                      SliverToBoxAdapter(child: const SizedBox(height: 18)),
+                      SliverToBoxAdapter(child: _buildHero()),
+                      // Hidden entirely until the backend has user-visible
+                      // categories (e.g. before the admin organizes the catalog).
+                      if (_loadingCategories || _categories.isNotEmpty) ...[
+                        const SliverToBoxAdapter(
+                          child: GcSectionHeader(
+                            title: 'Deal by category',
+                            subtitle: 'Pick a category to start saving',
+                          ),
                         ),
-                      ),
-                      SliverToBoxAdapter(child: _buildCategoryGrid()),
-                    ],
-                    if (_myOrders.isNotEmpty) ...[
+                        SliverToBoxAdapter(child: _buildCategoryGrid()),
+                      ],
+                      if (_myOrders.isNotEmpty) ...[
+                        SliverToBoxAdapter(
+                          child: GcSectionHeader(
+                            title: 'My cards',
+                            subtitle: 'Your latest gift card purchases',
+                            actionLabel: 'View all',
+                            onAction: () => Navigator.pushNamed(
+                              context,
+                              '/gift-card-orders',
+                            ),
+                          ),
+                        ),
+                        SliverToBoxAdapter(child: _buildMyCards()),
+                      ],
+                      SliverToBoxAdapter(child: const SizedBox(height: 18)),
+                      SliverToBoxAdapter(child: _buildQuickFilters()),
                       SliverToBoxAdapter(
                         child: GcSectionHeader(
-                          title: 'My cards',
-                          subtitle: 'Your latest gift card purchases',
-                          actionLabel: 'View all',
-                          onAction: () => Navigator.pushNamed(
-                            context,
-                            '/gift-card-orders',
+                          title: _selectedCategory != null
+                              ? _selectedCategory!.name
+                              : 'Save big on top brands',
+                          subtitle:
+                              '${_filteredProducts.length} vouchers available',
+                        ),
+                      ),
+                      _buildProductResultsSliver(),
+                      SliverToBoxAdapter(
+                        child: const Padding(
+                          padding: EdgeInsets.fromLTRB(18, 22, 18, 8),
+                          child: Text(
+                            'Trending now',
+                            style: TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w900,
+                              color: GcTokens.textPrimary,
+                            ),
                           ),
                         ),
                       ),
-                      SliverToBoxAdapter(child: _buildMyCards()),
+                      _buildTrendingSliver(),
+                      SliverToBoxAdapter(child: _buildBrandWatermark()),
                     ],
-                    SliverToBoxAdapter(child: const SizedBox(height: 18)),
-                    SliverToBoxAdapter(child: _buildQuickFilters()),
-                    SliverToBoxAdapter(
-                      child: GcSectionHeader(
-                        title: _selectedCategory != null
-                            ? _selectedCategory!.name
-                            : 'Save big on top brands',
-                        subtitle: '${_filteredProducts.length} vouchers available',
-                      ),
-                    ),
-                    _buildProductGridSliver(),
-                    SliverToBoxAdapter(
-                      child: const Padding(
-                        padding: EdgeInsets.fromLTRB(18, 22, 18, 8),
-                        child: Text(
-                          'Trending now',
-                          style: TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w900,
-                            color: GcTokens.textPrimary,
-                          ),
-                        ),
-                      ),
-                    ),
-                    _buildTrendingSliver(),
-                    SliverToBoxAdapter(child: _buildBrandWatermark()),
                     const SliverToBoxAdapter(child: SizedBox(height: 120)),
                   ],
                 ),
               ),
-              _buildFloatingFilterPill(),
+              if (!_isSearchMode) _buildFloatingFilterPill(),
             ],
           ),
         ),
@@ -275,18 +356,21 @@ class _GiftCardsViewState extends State<_GiftCardsView> {
       iconTheme: const IconThemeData(color: GcTokens.textPrimary),
       leading: IconButton(
         onPressed: () => Navigator.pop(context),
-        icon: const Icon(Icons.arrow_back_ios_new_rounded,
-            size: 18, color: GcTokens.textPrimary),
+        icon: const Icon(
+          Icons.arrow_back_ios_new_rounded,
+          size: 18,
+          color: GcTokens.textPrimary,
+        ),
       ),
       titleSpacing: 0,
       flexibleSpace: LayoutBuilder(
         builder: (context, constraints) {
           const expandedHeight = 150.0;
-          final minHeight =
-              kToolbarHeight + MediaQuery.of(context).padding.top;
-          final t = ((constraints.maxHeight - minHeight) /
-                  (expandedHeight - minHeight))
-              .clamp(0.0, 1.0);
+          final minHeight = kToolbarHeight + MediaQuery.of(context).padding.top;
+          final t =
+              ((constraints.maxHeight - minHeight) /
+                      (expandedHeight - minHeight))
+                  .clamp(0.0, 1.0);
           final leftPadding = 20.0 + (52.0 * (1 - t));
           return Container(
             decoration: BoxDecoration(
@@ -322,8 +406,7 @@ class _GiftCardsViewState extends State<_GiftCardsView> {
                     style: TextStyle(
                       color: const Color(0xFF1A202C),
                       fontSize: t > 0.5 ? 24 : 20,
-                      fontWeight:
-                          t > 0.5 ? FontWeight.w800 : FontWeight.w700,
+                      fontWeight: t > 0.5 ? FontWeight.w800 : FontWeight.w700,
                       letterSpacing: -0.5,
                     ),
                   ),
@@ -338,7 +421,7 @@ class _GiftCardsViewState extends State<_GiftCardsView> {
           padding: const EdgeInsets.only(right: 12),
           child: AnimatedBuilder(
             animation: _favorites,
-            builder: (_, __) {
+            builder: (_, _) {
               final count = _favorites.count;
               return Stack(
                 children: [
@@ -348,18 +431,15 @@ class _GiftCardsViewState extends State<_GiftCardsView> {
                     elevation: 0,
                     child: InkWell(
                       customBorder: const CircleBorder(),
-                      onTap: () => Navigator.pushNamed(
-                        context,
-                        '/gift-card-favorites',
-                      ),
+                      onTap: () =>
+                          Navigator.pushNamed(context, '/gift-card-favorites'),
                       child: Container(
                         width: 40,
                         height: 40,
                         decoration: BoxDecoration(
                           color: Colors.white,
                           shape: BoxShape.circle,
-                          border:
-                              Border.all(color: const Color(0xFFEFEAFB)),
+                          border: Border.all(color: const Color(0xFFEFEAFB)),
                         ),
                         child: const Icon(
                           Icons.favorite_border_rounded,
@@ -408,8 +488,260 @@ class _GiftCardsViewState extends State<_GiftCardsView> {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: GcSearchBar(
         controller: _searchController,
-        onChanged: (_) => setState(() {}),
+        onChanged: _onSearchChanged,
         onSubmitted: _onSearchSubmitted,
+      ),
+    );
+  }
+
+  Widget _buildSearchHeader() {
+    final count = _filteredProducts.length;
+    final query = _searchTerm;
+    final countLabel = count == 1 ? '1 voucher' : '$count vouchers';
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(18, 20, 18, 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      _loadingProducts ? 'Searching brands' : 'Results for',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.6,
+                        color: GcTokens.textTertiary,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      query,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 26,
+                        height: 1.05,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: -0.4,
+                        color: GcTokens.textPrimary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 14),
+              if (_loadingProducts)
+                Container(
+                  width: 34,
+                  height: 34,
+                  alignment: Alignment.center,
+                  child: const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.4,
+                      color: GcTokens.primary,
+                    ),
+                  ),
+                )
+              else
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: GcTokens.primary.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(GcTokens.rPill),
+                    border: Border.all(
+                      color: GcTokens.primary.withValues(alpha: 0.12),
+                    ),
+                  ),
+                  child: Text(
+                    countLabel,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w900,
+                      color: GcTokens.primary,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  _loadingProducts
+                      ? 'Checking all available gift voucher brands'
+                      : 'Tap a voucher to view denominations and savings.',
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 12.5,
+                    height: 1.35,
+                    fontWeight: FontWeight.w600,
+                    color: GcTokens.textTertiary,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              TextButton.icon(
+                onPressed: _clearSearch,
+                style: TextButton.styleFrom(
+                  foregroundColor: GcTokens.textPrimary,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 8,
+                  ),
+                  minimumSize: Size.zero,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                icon: const Icon(Icons.close_rounded, size: 16),
+                label: const Text(
+                  'Clear',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900),
+                ),
+              ),
+            ],
+          ),
+          if (!_loadingProducts && _products.isNotEmpty) ...[
+            const SizedBox(height: 14),
+            Container(
+              height: 1,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    GcTokens.primary.withValues(alpha: 0.20),
+                    GcTokens.divider,
+                    Colors.transparent,
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSearchEmptyState() {
+    final query = _searchTerm;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(28, 42, 28, 24),
+      child: Column(
+        children: [
+          Container(
+            width: 82,
+            height: 82,
+            decoration: BoxDecoration(
+              color: GcTokens.surfaceMuted,
+              borderRadius: BorderRadius.circular(26),
+              border: Border.all(color: const Color(0xFFEFEAFB)),
+            ),
+            child: const Icon(
+              Icons.search_off_rounded,
+              size: 38,
+              color: GcTokens.primary,
+            ),
+          ),
+          const SizedBox(height: 18),
+          Text(
+            'No voucher found for "$query"',
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w900,
+              color: GcTokens.textPrimary,
+              height: 1.15,
+            ),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Try a shorter brand name or clear search to browse every voucher.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 13,
+              height: 1.45,
+              fontWeight: FontWeight.w600,
+              color: GcTokens.textTertiary,
+            ),
+          ),
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              OutlinedButton(
+                onPressed: _clearSearch,
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: GcTokens.textPrimary,
+                  side: const BorderSide(color: Color(0xFFEFEAFB)),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 18,
+                    vertical: 12,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(GcTokens.rPill),
+                  ),
+                ),
+                child: const Text(
+                  'Browse all',
+                  style: TextStyle(fontWeight: FontWeight.w900),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSearchListSkeleton() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        children: List.generate(
+          4,
+          (index) => Padding(
+            padding: EdgeInsets.only(bottom: index == 3 ? 0 : 12),
+            child: Container(
+              height: 126,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: const Color(0xFFEFEAFB)),
+              ),
+              padding: const EdgeInsets.all(12),
+              child: Row(
+                children: [
+                  const GcSkeleton(width: 88, height: 88, radius: 16),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        GcSkeleton(width: 150, height: 16, radius: 8),
+                        SizedBox(height: 10),
+                        GcSkeleton(width: 210, height: 12, radius: 8),
+                        SizedBox(height: 10),
+                        GcSkeleton(width: 96, height: 22, radius: 999),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -418,7 +750,10 @@ class _GiftCardsViewState extends State<_GiftCardsView> {
     if (_hotDeals.isEmpty) {
       return const GcHeroSkeleton();
     }
-    return GcHeroCarousel(items: _hotDeals.take(5).toList(), onTap: _openDetail);
+    return GcHeroCarousel(
+      items: _hotDeals.take(5).toList(),
+      onTap: _openDetail,
+    );
   }
 
   Widget _buildCategoryGrid() {
@@ -439,7 +774,7 @@ class _GiftCardsViewState extends State<_GiftCardsView> {
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 16),
         itemCount: items.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 12),
+        separatorBuilder: (_, _) => const SizedBox(width: 12),
         itemBuilder: (_, i) => _MyCardTile(
           order: items[i],
           onTap: () {
@@ -465,27 +800,41 @@ class _GiftCardsViewState extends State<_GiftCardsView> {
     );
   }
 
-  Widget _buildProductGridSliver() {
+  Widget _buildProductResultsSliver({bool asList = false}) {
     if (_loadingProducts) {
-      return const SliverToBoxAdapter(child: GcProductGridSkeleton());
+      return SliverToBoxAdapter(
+        child: asList
+            ? _buildSearchListSkeleton()
+            : const GcProductGridSkeleton(),
+      );
     }
     final items = _filteredProducts;
     if (items.isEmpty) {
       return SliverToBoxAdapter(
-        child: GcEmptyState(
-          icon: Icons.search_off_rounded,
-          title: 'No vouchers found',
-          message: 'Try a different category, search term, or filter.',
-          actionLabel: 'Reset filters',
-          onAction: () {
-            setState(() {
-              _quickFilter = null;
-              _selectedCategory = null;
-              _searchController.clear();
-            });
-            context
-                .read<GiftCardsBloc>()
-                .add(const LoadGiftCardProducts());
+        child: asList
+            ? _buildSearchEmptyState()
+            : GcEmptyState(
+                icon: Icons.search_off_rounded,
+                title: 'No vouchers found',
+                message: 'Try a different category, search term, or filter.',
+                actionLabel: 'Reset filters',
+                onAction: _resetFilters,
+              ),
+      );
+    }
+    if (asList) {
+      return SliverPadding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        sliver: SliverList.separated(
+          itemCount: items.length,
+          separatorBuilder: (_, _) => const SizedBox(height: 10),
+          itemBuilder: (_, i) {
+            final p = items[i];
+            return _SearchResultTile(
+              product: p,
+              favorites: _favorites,
+              onTap: () => _openDetail(p),
+            );
           },
         ),
       );
@@ -499,37 +848,44 @@ class _GiftCardsViewState extends State<_GiftCardsView> {
           mainAxisSpacing: 14,
           childAspectRatio: 0.92,
         ),
-        delegate: SliverChildBuilderDelegate(
-          (_, i) {
-            final p = items[i];
-            return GiftCardProductCard(
-              product: p,
-              favorites: _favorites,
-              onTap: () => _openDetail(p),
-            );
-          },
-          childCount: items.length,
-        ),
+        delegate: SliverChildBuilderDelegate((_, i) {
+          final p = items[i];
+          return GiftCardProductCard(
+            product: p,
+            favorites: _favorites,
+            onTap: () => _openDetail(p),
+          );
+        }, childCount: items.length),
       ),
     );
+  }
+
+  void _resetFilters() {
+    setState(() {
+      _quickFilter = null;
+      _selectedCategory = null;
+      _searchController.clear();
+      _activeSearchTerm = null;
+    });
+    context.read<GiftCardsBloc>().add(const LoadGiftCardProducts());
   }
 
   Widget _buildTrendingSliver() {
     if (_loadingProducts) {
       return const SliverToBoxAdapter(child: GcListSkeleton());
     }
-    final trending = _filteredProducts
-        .where((p) => p.hasDiscount)
-        .toList()
-      ..sort((a, b) =>
-          (b.discountPercentage ?? 0).compareTo(a.discountPercentage ?? 0));
+    final trending = _filteredProducts.where((p) => p.hasDiscount).toList()
+      ..sort(
+        (a, b) =>
+            (b.discountPercentage ?? 0).compareTo(a.discountPercentage ?? 0),
+      );
     if (trending.isEmpty) return const SliverToBoxAdapter();
     final items = trending.take(5).toList();
     return SliverPadding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       sliver: SliverList.separated(
         itemCount: items.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 10),
+        separatorBuilder: (_, _) => const SizedBox(height: 10),
         itemBuilder: (_, i) {
           final p = items[i];
           return GcTrendingBrandTile(product: p, onTap: () => _openDetail(p));
@@ -591,20 +947,21 @@ class _GiftCardsViewState extends State<_GiftCardsView> {
           child: InkWell(
             borderRadius: BorderRadius.circular(GcTokens.rPill),
             onTap: () async {
-              final isAuth = await getIt<SecureStorageService>().isAuthenticated();
+              final isAuth = await getIt<SecureStorageService>()
+                  .isAuthenticated();
               if (!isAuth) {
                 if (!mounted) return;
-                LoginPrompt.show(context, message: 'Sign in to view your gift cards.');
+                LoginPrompt.show(
+                  context,
+                  message: 'Sign in to view your gift cards.',
+                );
                 return;
               }
               if (!mounted) return;
               Navigator.pushNamed(context, '/gift-card-orders');
             },
             child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 24,
-                vertical: 14,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: const [
@@ -642,6 +999,283 @@ class _GiftCardsViewState extends State<_GiftCardsView> {
 /// Light, voucher-style "my card" tile shown in the horizontal rail.
 /// Different from the hero (which is a full brand card) and different from
 /// the orders-list ticket (which is a full-width perforated pass).
+class _SearchResultTile extends StatelessWidget {
+  const _SearchResultTile({
+    required this.product,
+    required this.favorites,
+    required this.onTap,
+  });
+
+  final GiftCardProductEntity product;
+  final GiftCardFavoritesService favorites;
+  final VoidCallback onTap;
+
+  String get _title => product.brandName?.trim().isNotEmpty ?? false
+      ? product.brandName!.trim()
+      : product.name.trim();
+
+  String get _subtitle {
+    final offer = _cleanText(product.offerDescription);
+    if (offer.isNotEmpty) return offer;
+
+    final description = _cleanText(product.description);
+    if (description.isNotEmpty) return description;
+
+    return product.categoryName ?? 'Gift voucher';
+  }
+
+  String _cleanText(String? value) {
+    return (value ?? '')
+        .replaceAll(RegExp(r'<[^>]*>'), ' ')
+        .replaceAll(RegExp(r'\s+'), ' ')
+        .trim();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final accent = GcTokens.accentFor(product.id);
+    final currency = product.currencySymbol ?? '\u20B9';
+    final base = product.minPrice;
+    final payable = product.calculatePayable(base);
+
+    return GcPaletteExtractor(
+      imageUrl: product.squareImageUrl,
+      fallback: accent,
+      builder: (context, brand) {
+        final displayColor = Color.lerp(brand, GcTokens.primary, 0.18)!;
+        final imageBg = Color.lerp(displayColor, Colors.white, 0.86)!;
+
+        return Material(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(18),
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(18),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: const Color(0xFFEFEAFB)),
+                boxShadow: [
+                  BoxShadow(
+                    color: displayColor.withValues(alpha: 0.07),
+                    offset: const Offset(0, 10),
+                    blurRadius: 24,
+                  ),
+                ],
+              ),
+              padding: const EdgeInsets.all(12),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 92,
+                    height: 92,
+                    decoration: BoxDecoration(
+                      color: imageBg,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: displayColor.withValues(alpha: 0.12),
+                      ),
+                    ),
+                    padding: const EdgeInsets.all(10),
+                    child: _SearchResultImage(
+                      product: product,
+                      accent: displayColor,
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                _title,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 15.5,
+                                  fontWeight: FontWeight.w900,
+                                  color: GcTokens.textPrimary,
+                                  height: 1.1,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            AnimatedBuilder(
+                              animation: favorites,
+                              builder: (_, _) {
+                                final fav = favorites.isFavorite(product.id);
+                                return InkWell(
+                                  customBorder: const CircleBorder(),
+                                  onTap: () => favorites.toggle(product.id),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(2),
+                                    child: Icon(
+                                      fav
+                                          ? Icons.favorite_rounded
+                                          : Icons.favorite_border_rounded,
+                                      size: 18,
+                                      color: fav
+                                          ? Colors.redAccent
+                                          : GcTokens.textTertiary,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          _subtitle,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            height: 1.3,
+                            fontWeight: FontWeight.w600,
+                            color: GcTokens.textTertiary,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 6,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 5,
+                              ),
+                              decoration: BoxDecoration(
+                                color: displayColor.withValues(alpha: 0.08),
+                                borderRadius: BorderRadius.circular(9),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    'Starts at ',
+                                    style: TextStyle(
+                                      fontSize: 10.5,
+                                      fontWeight: FontWeight.w800,
+                                      color: displayColor.withValues(
+                                        alpha: 0.78,
+                                      ),
+                                    ),
+                                  ),
+                                  if (product.hasDiscount) ...[
+                                    Text(
+                                      '$currency${base.toStringAsFixed(0)}',
+                                      style: const TextStyle(
+                                        fontSize: 10.5,
+                                        fontWeight: FontWeight.w700,
+                                        color: GcTokens.textTertiary,
+                                        decoration: TextDecoration.lineThrough,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 4),
+                                  ],
+                                  Text(
+                                    '$currency${payable.toStringAsFixed(0)}',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w900,
+                                      color: displayColor,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            if (product.hasDiscount)
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 5,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: GcTokens.brandLime.withValues(
+                                    alpha: 0.36,
+                                  ),
+                                  borderRadius: BorderRadius.circular(9),
+                                ),
+                                child: Text(
+                                  'Save ${product.discountPercentage!.toStringAsFixed(0)}%',
+                                  style: const TextStyle(
+                                    fontSize: 10.5,
+                                    fontWeight: FontWeight.w900,
+                                    color: GcTokens.brandInk,
+                                  ),
+                                ),
+                              ),
+                            Icon(
+                              Icons.chevron_right_rounded,
+                              size: 22,
+                              color: displayColor,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _SearchResultImage extends StatelessWidget {
+  const _SearchResultImage({required this.product, required this.accent});
+
+  final GiftCardProductEntity product;
+  final Color accent;
+
+  @override
+  Widget build(BuildContext context) {
+    final url = product.squareImageUrl;
+    if (url == null || url.trim().isEmpty) {
+      final label = (product.brandName ?? product.name).trim();
+      final initial = label.isEmpty ? '?' : label.characters.first;
+      return Center(
+        child: Text(
+          initial.toUpperCase(),
+          style: TextStyle(
+            fontSize: 30,
+            fontWeight: FontWeight.w900,
+            color: accent,
+          ),
+        ),
+      );
+    }
+
+    return CachedNetworkImage(
+      imageUrl: url,
+      fit: BoxFit.contain,
+      memCacheWidth: 420,
+      placeholder: (_, _) => Center(
+        child: SizedBox(
+          width: 18,
+          height: 18,
+          child: CircularProgressIndicator(strokeWidth: 2, color: accent),
+        ),
+      ),
+      errorWidget: (_, _, _) =>
+          Icon(Icons.card_giftcard_rounded, color: accent, size: 34),
+    );
+  }
+}
+
 class _MyCardTile extends StatelessWidget {
   const _MyCardTile({required this.order, required this.onTap});
 
@@ -699,9 +1333,7 @@ class _MyCardTile extends StatelessWidget {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: brand.withValues(alpha: 0.20),
-              ),
+              border: Border.all(color: brand.withValues(alpha: 0.20)),
               boxShadow: [
                 BoxShadow(
                   color: brand.withValues(alpha: 0.10),
@@ -720,9 +1352,7 @@ class _MyCardTile extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: tintWell,
                     border: Border(
-                      right: BorderSide(
-                        color: brand.withValues(alpha: 0.18),
-                      ),
+                      right: BorderSide(color: brand.withValues(alpha: 0.18)),
                     ),
                   ),
                   padding: const EdgeInsets.all(12),
@@ -730,7 +1360,7 @@ class _MyCardTile extends StatelessWidget {
                       ? CachedNetworkImage(
                           imageUrl: order.productImageUrl!,
                           fit: BoxFit.contain,
-                          errorWidget: (_, __, ___) =>
+                          errorWidget: (_, _, _) =>
                               Icon(Icons.card_giftcard_rounded, color: ink),
                         )
                       : Icon(Icons.card_giftcard_rounded, color: ink),
@@ -791,8 +1421,7 @@ class _MyCardTile extends StatelessWidget {
                                 vertical: 3,
                               ),
                               decoration: BoxDecoration(
-                                color:
-                                    _statusColor.withValues(alpha: 0.12),
+                                color: _statusColor.withValues(alpha: 0.12),
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Row(
@@ -825,8 +1454,9 @@ class _MyCardTile extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 9.5,
                                 fontWeight: FontWeight.w900,
-                                color: GcTokens.textTertiary
-                                    .withValues(alpha: 0.85),
+                                color: GcTokens.textTertiary.withValues(
+                                  alpha: 0.85,
+                                ),
                               ),
                             ),
                           ],

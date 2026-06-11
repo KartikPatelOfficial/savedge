@@ -85,6 +85,9 @@ class GiftCardProductEntity extends Equatable {
   final List<GiftCardThemeEntity> themes;
   final int redemptionMode;
 
+  /// Admin-set: this product may be purchased with Meal Points.
+  final bool isMealPointEligible;
+
   const GiftCardProductEntity({
     required this.id,
     required this.name,
@@ -113,6 +116,7 @@ class GiftCardProductEntity extends Equatable {
     this.discountPercentage,
     this.themes = const [],
     this.redemptionMode = 3,
+    this.isMealPointEligible = false,
   });
 
   bool get hasDiscount =>
@@ -191,6 +195,7 @@ class GiftCardProductEntity extends Equatable {
         discountPercentage,
         themes,
         redemptionMode,
+        isMealPointEligible,
       ];
 }
 

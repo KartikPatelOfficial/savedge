@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import '../theme/gc_tokens.dart';
+import 'package:savedge/features/gift_cards/presentation/theme/gc_tokens.dart';
 
 class GcSearchBar extends StatelessWidget {
   const GcSearchBar({
@@ -8,7 +7,7 @@ class GcSearchBar extends StatelessWidget {
     required this.controller,
     required this.onChanged,
     this.onSubmitted,
-    this.hint = 'Search for top brands…',
+    this.hint = 'Search brands, restaurants, stores...',
   });
 
   final TextEditingController controller;
@@ -18,51 +17,80 @@ class GcSearchBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 46,
+    return Container(
+      height: 54,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: GcTokens.primary.withValues(alpha: 0.06),
+            offset: const Offset(0, 8),
+            blurRadius: 18,
+          ),
+        ],
+      ),
       child: TextField(
         controller: controller,
         onChanged: onChanged,
         onSubmitted: onSubmitted,
+        cursorColor: GcTokens.primary,
         textInputAction: TextInputAction.search,
-        style: const TextStyle(fontSize: 14, color: GcTokens.textPrimary),
+        style: const TextStyle(
+          fontSize: 15,
+          fontWeight: FontWeight.w700,
+          color: GcTokens.textPrimary,
+        ),
         decoration: InputDecoration(
           hintText: hint,
           hintStyle: const TextStyle(
             color: GcTokens.textTertiary,
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
+            fontSize: 14.5,
+            fontWeight: FontWeight.w600,
           ),
           prefixIcon: const Icon(
             Icons.search_rounded,
-            color: GcTokens.textTertiary,
-            size: 20,
+            color: GcTokens.primary,
+            size: 22,
           ),
           suffixIcon: controller.text.isNotEmpty
-              ? IconButton(
-                  icon: const Icon(Icons.close_rounded, size: 18),
-                  color: GcTokens.textTertiary,
-                  onPressed: () {
-                    controller.clear();
-                    onChanged('');
-                  },
+              ? Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: IconButton(
+                    icon: const Icon(Icons.close_rounded, size: 17),
+                    color: GcTokens.textSecondary,
+                    style: IconButton.styleFrom(
+                      backgroundColor: GcTokens.surfaceMuted,
+                      fixedSize: const Size(30, 30),
+                      minimumSize: const Size(30, 30),
+                      padding: EdgeInsets.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    onPressed: () {
+                      controller.clear();
+                      onChanged('');
+                    },
+                  ),
                 )
               : null,
+          suffixIconConstraints: const BoxConstraints(
+            minWidth: 46,
+            minHeight: 46,
+          ),
           filled: true,
-          fillColor: const Color(0xFFF5F5F8),
+          fillColor: Colors.white,
           isDense: true,
-          contentPadding: const EdgeInsets.symmetric(vertical: 12),
+          contentPadding: const EdgeInsets.symmetric(vertical: 16),
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(18),
             borderSide: BorderSide.none,
           ),
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: BorderSide.none,
+            borderRadius: BorderRadius.circular(18),
+            borderSide: const BorderSide(color: Color(0xFFEFEAFB)),
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: const BorderSide(color: GcTokens.primary, width: 1.4),
+            borderRadius: BorderRadius.circular(18),
+            borderSide: const BorderSide(color: GcTokens.primary, width: 1.5),
           ),
         ),
       ),

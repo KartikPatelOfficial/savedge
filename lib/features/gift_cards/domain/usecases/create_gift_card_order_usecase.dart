@@ -24,6 +24,7 @@ class CreateGiftCardOrderUseCase
       paymentMethod: params.paymentMethod,
       quantity: params.quantity,
       themeSku: params.themeSku,
+      pointType: params.pointType,
     );
   }
 }
@@ -34,6 +35,7 @@ class CreateGiftCardOrderParams extends Equatable {
   final GiftCardPaymentMethodEntity paymentMethod;
   final int quantity;
   final String? themeSku;
+  final String pointType;
 
   const CreateGiftCardOrderParams({
     required this.giftCardProductId,
@@ -41,8 +43,9 @@ class CreateGiftCardOrderParams extends Equatable {
     required this.paymentMethod,
     this.quantity = 1,
     this.themeSku,
+    this.pointType = 'SavEdge',
   });
 
   @override
-  List<Object?> get props => [giftCardProductId, amount, paymentMethod, quantity, themeSku];
+  List<Object?> get props => [giftCardProductId, amount, paymentMethod, quantity, themeSku, pointType];
 }

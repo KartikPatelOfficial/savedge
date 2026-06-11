@@ -38,6 +38,7 @@ abstract class GiftCardService {
     @Query('amount') required double amount,
     @Query('pointsToUse') int pointsToUse = 0,
     @Query('quantity') int quantity = 1,
+    @Query('pointType') String pointType = 'SavEdge',
   });
 
   @POST('/api/gift-card-orders')

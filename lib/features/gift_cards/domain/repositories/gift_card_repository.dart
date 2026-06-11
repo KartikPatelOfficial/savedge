@@ -27,6 +27,7 @@ abstract class GiftCardRepository {
     required double amount,
     int pointsToUse = 0,
     int quantity = 1,
+    String pointType = 'SavEdge',
   });
 
   Future<Either<Failure, GiftCardOrderEntity>> createOrder({
@@ -35,6 +36,7 @@ abstract class GiftCardRepository {
     required GiftCardPaymentMethodEntity paymentMethod,
     int quantity = 1,
     String? themeSku,
+    String pointType = 'SavEdge',
   });
 
   Future<Either<Failure, CreateGiftCardPaymentOrderResponse>>

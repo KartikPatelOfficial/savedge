@@ -47,7 +47,7 @@ class GiftCardCheckoutPage extends StatelessWidget {
   }
 }
 
-enum _PayMethod { points, online }
+enum _PayMethod { points, mealPoints, online }
 
 class _CheckoutView extends StatefulWidget {
   const _CheckoutView({
@@ -125,17 +125,32 @@ class _CheckoutViewState extends State<_CheckoutView> {
   }
 
   void _fetchBreakdown() {
-    final usePoints = _method == _PayMethod.points;
-    final pts = usePoints ? (_profile?.pointsBalance ?? 0) : 0;
     context.read<GiftCardsBloc>().add(
           LoadPriceBreakdown(
             productId: widget.product.id,
             amount: widget.amount,
-            pointsToUse: pts,
+            pointsToUse: _selectedPointsBalance,
             quantity: _quantity,
+            pointType: _selectedPointType,
           ),
         );
   }
+
+  /// Balance (in points) available for the currently selected pay method.
+  int get _selectedPointsBalance {
+    switch (_method) {
+      case _PayMethod.points:
+        return _profile?.pointsBalance ?? 0;
+      case _PayMethod.mealPoints:
+        return _profile?.mealPointsBalance ?? 0;
+      case _PayMethod.online:
+        return 0;
+    }
+  }
+
+  /// Backend PointType name for the currently selected pay method.
+  String get _selectedPointType =>
+      _method == _PayMethod.mealPoints ? 'Meal' : 'SavEdge';
 
   void _selectMethod(_PayMethod m) {
     if (_method == m) return;
@@ -206,9 +221,29 @@ class _CheckoutViewState extends State<_CheckoutView> {
       return;
     }
 
+    final breakdown = _breakdown;
+
+    // Meal Points: must fully cover the amount — no Razorpay top-up allowed.
+    if (_method == _PayMethod.mealPoints) {
+      if (breakdown == null || breakdown.finalPayableAmount > 0) {
+        _showError("You don't have enough Meal Points to cover the full amount.");
+        return;
+      }
+      context.read<GiftCardsBloc>().add(
+            CreateGiftCardOrder(
+              giftCardProductId: widget.product.id,
+              amount: widget.amount,
+              paymentMethod: GiftCardPaymentMethodEntity.points,
+              quantity: _quantity,
+              themeSku: widget.themeSku,
+              pointType: 'Meal',
+            ),
+          );
+      return;
+    }
+
     final usePoints = _method == _PayMethod.points;
     final pts = usePoints ? (_profile?.pointsBalance ?? 0) : 0;
-    final breakdown = _breakdown;
 
     if (usePoints && breakdown != null && breakdown.finalPayableAmount <= 0) {
       context.read<GiftCardsBloc>().add(
@@ -241,6 +276,9 @@ class _CheckoutViewState extends State<_CheckoutView> {
     final currency = p.currencySymbol ?? '\u20B9';
     final pointsBalance = _profile?.pointsBalance ?? 0;
     final pointsAvailable = _isEmployee && pointsBalance > 0;
+    final mealBalance = _profile?.mealPointsBalance ?? 0;
+    final mealAvailable =
+        _isEmployee && p.isMealPointEligible && mealBalance > 0;
 
     return Scaffold(
       backgroundColor: GcTokens.background,
@@ -328,6 +366,18 @@ class _CheckoutViewState extends State<_CheckoutView> {
                           subtitle: 'Balance: $pointsBalance pts',
                           selected: _method == _PayMethod.points,
                           onTap: () => _selectMethod(_PayMethod.points),
+                          accent: _accent,
+                        ),
+                      ),
+                    if (mealAvailable)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: GcPaymentMethodTile(
+                          icon: Icons.restaurant_rounded,
+                          title: 'Pay with Meal Points',
+                          subtitle: 'Balance: $mealBalance pts',
+                          selected: _method == _PayMethod.mealPoints,
+                          onTap: () => _selectMethod(_PayMethod.mealPoints),
                           accent: _accent,
                         ),
                       ),
@@ -461,9 +511,12 @@ class _CheckoutViewState extends State<_CheckoutView> {
     required double payable,
     required String currency,
   }) {
-    final isPointsOnly = _method == _PayMethod.points && payable <= 0;
+    final isPointsOnly =
+        _method != _PayMethod.online && payable <= 0;
     final label = isPointsOnly
-        ? 'Pay with Points'
+        ? (_method == _PayMethod.mealPoints
+            ? 'Pay with Meal Points'
+            : 'Pay with Points')
         : 'Pay $currency${payable.toStringAsFixed(0)}';
 
     return Material(

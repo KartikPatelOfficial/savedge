@@ -54,6 +54,9 @@ abstract class GiftCardProduct with _$GiftCardProduct {
     String? themesJson,
     @Default([]) List<GiftCardTheme> parsedThemes,
     @Default(3) int redemptionMode,
+
+    /// Admin-set: this product may be purchased with Meal Points.
+    @Default(false) bool isMealPointEligible,
   }) = _GiftCardProduct;
 
   factory GiftCardProduct.fromJson(Map<String, dynamic> json) =>
@@ -195,6 +198,9 @@ abstract class CreateGiftCardOrderRequest with _$CreateGiftCardOrderRequest {
     required GiftCardPaymentMethod paymentMethod,
     @Default(0) int pointsToUse,
     String? themeSku,
+
+    /// Point currency: "SavEdge" (default) or "Meal". Meal only for eligible products.
+    @Default('SavEdge') String pointType,
   }) = _CreateGiftCardOrderRequest;
 
   factory CreateGiftCardOrderRequest.fromJson(Map<String, dynamic> json) =>

@@ -184,6 +184,7 @@ class _GiftCardService implements GiftCardService {
     required double amount,
     int pointsToUse = 0,
     int quantity = 1,
+    String pointType = 'SavEdge',
   }) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{
@@ -191,6 +192,7 @@ class _GiftCardService implements GiftCardService {
       r'amount': amount,
       r'pointsToUse': pointsToUse,
       r'quantity': quantity,
+      r'pointType': pointType,
     };
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;

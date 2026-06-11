@@ -74,6 +74,7 @@ _GiftCardProduct _$GiftCardProductFromJson(Map<String, dynamic> json) =>
               .toList() ??
           const [],
       redemptionMode: (json['redemptionMode'] as num?)?.toInt() ?? 3,
+      isMealPointEligible: json['isMealPointEligible'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$GiftCardProductToJson(_GiftCardProduct instance) =>
@@ -106,6 +107,7 @@ Map<String, dynamic> _$GiftCardProductToJson(_GiftCardProduct instance) =>
       'themesJson': instance.themesJson,
       'parsedThemes': instance.parsedThemes,
       'redemptionMode': instance.redemptionMode,
+      'isMealPointEligible': instance.isMealPointEligible,
     };
 
 _GiftCardTheme _$GiftCardThemeFromJson(Map<String, dynamic> json) =>
@@ -356,6 +358,7 @@ _CreateGiftCardOrderRequest _$CreateGiftCardOrderRequestFromJson(
   ),
   pointsToUse: (json['pointsToUse'] as num?)?.toInt() ?? 0,
   themeSku: json['themeSku'] as String?,
+  pointType: json['pointType'] as String? ?? 'SavEdge',
 );
 
 Map<String, dynamic> _$CreateGiftCardOrderRequestToJson(
@@ -367,6 +370,7 @@ Map<String, dynamic> _$CreateGiftCardOrderRequestToJson(
   'paymentMethod': _$GiftCardPaymentMethodEnumMap[instance.paymentMethod]!,
   'pointsToUse': instance.pointsToUse,
   'themeSku': instance.themeSku,
+  'pointType': instance.pointType,
 };
 
 _GiftCardPriceBreakdown _$GiftCardPriceBreakdownFromJson(
