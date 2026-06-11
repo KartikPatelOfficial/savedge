@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:injectable/injectable.dart';
 
@@ -20,6 +21,31 @@ class SecureStorageService {
     ),
   );
 
+  /// Reads a value, recovering gracefully from corrupted/undecryptable storage.
+  ///
+  /// When the Android Keystore master key is invalidated (e.g. after a
+  /// reinstall, backup restore, or OS keystore reset), every decrypt throws
+  /// [PlatformException] with `BAD_DECRYPT` / `AEADBadTagException`. The data
+  /// is unrecoverable, so we wipe storage once and return null — the user
+  /// simply re-authenticates / re-selects, instead of the app crashing.
+  Future<String?> _safeRead(String key) async {
+    try {
+      return await _storage.read(key: key);
+    } catch (e) {
+      debugPrint('SecureStorage read failed for "$key", clearing storage: $e');
+      await _safeDeleteAll();
+      return null;
+    }
+  }
+
+  Future<void> _safeDeleteAll() async {
+    try {
+      await _storage.deleteAll();
+    } catch (e) {
+      debugPrint('SecureStorage deleteAll failed: $e');
+    }
+  }
+
   // Token Management
   Future<void> saveTokens({
     required String accessToken,
@@ -34,15 +60,15 @@ class SecureStorageService {
   }
 
   Future<String?> getAccessToken() async {
-    return await _storage.read(key: _accessTokenKey);
+    return await _safeRead(_accessTokenKey);
   }
 
   Future<String?> getRefreshToken() async {
-    return await _storage.read(key: _refreshTokenKey);
+    return await _safeRead(_refreshTokenKey);
   }
 
   Future<DateTime?> getTokenExpiresAt() async {
-    final expiresAtString = await _storage.read(key: _tokenExpiresAtKey);
+    final expiresAtString = await _safeRead(_tokenExpiresAtKey);
     if (expiresAtString != null) {
       return DateTime.parse(expiresAtString);
     }
@@ -66,7 +92,7 @@ class SecureStorageService {
   }
 
   Future<String?> getUserId() async {
-    return await _storage.read(key: _userIdKey);
+    return await _safeRead(_userIdKey);
   }
 
   Future<void> saveUserData(String userData) async {
@@ -74,12 +100,12 @@ class SecureStorageService {
   }
 
   Future<String?> getUserData() async {
-    return await _storage.read(key: _userDataKey);
+    return await _safeRead(_userDataKey);
   }
 
   // Clear all stored data
   Future<void> clearAll() async {
-    await _storage.deleteAll();
+    await _safeDeleteAll();
   }
 
   // Check if user is authenticated
@@ -101,7 +127,7 @@ class SecureStorageService {
   }
 
   Future<int?> getSelectedCityId() async {
-    final cityIdString = await _storage.read(key: _selectedCityIdKey);
+    final cityIdString = await _safeRead(_selectedCityIdKey);
     if (cityIdString != null) {
       return int.tryParse(cityIdString);
     }
@@ -109,7 +135,7 @@ class SecureStorageService {
   }
 
   Future<String?> getSelectedCityName() async {
-    return await _storage.read(key: _selectedCityNameKey);
+    return await _safeRead(_selectedCityNameKey);
   }
 
   Future<void> clearSelectedCity() async {
