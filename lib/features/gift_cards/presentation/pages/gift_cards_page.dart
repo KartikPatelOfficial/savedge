@@ -248,7 +248,8 @@ class _GiftCardsViewState extends State<_GiftCardsView> {
                       ),
                     ),
                     _buildTrendingSliver(),
-                    const SliverToBoxAdapter(child: SizedBox(height: 110)),
+                    SliverToBoxAdapter(child: _buildBrandWatermark()),
+                    const SliverToBoxAdapter(child: SizedBox(height: 120)),
                   ],
                 ),
               ),
@@ -533,6 +534,45 @@ class _GiftCardsViewState extends State<_GiftCardsView> {
           final p = items[i];
           return GcTrendingBrandTile(product: p, onTap: () => _openDetail(p));
         },
+      ),
+    );
+  }
+
+  /// Brand logo + tagline that close the scroll. The logo is shown softly
+  /// (reduced opacity) as a watermark, and the extra height lets the list
+  /// over-scroll more.
+  Widget _buildBrandWatermark() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 32, 24, 0),
+      child: Column(
+        children: [
+          ShaderMask(
+            shaderCallback: (rect) => LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                GcTokens.textTertiary.withValues(alpha: 0.55),
+                GcTokens.textTertiary.withValues(alpha: 0.35),
+              ],
+            ).createShader(rect),
+            blendMode: BlendMode.srcIn,
+            child: Image.asset(
+              'assets/images/logo_transparant.png',
+              width: 100,
+              fit: BoxFit.contain,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Save on every brand you love',
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.2,
+              color: GcTokens.textTertiary.withValues(alpha: 0.45),
+            ),
+          ),
+        ],
       ),
     );
   }
