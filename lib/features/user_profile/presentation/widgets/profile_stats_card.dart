@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Profile stats card widget displaying user statistics
 class ProfileStatsCard extends StatelessWidget {
@@ -65,9 +66,9 @@ class ProfileStatsCard extends StatelessWidget {
                   ),
                   if (onTap != null)
                     Icon(
-                      Icons.arrow_forward_ios,
+                      LucideIcons.chevronRight,
                       color: Colors.grey[400],
-                      size: 12,
+                      size: 16,
                     ),
                 ],
               ),

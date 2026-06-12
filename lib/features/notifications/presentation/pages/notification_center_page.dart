@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:savedge/features/notifications/presentation/bloc/notification_bloc.dart';
 import 'package:savedge/features/notifications/presentation/widgets/notification_list_item.dart';
 
@@ -152,18 +153,29 @@ class _NotificationCenterPageState extends State<NotificationCenterPage> {
       systemOverlayStyle: SystemUiOverlayStyle.dark,
       iconTheme: const IconThemeData(color: Color(0xFF1A202C)),
       actions: [
-        if (state.notifications.isNotEmpty)
+        if (state.notifications.isNotEmpty) ...[
           IconButton(
+            tooltip: 'Clear all',
+            onPressed: () => _confirmClearAll(context),
+            icon: const Icon(
+              LucideIcons.trash2,
+              size: 20,
+              color: Color(0xFF9CA3AF),
+            ),
+          ),
+          IconButton(
+            tooltip: 'Notification settings',
             onPressed: () => Navigator.pushNamed(
               context,
               '/notification-preferences',
             ),
             icon: const Icon(
-              Icons.tune_rounded,
+              LucideIcons.slidersHorizontal,
               size: 20,
               color: Color(0xFF9CA3AF),
             ),
           ),
+        ],
         const SizedBox(width: 4),
       ],
       flexibleSpace: LayoutBuilder(
@@ -226,6 +238,71 @@ class _NotificationCenterPageState extends State<NotificationCenterPage> {
   void _handleNotificationTap(dynamic notification) {
     debugPrint('Notification tapped: ${notification.id}');
   }
+
+  Future<void> _confirmClearAll(BuildContext context) async {
+    HapticFeedback.lightImpact();
+    final bloc = context.read<NotificationBloc>();
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        title: Row(
+          children: const [
+            Icon(LucideIcons.trash2, size: 20, color: Color(0xFFEF4444)),
+            SizedBox(width: 10),
+            Text(
+              'Clear all?',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                color: Color(0xFF1A202C),
+              ),
+            ),
+          ],
+        ),
+        content: const Text(
+          "This removes every notification from your inbox. This can't be "
+          'undone.',
+          style: TextStyle(
+            fontSize: 13.5,
+            color: Color(0xFF6B7280),
+            height: 1.45,
+          ),
+        ),
+        actionsPadding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text(
+              'Cancel',
+              style: TextStyle(
+                color: Color(0xFF6B7280),
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: const Text(
+              'Clear all',
+              style: TextStyle(
+                color: Color(0xFFEF4444),
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      HapticFeedback.mediumImpact();
+      bloc.add(const ClearAllNotifications());
+    }
+  }
 }
 
 // ─── Mark All Read Row ──────────────────────────────────────
@@ -266,13 +343,24 @@ class _MarkAllReadRow extends StatelessWidget {
               HapticFeedback.lightImpact();
               onMarkAll();
             },
-            child: const Text(
-              'Mark all as read',
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
-                color: Color(0xFF6F3FCC),
-              ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                Icon(
+                  LucideIcons.checkCheck,
+                  size: 14,
+                  color: Color(0xFF6F3FCC),
+                ),
+                SizedBox(width: 5),
+                Text(
+                  'Mark all as read',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF6F3FCC),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -304,8 +392,8 @@ class _EmptyBody extends StatelessWidget {
               ),
             ),
             child: const Icon(
-              Icons.notifications_none_rounded,
-              size: 44,
+              LucideIcons.bellOff,
+              size: 42,
               color: Color(0xFF6F3FCC),
             ),
           ),
@@ -357,8 +445,8 @@ class _ErrorBody extends StatelessWidget {
               shape: BoxShape.circle,
             ),
             child: const Icon(
-              Icons.wifi_off_rounded,
-              size: 36,
+              LucideIcons.wifiOff,
+              size: 34,
               color: Color(0xFFEF4444),
             ),
           ),
@@ -384,7 +472,7 @@ class _ErrorBody extends StatelessWidget {
           const SizedBox(height: 24),
           OutlinedButton.icon(
             onPressed: onRetry,
-            icon: const Icon(Icons.refresh_rounded, size: 16),
+            icon: const Icon(LucideIcons.refreshCw, size: 15),
             label: const Text(
               'Try again',
               style: TextStyle(fontWeight: FontWeight.w700),

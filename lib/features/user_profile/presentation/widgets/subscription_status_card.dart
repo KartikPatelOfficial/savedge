@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:savedge/features/auth/data/models/user_profile_models.dart';
 
 /// Widget to display subscription status information
@@ -55,7 +56,7 @@ class SubscriptionStatusCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(
-                  Icons.workspace_premium,
+                  LucideIcons.crown,
                   color: Colors.white,
                   size: 28,
                 ),
@@ -232,7 +233,7 @@ class SubscriptionStatusCard extends StatelessWidget {
             children: [
               Expanded(
                 child: _buildFeatureItem(
-                  icon: Icons.access_time_rounded,
+                  icon: LucideIcons.clock,
                   label: hasExpired ? 'Expired' : 'Expires In',
                   value: hasExpired
                       ? 'Renew Now'
@@ -247,7 +248,7 @@ class SubscriptionStatusCard extends StatelessWidget {
               const SizedBox(width: 16),
               Expanded(
                 child: _buildFeatureItem(
-                  icon: Icons.autorenew_rounded,
+                  icon: LucideIcons.refreshCw,
                   label: 'Auto Renew',
                   value: subscription.autoRenew ? 'Enabled' : 'Disabled',
                   color: subscription.autoRenew
@@ -264,7 +265,7 @@ class SubscriptionStatusCard extends StatelessWidget {
             children: [
               Expanded(
                 child: _buildFeatureItem(
-                  icon: Icons.event_available_rounded,
+                  icon: LucideIcons.calendarCheck,
                   label: 'Valid Until',
                   value: _formatDate(subscription.endDate),
                   color: const Color(0xFF6F3FCC),
@@ -273,7 +274,7 @@ class SubscriptionStatusCard extends StatelessWidget {
               const SizedBox(width: 16),
               Expanded(
                 child: _buildFeatureItem(
-                  icon: Icons.star_rounded,
+                  icon: LucideIcons.star,
                   label: 'Access Level',
                   value: 'Premium',
                   color: const Color(0xFFD69E2E),
@@ -291,7 +292,7 @@ class SubscriptionStatusCard extends StatelessWidget {
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: onUpgradeTap,
-                    icon: const Icon(Icons.refresh_rounded, size: 18),
+                    icon: const Icon(LucideIcons.refreshCw, size: 18),
                     label: const Text('Renew Now'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF6F3FCC),
@@ -309,7 +310,7 @@ class SubscriptionStatusCard extends StatelessWidget {
                   Expanded(
                     child: ElevatedButton.icon(
                       onPressed: onUpgradeTap,
-                      icon: const Icon(Icons.refresh_rounded, size: 18),
+                      icon: const Icon(LucideIcons.refreshCw, size: 18),
                       label: const Text('Renew'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFD69E2E),
@@ -344,7 +345,7 @@ class SubscriptionStatusCard extends StatelessWidget {
               child: Row(
                 children: [
                   const Icon(
-                    Icons.warning_amber_rounded,
+                    LucideIcons.triangleAlert,
                     color: Color(0xFFD69E2E),
                     size: 20,
                   ),
@@ -468,7 +469,7 @@ class _MembershipBadge extends StatelessWidget {
         alignment: Alignment.center,
         children: [
           const Icon(
-            Icons.workspace_premium_rounded,
+            LucideIcons.crown,
             color: Colors.white,
             size: 28,
           ),
@@ -476,7 +477,7 @@ class _MembershipBadge extends StatelessWidget {
             top: 7,
             right: 7,
             child: Icon(
-              Icons.auto_awesome,
+              LucideIcons.sparkles,
               color: Colors.white.withValues(alpha: 0.85),
               size: 10,
             ),

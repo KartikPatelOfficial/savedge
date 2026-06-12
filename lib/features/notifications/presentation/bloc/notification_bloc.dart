@@ -42,6 +42,7 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     on<MarkAllAsRead>(_onMarkAllAsRead);
     on<LogUserActivity>(_onLogUserActivity);
     on<DeleteNotification>(_onDeleteNotification);
+    on<ClearAllNotifications>(_onClearAllNotifications);
   }
 
   Future<void> _onRegisterDeviceToken(
@@ -295,5 +296,34 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
         ));
       },
     );
+  }
+
+  Future<void> _onClearAllNotifications(
+    ClearAllNotifications event,
+    Emitter<NotificationState> emit,
+  ) async {
+    final notifications = state.notifications;
+    if (notifications.isEmpty) return;
+
+    // Optimistically clear the inbox for instant feedback.
+    emit(state.copyWith(notifications: [], unreadCount: 0));
+
+    // Delete each on the server in parallel; a returned entity marks a failure.
+    final results = await Future.wait(
+      notifications.map((n) async {
+        final result = await repository.deleteNotification(n.id);
+        return result.fold((_) => n, (_) => null);
+      }),
+    );
+    final failures = results.whereType<NotificationEntity>().toList();
+
+    // Restore whatever couldn't be deleted and surface an error.
+    if (failures.isNotEmpty) {
+      emit(state.copyWith(
+        notifications: failures,
+        unreadCount: failures.where((n) => !n.isRead).length,
+        error: 'Some notifications could not be cleared',
+      ));
+    }
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-import '../theme/gc_tokens.dart';
+import 'package:savedge/features/gift_cards/presentation/theme/gc_tokens.dart';
 
 enum GcQuickFilter {
   onSale,
@@ -10,6 +11,9 @@ enum GcQuickFilter {
   bigSaver,
 }
 
+/// Horizontal row of price/sale filter pills. Each pill pairs a thin-stroke
+/// Lucide icon with a label. Unselected pills are white with a hairline border
+/// and a faint shadow; the active pill is filled violet.
 class GcQuickFilterChips extends StatelessWidget {
   const GcQuickFilterChips({
     super.key,
@@ -28,27 +32,36 @@ class GcQuickFilterChips extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
         children: [
-          _chip(GcQuickFilter.onSale, 'On sale'),
+          _chip(GcQuickFilter.onSale, 'On sale', LucideIcons.tag),
           const SizedBox(width: 8),
-          _chip(GcQuickFilter.under500, 'Under \u20B9500'),
+          _chip(GcQuickFilter.under500, 'Under ₹500', LucideIcons.wallet),
           const SizedBox(width: 8),
-          _chip(GcQuickFilter.from500to2000, '\u20B9500 – \u20B92000'),
+          _chip(
+            GcQuickFilter.from500to2000,
+            '₹500 – ₹2000',
+            LucideIcons.badgeIndianRupee,
+          ),
           const SizedBox(width: 8),
-          _chip(GcQuickFilter.above2000, 'Above \u20B92000'),
+          _chip(
+            GcQuickFilter.above2000,
+            'Above ₹2000',
+            LucideIcons.layoutGrid,
+          ),
           const SizedBox(width: 8),
-          _chip(GcQuickFilter.bigSaver, 'Big savers'),
+          _chip(GcQuickFilter.bigSaver, 'Big savers', LucideIcons.sparkles),
         ],
       ),
     );
   }
 
-  Widget _chip(GcQuickFilter v, String label) {
+  Widget _chip(GcQuickFilter v, String label, IconData icon) {
     final isSelected = selected == v;
     return GestureDetector(
       onTap: () => onChanged(isSelected ? null : v),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        curve: Curves.easeOut,
+        padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 9),
         decoration: BoxDecoration(
           color: isSelected ? GcTokens.primary : Colors.white,
           borderRadius: BorderRadius.circular(GcTokens.rPill),
@@ -63,15 +76,26 @@ class GcQuickFilterChips extends StatelessWidget {
                     blurRadius: 12,
                   ),
                 ]
-              : null,
+              : GcTokens.tinyShadow,
         ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 12.5,
-            fontWeight: FontWeight.w800,
-            color: isSelected ? Colors.white : GcTokens.textPrimary,
-          ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 15,
+              color: isSelected ? Colors.white : GcTokens.primary,
+            ),
+            const SizedBox(width: 7),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12.5,
+                fontWeight: FontWeight.w800,
+                color: isSelected ? Colors.white : GcTokens.textPrimary,
+              ),
+            ),
+          ],
         ),
       ),
     );

@@ -123,13 +123,13 @@ extension UserProfileResponse3Extensions on UserProfileResponse3 {
   /// Check if user is an employee with organization
   bool get isEmployeeWithOrganization => isEmployee && employeeInfo != null;
 
-  /// Get SavEdge points balance (from employee info or 0 for others)
+  /// Get Gift points balance (from employee info or 0 for others)
   int get pointsBalance => employeeInfo?.availablePoints ?? 0;
 
-  /// Get meal points balance — a separate bucket from SavEdge points
+  /// Get meal points balance — a separate bucket from Gift points
   int get mealPointsBalance => employeeInfo?.mealAvailablePoints ?? 0;
 
-  /// The single number users should see everywhere: SavEdge + Meal combined
+  /// The single number users should see everywhere: Gift + Meal combined (SavEdge Points)
   int get totalPointsBalance => pointsBalance + mealPointsBalance;
 
   /// Get display name

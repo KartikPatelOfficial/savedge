@@ -10,7 +10,7 @@ abstract class InitiatePointsPaymentRequest
     required int vendorProfileId,
     required double amount,
     required int pointsToUse,
-    // 0 = SavEdge points, 1 = Meal points. Meal points are only accepted at
+    // 0 = Gift points, 1 = Meal points. Meal points are only accepted at
     // allowlisted vendors (the backend validates and rejects otherwise).
     @Default(0) int pointType,
   }) = _InitiatePointsPaymentRequest;
@@ -69,7 +69,7 @@ abstract class VerifyPointsPaymentOtpResponse
 @freezed
 abstract class UserPointsBalanceResponse with _$UserPointsBalanceResponse {
   const factory UserPointsBalanceResponse({
-    // SavEdge points (legacy field names preserved for back-compat).
+    // Gift points (legacy field names preserved for back-compat).
     required int availablePoints,
     required int usedPoints,
     required int expiringPoints,

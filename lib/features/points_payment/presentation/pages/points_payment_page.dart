@@ -363,6 +363,8 @@ class _PointsPaymentPageState extends State<PointsPaymentPage> {
                   const SizedBox(height: 10),
                   _buildMealNote(),
                 ],
+                const SizedBox(height: 14),
+                _buildPricingNote(),
                 const SizedBox(height: 28),
                 _sectionHeader(
                   'Payment mode',
@@ -428,6 +430,7 @@ class _PointsPaymentPageState extends State<PointsPaymentPage> {
       onTap: () => _billFocusNode.requestFocus(),
       behavior: HitTestBehavior.opaque,
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
             'TOTAL BILL AMOUNT',
@@ -541,7 +544,7 @@ class _PointsPaymentPageState extends State<PointsPaymentPage> {
         Expanded(
           child: _buildPointTypeCard(
             label: 'Meal',
-            subtitle: 'Food wallet',
+            subtitle: 'Meal points',
             available: _mealAvailable,
             type: 1,
           ),
@@ -640,6 +643,36 @@ class _PointsPaymentPageState extends State<PointsPaymentPage> {
                 fontSize: 12.5,
                 color: Color(0xFF9A4A12),
                 height: 1.35,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Fine-print disclaimer about how points payments are priced.
+  Widget _buildPricingNote() {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: _kField,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: const [
+          Icon(Icons.info_outline_rounded, size: 16, color: _kSecondary),
+          SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              'Meal Points and Gift Points payments are charged at the '
+              "vendor's regular menu price (MRP). No SavEdge offers or "
+              'discounts apply.',
+              style: TextStyle(
+                fontSize: 12,
+                color: _kSecondary,
+                height: 1.4,
               ),
             ),
           ),

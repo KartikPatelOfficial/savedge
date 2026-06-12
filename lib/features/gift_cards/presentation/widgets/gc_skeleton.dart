@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 
-import '../theme/gc_tokens.dart';
+import 'package:savedge/features/gift_cards/presentation/theme/gc_tokens.dart';
 
 /// Shimmer building blocks used by the gift card surface.
 class GcSkeleton extends StatelessWidget {
@@ -54,20 +54,28 @@ class GcCategoryGridSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Mirrors the wrapping pill set in GcCategoryGrid.
-    return const Padding(
-      padding: EdgeInsets.fromLTRB(16, 2, 16, 4),
-      child: Wrap(
-        spacing: 8,
-        runSpacing: 8,
-        children: [
-          GcSkeleton(width: 64, height: 38, radius: 999),
-          GcSkeleton(width: 112, height: 38, radius: 999),
-          GcSkeleton(width: 96, height: 38, radius: 999),
-          GcSkeleton(width: 124, height: 38, radius: 999),
-          GcSkeleton(width: 88, height: 38, radius: 999),
-          GcSkeleton(width: 80, height: 38, radius: 999),
-        ],
+    // Mirrors the 3-column tile grid in GcCategoryGrid.
+    const gap = 10.0;
+    const columns = 3;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 2, 16, 4),
+      child: LayoutBuilder(
+        builder: (context, c) {
+          final tileWidth =
+              ((c.maxWidth - gap * (columns - 1)) / columns).floorToDouble();
+          return Wrap(
+            spacing: gap,
+            runSpacing: gap,
+            children: List.generate(
+              6,
+              (_) => GcSkeleton(
+                width: tileWidth,
+                height: 58,
+                radius: GcTokens.rCard,
+              ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -88,9 +96,9 @@ class GcProductGridSkeleton extends StatelessWidget {
         crossAxisCount: 2,
         crossAxisSpacing: 14,
         mainAxisSpacing: 14,
-        childAspectRatio: 0.92,
+        childAspectRatio: 0.70,
       ),
-      itemBuilder: (_, __) => const GcSkeleton(
+      itemBuilder: (_, _) => const GcSkeleton(
         width: double.infinity,
         height: double.infinity,
         radius: GcTokens.rCard,

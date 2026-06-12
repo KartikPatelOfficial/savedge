@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:savedge/core/error/error_message_mapper.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
@@ -79,7 +80,7 @@ class _ProfilePageState extends State<ProfilePage> {
   /// Breakdown shown under the points total; meal points are a separate
   /// bucket, so the description only appears when the user has any.
   String? get _pointsBreakdown => (_userProfile?.mealPointsBalance ?? 0) > 0
-      ? '${_userProfile?.pointsBalance ?? 0} Savedge + '
+      ? '${_userProfile?.pointsBalance ?? 0} Gift + '
             '${_userProfile?.mealPointsBalance ?? 0} Meal'
       : null;
 
@@ -120,7 +121,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       borderRadius: BorderRadius.circular(50),
                     ),
                     child: const Icon(
-                      Icons.error_outline,
+                      LucideIcons.circleAlert,
                       size: 48,
                       color: Color(0xFFE53E3E),
                     ),
@@ -246,7 +247,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 title: 'Points Balance',
                                 value: '$_totalPointsBalance',
                                 subtitle: _pointsBreakdown,
-                                icon: Icons.stars_outlined,
+                                icon: LucideIcons.coins,
                                 color: const Color(0xFFD69E2E),
                                 onTap: _onPointsBalanceTap,
                               ),
@@ -256,7 +257,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               child: ProfileStatsCard(
                                 title: _userProfile!.subscriptionInfo!.planName,
                                 value: 'Subscription',
-                                icon: Icons.star,
+                                icon: LucideIcons.crown,
                                 color: !_userProfile!.subscriptionInfo!.isActive
                                     ? Colors.red
                                     : Colors.green,
@@ -275,7 +276,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               title: 'Points Balance',
                               value: '$_totalPointsBalance',
                               subtitle: _pointsBreakdown,
-                              icon: Icons.stars_outlined,
+                              icon: LucideIcons.coins,
                               color: const Color(0xFFD69E2E),
                               onTap: _onPointsBalanceTap,
                             ),
@@ -293,7 +294,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           child: ProfileStatsCard(
                             title: _userProfile!.subscriptionInfo!.planName,
                             value: 'Subscription',
-                            icon: Icons.star,
+                            icon: LucideIcons.crown,
                             color: !_userProfile!.subscriptionInfo!.isActive
                                 ? Colors.red
                                 : Colors.green,
@@ -322,7 +323,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   if (_userProfile != null) ...[
                     _buildMenuSection('Account', [
                       ProfileMenuItem(
-                        icon: Icons.person,
+                        icon: LucideIcons.user,
                         iconColor: const Color(0xFF3B82F6),
                         title: 'View Profile',
                         subtitle: _userProfile!.isEmployee
@@ -332,7 +333,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                       if (!_userProfile!.isEmployee) ...[
                         ProfileMenuItem(
-                          icon: Icons.security,
+                          icon: LucideIcons.shieldCheck,
                           iconColor: const Color(0xFF0D9488),
                           title: 'Privacy & Security',
                           subtitle: 'Manage your account security',
@@ -340,7 +341,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                       ],
                       ProfileMenuItem(
-                        icon: Icons.notifications,
+                        icon: LucideIcons.bell,
                         iconColor: const Color(0xFFD69E2E),
                         title: 'Notifications',
                         subtitle: 'Configure your notification preferences',
@@ -353,7 +354,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     _buildMenuSection('Activity', [
                       if (!_userProfile!.isEmployee) ...[
                         ProfileMenuItem(
-                          icon: Icons.history,
+                          icon: LucideIcons.history,
                           iconColor: const Color(0xFF0EA5E9),
                           title: 'Order History',
                           subtitle: 'View your past orders',
@@ -361,21 +362,21 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                       ],
                       ProfileMenuItem(
-                        icon: Icons.receipt_long_rounded,
+                        icon: LucideIcons.receiptText,
                         iconColor: const Color(0xFF64748B),
                         title: 'Invoices',
                         subtitle: 'View and download your invoices',
                         onTap: _onInvoicesTap,
                       ),
                       ProfileMenuItem(
-                        icon: Icons.favorite,
+                        icon: LucideIcons.heart,
                         iconColor: const Color(0xFFE11D48),
                         title: 'Favorites',
                         subtitle: 'Your favorite restaurants and items',
                         onTap: _onFavoritesTap,
                       ),
                       ProfileMenuItem(
-                        icon: Icons.card_giftcard,
+                        icon: LucideIcons.gift,
                         iconColor: const Color(0xFFEA580C),
                         title: 'Gift Cards',
                         subtitle: 'Browse and buy brand gift cards',
@@ -384,7 +385,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       // Gift to colleagues (show for employees only)
                       if (_userProfile!.isEmployee) ...[
                         ProfileMenuItem(
-                          icon: Icons.card_giftcard_outlined,
+                          icon: LucideIcons.handHeart,
                           iconColor: const Color(0xFFDB2777),
                           title: 'Send & Receive Gifts',
                           subtitle: 'Gift coupons or points to colleagues',
@@ -393,7 +394,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       ],
                       if (_userProfile!.isEmployee) ...[
                         ProfileMenuItem(
-                          icon: Icons.history_outlined,
+                          icon: LucideIcons.ticketCheck,
                           iconColor: const Color(0xFF38A169),
                           title: 'Redemption History',
                           subtitle: 'View your coupon redemptions',
@@ -406,14 +407,14 @@ class _ProfilePageState extends State<ProfilePage> {
 
                     _buildMenuSection('Support', [
                       ProfileMenuItem(
-                        icon: Icons.help,
+                        icon: LucideIcons.circleHelp,
                         iconColor: const Color(0xFF06B6D4),
                         title: 'Help & Support',
                         subtitle: 'Get help with your account',
                         onTap: _onHelpTap,
                       ),
                       ProfileMenuItem(
-                        icon: Icons.info,
+                        icon: LucideIcons.info,
                         iconColor: const Color(0xFF607D8B),
                         title: 'About',
                         subtitle: 'App version and information',
@@ -427,7 +428,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   // Danger Zone
                   _buildMenuSection('Danger Zone', [
                     ProfileMenuItem(
-                      icon: Icons.delete_forever,
+                      icon: LucideIcons.trash2,
                       title: 'Delete Account',
                       subtitle: 'Permanently delete your account and data',
                       titleColor: const Color(0xFFE53E3E),
@@ -492,7 +493,7 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
       ),
       child: ProfileMenuItem(
-        icon: Icons.logout,
+        icon: LucideIcons.logOut,
         title: 'Sign Out',
         subtitle: 'Sign out of your account',
         titleColor: const Color(0xFFE53E3E),
@@ -790,7 +791,7 @@ class _DeleteAccountDialogState extends State<_DeleteAccountDialog> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       title: const Row(
         children: [
-          Icon(Icons.warning_amber_rounded, color: Color(0xFFE53E3E), size: 28),
+          Icon(LucideIcons.triangleAlert, color: Color(0xFFE53E3E), size: 28),
           SizedBox(width: 12),
           Text(
             'Delete Account',
@@ -897,7 +898,7 @@ class _DeleteAccountDialogState extends State<_DeleteAccountDialog> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.close, size: 20, color: Color(0xFFE53E3E)),
+          const Icon(LucideIcons.x, size: 20, color: Color(0xFFE53E3E)),
           const SizedBox(width: 8),
           Expanded(
             child: Text(

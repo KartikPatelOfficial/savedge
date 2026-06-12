@@ -6,7 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:savedge/features/coupons/data/models/coupon_claim_models.dart';
 import 'package:savedge/features/coupons/data/services/coupon_service.dart';
+import 'package:savedge/features/qr_scanner/presentation/widgets/redeem_confirm_sheet.dart';
 
 /// QR Scanner page for scanning vendor QR codes to validate and claim coupons
 class QRScannerPage extends StatefulWidget {
@@ -45,6 +47,21 @@ class _QRScannerPageState extends State<QRScannerPage>
   bool _isDisposed = false;
 
   CouponService get _couponService => GetIt.I<CouponService>();
+
+  /// The redemption code that will actually be consumed, for display in the
+  /// confirmation sheet. Null when claiming-and-using (no code exists yet).
+  String? _previewRedemptionCode(CouponCheckResponse check) {
+    if (widget.userCouponId != null) {
+      for (final u in check.unusedCoupons) {
+        if (u.userCouponId == widget.userCouponId) return u.uniqueCode;
+      }
+      return null;
+    }
+    if (!widget.claimAndUse && check.unusedCoupons.isNotEmpty) {
+      return check.unusedCoupons.first.uniqueCode;
+    }
+    return null;
+  }
 
   Future<dynamic> _claimCoupon(String redemptionMethod) async {
     switch (redemptionMethod) {
@@ -493,6 +510,26 @@ class _QRScannerPageState extends State<QRScannerPage>
           'Coupon cannot be redeemed: ${couponCheck.redeemabilityReasons.join(', ')}',
         );
       }
+
+      // Deliberate confirmation gate. Redemption is irreversible, so the user
+      // must slide to confirm here — the QR validating is no longer enough to
+      // burn the coupon on its own.
+      if (!mounted) return;
+      setState(() => isProcessing = false); // hide the "Validating..." overlay
+      final confirmed = await RedeemConfirmSheet.show(
+        context,
+        vendorName: widget.expectedVendorName,
+        couponTitle: couponCheck.title,
+        discountDisplay: couponCheck.discountDisplay,
+        code: _previewRedemptionCode(couponCheck),
+      );
+      if (confirmed != true) {
+        // User backed out — resume scanning so they can retry or leave.
+        _resetScanning();
+        return;
+      }
+      if (!mounted) return;
+      setState(() => isProcessing = true);
 
       // QR verification successful - handle claiming and/or redeeming
       if (mounted) {

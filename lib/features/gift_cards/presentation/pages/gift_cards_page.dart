@@ -846,7 +846,7 @@ class _GiftCardsViewState extends State<_GiftCardsView> {
           crossAxisCount: 2,
           crossAxisSpacing: 14,
           mainAxisSpacing: 14,
-          childAspectRatio: 0.92,
+          childAspectRatio: 0.70,
         ),
         delegate: SliverChildBuilderDelegate((_, i) {
           final p = items[i];

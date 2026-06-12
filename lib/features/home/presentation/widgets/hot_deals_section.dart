@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math' as math;
+import 'dart:ui' show ImageFilter;
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -127,7 +128,7 @@ class _StackedDealsCardsState extends State<StackedDealsCards>
   @override
   void initState() {
     super.initState();
-    _pageController = PageController(viewportFraction: 0.85);
+    _pageController = PageController(viewportFraction: 1.0);
 
     // Initialize animation controllers
     _animationControllers = List.generate(
@@ -331,7 +332,7 @@ class _StackedDealsCardsState extends State<StackedDealsCards>
       curve: Curves.easeOut,
       margin: EdgeInsets.symmetric(
         vertical: isCenter ? 0 : 10,
-        horizontal: 6,
+        horizontal: 24,
       ),
       child: Transform.scale(
         scale: isCenter ? 1.0 : 0.88,
@@ -346,18 +347,40 @@ class _StackedDealsCardsState extends State<StackedDealsCards>
   }
 
   Widget _buildSpecialOfferImage(Coupon coupon) {
+    final imageUrl = coupon.specialOfferImageUrl!;
     return ClipRRect(
       borderRadius: BorderRadius.circular(24),
-      child: CachedNetworkImage(
-        imageUrl: coupon.specialOfferImageUrl!,
-        fit: BoxFit.cover,
-        width: double.infinity,
-        height: double.infinity,
-        placeholder: (context, url) => coupon.specialOfferBlurHash != null
-            ? BlurHash(hash: coupon.specialOfferBlurHash!)
-            : Container(color: Colors.grey[300]),
-        errorWidget: (context, url, error) =>
-            _buildCouponTicket(coupon, _currentIndex),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          // Blurred, zoomed copy of the banner fills the frame so the
+          // uncropped image below never sits on a dead grey band.
+          ImageFiltered(
+            imageFilter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+            child: CachedNetworkImage(
+              imageUrl: imageUrl,
+              fit: BoxFit.cover,
+              placeholder: (context, url) => coupon.specialOfferBlurHash != null
+                  ? BlurHash(hash: coupon.specialOfferBlurHash!)
+                  : Container(color: Colors.grey[300]),
+              errorWidget: (context, url, error) => Container(
+                color: Colors.grey[300],
+              ),
+            ),
+          ),
+          // Subtle scrim to deepen the blurred backdrop.
+          Container(color: Colors.black.withOpacity(0.12)),
+          // The full, uncropped promotional image.
+          CachedNetworkImage(
+            imageUrl: imageUrl,
+            fit: BoxFit.contain,
+            width: double.infinity,
+            height: double.infinity,
+            placeholder: (context, url) => const SizedBox.shrink(),
+            errorWidget: (context, url, error) =>
+                _buildCouponTicket(coupon, _currentIndex),
+          ),
+        ],
       ),
     );
   }

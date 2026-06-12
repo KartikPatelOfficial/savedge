@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 /// Profile menu item widget for settings and options
 class ProfileMenuItem extends StatelessWidget {
@@ -82,7 +83,7 @@ class ProfileMenuItem extends StatelessWidget {
               if (trailing != null)
                 trailing!
               else if (showArrow)
-                Icon(Icons.chevron_right, color: Colors.grey[400], size: 20),
+                Icon(LucideIcons.chevronRight, color: Colors.grey[400], size: 20),
             ],
           ),
         ),

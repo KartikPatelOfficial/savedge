@@ -606,7 +606,7 @@ class _EditProfilePageState extends State<EditProfilePage>
                 _buildResponsivePair(
                   _HeroMetricTile(
                     value: _isEmployee
-                        ? (_profile.employeeInfo?.employeeCode ?? 'N/A')
+                        ? _orFallback(_profile.employeeInfo?.employeeCode, 'N/A')
                         : '${(_completionRatio * 100).round()}%',
                     label: _isEmployee ? 'employee code' : 'completion',
                     accent: _heroAccent,
@@ -628,7 +628,10 @@ class _EditProfilePageState extends State<EditProfilePage>
                   ),
                   _HeroMetricTile(
                     value: _isEmployee
-                        ? (_profile.employeeInfo?.department ?? 'Team')
+                        ? _orFallback(
+                            _profile.employeeInfo?.department,
+                            'Not assigned',
+                          )
                         : (_hasChanges ? '$_changedFieldCount' : '0'),
                     label: _isEmployee ? 'department' : 'pending edits',
                     accent: _isEmployee ? _coral : _mint,
@@ -1389,6 +1392,14 @@ class _EditProfilePageState extends State<EditProfilePage>
     );
   }
 
+  /// Returns [value] trimmed, or [fallback] when it is null or blank. Guards
+  /// against the API sending empty strings (e.g. an unset department), which
+  /// would otherwise render as a tile with no value.
+  String _orFallback(String? value, String fallback) {
+    final String trimmed = value?.trim() ?? '';
+    return trimmed.isEmpty ? fallback : trimmed;
+  }
+
   Widget _buildResponsivePair(
     Widget left,
     Widget right, {
@@ -1397,8 +1408,14 @@ class _EditProfilePageState extends State<EditProfilePage>
   }) {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
-        if (constraints.maxWidth < 340) {
-          return Column(children: [left, const SizedBox(height: 12), right]);
+        // Only stack on genuinely narrow widths. The pair lives inside the hero
+        // card, so the constraint is already the screen width minus the page
+        // and card padding; keep the two tiles side-by-side on normal phones.
+        if (constraints.maxWidth < 260) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [left, const SizedBox(height: 12), right],
+          );
         }
 
         return IntrinsicHeight(
@@ -1981,7 +1998,7 @@ class _PointsBreakdownStrip extends StatelessWidget {
     return Semantics(
       button: true,
       label:
-          'Points breakdown: $savedgePoints SavEdge points and $mealPoints '
+          'Points breakdown: $savedgePoints Gift points and $mealPoints '
           'meal points. Open wallet.',
       child: Material(
         color: Colors.white.withValues(alpha: 0.78),

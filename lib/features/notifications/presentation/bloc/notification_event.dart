@@ -93,3 +93,8 @@ class DeleteNotification extends NotificationEvent {
   @override
   List<Object?> get props => [notificationId];
 }
+
+/// Event to clear (delete) all loaded notifications
+class ClearAllNotifications extends NotificationEvent {
+  const ClearAllNotifications();
+}

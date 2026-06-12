@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 
-import '../../domain/entities/gift_card_entity.dart';
-import '../theme/gc_tokens.dart';
+import 'package:savedge/features/gift_cards/domain/entities/gift_card_entity.dart';
+import 'package:savedge/features/gift_cards/presentation/theme/gc_tokens.dart';
+import 'package:savedge/features/gift_cards/presentation/widgets/gc_category_icons.dart';
 
 /// Category selector for the gift-card page.
 ///
-/// A flat, wrapping chip set — an "All" chip, the first few categories, then a
-/// "More" chip that opens the full list in a dialog. Selection is single-value:
-/// tapping the active chip (or "All") clears the filter via `onSelect(null)`, so
-/// exactly one chip is ever active. Selection is shown with the category's accent
-/// (tint + border + dot), never a filled bar — and no elevation/shadow/gradient.
+/// A 3-column grid of tiles — an "All" tile, the first few categories, then a
+/// "More" tile that opens the full list in a dialog. Each tile pairs a
+/// thin-stroke Lucide icon with the category name. Selection is single-value:
+/// tapping the active tile (or "All") clears the filter via `onSelect(null)`, so
+/// exactly one tile is ever active. The active tile is shown with a violet tint
+/// and border; the rest are white with a hairline border and a faint shadow.
 class GcCategoryGrid extends StatelessWidget {
   const GcCategoryGrid({
     super.key,
@@ -22,13 +24,12 @@ class GcCategoryGrid extends StatelessWidget {
   final int? selectedId;
   final ValueChanged<GiftCardCategoryEntity?> onSelect;
 
-  /// How many category chips show inline before collapsing into "More".
-  static const int _inlineCount = 5;
+  /// How many category tiles show inline before collapsing into "More".
+  static const int _inlineCount = 8;
 
-  Color _accentOf(GiftCardCategoryEntity c) {
-    final idx = categories.indexWhere((x) => x.id == c.id);
-    return GcTokens.categoryAccentFor(idx < 0 ? 0 : idx);
-  }
+  /// Columns in the grid and the gap between tiles.
+  static const int _columns = 3;
+  static const double _gap = 10;
 
   @override
   Widget build(BuildContext context) {
@@ -47,146 +48,147 @@ class GcCategoryGrid extends StatelessWidget {
     if (selected != null && !visible.any((c) => c.id == selected!.id)) {
       visible = [
         selected,
-        ...categories
-            .where((c) => c.id != selected!.id)
-            .take(_inlineCount - 1),
+        ...categories.where((c) => c.id != selected!.id).take(_inlineCount - 1),
       ];
     }
     final hasMore = categories.length > visible.length;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 2, 16, 4),
-      child: Wrap(
-        spacing: 8,
-        runSpacing: 8,
-        children: [
-          GcCategoryChip(
-            label: 'All',
-            accent: GcTokens.primary,
-            leadingIcon: Icons.grid_view_rounded,
-            selected: selectedId == null,
-            onTap: () => onSelect(null),
-          ),
-          for (final c in visible)
-            GcCategoryChip(
-              label: c.name,
-              accent: _accentOf(c),
-              selected: c.id == selectedId,
-              onTap: () => onSelect(c.id == selectedId ? null : c),
-            ),
-          if (hasMore)
-            GcCategoryChip(
-              label: 'More',
-              accent: GcTokens.textTertiary,
-              leadingIcon: Icons.more_horiz_rounded,
-              selected: false,
-              onTap: () => _GcCategorySheet.show(
-                context,
-                categories: categories,
-                selectedId: selectedId,
-                accentOf: _accentOf,
-                onSelect: onSelect,
+      child: LayoutBuilder(
+        builder: (context, c) {
+          final tileWidth =
+              ((c.maxWidth - _gap * (_columns - 1)) / _columns).floorToDouble();
+          return Wrap(
+            spacing: _gap,
+            runSpacing: _gap,
+            children: [
+              GcCategoryTile(
+                width: tileWidth,
+                label: 'All',
+                icon: GcCategoryIcon.all,
+                selected: selectedId == null,
+                onTap: () => onSelect(null),
               ),
-            ),
-        ],
+              for (final cat in visible)
+                GcCategoryTile(
+                  width: tileWidth,
+                  label: cat.name,
+                  icon: GcCategoryIcon.forName(cat.name),
+                  selected: cat.id == selectedId,
+                  onTap: () => onSelect(cat.id == selectedId ? null : cat),
+                ),
+              if (hasMore)
+                GcCategoryTile(
+                  width: tileWidth,
+                  label: 'More',
+                  icon: GcCategoryIcon.more,
+                  selected: false,
+                  onTap: () => _GcCategorySheet.show(
+                    context,
+                    categories: categories,
+                    selectedId: selectedId,
+                    onSelect: onSelect,
+                  ),
+                ),
+            ],
+          );
+        },
       ),
     );
   }
 }
 
-/// Flat selectable pill. Unselected: white with a hairline border and an accent
-/// dot. Selected: a soft accent tint with an accent border. No shadow.
-class GcCategoryChip extends StatelessWidget {
-  const GcCategoryChip({
+/// A single grid tile: a thin-stroke icon next to a (max two-line) label.
+/// Unselected tiles are white with a hairline border and a faint shadow;
+/// the active tile gets a soft violet tint and a violet border.
+class GcCategoryTile extends StatelessWidget {
+  const GcCategoryTile({
     super.key,
+    required this.width,
     required this.label,
-    required this.accent,
+    required this.icon,
     required this.selected,
     required this.onTap,
-    this.leadingIcon,
   });
 
+  final double width;
   final String label;
-  final Color accent;
+  final IconData icon;
   final bool selected;
   final VoidCallback onTap;
 
-  /// Optional icon instead of the default colour dot (used by "All" / "More").
-  final IconData? leadingIcon;
-
   @override
   Widget build(BuildContext context) {
-    final borderColor = selected ? accent : const Color(0xFFEFEAFB);
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 160),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
-        decoration: BoxDecoration(
-          color: selected ? accent.withValues(alpha: 0.10) : Colors.white,
-          borderRadius: BorderRadius.circular(GcTokens.rPill),
-          border: Border.all(
-            color: borderColor,
-            width: selected ? 1.5 : 1,
-          ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (leadingIcon != null)
-              Icon(leadingIcon, size: 15, color: accent)
-            else
-              _Dot(color: accent),
-            const SizedBox(width: 7),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 12.5,
-                fontWeight: FontWeight.w800,
-                color: GcTokens.textPrimary,
-              ),
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: label,
+      child: GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 160),
+          curve: Curves.easeOut,
+          width: width,
+          constraints: const BoxConstraints(minHeight: 58),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
+          decoration: BoxDecoration(
+            color: selected
+                ? GcTokens.primary.withValues(alpha: 0.08)
+                : Colors.white,
+            borderRadius: BorderRadius.circular(GcTokens.rCard),
+            border: Border.all(
+              color: selected ? GcTokens.primary : const Color(0xFFEFEAFB),
+              width: selected ? 1.5 : 1,
             ),
-          ],
+            boxShadow: selected ? null : GcTokens.tinyShadow,
+          ),
+          child: Row(
+            children: [
+              Icon(icon, size: 21, color: GcTokens.primary),
+              const SizedBox(width: 9),
+              Expanded(
+                child: Text(
+                  label,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    height: 1.12,
+                    fontWeight: FontWeight.w700,
+                    color: GcTokens.textPrimary,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-class _Dot extends StatelessWidget {
-  const _Dot({required this.color});
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 8,
-      height: 8,
-      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-    );
-  }
-}
-
-/// "More" dialog: the full category list as the same flat chips, on a plain
+/// "More" dialog: the full category list as the same grid tiles, on a plain
 /// rounded white surface that matches the page — no elevation/shadow/gradient.
 class _GcCategorySheet extends StatelessWidget {
   const _GcCategorySheet({
     required this.categories,
     required this.selectedId,
-    required this.accentOf,
     required this.onSelect,
   });
 
   final List<GiftCardCategoryEntity> categories;
   final int? selectedId;
-  final Color Function(GiftCardCategoryEntity) accentOf;
   final ValueChanged<GiftCardCategoryEntity?> onSelect;
+
+  static const int _columns = 3;
+  static const double _gap = 10;
 
   static Future<void> show(
     BuildContext context, {
     required List<GiftCardCategoryEntity> categories,
     required int? selectedId,
-    required Color Function(GiftCardCategoryEntity) accentOf,
     required ValueChanged<GiftCardCategoryEntity?> onSelect,
   }) {
     return showDialog<void>(
@@ -195,7 +197,6 @@ class _GcCategorySheet extends StatelessWidget {
       builder: (_) => _GcCategorySheet(
         categories: categories,
         selectedId: selectedId,
-        accentOf: accentOf,
         onSelect: onSelect,
       ),
     );
@@ -263,25 +264,34 @@ class _GcCategorySheet extends StatelessWidget {
             Flexible(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(20, 16, 20, 22),
-                child: Wrap(
-                  spacing: 8,
-                  runSpacing: 10,
-                  children: [
-                    GcCategoryChip(
-                      label: 'All',
-                      accent: GcTokens.primary,
-                      leadingIcon: Icons.grid_view_rounded,
-                      selected: selectedId == null,
-                      onTap: () => _pick(context, null),
-                    ),
-                    for (final c in categories)
-                      GcCategoryChip(
-                        label: c.name,
-                        accent: accentOf(c),
-                        selected: c.id == selectedId,
-                        onTap: () => _pick(context, c.id == selectedId ? null : c),
-                      ),
-                  ],
+                child: LayoutBuilder(
+                  builder: (context, c) {
+                    final tileWidth =
+                        ((c.maxWidth - _gap * (_columns - 1)) / _columns)
+                            .floorToDouble();
+                    return Wrap(
+                      spacing: _gap,
+                      runSpacing: _gap,
+                      children: [
+                        GcCategoryTile(
+                          width: tileWidth,
+                          label: 'All',
+                          icon: GcCategoryIcon.all,
+                          selected: selectedId == null,
+                          onTap: () => _pick(context, null),
+                        ),
+                        for (final cat in categories)
+                          GcCategoryTile(
+                            width: tileWidth,
+                            label: cat.name,
+                            icon: GcCategoryIcon.forName(cat.name),
+                            selected: cat.id == selectedId,
+                            onTap: () =>
+                                _pick(context, cat.id == selectedId ? null : cat),
+                          ),
+                      ],
+                    );
+                  },
                 ),
               ),
             ),

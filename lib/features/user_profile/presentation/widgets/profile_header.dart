@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:savedge/features/auth/data/models/user_profile_models.dart';
 
 /// Profile header widget displaying user avatar and basic info.
@@ -68,14 +69,14 @@ class ProfileHeader extends StatelessWidget {
                       children: [
                         _InfoChip(
                           label: employeeInfo.organizationName,
-                          icon: Icons.business_rounded,
+                          icon: LucideIcons.building2,
                           foreground: _primary,
                           background: _primary.withValues(alpha: 0.1),
                         ),
                         if (employeeInfo.employeeCode.trim().isNotEmpty)
                           _InfoChip(
                             label: employeeInfo.employeeCode,
-                            icon: Icons.badge_outlined,
+                            icon: LucideIcons.idCard,
                             foreground: const Color(0xFF4A5568),
                             background: const Color(0xFFEDF2F7),
                           ),
@@ -114,7 +115,7 @@ class ProfileHeader extends StatelessWidget {
             child: Row(
               children: [
                 Icon(
-                  Icons.warning_amber_rounded,
+                  LucideIcons.triangleAlert,
                   color: Colors.orange[700],
                   size: 20,
                 ),
@@ -208,7 +209,7 @@ class ProfileHeader extends StatelessWidget {
                 border: Border.all(color: Colors.white, width: 2),
               ),
               child: const Icon(
-                Icons.edit_rounded,
+                LucideIcons.pencil,
                 color: Colors.white,
                 size: 13,
               ),
