@@ -70,7 +70,7 @@ class GcCategoryGridSkeleton extends StatelessWidget {
               6,
               (_) => GcSkeleton(
                 width: tileWidth,
-                height: 58,
+                height: 84,
                 radius: GcTokens.rCard,
               ),
             ),

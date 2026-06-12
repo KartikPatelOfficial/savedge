@@ -25,7 +25,9 @@ class GcCategoryGrid extends StatelessWidget {
   final ValueChanged<GiftCardCategoryEntity?> onSelect;
 
   /// How many category tiles show inline before collapsing into "More".
-  static const int _inlineCount = 8;
+  /// 7 keeps the grid a clean 3×3: the "All" tile + 7 categories + the "More"
+  /// tile = 9 cells. The rest live in the "More" sheet.
+  static const int _inlineCount = 7;
 
   /// Columns in the grid and the gap between tiles.
   static const int _columns = 3;
@@ -99,8 +101,10 @@ class GcCategoryGrid extends StatelessWidget {
   }
 }
 
-/// A single grid tile: a thin-stroke icon next to a (max two-line) label.
-/// Unselected tiles are white with a hairline border and a faint shadow;
+/// A single grid tile: a thin-stroke icon above a (max two-line) centered
+/// label. Stacking vertically gives the label the full tile width, so longer
+/// category names wrap cleanly instead of truncating in the narrow 3-column
+/// grid. Unselected tiles are white with a hairline border and a faint shadow;
 /// the active tile gets a soft violet tint and a violet border.
 class GcCategoryTile extends StatelessWidget {
   const GcCategoryTile({
@@ -131,8 +135,8 @@ class GcCategoryTile extends StatelessWidget {
           duration: const Duration(milliseconds: 160),
           curve: Curves.easeOut,
           width: width,
-          constraints: const BoxConstraints(minHeight: 58),
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
+          constraints: const BoxConstraints(minHeight: 84),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
           decoration: BoxDecoration(
             color: selected
                 ? GcTokens.primary.withValues(alpha: 0.08)
@@ -144,21 +148,22 @@ class GcCategoryTile extends StatelessWidget {
             ),
             boxShadow: selected ? null : GcTokens.tinyShadow,
           ),
-          child: Row(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 21, color: GcTokens.primary),
-              const SizedBox(width: 9),
-              Expanded(
-                child: Text(
-                  label,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    height: 1.12,
-                    fontWeight: FontWeight.w700,
-                    color: GcTokens.textPrimary,
-                  ),
+              Icon(icon, size: 23, color: GcTokens.primary),
+              const SizedBox(height: 8),
+              Text(
+                label,
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 12,
+                  height: 1.18,
+                  fontWeight: FontWeight.w700,
+                  color: GcTokens.textPrimary,
                 ),
               ),
             ],

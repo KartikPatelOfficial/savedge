@@ -1087,14 +1087,13 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Flexible(
-                          child: Text(
-                            _isVoucherOnly ? _cardPin! : _maskedNumber,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w900,
-                              color: GcTokens.textPrimary,
-                              letterSpacing: 2.2,
-                            ),
+                          child: _FittedCodeText(
+                            text: _isVoucherOnly ? _cardPin! : _maskedNumber,
+                            maxFontSize: 16,
+                            minFontSize: 9,
+                            maxLines: 6,
+                            color: GcTokens.textPrimary,
+                            letterSpacingRatio: 2.2 / 16,
                           ),
                         ),
                         if (_isVoucherOnly) ...[
@@ -1230,14 +1229,13 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Expanded(
-                          child: Text(
-                            _cardPin ?? '••••••',
-                            style: const TextStyle(
-                              fontSize: 26,
-                              fontWeight: FontWeight.w900,
-                              color: GcTokens.textPrimary,
-                              letterSpacing: 6,
-                            ),
+                          child: _FittedCodeText(
+                            text: _cardPin ?? '••••••',
+                            maxFontSize: 26,
+                            minFontSize: 10,
+                            maxLines: 6,
+                            color: GcTokens.textPrimary,
+                            letterSpacingRatio: 6 / 26,
                           ),
                         ),
                         if (_cardPin != null &&
@@ -1506,6 +1504,69 @@ class _GiftCardViewPageState extends State<GiftCardViewPage>
 
   String _fmt(DateTime d) =>
       '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}';
+}
+
+/// Renders a code/PIN at the largest font size — between [maxFontSize] and
+/// [minFontSize] — that still fits within [maxLines] at the available width.
+/// Short codes keep the big designed size; long voucher tokens shrink to stay
+/// inside the card instead of overflowing it, so cards read consistently
+/// regardless of how long the underlying code is.
+class _FittedCodeText extends StatelessWidget {
+  const _FittedCodeText({
+    required this.text,
+    required this.maxFontSize,
+    required this.minFontSize,
+    required this.maxLines,
+    required this.color,
+    this.letterSpacingRatio = 0.0,
+  });
+
+  final String text;
+  final double maxFontSize;
+  final double minFontSize;
+  final int maxLines;
+  final Color color;
+
+  /// letterSpacing expressed as a fraction of the font size, so the spacing
+  /// shrinks proportionally with the text instead of fighting the fit.
+  final double letterSpacingRatio;
+
+  TextStyle _styleFor(double fontSize) => TextStyle(
+        fontSize: fontSize,
+        fontWeight: FontWeight.w900,
+        color: color,
+        letterSpacing: fontSize * letterSpacingRatio,
+        height: 1.2,
+      );
+
+  @override
+  Widget build(BuildContext context) {
+    final scaler = MediaQuery.textScalerOf(context);
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final maxWidth = constraints.maxWidth.isFinite
+            ? constraints.maxWidth
+            : MediaQuery.of(context).size.width;
+        var fontSize = maxFontSize;
+        while (fontSize > minFontSize) {
+          final painter = TextPainter(
+            text: TextSpan(text: text, style: _styleFor(fontSize)),
+            maxLines: maxLines,
+            textDirection: TextDirection.ltr,
+            textScaler: scaler,
+          )..layout(maxWidth: maxWidth);
+          if (!painter.didExceedMaxLines) break;
+          fontSize -= 1;
+        }
+        return Text(
+          text,
+          maxLines: maxLines,
+          overflow: TextOverflow.ellipsis,
+          style: _styleFor(fontSize),
+        );
+      },
+    );
+  }
 }
 
 /// Two compact corner glows in brand lime + purple, slowly drifting

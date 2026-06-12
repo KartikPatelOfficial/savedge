@@ -680,22 +680,10 @@ class _VendorDetailViewState extends State<_VendorDetailView> {
             _ExpandableText(text: description),
           ],
           if (socials.isNotEmpty) ...[
-            SizedBox(height: description.isNotEmpty ? 18 : 0),
-            Text(
-              'Find ${widget.vendor.businessName} on',
-              style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: _T.inkLow,
-              ),
-            ),
-            const SizedBox(height: 10),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                for (final social in socials) _SocialChip(social: social),
-              ],
+            SizedBox(height: description.isNotEmpty ? 24 : 0),
+            _SocialLinks(
+              businessName: widget.vendor.businessName,
+              socials: socials,
             ),
           ],
         ],
@@ -1718,62 +1706,93 @@ class _ExpandableTextState extends State<_ExpandableText> {
   }
 }
 
-/// Labeled platform pill — logo plus name, so the row reads as a deliberate
-/// set of links instead of stray icons.
-class _SocialChip extends StatelessWidget {
-  const _SocialChip({required this.social});
+/// Platform identity: (asset name, display label, brand accent colour).
+class _SocialMeta {
+  const _SocialMeta(this.asset, this.label, this.color);
+  final String asset;
+  final String label;
+  final Color color;
 
-  final VendorSocialMedia social;
-
-  static const Map<int, (String, String)> _platforms = {
-    1: ('Instagram', 'Instagram'),
-    2: ('Facebook', 'Facebook'),
-    3: ('X', 'X'),
-    4: ('LinkedIn', 'LinkedIn'),
-    5: ('YouTube', 'YouTube'),
-    6: ('GoogleMaps', 'Maps'),
-    7: ('WhatsApp', 'WhatsApp'),
+  static const Map<int, _SocialMeta> byPlatform = {
+    1: _SocialMeta('Instagram', 'Instagram', Color(0xFFE1306C)),
+    2: _SocialMeta('Facebook', 'Facebook', Color(0xFF1877F2)),
+    3: _SocialMeta('X', 'X', Color(0xFF0F1419)),
+    4: _SocialMeta('LinkedIn', 'LinkedIn', Color(0xFF0A66C2)),
+    5: _SocialMeta('YouTube', 'YouTube', Color(0xFFFF0000)),
+    6: _SocialMeta('GoogleMaps', 'Maps', Color(0xFF1A73E8)),
+    7: _SocialMeta('WhatsApp', 'WhatsApp', Color(0xFF25D366)),
   };
+}
+
+/// "Find us on" — a tight row of icon-only buttons, each tinted with its
+/// platform's own brand colour. Compact: one overline + a single row of marks.
+class _SocialLinks extends StatelessWidget {
+  const _SocialLinks({required this.businessName, required this.socials});
+
+  final String businessName;
+  final List<VendorSocialMedia> socials;
 
   @override
   Widget build(BuildContext context) {
-    final (asset, label) =
-        _platforms[social.platform] ?? ('Link', social.platformName);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Connect with us',
+          style: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w700,
+            color: _T.ink,
+            letterSpacing: -0.2,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Wrap(
+          spacing: 10,
+          runSpacing: 10,
+          children: [
+            for (final social in socials) _SocialIcon(social: social),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+/// A single icon-only platform button — brand-tinted circle holding the logo.
+class _SocialIcon extends StatelessWidget {
+  const _SocialIcon({required this.social});
+
+  final VendorSocialMedia social;
+
+  @override
+  Widget build(BuildContext context) {
+    final meta = _SocialMeta.byPlatform[social.platform];
+    final asset = meta?.asset ?? 'Link';
+    final label = meta?.label ?? social.platformName;
+    final accent = meta?.color ?? _T.brand;
 
     return Semantics(
       button: true,
       label: 'Open $label',
       child: Material(
-        color: _T.card,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(22),
-          side: const BorderSide(color: _T.hairline),
-        ),
+        color: accent.withValues(alpha: 0.10),
+        shape: const CircleBorder(),
+        clipBehavior: Clip.antiAlias,
         child: InkWell(
-          onTap: () => launchUrlString(social.url),
-          borderRadius: BorderRadius.circular(22),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(12, 9, 14, 9),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SizedBox(
-                  width: 18,
-                  height: 18,
-                  child: Image.asset(
-                    'assets/icons/social_media_platforms/$asset.png',
-                  ),
-                ),
-                const SizedBox(width: 7),
-                Text(
-                  label,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: _T.ink,
-                  ),
-                ),
-              ],
+          onTap: () {
+            HapticFeedback.lightImpact();
+            launchUrlString(social.url);
+          },
+          child: SizedBox(
+            width: 44,
+            height: 44,
+            child: Center(
+              child: Image.asset(
+                'assets/icons/social_media_platforms/$asset.png',
+                width: 22,
+                height: 22,
+              ),
             ),
           ),
         ),

@@ -277,17 +277,6 @@ class _GiftCardsViewState extends State<_GiftCardsView> {
                     ] else ...[
                       SliverToBoxAdapter(child: const SizedBox(height: 18)),
                       SliverToBoxAdapter(child: _buildHero()),
-                      // Hidden entirely until the backend has user-visible
-                      // categories (e.g. before the admin organizes the catalog).
-                      if (_loadingCategories || _categories.isNotEmpty) ...[
-                        const SliverToBoxAdapter(
-                          child: GcSectionHeader(
-                            title: 'Deal by category',
-                            subtitle: 'Pick a category to start saving',
-                          ),
-                        ),
-                        SliverToBoxAdapter(child: _buildCategoryGrid()),
-                      ],
                       if (_myOrders.isNotEmpty) ...[
                         SliverToBoxAdapter(
                           child: GcSectionHeader(
@@ -301,6 +290,17 @@ class _GiftCardsViewState extends State<_GiftCardsView> {
                           ),
                         ),
                         SliverToBoxAdapter(child: _buildMyCards()),
+                      ],
+                      // Hidden entirely until the backend has user-visible
+                      // categories (e.g. before the admin organizes the catalog).
+                      if (_loadingCategories || _categories.isNotEmpty) ...[
+                        const SliverToBoxAdapter(
+                          child: GcSectionHeader(
+                            title: 'Deal by category',
+                            subtitle: 'Pick a category to start saving',
+                          ),
+                        ),
+                        SliverToBoxAdapter(child: _buildCategoryGrid()),
                       ],
                       SliverToBoxAdapter(child: const SizedBox(height: 18)),
                       SliverToBoxAdapter(child: _buildQuickFilters()),
