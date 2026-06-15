@@ -39,9 +39,11 @@ abstract class _T {
 
   static const double margin = 20;
 
-  /// Full-bleed gallery height and how far the info card rides over it.
-  static const double heroHeight = 300;
-  static const double cardOverlap = 52;
+  /// Full-bleed gallery height and the breathing room between the photo and
+  /// the info card that sits beneath it. The card no longer overlaps the
+  /// photo — the logo is grounded inside the card, so the gap is just spacing.
+  static const double heroHeight = 280;
+  static const double cardGap = 16;
 }
 
 class VendorDetailPage extends StatefulWidget {
@@ -408,14 +410,18 @@ class _VendorDetailViewState extends State<_VendorDetailView> {
   // -- Hero + overlapping identity card ----------------------------------------
 
   Widget _buildHeroAndCard(BuildContext context) {
-    return Stack(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _HeroGallery(images: _displayImages, onImageTap: _openPhotoViewer),
         Padding(
-          padding: const EdgeInsets.only(
-            top: _T.heroHeight - _T.cardOverlap,
-            left: _T.margin,
-            right: _T.margin,
+          // Card sits cleanly below the photo. The gap leaves room for the
+          // logo that straddles the card's top edge to clear the image.
+          padding: const EdgeInsets.fromLTRB(
+            _T.margin,
+            _T.cardGap,
+            _T.margin,
+            0,
           ),
           child: _buildIdentityCard(),
         ),
@@ -445,86 +451,90 @@ class _VendorDetailViewState extends State<_VendorDetailView> {
           child: child,
         ),
       ),
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              color: _T.card,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: _T.hairline),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.07),
-                  blurRadius: 24,
-                  offset: const Offset(0, 10),
-                ),
-              ],
+      child: Container(
+        decoration: BoxDecoration(
+          color: _T.card,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: _T.hairline),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.07),
+              blurRadius: 24,
+              offset: const Offset(0, 10),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  // Top padding clears the half of the logo that sits
-                  // inside the card.
-                  padding: const EdgeInsets.fromLTRB(18, 40, 18, 0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(18, 18, 18, 0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Identity row: logo grounded inside the card, beside the
+                  // name — no floating straddle against the canvas.
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Text(
-                        widget.vendor.businessName,
-                        style: const TextStyle(
-                          fontSize: 23,
-                          fontWeight: FontWeight.w800,
-                          color: _T.ink,
-                          letterSpacing: -0.5,
-                          height: 1.15,
+                      _StoreLogo(
+                        logoUrl: _logoUrl,
+                        businessName: widget.vendor.businessName,
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              widget.vendor.businessName,
+                              style: const TextStyle(
+                                fontSize: 21,
+                                fontWeight: FontWeight.w800,
+                                color: _T.ink,
+                                letterSpacing: -0.5,
+                                height: 1.15,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              metaLine,
+                              style: const TextStyle(
+                                fontSize: 13.5,
+                                fontWeight: FontWeight.w500,
+                                color: _T.inkMid,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(height: 5),
-                      Text(
-                        metaLine,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: _T.inkMid,
-                        ),
-                      ),
-                      if (offerCount > 0) ...[
-                        const SizedBox(height: 10),
-                        _LiveOffersTag(count: offerCount),
-                      ],
-                      if (hasStreetAddress) ...[
-                        const SizedBox(height: 14),
-                        _AddressLine(
-                          address: _fullAddress,
-                          onTap: _googleMapsUrl != null
-                              ? () {
-                                  HapticFeedback.lightImpact();
-                                  launchUrlString(_googleMapsUrl!);
-                                }
-                              : null,
-                        ),
-                      ],
-                      const SizedBox(height: 16),
                     ],
                   ),
-                ),
-                const Divider(color: _T.hairline, height: 1),
-                _buildActionRow(),
-              ],
+                  if (offerCount > 0) ...[
+                    const SizedBox(height: 14),
+                    _LiveOffersTag(count: offerCount),
+                  ],
+                  if (hasStreetAddress) ...[
+                    const SizedBox(height: 14),
+                    _AddressLine(
+                      address: _fullAddress,
+                      onTap: _googleMapsUrl != null
+                          ? () {
+                              HapticFeedback.lightImpact();
+                              launchUrlString(_googleMapsUrl!);
+                            }
+                          : null,
+                    ),
+                  ],
+                  const SizedBox(height: 16),
+                ],
+              ),
             ),
-          ),
-          // Store logo straddling the card's top edge.
-          Positioned(
-            top: -28,
-            left: 18,
-            child: _StoreLogo(
-              logoUrl: _logoUrl,
-              businessName: widget.vendor.businessName,
-            ),
-          ),
-        ],
+            const Divider(color: _T.hairline, height: 1),
+            _buildActionRow(),
+          ],
+        ),
       ),
     );
   }
@@ -1100,52 +1110,57 @@ class _HeroGalleryState extends State<_HeroGallery> {
               ),
             ),
           ),
-          if (widget.images.isNotEmpty)
+          // Page dots — only meaningful with more than one photo.
+          if (widget.images.length > 1)
             Positioned(
-              right: 14,
-              bottom: _T.cardOverlap + 14,
-              child: Semantics(
-                button: true,
-                label: 'View photos fullscreen',
-                child: GestureDetector(
-                  onTap: () => widget.onImageTap(_page),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.55),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(
-                          Icons.fullscreen_rounded,
-                          size: 15,
-                          color: Colors.white,
-                        ),
-                        const SizedBox(width: 5),
-                        Text(
-                          widget.images.length == 1
-                              ? 'View'
-                              : '${_page + 1} / ${widget.images.length}',
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                            letterSpacing: 0.3,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+              left: 0,
+              right: 0,
+              bottom: 16,
+              child: _DotIndicator(
+                count: widget.images.length,
+                index: _page,
               ),
             ),
         ],
       ),
+    );
+  }
+}
+
+/// Centered carousel page dots; the active dot widens into a pill.
+class _DotIndicator extends StatelessWidget {
+  const _DotIndicator({required this.count, required this.index});
+
+  final int count;
+  final int index;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(count, (i) {
+        final active = i == index;
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOut,
+          margin: const EdgeInsets.symmetric(horizontal: 3),
+          width: active ? 18 : 6,
+          height: 6,
+          decoration: BoxDecoration(
+            color: active
+                ? Colors.white
+                : Colors.white.withValues(alpha: 0.5),
+            borderRadius: BorderRadius.circular(3),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x33000000),
+                blurRadius: 4,
+                offset: Offset(0, 1),
+              ),
+            ],
+          ),
+        );
+      }),
     );
   }
 }
@@ -1376,8 +1391,9 @@ class _HeroFallback extends StatelessWidget {
 // Identity card pieces
 // ---------------------------------------------------------------------------
 
-/// Circular store logo with a white ring; falls back to a monogram so the
-/// card composition holds even when no logo was uploaded.
+/// Circular store logo that sits grounded inside the identity card. A hairline
+/// ring gives it definition against the white card; falls back to a monogram
+/// so the composition holds even when no logo was uploaded.
 class _StoreLogo extends StatelessWidget {
   const _StoreLogo({required this.logoUrl, required this.businessName});
 
@@ -1393,20 +1409,14 @@ class _StoreLogo extends StatelessWidget {
         : '?';
 
     return Container(
-      width: _size + 8,
-      height: _size + 8,
+      width: _size,
+      height: _size,
       decoration: BoxDecoration(
         color: _T.card,
         shape: BoxShape.circle,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.10),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        border: Border.all(color: _T.hairline),
       ),
-      padding: const EdgeInsets.all(4),
+      padding: const EdgeInsets.all(3),
       child: ClipOval(
         child: logoUrl != null
             ? CachedNetworkImage(
@@ -1823,10 +1833,11 @@ class _SkeletonView extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    height: _T.heroHeight - _T.cardOverlap,
+                    height: _T.heroHeight,
                     width: double.infinity,
                     color: Colors.white,
                   ),
+                  const SizedBox(height: _T.cardGap),
                   Padding(
                     padding: const EdgeInsets.symmetric(
                       horizontal: _T.margin,
