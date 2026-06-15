@@ -10,6 +10,21 @@ import 'package:savedge/features/stores/presentation/pages/vendor_detail_page.da
 import 'package:savedge/features/vendors/domain/entities/coupon.dart';
 import 'package:savedge/features/vendors/presentation/bloc/coupons_bloc.dart';
 
+/// Banner cards use a fixed 3:2 aspect ratio so they look identical on every
+/// device width — the height is derived from the available width, never a
+/// hard-coded constant. Upload special-offer images at this ratio (e.g.
+/// 1200×800) for an edge-to-edge fit with no letterbox bands.
+const double _kDealCardAspectRatio = 3 / 2;
+
+/// Horizontal margin applied to each side of a deal card.
+const double _kDealCardHMargin = 24;
+
+/// Height of the card frame for the current device width, honouring the
+/// fixed [_kDealCardAspectRatio].
+double _dealCardHeight(BuildContext context) =>
+    (MediaQuery.of(context).size.width - _kDealCardHMargin * 2) /
+    _kDealCardAspectRatio;
+
 class HotDealsSection extends StatelessWidget {
   const HotDealsSection({super.key});
 
@@ -29,7 +44,12 @@ class HotDealsView extends StatelessWidget {
         if (state is CouponsLoading) {
           return _wrap(const _HotDealsShimmer());
         } else if (state is CouponsError) {
-          return _wrap(_buildErrorWidget(state.message));
+          return _wrap(
+            SizedBox(
+              height: _dealCardHeight(context),
+              child: _buildErrorWidget(state.message),
+            ),
+          );
         } else if (state is CouponsLoaded) {
           // Collapse the section entirely when there are no deals.
           if (state.coupons.isEmpty) {
@@ -42,13 +62,14 @@ class HotDealsView extends StatelessWidget {
     );
   }
 
-  /// Wraps content with the section's vertical spacing and fixed height.
-  /// Kept here (rather than in the parent) so the whole section, spacing
-  /// included, collapses when there are no deals to show.
+  /// Wraps content with the section's vertical spacing. Each child sizes
+  /// itself (the card frame derives its height from the device width via
+  /// [_dealCardHeight]), so the whole section, spacing included, collapses
+  /// when there are no deals to show.
   Widget _wrap(Widget child) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 20),
-      child: SizedBox(height: 280, child: child),
+      child: child,
     );
   }
 
@@ -280,9 +301,10 @@ class _StackedDealsCardsState extends State<StackedDealsCards>
 
     return Column(
       children: [
-        // Main stacked cards
+        // Main stacked cards — height derives from the fixed card aspect
+        // ratio so banners look identical across all device widths.
         SizedBox(
-          height: 240,
+          height: _dealCardHeight(context),
           child: NotificationListener<ScrollNotification>(
             onNotification: (notification) {
               if (notification is ScrollStartNotification) {
@@ -893,7 +915,7 @@ class _HotDealsShimmerState extends State<_HotDealsShimmer>
             children: [
               // Main card shimmer
               Container(
-                height: 220,
+                height: _dealCardHeight(context),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(24),
                   gradient: LinearGradient(

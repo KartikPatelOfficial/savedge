@@ -1,7 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 
-/// Local design tokens for the points wallet surface. Pure constants â€” no
-/// MaterialApp.theme overrides â€” following the same pattern as GcTokens so
+/// Local design tokens for the points wallet surface. Pure constants — no
+/// MaterialApp.theme overrides — following the same pattern as GcTokens so
 /// the rest of the app's styling is unaffected.
 class WalletTokens {
   WalletTokens._();
@@ -45,7 +45,7 @@ class WalletTokens {
   // Loading skeleton
   static const Color skeleton = Color(0xFFE9ECF2);
 
-  // Semantics â€” green strictly for credits, red for debits/expiry
+  // Semantics — green strictly for credits, red for debits/expiry
   static const Color credit = Color(0xFF059669);
   static const Color creditSoft = Color(0xFFE6F9F0);
   static const Color debit = Color(0xFFDC2626);
@@ -96,7 +96,7 @@ class WalletTokens {
     BoxShadow(color: Color(0x0A101828), offset: Offset(0, 4), blurRadius: 12),
   ];
 
-  // Type â€” system font, tightened numerals for the fintech feel
+  // Type — system font, tightened numerals for the fintech feel
   static const TextStyle balance = TextStyle(
     fontSize: 48,
     height: 1.05,
@@ -134,7 +134,7 @@ class WalletTokens {
     color: textTertiary,
   );
 
-  /// 1,234 / 12,345 â€” thin-space-free comma grouping for point amounts.
+  /// 1,234 / 12,345 — thin-space-free comma grouping for point amounts.
   static String fmt(int n) {
     final digits = n.abs().toString();
     final buf = StringBuffer();

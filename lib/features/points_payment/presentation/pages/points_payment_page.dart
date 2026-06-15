@@ -1236,9 +1236,49 @@ class _PointsPaymentPageState extends State<PointsPaymentPage> {
         _isVerifying = false;
       });
     } catch (e) {
+      // The verify call can fail at the client (e.g. a connection timeout) even though
+      // the server already completed the payment and deducted points. Reporting a plain
+      // failure here would tempt the user to retry — which initiates a fresh payment and
+      // double-charges. Reconcile the authoritative status with the server first.
+      final reconciled = await _reconcilePaymentStatus();
       if (!mounted) return;
+      if (reconciled != null) {
+        HapticFeedback.heavyImpact();
+        setState(() {
+          _paymentResponse = reconciled;
+          _currentStep = PaymentStep.success;
+          _isVerifying = false;
+        });
+        return;
+      }
       setState(() => _isVerifying = false);
       _showErrorSnackbar(ErrorMessageMapper.map(e));
+    }
+  }
+
+  /// After a failed/timed-out verify call, ask the server for the authoritative payment
+  /// status. Returns a success response to display if the payment actually completed, or
+  /// null if it did not (or the status could not be determined).
+  Future<VerifyPointsPaymentOtpResponse?> _reconcilePaymentStatus() async {
+    final paymentId = _paymentId;
+    if (paymentId == null) return null;
+    try {
+      final details = await _paymentService.getPaymentDetails(paymentId);
+      if (details.status.toLowerCase() != 'completed') return null;
+      return VerifyPointsPaymentOtpResponse(
+        paymentId: details.paymentId,
+        transactionReference: details.transactionReference,
+        pointsUsed: details.pointsUsed,
+        pointsValue: details.pointsValue,
+        billAmount: details.billAmount,
+        paidAmount: details.pointsValue,
+        remainingAmount: details.remainingAmount,
+        vendorName: details.vendorName,
+        completedAt: details.completedAt ?? DateTime.now(),
+      );
+    } catch (_) {
+      // Couldn't confirm — fall back to surfacing the original error.
+      return null;
     }
   }
 
