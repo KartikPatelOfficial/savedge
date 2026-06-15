@@ -82,7 +82,7 @@ class _PhoneVerificationPageState extends State<PhoneVerificationPage>
       '+${_selectedCountry.phoneCode}${_phoneController.text.trim()}';
 
   void _launchPrivacyPolicy() async {
-    final uri = Uri.parse('https://savedge.in/privacy-policy.html');
+    final uri = Uri.parse('https://savedge.in/privacy');
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     }

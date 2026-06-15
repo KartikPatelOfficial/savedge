@@ -331,15 +331,13 @@ class _ProfilePageState extends State<ProfilePage> {
                             : 'Update your personal information',
                         onTap: _onEditProfileTap,
                       ),
-                      if (!_userProfile!.isEmployee) ...[
-                        ProfileMenuItem(
-                          icon: LucideIcons.shieldCheck,
-                          iconColor: const Color(0xFF0D9488),
-                          title: 'Privacy & Security',
-                          subtitle: 'Manage your account security',
-                          onTap: _onPrivacyTap,
-                        ),
-                      ],
+                      ProfileMenuItem(
+                        icon: LucideIcons.shieldCheck,
+                        iconColor: const Color(0xFF0D9488),
+                        title: 'Privacy & Security',
+                        subtitle: 'Manage your account security',
+                        onTap: _onPrivacyTap,
+                      ),
                       ProfileMenuItem(
                         icon: LucideIcons.bell,
                         iconColor: const Color(0xFFD69E2E),
@@ -352,15 +350,13 @@ class _ProfilePageState extends State<ProfilePage> {
                     const SizedBox(height: 24),
 
                     _buildMenuSection('Activity', [
-                      if (!_userProfile!.isEmployee) ...[
-                        ProfileMenuItem(
-                          icon: LucideIcons.history,
-                          iconColor: const Color(0xFF0EA5E9),
-                          title: 'Order History',
-                          subtitle: 'View your past orders',
-                          onTap: _onOrderHistoryTap,
-                        ),
-                      ],
+                      ProfileMenuItem(
+                        icon: LucideIcons.history,
+                        iconColor: const Color(0xFF0EA5E9),
+                        title: 'Order History',
+                        subtitle: 'View your past orders',
+                        onTap: _onOrderHistoryTap,
+                      ),
                       ProfileMenuItem(
                         icon: LucideIcons.receiptText,
                         iconColor: const Color(0xFF64748B),
@@ -532,7 +528,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   void _onPrivacyTap() {
     launchUrlString(
-      'https://savedge.in/privacy-policy.html',
+      'https://savedge.in/privacy',
       mode: LaunchMode.externalApplication,
     );
   }
