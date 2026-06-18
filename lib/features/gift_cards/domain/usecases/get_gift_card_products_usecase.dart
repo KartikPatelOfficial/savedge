@@ -9,13 +9,13 @@ import '../repositories/gift_card_repository.dart';
 
 @injectable
 class GetGiftCardProductsUseCase
-    implements UseCase<List<GiftCardProductEntity>, GetGiftCardProductsParams> {
+    implements UseCase<GiftCardProductsPage, GetGiftCardProductsParams> {
   final GiftCardRepository repository;
 
   GetGiftCardProductsUseCase(this.repository);
 
   @override
-  Future<Either<Failure, List<GiftCardProductEntity>>> call(
+  Future<Either<Failure, GiftCardProductsPage>> call(
     GetGiftCardProductsParams params,
   ) async {
     return await repository.getProducts(

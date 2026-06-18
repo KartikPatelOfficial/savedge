@@ -54,6 +54,33 @@ class GiftCardThemeEntity extends Equatable {
   List<Object?> get props => [sku, name, price, image];
 }
 
+/// A single page of gift card products plus the catalog-wide pagination
+/// metadata needed to drive "X vouchers available" and load-more behaviour.
+class GiftCardProductsPage extends Equatable {
+  final List<GiftCardProductEntity> items;
+  final int pageNumber;
+  final int totalPages;
+  final int totalCount;
+  final bool hasNextPage;
+
+  const GiftCardProductsPage({
+    required this.items,
+    required this.pageNumber,
+    required this.totalPages,
+    required this.totalCount,
+    required this.hasNextPage,
+  });
+
+  @override
+  List<Object?> get props => [
+        items,
+        pageNumber,
+        totalPages,
+        totalCount,
+        hasNextPage,
+      ];
+}
+
 class GiftCardProductEntity extends Equatable {
   final int id;
   final String name;

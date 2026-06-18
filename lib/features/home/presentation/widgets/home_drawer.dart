@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:savedge/features/coupons/presentation/pages/redemption_history_page.dart';
 import 'package:savedge/features/static_pages/presentation/pages/about_us_page.dart';
@@ -22,13 +23,11 @@ class HomeDrawer extends StatelessWidget {
   const HomeDrawer({
     super.key,
     this.userName = '',
-    this.userAvatar,
     this.onMenuItemTap,
     this.isGuest = false,
   });
 
   final String userName;
-  final String? userAvatar;
   final Function(String)? onMenuItemTap;
   final bool isGuest;
 
@@ -56,8 +55,15 @@ class HomeDrawer extends StatelessWidget {
             children: [
               // Premium Header
               if (!isGuest) ...[
-                _PremiumUserProfileSection(
-                    userName: userName, userAvatar: userAvatar),
+                // The app content slides 260px to the right when the drawer
+                // opens (see main_navigation_page.dart), so only the leftmost
+                // 260px of the drawer is visible. Constrain the header to that
+                // region (minus the 24px left padding, with a small gap) so a
+                // long name ellipsizes instead of running behind the content.
+                SizedBox(
+                  width: 224,
+                  child: _PremiumUserProfileSection(userName: userName),
+                ),
                 const SizedBox(height: 40),
               ] else ...[
                 Padding(
@@ -203,10 +209,9 @@ class HomeDrawer extends StatelessWidget {
 }
 
 class _PremiumUserProfileSection extends StatelessWidget {
-  const _PremiumUserProfileSection({required this.userName, this.userAvatar});
+  const _PremiumUserProfileSection({required this.userName});
 
   final String userName;
-  final String? userAvatar;
 
   @override
   Widget build(BuildContext context) {
@@ -216,26 +221,8 @@ class _PremiumUserProfileSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // User Avatar
-          Container(
-            width: 80,
-            height: 80,
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-            ),
-            child: userAvatar != null
-                ? ClipRRect(
-                    borderRadius: BorderRadius.circular(40),
-                    child: Image.network(
-                      userAvatar!,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) =>
-                          _PremiumInitialsAvatar(name: userName),
-                    ),
-                  )
-                : _PremiumInitialsAvatar(name: userName),
-          ),
-          const SizedBox(height: 24),
+          _PremiumInitialsAvatar(name: userName),
+          const SizedBox(height: 20),
           // Greeting & Name
           Text(
             userName == 'Guest' ? 'Hello,' : 'Welcome back,',
@@ -264,14 +251,29 @@ class _PremiumUserProfileSection extends StatelessWidget {
   }
 }
 
+/// SavEdge "stacked-card" brand mark.
+///
+/// Echoes the gift-card "credit-card" motif: a flat LIME squircle peeks out
+/// behind a flat PURPLE front card (layered depth, no gradients, no soft
+/// drop-shadow), so both brand colors read together on the mark itself.
+///
+/// The mark is identical for every user (consistent brand identity); per-user
+/// identity comes only from the initials.
 class _PremiumInitialsAvatar extends StatelessWidget {
   const _PremiumInitialsAvatar({required this.name});
 
   final String name;
 
-  String _getInitials() {
+  // SavEdge brand palette — flat, fixed, never randomized per user.
+  static const Color _brandPurple = Color(0xFF6F3FCC);
+  static const Color _brandPurpleDark = Color(0xFF5B21B6);
+  static const Color _brandLime = Color(0xFFC0FF88);
+  static const Color _brandLimeDark = Color(0xFF8FE13D);
+  static const Color _nearWhite = Color(0xFFFFFFFF);
+
+  String get _initials {
     final trimmed = name.trim();
-    if (trimmed.isEmpty) return '?';
+    if (trimmed.isEmpty || trimmed == 'Guest') return '?';
     final parts = trimmed.split(RegExp(r'\s+'));
     if (parts.length >= 2) {
       return '${parts.first[0]}${parts.last[0]}'.toUpperCase();
@@ -281,27 +283,82 @@ class _PremiumInitialsAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF6F3FCC),
-            Color(0xFF9C4DFF),
-          ],
-        ),
-      ),
-      alignment: Alignment.center,
-      child: Text(
-        _getInitials(),
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 28,
-          fontWeight: FontWeight.w700,
-          letterSpacing: 1,
-        ),
+    // Fixed 72x72 footprint so the greeting/name below stay aligned.
+    const double box = 72;
+    const double card = 60; // front + back cards are this size
+    const double radius = 18;
+
+    return SizedBox(
+      width: box,
+      height: box,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          // BACK CARD — flat lime, offset to bottom-right so it peeks out.
+          Positioned(
+            right: 0,
+            bottom: 0,
+            child: Container(
+              width: card,
+              height: card,
+              decoration: BoxDecoration(
+                color: _brandLime,
+                borderRadius: BorderRadius.circular(radius),
+                border: Border.all(color: _brandLimeDark, width: 1.5),
+              ),
+            ),
+          ),
+
+          // FRONT CARD — flat purple, top-left, with a crisp white ring to
+          // lift it off the lavender drawer and a hard ink seam for depth.
+          Positioned(
+            left: 0,
+            top: 0,
+            child: Container(
+              width: card,
+              height: card,
+              decoration: BoxDecoration(
+                color: _brandPurple,
+                borderRadius: BorderRadius.circular(radius),
+                border: Border.all(
+                  color: _nearWhite.withValues(alpha: 0.92),
+                  width: 2,
+                ),
+              ),
+              child: Stack(
+                children: [
+                  // Hairline ink edge inside the card for a printed-card feel.
+                  Positioned.fill(
+                    child: Container(
+                      margin: const EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(radius - 4),
+                        border: Border.all(
+                          color: _brandPurpleDark.withValues(alpha: 0.55),
+                          width: 1,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  // Initials — the only per-user element.
+                  Center(
+                    child: Text(
+                      _initials,
+                      style: GoogleFonts.spaceGrotesk(
+                        color: _nearWhite,
+                        fontSize: 24,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.5,
+                        height: 1,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

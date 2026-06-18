@@ -15,6 +15,8 @@ class LoadHotDeals extends GiftCardsEvent {
   const LoadHotDeals();
 }
 
+/// Loads (or reloads) the first page of products for the given filters,
+/// replacing whatever was loaded before. Resets pagination back to page 1.
 class LoadGiftCardProducts extends GiftCardsEvent {
   final int? categoryId;
   final String? searchTerm;
@@ -26,6 +28,12 @@ class LoadGiftCardProducts extends GiftCardsEvent {
 
   @override
   List<Object?> get props => [categoryId, searchTerm];
+}
+
+/// Appends the next page of products to the already-loaded list, keeping the
+/// current filters. The bloc tracks the current page/filters internally.
+class LoadMoreGiftCardProducts extends GiftCardsEvent {
+  const LoadMoreGiftCardProducts();
 }
 
 class LoadGiftCardProduct extends GiftCardsEvent {

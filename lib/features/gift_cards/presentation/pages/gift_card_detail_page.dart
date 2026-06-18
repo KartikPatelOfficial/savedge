@@ -231,48 +231,45 @@ class _GiftCardDetailPageState extends State<GiftCardDetailPage> {
   }
 
   Widget _heroBox() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(GcTokens.rHero),
+        child: _hasImage
+            ? CachedNetworkImage(
+                imageUrl: _heroImage!,
+                width: double.infinity,
+                fit: BoxFit.fitWidth,
+                placeholder: (_, __) => _p.blurHash != null
+                    ? AspectRatio(
+                        aspectRatio: 16 / 9,
+                        child: BlurHash(hash: _p.blurHash!),
+                      )
+                    : _heroFallback(),
+                errorWidget: (_, __, ___) => _heroFallback(),
+              )
+            : _heroFallback(),
+      ),
+    );
+  }
+
+  Widget _heroFallback() {
     return Container(
       height: 220,
-      margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [_accent, _accent.withValues(alpha: 0.70)],
         ),
-        borderRadius: BorderRadius.circular(GcTokens.rHero),
       ),
+      alignment: Alignment.center,
       padding: const EdgeInsets.all(28),
-      child: Center(
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(GcTokens.rCard),
-          ),
-          padding: const EdgeInsets.all(18),
-          alignment: Alignment.center,
-          child: _hasImage
-              ? CachedNetworkImage(
-                  imageUrl: _heroImage!,
-                  fit: BoxFit.contain,
-                  placeholder: (_, __) => _p.blurHash != null
-                      ? BlurHash(hash: _p.blurHash!)
-                      : _heroFallback(),
-                  errorWidget: (_, __, ___) => _heroFallback(),
-                )
-              : _heroFallback(),
-        ),
-      ),
-    );
-  }
-
-  Widget _heroFallback() {
-    return Center(
       child: Text(
         _p.brandName ?? _p.name,
         textAlign: TextAlign.center,
-        style: TextStyle(
-          color: _accent,
+        style: const TextStyle(
+          color: Colors.white,
           fontWeight: FontWeight.w900,
           fontSize: 22,
         ),
@@ -871,7 +868,8 @@ class _RelatedProductLoaderPageState extends State<_RelatedProductLoaderPage> {
     return searchResult.fold(
       (failure) =>
           throw Exception(failure.message ?? 'Unable to open this gift card.'),
-      (products) {
+      (page) {
+        final products = page.items;
         GiftCardProductEntity? matchedProduct;
 
         for (final product in products) {
@@ -890,7 +888,7 @@ class _RelatedProductLoaderPageState extends State<_RelatedProductLoaderPage> {
           throw Exception('Unable to find this gift card.');
         }
 
-        return matchedProduct!;
+        return matchedProduct;
       },
     );
   }

@@ -13,7 +13,6 @@ class AppConstants {
 
   // API Endpoints per environment
   static const String _developmentBaseUrl = 'https://staging.api.savedge.in';
-  //static const String _developmentBaseUrl = 'https://staging.api.savedge.in';
   static const String _stagingBaseUrl = 'https://staging.api.savedge.in';
   static const String _productionBaseUrl = 'https://api.savedge.in';
 

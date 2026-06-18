@@ -44,12 +44,28 @@ class HotDealsLoaded extends GiftCardsState {
 class GiftCardProductsLoading extends GiftCardsState {}
 
 class GiftCardProductsLoaded extends GiftCardsState {
+  /// All products loaded so far (accumulated across pages).
   final List<GiftCardProductEntity> products;
 
-  const GiftCardProductsLoaded(this.products);
+  /// Total number of products available in the catalog for the active filters,
+  /// reported by the backend — not the number currently loaded.
+  final int totalCount;
+
+  /// Whether another page can still be fetched.
+  final bool hasNextPage;
+
+  /// Whether the next page is currently being fetched (append in progress).
+  final bool isLoadingMore;
+
+  const GiftCardProductsLoaded(
+    this.products, {
+    this.totalCount = 0,
+    this.hasNextPage = false,
+    this.isLoadingMore = false,
+  });
 
   @override
-  List<Object> get props => [products];
+  List<Object> get props => [products, totalCount, hasNextPage, isLoadingMore];
 }
 
 class GiftCardProductsError extends GiftCardsState {
