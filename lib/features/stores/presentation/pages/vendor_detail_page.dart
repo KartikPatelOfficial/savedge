@@ -208,26 +208,35 @@ class _VendorDetailViewState extends State<_VendorDetailView> {
     return images;
   }
 
-  String? get _logoUrl {
+  /// The single image that represents the store's logo. Prefers the primary
+  /// logo, then any logo, then the primary image — staying consistent with
+  /// _displayImages, which treats the primary image as the logo when types
+  /// are unreliable (every image often arrives mis-typed as 'logo').
+  VendorImage? get _logoImage {
     final images = widget.vendor.images;
-    // Prefer the primary logo so it stays consistent with _displayImages,
-    // which treats the primary image as the logo when types are unreliable.
     for (final img in images) {
-      if (img.imageType.toLowerCase() == 'logo' && img.isPrimary) {
-        return img.imageUrl;
-      }
+      if (img.imageType.toLowerCase() == 'logo' && img.isPrimary) return img;
     }
     for (final img in images) {
-      if (img.imageType.toLowerCase() == 'logo') return img.imageUrl;
+      if (img.imageType.toLowerCase() == 'logo') return img;
     }
     for (final img in images) {
-      if (img.isPrimary) return img.imageUrl;
+      if (img.isPrimary) return img;
     }
     return null;
   }
 
+  String? get _logoUrl => _logoImage?.imageUrl;
+
+  /// Carousel order: the logo first, then the gallery shots. _displayImages
+  /// already excludes the logo (by type, or by the primary flag in its
+  /// fallback), so there's no duplicate.
+  List<VendorImage> get _carouselImages {
+    return [?_logoImage, ..._displayImages];
+  }
+
   void _openPhotoViewer(int initialIndex) {
-    final images = _displayImages;
+    final images = _carouselImages;
     if (images.isEmpty) return;
     HapticFeedback.selectionClick();
     Navigator.of(context).push(
@@ -413,7 +422,7 @@ class _VendorDetailViewState extends State<_VendorDetailView> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _HeroGallery(images: _displayImages, onImageTap: _openPhotoViewer),
+        _HeroGallery(images: _carouselImages, onImageTap: _openPhotoViewer),
         Padding(
           // Card sits cleanly below the photo. The gap leaves room for the
           // logo that straddles the card's top edge to clear the image.

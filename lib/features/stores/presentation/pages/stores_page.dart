@@ -14,6 +14,25 @@ import 'package:savedge/features/vendors/presentation/bloc/vendors_state.dart';
 // First 5 categories shown in the quick row
 const int _quickCategoryCount = 5;
 
+/// Picks the image that best represents a store's logo for list cards: the
+/// primary logo, then any logo, then the primary image, then the first image.
+/// Vendor media often arrives with every image mis-typed as 'logo', so the
+/// primary flag is the reliable signal.
+VendorImage? _logoImageFor(Vendor vendor) {
+  final images = vendor.images;
+  if (images.isEmpty) return null;
+  for (final img in images) {
+    if (img.imageType.toLowerCase() == 'logo' && img.isPrimary) return img;
+  }
+  for (final img in images) {
+    if (img.imageType.toLowerCase() == 'logo') return img;
+  }
+  for (final img in images) {
+    if (img.isPrimary) return img;
+  }
+  return images.first;
+}
+
 class StoresPage extends StatelessWidget {
   const StoresPage({super.key, this.initialCategory = 'All'});
 
@@ -1030,9 +1049,7 @@ class _FeaturedStoreCardState extends State<_FeaturedStoreCard> {
 
   @override
   Widget build(BuildContext context) {
-    final primaryImage = widget.vendor.images.isNotEmpty
-        ? widget.vendor.images[0]
-        : null;
+    final primaryImage = _logoImageFor(widget.vendor);
     final imageUrl = primaryImage?.imageUrl;
 
     return GestureDetector(
@@ -1163,9 +1180,7 @@ class _ModernVendorCardState extends State<ModernVendorCard> {
 
   @override
   Widget build(BuildContext context) {
-    final primaryImage = widget.vendor.images.isNotEmpty
-        ? widget.vendor.images[0]
-        : null;
+    final primaryImage = _logoImageFor(widget.vendor);
     final imageUrl = primaryImage?.imageUrl;
 
     return GestureDetector(
