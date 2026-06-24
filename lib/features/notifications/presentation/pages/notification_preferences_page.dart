@@ -136,42 +136,44 @@ class _NotificationPreferencesPageState
             decoration: BoxDecoration(
               color: Color.lerp(Colors.white, Colors.transparent, t),
             ),
-            child: Stack(
-              children: [
-                if (t > 0.05)
-                  Positioned(
-                    bottom: 70,
-                    left: 20,
-                    child: Opacity(
-                      opacity: t.clamp(0.0, 1.0),
-                      child: const Text(
-                        'Manage your alerts',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400,
-                          color: Color(0xFF9CA3AF),
+            child: Align(
+              alignment: Alignment.bottomLeft,
+              child: Padding(
+                padding: EdgeInsets.only(
+                  left: leftPadding,
+                  right: 20,
+                  bottom: 16,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (t > 0.05) ...[
+                      Opacity(
+                        opacity: t.clamp(0.0, 1.0),
+                        child: const Text(
+                          'Manage your alerts',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                            color: Color(0xFF9CA3AF),
+                          ),
                         ),
                       ),
+                      const SizedBox(height: 2),
+                    ],
+                    Text(
+                      'Preferences',
+                      style: TextStyle(
+                        color: const Color(0xFF1A202C),
+                        fontSize: t > 0.5 ? 32 : 20,
+                        fontWeight: t > 0.5 ? FontWeight.w800 : FontWeight.w700,
+                        letterSpacing: -0.5,
+                      ),
                     ),
-                  ),
-                FlexibleSpaceBar(
-                  titlePadding: EdgeInsets.only(
-                    left: leftPadding,
-                    bottom: 16,
-                    right: 20,
-                  ),
-                  centerTitle: false,
-                  title: Text(
-                    'Preferences',
-                    style: TextStyle(
-                      color: const Color(0xFF1A202C),
-                      fontSize: t > 0.5 ? 24 : 20,
-                      fontWeight: t > 0.5 ? FontWeight.w800 : FontWeight.w700,
-                      letterSpacing: -0.5,
-                    ),
-                  ),
+                  ],
                 ),
-              ],
+              ),
             ),
           );
         },
