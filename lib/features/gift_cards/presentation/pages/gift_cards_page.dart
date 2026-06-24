@@ -70,6 +70,10 @@ class _GiftCardsViewState extends State<_GiftCardsView> {
   String get _searchTerm => _searchController.text.trim();
   bool get _isSearchMode => _searchTerm.isNotEmpty;
 
+  /// How many products to show inline on the landing page before sending the
+  /// user to the full catalog. Keeps the 300+ list off the landing scroll.
+  static const int _browsePreviewCount = 8;
+
   @override
   void dispose() {
     _searchDebounce?.cancel();
@@ -188,6 +192,15 @@ class _GiftCardsViewState extends State<_GiftCardsView> {
 
   void _openDetail(GiftCardProductEntity p) {
     Navigator.pushNamed(context, '/gift-card-detail', arguments: p);
+  }
+
+  /// Opens the full paginated catalog, carrying over the selected category.
+  void _openCatalog() {
+    Navigator.pushNamed(
+      context,
+      '/gift-card-catalog',
+      arguments: _selectedCategory,
+    );
   }
 
   @override
@@ -309,11 +322,15 @@ class _GiftCardsViewState extends State<_GiftCardsView> {
                           title: _selectedCategory != null
                               ? _selectedCategory!.name
                               : 'Save big on top brands',
-                          subtitle:
-                              '${_filteredProducts.length} vouchers available',
+                          subtitle: 'Tap “View all” to browse every voucher',
+                          actionLabel: 'View all',
+                          onAction: _openCatalog,
                         ),
                       ),
-                      _buildProductResultsSliver(),
+                      _buildProductResultsSliver(
+                        previewLimit: _browsePreviewCount,
+                      ),
+                      _buildViewAllSliver(),
                       SliverToBoxAdapter(
                         child: const Padding(
                           padding: EdgeInsets.fromLTRB(18, 22, 18, 8),
@@ -800,7 +817,7 @@ class _GiftCardsViewState extends State<_GiftCardsView> {
     );
   }
 
-  Widget _buildProductResultsSliver({bool asList = false}) {
+  Widget _buildProductResultsSliver({bool asList = false, int? previewLimit}) {
     if (_loadingProducts) {
       return SliverToBoxAdapter(
         child: asList
@@ -808,7 +825,10 @@ class _GiftCardsViewState extends State<_GiftCardsView> {
             : const GcProductGridSkeleton(),
       );
     }
-    final items = _filteredProducts;
+    final allItems = _filteredProducts;
+    final items = (previewLimit != null && allItems.length > previewLimit)
+        ? allItems.sublist(0, previewLimit)
+        : allItems;
     if (items.isEmpty) {
       return SliverToBoxAdapter(
         child: asList
@@ -856,6 +876,40 @@ class _GiftCardsViewState extends State<_GiftCardsView> {
             onTap: () => _openDetail(p),
           );
         }, childCount: items.length),
+      ),
+    );
+  }
+
+  /// Full-width "View all" affordance shown under the preview grid when more
+  /// vouchers exist than fit in the landing preview.
+  Widget _buildViewAllSliver() {
+    if (_loadingProducts || _filteredProducts.length <= _browsePreviewCount) {
+      return const SliverToBoxAdapter(child: SizedBox.shrink());
+    }
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+        child: SizedBox(
+          width: double.infinity,
+          child: OutlinedButton.icon(
+            onPressed: _openCatalog,
+            style: OutlinedButton.styleFrom(
+              foregroundColor: GcTokens.primary,
+              side: BorderSide(color: GcTokens.primary.withValues(alpha: 0.4)),
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(GcTokens.rPill),
+              ),
+            ),
+            icon: const Icon(Icons.grid_view_rounded, size: 18),
+            label: Text(
+              _selectedCategory != null
+                  ? 'View all ${_selectedCategory!.name}'
+                  : 'View all vouchers',
+              style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 13),
+            ),
+          ),
+        ),
       ),
     );
   }
