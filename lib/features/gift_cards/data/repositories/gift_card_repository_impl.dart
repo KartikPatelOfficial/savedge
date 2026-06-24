@@ -36,7 +36,7 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
   }
 
   @override
-  Future<Either<Failure, List<GiftCardProductEntity>>> getProducts({
+  Future<Either<Failure, GiftCardProductsPage>> getProducts({
     int? categoryId,
     String? searchTerm,
     int pageNumber = 1,
@@ -49,8 +49,14 @@ class GiftCardRepositoryImpl implements GiftCardRepository {
         pageNumber: pageNumber,
         pageSize: pageSize,
       );
-      final entities = response.items.map(_mapProductToEntity).toList();
-      return Right(entities);
+      final page = GiftCardProductsPage(
+        items: response.items.map(_mapProductToEntity).toList(),
+        pageNumber: response.pageNumber,
+        totalPages: response.totalPages,
+        totalCount: response.totalCount,
+        hasNextPage: response.hasNextPage,
+      );
+      return Right(page);
     } catch (e) {
       return Left(ServerFailure(ErrorMessageMapper.map(e)));
     }

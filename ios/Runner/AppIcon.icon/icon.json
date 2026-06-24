@@ -1,12 +1,10 @@
 {
-  "fill" : {
-    "solid" : "extended-gray:1.00000,1.00000"
-  },
+  "fill" : "system-light",
   "groups" : [
     {
       "layers" : [
         {
-          "glass" : false,
+          "glass" : true,
           "image-name" : "SavEdge (500 x 200 px) (300 x 200 px) (Logo)_20260321_154828_0000.png",
           "name" : "SavEdge (500 x 200 px) (300 x 200 px) (Logo)_20260321_154828_0000",
           "position" : {

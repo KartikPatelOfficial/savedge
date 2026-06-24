@@ -6,7 +6,6 @@ import 'package:savedge/features/auth/presentation/bloc/otp_auth_cubit.dart';
 import 'package:savedge/features/auth/presentation/widgets/auth_wrapper.dart';
 import 'package:savedge/features/app/presentation/navigation/main_navigation_page.dart';
 import 'package:savedge/features/gift_cards/presentation/pages/gift_cards_page.dart';
-import 'package:savedge/features/gift_cards/presentation/pages/gift_card_catalog_page.dart';
 import 'package:savedge/features/gift_cards/presentation/pages/gift_card_detail_page.dart';
 import 'package:savedge/features/gift_cards/presentation/pages/gift_card_checkout_page.dart';
 import 'package:savedge/features/gift_cards/presentation/pages/gift_card_orders_page.dart';
@@ -92,12 +91,6 @@ class SavedgeApp extends StatelessWidget {
       case '/gift-cards':
         return MaterialPageRoute(
           builder: (_) => const GiftCardsPage(),
-          settings: settings,
-        );
-      case '/gift-card-catalog':
-        final category = settings.arguments as GiftCardCategoryEntity?;
-        return MaterialPageRoute(
-          builder: (_) => GiftCardCatalogPage(initialCategory: category),
           settings: settings,
         );
       case '/gift-card-detail':

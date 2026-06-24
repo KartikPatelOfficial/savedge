@@ -13,7 +13,7 @@ abstract class GiftCardRepository {
 
   Future<Either<Failure, List<GiftCardProductEntity>>> getHotDeals();
 
-  Future<Either<Failure, List<GiftCardProductEntity>>> getProducts({
+  Future<Either<Failure, GiftCardProductsPage>> getProducts({
     int? categoryId,
     String? searchTerm,
     int pageNumber = 1,
