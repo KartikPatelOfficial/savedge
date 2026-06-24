@@ -393,7 +393,7 @@ class _EditProfilePageState extends State<EditProfilePage>
               children: [
                 if (t > 0.05)
                   Positioned(
-                    bottom: 52,
+                    bottom: 70,
                     left: 20,
                     child: Opacity(
                       opacity: t,

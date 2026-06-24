@@ -97,7 +97,7 @@ class _FavoritesView extends StatelessWidget {
               children: [
                 if (t > 0.05)
                   Positioned(
-                    bottom: 52,
+                    bottom: 70,
                     left: 20,
                     child: Opacity(
                       opacity: t.clamp(0.0, 1.0),
